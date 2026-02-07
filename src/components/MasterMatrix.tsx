@@ -34,32 +34,89 @@ const formatFeaturing = (featuring: string) => {
   );
 };
 
-// Organic Mosaic Chakra Symbol (curved, gemstone style)
+// Organic Gemstone Chakra Symbol - Woven mosaic bead style
 const GemstoneChakra = ({ color, size = 32 }: { color: string; size?: number }) => (
-  <svg viewBox="0 0 24 24" width={size} height={size}>
-    {/* Outer organic circle */}
-    <circle 
-      cx="12" 
-      cy="12" 
-      r="10" 
-      fill="none" 
-      stroke={`hsl(${color})`} 
-      strokeWidth="1.5"
-    />
-    {/* Inner gemstone shape */}
-    <path 
-      d="M12 3 L18 9 L12 21 L6 9 Z" 
-      fill={`hsl(${color} / 0.4)`} 
-      stroke={`hsl(${color})`} 
+  <svg viewBox="0 0 40 40" width={size} height={size} className="drop-shadow-lg">
+    <defs>
+      {/* Gemstone gradient */}
+      <radialGradient id={`gem-${color.replace(/\s/g, '')}`} cx="35%" cy="35%" r="60%">
+        <stop offset="0%" stopColor={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 75%)`} />
+        <stop offset="50%" stopColor={`hsl(${color})`} />
+        <stop offset="100%" stopColor={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 25%)`} />
+      </radialGradient>
+      {/* Inner glow */}
+      <radialGradient id={`glow-${color.replace(/\s/g, '')}`} cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor={`hsl(${color} / 0.6)`} />
+        <stop offset="100%" stopColor="transparent" />
+      </radialGradient>
+      {/* Vine gradient */}
+      <linearGradient id="vine-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="hsl(140 50% 35%)" />
+        <stop offset="100%" stopColor="hsl(140 40% 25%)" />
+      </linearGradient>
+    </defs>
+    
+    {/* Outer glow */}
+    <circle cx="20" cy="20" r="18" fill={`url(#glow-${color.replace(/\s/g, '')})`} />
+    
+    {/* Vine tendrils wrapping around - organic curving paths */}
+    <g stroke="url(#vine-grad)" strokeWidth="2" fill="none" strokeLinecap="round">
+      {/* Top tendril */}
+      <path d="M20 2 Q25 6, 20 10 Q15 14, 18 18" opacity="0.8" />
+      {/* Right tendril */}
+      <path d="M38 20 Q34 25, 30 20 Q26 15, 22 18" opacity="0.8" />
+      {/* Bottom tendril */}
+      <path d="M20 38 Q15 34, 20 30 Q25 26, 22 22" opacity="0.8" />
+      {/* Left tendril */}
+      <path d="M2 20 Q6 15, 10 20 Q14 25, 18 22" opacity="0.8" />
+    </g>
+    
+    {/* Small leaf accents on vines */}
+    <g fill="hsl(140 50% 40%)">
+      <ellipse cx="22" cy="5" rx="2.5" ry="1.5" transform="rotate(45 22 5)" />
+      <ellipse cx="35" cy="22" rx="2.5" ry="1.5" transform="rotate(-45 35 22)" />
+      <ellipse cx="18" cy="35" rx="2.5" ry="1.5" transform="rotate(45 18 35)" />
+      <ellipse cx="5" cy="18" rx="2.5" ry="1.5" transform="rotate(-45 5 18)" />
+    </g>
+    
+    {/* Main gemstone - faceted hexagonal shape */}
+    <polygon 
+      points="20,8 28,14 28,26 20,32 12,26 12,14" 
+      fill={`url(#gem-${color.replace(/\s/g, '')})`}
+      stroke={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 65%)`}
       strokeWidth="1"
     />
-    {/* Center glow */}
-    <circle 
-      cx="12" 
-      cy="10" 
-      r="3" 
-      fill={`hsl(${color})`}
+    
+    {/* Facet lines for gem effect */}
+    <g stroke={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 80% / 0.5)`} strokeWidth="0.5" fill="none">
+      <line x1="20" y1="8" x2="20" y2="20" />
+      <line x1="28" y1="14" x2="20" y2="20" />
+      <line x1="28" y1="26" x2="20" y2="20" />
+      <line x1="20" y1="32" x2="20" y2="20" />
+      <line x1="12" y1="26" x2="20" y2="20" />
+      <line x1="12" y1="14" x2="20" y2="20" />
+    </g>
+    
+    {/* Inner highlight - light reflection */}
+    <ellipse 
+      cx="16" 
+      cy="14" 
+      rx="3" 
+      ry="2" 
+      fill="white" 
+      opacity="0.4"
+      transform="rotate(-30 16 14)"
     />
+    
+    {/* Small mosaic bead accents around gem */}
+    <g>
+      <circle cx="20" cy="4" r="2" fill={`hsl(${color})`} opacity="0.7" />
+      <circle cx="32" cy="12" r="1.5" fill="hsl(45 90% 60%)" opacity="0.6" />
+      <circle cx="32" cy="28" r="1.5" fill="hsl(220 75% 55%)" opacity="0.6" />
+      <circle cx="20" cy="36" r="2" fill={`hsl(${color})`} opacity="0.7" />
+      <circle cx="8" cy="28" r="1.5" fill="hsl(280 60% 55%)" opacity="0.6" />
+      <circle cx="8" cy="12" r="1.5" fill="hsl(350 75% 50%)" opacity="0.6" />
+    </g>
   </svg>
 );
 
