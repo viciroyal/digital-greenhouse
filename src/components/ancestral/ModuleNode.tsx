@@ -10,6 +10,8 @@ interface ModuleNodeProps {
   color: string;
   icon: React.ReactNode;
   isUnlocked: boolean;
+  isCompleted?: boolean;
+  completionPercent?: number;
   onSelect: () => void;
 }
 
@@ -23,7 +25,9 @@ const ModuleNode = ({
   lineage, 
   color, 
   icon, 
-  isUnlocked, 
+  isUnlocked,
+  isCompleted = false,
+  completionPercent = 0,
   onSelect 
 }: ModuleNodeProps) => {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -115,16 +119,41 @@ const ModuleNode = ({
             : 'none',
         }}
       >
-        {/* Level Badge */}
-        <div 
-          className="inline-block px-3 py-1 rounded-full text-xs font-mono mb-2"
-          style={{
-            background: isUnlocked ? `${color}20` : 'hsl(0 0% 20%)',
-            color: isUnlocked ? color : 'hsl(0 0% 50%)',
-            border: `1px solid ${isUnlocked ? color : 'hsl(0 0% 30%)'}`,
-          }}
-        >
-          {title}
+        {/* Level Badge with completion indicator */}
+        <div className="flex items-center gap-2 mb-2">
+          <div 
+            className="inline-block px-3 py-1 rounded-full text-xs font-mono"
+            style={{
+              background: isUnlocked ? `${color}20` : 'hsl(0 0% 20%)',
+              color: isUnlocked ? color : 'hsl(0 0% 50%)',
+              border: `1px solid ${isUnlocked ? color : 'hsl(0 0% 30%)'}`,
+            }}
+          >
+            {title}
+          </div>
+          {isCompleted && (
+            <div 
+              className="px-2 py-0.5 rounded text-xs font-mono"
+              style={{
+                background: 'hsl(140 50% 25%)',
+                color: 'hsl(140 70% 60%)',
+                border: '1px solid hsl(140 50% 40%)',
+              }}
+            >
+              ✓ COMPLETE
+            </div>
+          )}
+          {!isCompleted && isUnlocked && completionPercent > 0 && (
+            <div 
+              className="px-2 py-0.5 rounded text-xs font-mono"
+              style={{
+                background: `${color}20`,
+                color: color,
+              }}
+            >
+              {completionPercent}%
+            </div>
+          )}
         </div>
 
         {/* Lineage */}

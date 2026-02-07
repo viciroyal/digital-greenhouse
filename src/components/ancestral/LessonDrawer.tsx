@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, BookOpen, Leaf, Play, Scroll } from 'lucide-react';
+import { X, BookOpen, Leaf, Play, Scroll, CheckCircle } from 'lucide-react';
 import FileDropZone from './FileDropZone';
 import HogonSeal from './HogonSeal';
+import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 interface LessonDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   module: {
+    id: string;
     level: number;
     title: string;
     mission: string;
@@ -16,64 +18,68 @@ interface LessonDrawerProps {
   } | null;
 }
 
-// Lesson content per level
-const lessonContent: Record<number, {
-  videoTitle: string;
-  lore: string;
-  task: string;
-}> = {
-  1: {
-    videoTitle: "How to Build a Muscogee Mound",
-    lore: "The Maroons survived by reading the soil. Today, we read the Brix. Your task is to build a compost pile that mimics the forest floor. Layer brown and green materials like leaves upon leaves of ancestral memory. The decomposition is not decay—it is transformation. The worms are your co-conspirators.",
-    task: "UPLOAD COMPOST PHOTO",
-  },
-  2: {
-    videoTitle: "Mapping Sirius to Your Garden Grid",
-    lore: "The Dogon knew that Sirius B orbited the Dog Star before any telescope confirmed it. They mapped their granaries to the stars. Your garden is not random—it is a mirror of the cosmos. Align your beds to the cardinal directions. Plant your corn where the sunrise touches first.",
-    task: "UPLOAD GARDEN GRID SKETCH",
-  },
-  3: {
-    videoTitle: "The Frequency of Germination",
-    lore: "The Aboriginal Elders sang the Dreamlines into being. Every plant has a frequency, a song that calls it from seed to fruit. Hum to your seedlings. Play them the sounds of the earth. Record yourself speaking to a seed and watch it respond.",
-    task: "UPLOAD SINGING VIDEO",
-  },
-  4: {
-    videoTitle: "Transmuting Light into Brix",
-    lore: "The Kemetic Priests built pyramids to capture cosmic energy. You will do the same with your plants. High Brix farming is the alchemy of transforming sunlight into nutrient-dense, disease-resistant crops. Measure your Brix. Document the transformation.",
-    task: "UPLOAD BRIX READING",
-  },
-};
-
 /**
- * Lesson Drawer - Enhanced with Tabs
+ * Lesson Drawer - Enhanced with Database Integration
  * Contains The Transmission (learning) and Field Journal (action)
  */
 const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
   const [activeTab, setActiveTab] = useState<'transmission' | 'journal'>('transmission');
-  const [hasUploaded, setHasUploaded] = useState(false);
-  const [isApproved, setIsApproved] = useState(false);
+  const [selectedLessonIndex, setSelectedLessonIndex] = useState(0);
+  
+  const {
+    getLessonsForModule,
+    isLessonCompleted,
+    completeLesson,
+    uploadToJournal,
+    getJournalEntriesForLesson,
+    user,
+  } = useAncestralProgress();
+
+  // Reset state when drawer closes or module changes
+  useEffect(() => {
+    if (!isOpen) {
+      setTimeout(() => {
+        setActiveTab('transmission');
+        setSelectedLessonIndex(0);
+      }, 300);
+    }
+  }, [isOpen]);
 
   if (!module) return null;
 
-  const content = lessonContent[module.level] || lessonContent[1];
+  const lessons = getLessonsForModule(module.id);
+  const currentLesson = lessons[selectedLessonIndex];
+  const isCurrentLessonCompleted = currentLesson ? isLessonCompleted(currentLesson.id) : false;
+  const journalEntries = currentLesson ? getJournalEntriesForLesson(currentLesson.id) : [];
+  const hasPendingUpload = journalEntries.some(e => e.status === 'pending');
+  const hasCertifiedUpload = journalEntries.some(e => e.status === 'certified');
 
-  const handleFileUpload = () => {
-    setHasUploaded(true);
+  const handleFileUpload = async (file: File) => {
+    if (!currentLesson) return;
+    
+    const success = await uploadToJournal(currentLesson.id, file);
+    if (success && !isCurrentLessonCompleted) {
+      // Auto-complete lesson when file is uploaded
+      await completeLesson(currentLesson.id);
+    }
   };
 
-  const handleApprove = () => {
-    setIsApproved(true);
-  };
-
-  // Reset state when drawer closes
   const handleClose = () => {
     onClose();
-    setTimeout(() => {
-      setActiveTab('transmission');
-      setHasUploaded(false);
-      setIsApproved(false);
-    }, 300);
   };
+
+  // Fallback content if no lessons from database
+  const fallbackContent = {
+    videoTitle: "Loading lesson...",
+    lore: "The ancestors are preparing your transmission. This lesson contains the sacred knowledge of the lineage.",
+    task: "UPLOAD YOUR EVIDENCE",
+  };
+
+  const lessonContent = currentLesson ? {
+    videoTitle: currentLesson.display_name,
+    lore: currentLesson.description || fallbackContent.lore,
+    task: `COMPLETE: ${currentLesson.display_name.toUpperCase()}`,
+  } : fallbackContent;
 
   return (
     <AnimatePresence>
@@ -150,8 +156,42 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                 {module.lineage.split('—')[0].trim()}
               </h2>
 
+              {/* Lesson selector (if multiple lessons) */}
+              {lessons.length > 1 && (
+                <div className="flex gap-2 mt-4 mb-2 overflow-x-auto pb-2">
+                  {lessons.map((lesson, idx) => {
+                    const completed = isLessonCompleted(lesson.id);
+                    return (
+                      <motion.button
+                        key={lesson.id}
+                        className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-mono whitespace-nowrap"
+                        style={{
+                          background: idx === selectedLessonIndex 
+                            ? `${module.color}30` 
+                            : 'hsl(0 0% 12%)',
+                          border: idx === selectedLessonIndex
+                            ? `1px solid ${module.color}`
+                            : '1px solid hsl(0 0% 25%)',
+                          color: completed 
+                            ? 'hsl(140 60% 50%)' 
+                            : idx === selectedLessonIndex 
+                              ? module.color 
+                              : 'hsl(0 0% 60%)',
+                        }}
+                        onClick={() => setSelectedLessonIndex(idx)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        {completed && <CheckCircle className="w-3 h-3" />}
+                        Lesson {idx + 1}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              )}
+
               {/* Tabs */}
-              <div className="flex gap-2 mt-6">
+              <div className="flex gap-2 mt-4">
                 <motion.button
                   className="flex items-center gap-2 px-4 py-2 rounded-lg font-mono text-sm"
                   style={{
@@ -234,7 +274,7 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                           className="mt-4 text-sm font-mono text-center px-4"
                           style={{ color: 'hsl(40 50% 60%)' }}
                         >
-                          {content.videoTitle}
+                          {lessonContent.videoTitle}
                         </p>
                       </div>
                       
@@ -246,6 +286,24 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                         }}
                       />
                     </div>
+
+                    {/* Completion status */}
+                    {isCurrentLessonCompleted && (
+                      <motion.div
+                        className="mb-4 p-3 rounded-lg flex items-center gap-2"
+                        style={{
+                          background: 'hsl(140 40% 15%)',
+                          border: '1px solid hsl(140 50% 30%)',
+                        }}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                      >
+                        <CheckCircle className="w-5 h-5" style={{ color: 'hsl(140 60% 50%)' }} />
+                        <span className="text-sm font-mono" style={{ color: 'hsl(140 60% 60%)' }}>
+                          LESSON COMPLETED
+                        </span>
+                      </motion.div>
+                    )}
 
                     {/* The Scroll - Lore & Science */}
                     <div 
@@ -268,7 +326,7 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                         className="text-sm leading-relaxed font-mono"
                         style={{ color: 'hsl(40 40% 75%)' }}
                       >
-                        {content.lore}
+                        {lessonContent.lore}
                       </p>
                     </div>
 
@@ -305,6 +363,24 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.2 }}
                   >
+                    {/* Auth warning */}
+                    {!user && (
+                      <div 
+                        className="mb-6 p-4 rounded-xl text-center"
+                        style={{
+                          background: 'hsl(40 40% 15%)',
+                          border: '1px solid hsl(40 50% 30%)',
+                        }}
+                      >
+                        <p 
+                          className="text-sm font-mono"
+                          style={{ color: 'hsl(40 60% 60%)' }}
+                        >
+                          Sign in to track your progress and upload evidence
+                        </p>
+                      </div>
+                    )}
+
                     {/* The Challenge */}
                     <div 
                       className="mb-6 p-4 rounded-xl text-center"
@@ -327,7 +403,7 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                           textShadow: `0 0 20px ${module.color}40`,
                         }}
                       >
-                        TASK: {content.task}
+                        {lessonContent.task}
                       </p>
                     </div>
 
@@ -343,11 +419,58 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                       <FileDropZone 
                         color={module.color}
                         onFileUpload={handleFileUpload}
+                        disabled={!user}
                       />
                     </div>
 
+                    {/* Previous uploads */}
+                    {journalEntries.length > 0 && (
+                      <div className="mb-6">
+                        <h3 
+                          className="text-sm font-mono mb-3"
+                          style={{ color: 'hsl(40 50% 60%)' }}
+                        >
+                          YOUR SUBMISSIONS
+                        </h3>
+                        <div className="space-y-2">
+                          {journalEntries.map((entry) => (
+                            <div
+                              key={entry.id}
+                              className="p-3 rounded-lg flex items-center justify-between"
+                              style={{
+                                background: 'hsl(0 0% 10%)',
+                                border: entry.status === 'certified' 
+                                  ? '1px solid hsl(51 100% 50%)' 
+                                  : '1px solid hsl(0 0% 20%)',
+                              }}
+                            >
+                              <span 
+                                className="text-xs font-mono truncate max-w-[200px]"
+                                style={{ color: 'hsl(40 50% 60%)' }}
+                              >
+                                {entry.file_name}
+                              </span>
+                              <span 
+                                className="text-xs font-mono px-2 py-1 rounded"
+                                style={{
+                                  background: entry.status === 'certified' 
+                                    ? 'hsl(51 80% 30%)' 
+                                    : 'hsl(40 30% 20%)',
+                                  color: entry.status === 'certified' 
+                                    ? 'hsl(51 100% 70%)' 
+                                    : 'hsl(40 40% 60%)',
+                                }}
+                              >
+                                {entry.status.toUpperCase()}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* The Hogon's Seal - Only show after upload */}
-                    {hasUploaded && (
+                    {(hasPendingUpload || hasCertifiedUpload) && (
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -360,15 +483,14 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                           THE HOGON'S SEAL
                         </h3>
                         <HogonSeal 
-                          status={isApproved ? 'approved' : 'pending'}
+                          status={hasCertifiedUpload ? 'approved' : 'pending'}
                           color={module.color}
-                          onApprove={handleApprove}
                         />
                       </motion.div>
                     )}
 
                     {/* Instructions if not uploaded */}
-                    {!hasUploaded && (
+                    {journalEntries.length === 0 && user && (
                       <div 
                         className="p-4 rounded-lg text-center"
                         style={{

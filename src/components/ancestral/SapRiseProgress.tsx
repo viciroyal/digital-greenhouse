@@ -5,7 +5,11 @@ import { useEffect, useState } from 'react';
  * Sap Rise Progress Bar - A thermometer-style gauge
  * showing scroll progress through the Ancestral Path
  */
-const SapRiseProgress = () => {
+interface SapRiseProgressProps {
+  overallProgress?: number;
+}
+
+const SapRiseProgress = ({ overallProgress }: SapRiseProgressProps) => {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
@@ -40,7 +44,7 @@ const SapRiseProgress = () => {
           transform: 'rotate(180deg)',
         }}
       >
-        INITIATION PROGRESS
+        {overallProgress !== undefined ? 'COURSE PROGRESS' : 'SCROLL PROGRESS'}
       </div>
 
       {/* Thermometer Container */}
@@ -82,7 +86,7 @@ const SapRiseProgress = () => {
             `,
           }}
           animate={{
-            height: `${scrollProgress}%`,
+            height: `${overallProgress !== undefined ? overallProgress : scrollProgress}%`,
           }}
           transition={{
             duration: 0.3,
@@ -90,7 +94,7 @@ const SapRiseProgress = () => {
           }}
         >
           {/* Bubbles animation */}
-          {scrollProgress > 10 && (
+          {(overallProgress !== undefined ? overallProgress : scrollProgress) > 10 && (
             <div className="absolute inset-0 overflow-hidden">
               {[...Array(5)].map((_, i) => (
                 <motion.div
@@ -136,11 +140,11 @@ const SapRiseProgress = () => {
       <div 
         className="w-10 h-10 md:w-12 md:h-12 rounded-full -mt-4"
         style={{
-          background: scrollProgress > 5 
+          background: (overallProgress !== undefined ? overallProgress : scrollProgress) > 5 
             ? `radial-gradient(circle at 30% 30%, hsl(140 70% 35%), hsl(140 60% 20%))`
             : 'hsl(0 0% 15%)',
           border: '2px solid hsl(40 40% 25%)',
-          boxShadow: scrollProgress > 5 
+          boxShadow: (overallProgress !== undefined ? overallProgress : scrollProgress) > 5 
             ? '0 0 20px hsl(140 60% 30% / 0.5)' 
             : 'none',
         }}
@@ -151,7 +155,7 @@ const SapRiseProgress = () => {
         className="text-sm font-mono mt-2"
         style={{ color: 'hsl(140 50% 60%)' }}
       >
-        {Math.round(scrollProgress)}%
+        {Math.round(overallProgress !== undefined ? overallProgress : scrollProgress)}%
       </div>
     </motion.div>
   );

@@ -5,13 +5,14 @@ import { Upload, Check, Loader2 } from 'lucide-react';
 interface FileDropZoneProps {
   color: string;
   onFileUpload: (file: File) => void;
+  disabled?: boolean;
 }
 
 /**
  * File Drop Zone - "The Seed Bed"
  * A dashed border area for uploading proof of work
  */
-const FileDropZone = ({ color, onFileUpload }: FileDropZoneProps) => {
+const FileDropZone = ({ color, onFileUpload, disabled = false }: FileDropZoneProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -70,8 +71,8 @@ const FileDropZone = ({ color, onFileUpload }: FileDropZoneProps) => {
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragging(true);
-  }, []);
+    if (!disabled) setIsDragging(true);
+  }, [disabled]);
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -82,18 +83,21 @@ const FileDropZone = ({ color, onFileUpload }: FileDropZoneProps) => {
     e.preventDefault();
     setIsDragging(false);
     
+    if (disabled) return;
+    
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       processFile(files[0]);
     }
-  }, []);
+  }, [disabled]);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
     const files = e.target.files;
     if (files && files.length > 0) {
       processFile(files[0]);
     }
-  }, []);
+  }, [disabled]);
 
   const processFile = (file: File) => {
     setIsUploading(true);
@@ -112,13 +116,14 @@ const FileDropZone = ({ color, onFileUpload }: FileDropZoneProps) => {
       className="relative rounded-2xl p-1 cursor-pointer"
       style={{
         background: `linear-gradient(135deg, ${color}30, ${color}10)`,
+        ...(disabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}),
       }}
-      onClick={() => !uploadedFile && fileInputRef.current?.click()}
+      onClick={() => !uploadedFile && !disabled && fileInputRef.current?.click()}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      whileHover={!uploadedFile ? { scale: 1.02 } : {}}
-      whileTap={!uploadedFile ? { scale: 0.98 } : {}}
+      whileHover={!uploadedFile && !disabled ? { scale: 1.02 } : {}}
+      whileTap={!uploadedFile && !disabled ? { scale: 0.98 } : {}}
     >
       <input
         ref={fileInputRef}
