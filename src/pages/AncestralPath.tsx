@@ -1,7 +1,7 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, LogIn } from 'lucide-react';
 import {
   ModuleNode,
   SapRiseProgress,
@@ -12,45 +12,23 @@ import {
   DreamtimeCircleIcon,
   DjedPillarIcon,
 } from '@/components/ancestral';
+import { useAncestralProgress, Module } from '@/hooks/useAncestralProgress';
+import { Button } from '@/components/ui/button';
 
-// Module definitions (ordered bottom to top conceptually)
-const modules = [
-  {
-    level: 1,
-    title: "LEVEL 1: SOIL & SURVIVAL",
-    mission: "Heal the Clay. Save the Seed.",
-    lineage: "Muscogee & Maroons — The Foundation",
-    color: "hsl(0 100% 50%)", // Root Red
-    icon: SpiralMoundIcon,
-    isUnlocked: true,
-  },
-  {
-    level: 2,
-    title: "LEVEL 2: COSMIC ALIGNMENT",
-    mission: "Map the Garden to the Sky.",
-    lineage: "Dogon — The Architecture",
-    color: "hsl(195 100% 50%)", // Throat Blue
-    icon: KanagaMaskIcon,
-    isUnlocked: false,
-  },
-  {
-    level: 3,
-    title: "LEVEL 3: SONGLINES & FREQUENCY",
-    mission: "Sing the Plant into Being.",
-    lineage: "Aboriginal — The Song",
-    color: "hsl(275 100% 25%)", // Third Eye Indigo
-    icon: DreamtimeCircleIcon,
-    isUnlocked: false,
-  },
-  {
-    level: 4,
-    title: "LEVEL 4: HIGH BRIX ALCHEMY",
-    mission: "Transmute Sunlight into Nutrient Density.",
-    lineage: "Ancient Kemit — The Mastery",
-    color: "hsl(51 100% 50%)", // Crown Gold
-    icon: DjedPillarIcon,
-    isUnlocked: false,
-  },
+// Icon mapping
+const iconMap: Record<string, React.ComponentType<{ color: string }>> = {
+  'spiral-mound': SpiralMoundIcon,
+  'kanaga-mask': KanagaMaskIcon,
+  'dot-circle': DreamtimeCircleIcon,
+  'sun-disc': DjedPillarIcon,
+};
+
+// Fallback modules for display when loading
+const fallbackModules = [
+  { level: 1, title: "LEVEL 1: SOIL & SURVIVAL", mission: "Heal the Clay. Save the Seed.", lineage: "Muscogee & Maroons — The Foundation", color: "hsl(0 100% 50%)", iconName: 'spiral-mound' },
+  { level: 2, title: "LEVEL 2: COSMIC ALIGNMENT", mission: "Map the Garden to the Sky.", lineage: "Dogon — The Architecture", color: "hsl(195 100% 50%)", iconName: 'kanaga-mask' },
+  { level: 3, title: "LEVEL 3: SONGLINES & FREQUENCY", mission: "Sing the Plant into Being.", lineage: "Aboriginal — The Song", color: "hsl(275 100% 25%)", iconName: 'dot-circle' },
+  { level: 4, title: "LEVEL 4: HIGH BRIX ALCHEMY", mission: "Transmute Sunlight into Nutrient Density.", lineage: "Ancient Kemit — The Mastery", color: "hsl(51 100% 50%)", iconName: 'sun-disc' },
 ];
 
 /**
@@ -61,9 +39,26 @@ const modules = [
  */
 const AncestralPath = () => {
   const navigate = useNavigate();
-  const [selectedModule, setSelectedModule] = useState<typeof modules[0] | null>(null);
+  const [selectedModule, setSelectedModule] = useState<{
+    id: string;
+    level: number;
+    title: string;
+    mission: string;
+    lineage: string;
+    color: string;
+  } | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const {
+    modules,
+    isLoading,
+    user,
+    isModuleUnlocked,
+    isModuleCompleted,
+    getModuleCompletionPercent,
+    getOverallProgress,
+  } = useAncestralProgress();
 
   // Scroll to bottom on mount (start at roots)
   useEffect(() => {
@@ -73,13 +68,39 @@ const AncestralPath = () => {
     });
   }, []);
 
-  const handleModuleSelect = (module: typeof modules[0]) => {
-    setSelectedModule(module);
+  // Transform database modules to display format
+  const displayModules = modules.length > 0
+    ? [...modules].reverse().map((m: Module) => ({
+        id: m.id,
+        level: m.order_index,
+        title: `LEVEL ${m.order_index}: ${m.display_name}`,
+        mission: m.description || '',
+        lineage: m.lineage,
+        color: m.chakra_color,
+        iconName: m.icon_name || 'spiral-mound',
+        isUnlocked: isModuleUnlocked(m.id),
+        isCompleted: isModuleCompleted(m.id),
+        completionPercent: getModuleCompletionPercent(m.id),
+      }))
+    : fallbackModules.map((m, i) => ({
+        id: `fallback-${i}`,
+        ...m,
+        isUnlocked: i === 0,
+        isCompleted: false,
+        completionPercent: 0,
+      }));
+
+  const handleModuleSelect = (module: typeof displayModules[0]) => {
+    setSelectedModule({
+      id: module.id,
+      level: module.level,
+      title: module.title,
+      mission: module.mission,
+      lineage: module.lineage,
+      color: module.color,
+    });
     setIsDrawerOpen(true);
   };
-
-  // Reverse modules for display (bottom to top = roots to crown)
-  const displayModules = [...modules].reverse();
 
   return (
     <main 
@@ -170,8 +191,33 @@ const AncestralPath = () => {
         </span>
       </motion.button>
 
+      {/* Auth Status Indicator */}
+      {!user && !isLoading && (
+        <motion.div
+          className="fixed top-6 right-20 z-50"
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2 font-mono text-xs"
+            style={{
+              background: 'hsl(20 30% 12% / 0.9)',
+              border: '1px solid hsl(40 40% 30%)',
+              color: 'hsl(40 50% 70%)',
+            }}
+            onClick={() => navigate('/auth')}
+          >
+            <LogIn className="w-3 h-3" />
+            Sign In to Track Progress
+          </Button>
+        </motion.div>
+      )}
+
       {/* Sap Rise Progress Bar */}
-      <SapRiseProgress />
+      <SapRiseProgress overallProgress={getOverallProgress()} />
 
       {/* Main Content - The Totem */}
       <div className="relative z-10 pt-24 pb-32">
@@ -202,39 +248,56 @@ const AncestralPath = () => {
           >
             Ascend from Root to Crown
           </p>
+          {user && (
+            <motion.p
+              className="mt-2 text-sm font-mono"
+              style={{ color: 'hsl(140 50% 50%)' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              Overall Progress: {getOverallProgress()}%
+            </motion.p>
+          )}
         </motion.div>
 
         {/* Skill Tree Container */}
         <div className="max-w-3xl mx-auto px-6 md:px-12">
           
           {/* Module Nodes with Mycelial Cords */}
-          {displayModules.map((module, index) => (
-            <div key={module.level} className="relative">
-              {/* Mycelial Cord connector (except for last/top node) */}
-              {index < displayModules.length - 1 && (
-                <div className="absolute left-10 md:left-14 top-full z-0">
-                  <MycelialCord 
-                    height="120px" 
-                    isActive={module.isUnlocked || displayModules[index + 1].isUnlocked}
+          {displayModules.map((module, index) => {
+            const IconComponent = iconMap[module.iconName] || SpiralMoundIcon;
+            
+            return (
+              <div key={module.id} className="relative">
+                {/* Mycelial Cord connector (except for last/top node) */}
+                {index < displayModules.length - 1 && (
+                  <div className="absolute left-10 md:left-14 top-full z-0">
+                    <MycelialCord 
+                      height="120px" 
+                      isActive={module.isUnlocked || displayModules[index + 1]?.isUnlocked}
+                    />
+                  </div>
+                )}
+
+                {/* Module Node */}
+                <div className="relative z-10 py-8">
+                  <ModuleNode
+                    level={module.level}
+                    title={module.title}
+                    mission={module.mission}
+                    lineage={module.lineage}
+                    color={module.color}
+                    icon={<IconComponent color={module.color} />}
+                    isUnlocked={module.isUnlocked}
+                    isCompleted={module.isCompleted}
+                    completionPercent={module.completionPercent}
+                    onSelect={() => handleModuleSelect(module)}
                   />
                 </div>
-              )}
-
-              {/* Module Node */}
-              <div className="relative z-10 py-8">
-                <ModuleNode
-                  level={module.level}
-                  title={module.title}
-                  mission={module.mission}
-                  lineage={module.lineage}
-                  color={module.color}
-                  icon={<module.icon color={module.color} />}
-                  isUnlocked={module.isUnlocked}
-                  onSelect={() => handleModuleSelect(module)}
-                />
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Root symbol at the very bottom */}
           <motion.div
