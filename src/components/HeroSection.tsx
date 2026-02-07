@@ -209,14 +209,11 @@ const HeroSection = () => {
             <KanagaMask side="left" />
             
             <motion.h1 
-              className="text-5xl md:text-7xl lg:text-8xl carved-text"
+              className="text-5xl md:text-7xl lg:text-8xl pillar-text"
+              data-text="PHARMBOI"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              style={{
-                fontFamily: "'Staatliches', sans-serif",
-                letterSpacing: '0.12em',
-              }}
             >
               PHARMBOI
             </motion.h1>
