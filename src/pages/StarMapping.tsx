@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CalendarIcon, Clock, MapPin, User, Sparkles, Sun, Moon, ArrowUp, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { calculateBirthChart, type ChartResult } from '@/lib/astroCalculator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
@@ -55,7 +56,7 @@ const SIGN_ORDER = [
 
 /**
  * Determines Sun sign from month (1-12) and day.
- * Uses day-of-year ranges to avoid edge-case bugs with month boundary checks.
+ * Used as fallback if celestine calculation fails.
  */
 const ZODIAC_RANGES: { sign: string; startMonth: number; startDay: number; endMonth: number; endDay: number }[] = [
   { sign: 'Aries',       startMonth: 3,  startDay: 21, endMonth: 4,  endDay: 19 },
@@ -74,7 +75,6 @@ const ZODIAC_RANGES: { sign: string; startMonth: number; startDay: number; endMo
 
 const getZodiacSign = (month: number, day: number) => {
   for (const range of ZODIAC_RANGES) {
-    // Handle Capricorn which wraps around year boundary (Dec 22 – Jan 19)
     if (range.startMonth > range.endMonth) {
       if (
         (month === range.startMonth && day >= range.startDay) ||
@@ -83,7 +83,6 @@ const getZodiacSign = (month: number, day: number) => {
         return ZODIAC_SIGNS.find(z => z.sign === range.sign) || ZODIAC_SIGNS[0];
       }
     } else {
-      // Check if month/day falls within the range
       const afterStart = month > range.startMonth || (month === range.startMonth && day >= range.startDay);
       const beforeEnd = month < range.endMonth || (month === range.endMonth && day <= range.endDay);
       if (afterStart && beforeEnd) {
@@ -91,34 +90,7 @@ const getZodiacSign = (month: number, day: number) => {
       }
     }
   }
-  return ZODIAC_SIGNS[0]; // fallback
-};
-
-/**
- * Simplified Moon sign approximation.
- * True moon sign requires precise ephemeris data, birth time, and geographic coordinates.
- * This uses birth date + time to generate a plausible (but not astronomically accurate) result.
- */
-const getMoonSign = (month: number, day: number, hour: number) => {
-  // The moon moves through all 12 signs roughly every 27.3 days (~2.3 days per sign).
-  // We use a seed-based offset from the Sun sign to approximate.
-  const dayOfYear = Math.floor(((month - 1) * 30.44) + day);
-  // Shift by ~13 signs per year (moon cycle), offset by birth hour
-  const moonOffset = Math.floor((dayOfYear * 13.37 + hour) / 27.3) % 12;
-  const idx = Math.abs(moonOffset) % 12;
-  return ZODIAC_SIGNS.find(z => z.sign === SIGN_ORDER[idx]) || ZODIAC_SIGNS[0];
-};
-
-/**
- * Simplified Rising sign (Ascendant) approximation.
- * True rising sign requires exact birth time, date, AND geographic coordinates (latitude/longitude).
- * This uses birth hour + sun sign offset for a plausible approximation.
- */
-const getRisingSign = (hour: number, sunSignIndex: number) => {
-  // Rising sign is roughly the sign on the eastern horizon at birth.
-  // It cycles through all 12 signs every 24 hours, offset by the sun's position.
-  const risingIdx = (sunSignIndex + Math.floor(hour / 2)) % 12;
-  return ZODIAC_SIGNS.find(z => z.sign === SIGN_ORDER[risingIdx]) || ZODIAC_SIGNS[0];
+  return ZODIAC_SIGNS[0];
 };
 
 const getResonance = (elements: string[]) => {
@@ -151,9 +123,10 @@ const getResonance = (elements: string[]) => {
 type Step = 'form' | 'calculating' | 'result';
 
 interface UserChart {
-  sun: typeof ZODIAC_SIGNS[0];
-  moon: typeof ZODIAC_SIGNS[0];
-  rising: typeof ZODIAC_SIGNS[0];
+  sun: { sign: string; symbol: string; element: string; formatted?: string };
+  moon: { sign: string; symbol: string; element: string; formatted?: string };
+  rising: { sign: string; symbol: string; element: string; formatted?: string };
+  precise?: boolean;
 }
 
 const VICI_CHART = {
@@ -183,6 +156,7 @@ const StarMapping = () => {
   const [progress, setProgress] = useState(0);
   const [calcText, setCalcText] = useState('');
   const [userChart, setUserChart] = useState<UserChart | null>(null);
+  const [isPrecise, setIsPrecise] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const hasAnyField = fullName.trim() !== '';
@@ -215,16 +189,31 @@ const StarMapping = () => {
 
   const handleCalculate = () => {
     if (!isFormComplete || !birthDate) return;
-    // Extract local date components to avoid UTC timezone drift
-    const month = birthDate.getFullYear() ? birthDate.getMonth() + 1 : 1;
+    const year = birthDate.getFullYear();
+    const month = birthDate.getMonth() + 1;
     const day = birthDate.getDate();
-    const [hours] = birthTime.split(':').map(Number);
-    
-    const sunSign = getZodiacSign(month, day);
-    const sunIdx = SIGN_ORDER.indexOf(sunSign.sign);
-    const moonSign = getMoonSign(month, day, hours);
-    const risingSign = getRisingSign(hours, sunIdx >= 0 ? sunIdx : 0);
-    setUserChart({ sun: sunSign, moon: moonSign, rising: risingSign });
+    const [hours, minutes] = birthTime.split(':').map(Number);
+
+    try {
+      // Use precise celestine ephemeris calculations
+      const chart = calculateBirthChart(year, month, day, hours, minutes || 0, birthState);
+      setUserChart({
+        sun: chart.sun,
+        moon: chart.moon,
+        rising: chart.rising,
+      });
+      setIsPrecise(true);
+    } catch (err) {
+      console.warn('Celestine calculation failed, falling back to approximation:', err);
+      // Fallback to basic zodiac lookup
+      const sunSign = getZodiacSign(month, day);
+      setUserChart({
+        sun: { sign: sunSign.sign, symbol: sunSign.symbol, element: sunSign.element },
+        moon: { sign: 'Unknown', symbol: '☽', element: 'Water' },
+        rising: { sign: 'Unknown', symbol: '↑', element: 'Fire' },
+      });
+      setIsPrecise(false);
+    }
     setProgress(0);
     setStep('calculating');
   };
@@ -237,6 +226,7 @@ const StarMapping = () => {
     setBirthCity('');
     setBirthState('');
     setUserChart(null);
+    setIsPrecise(false);
     setProgress(0);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -596,9 +586,9 @@ const StarMapping = () => {
                       {birthState && `${birthCity ? birthCity + ', ' : ''}${birthState}`}
                     </p>
                     <div className="space-y-3">
-                      <ChartRow icon={<Sun className="w-5 h-5" style={{ color: '#FFD700' }} />} label="Sun" metaphor="The Fruit" sign={userChart.sun.sign} symbol={userChart.sun.symbol} element={userChart.sun.element} elementColors={elementColors} />
-                      <ChartRow icon={<Moon className="w-5 h-5" style={{ color: '#B0BEC5' }} />} label="Moon" metaphor="The Root" sign={userChart.moon.sign} symbol={userChart.moon.symbol} element={userChart.moon.element} elementColors={elementColors} />
-                      <ChartRow icon={<ArrowUp className="w-5 h-5" style={{ color: '#CE93D8' }} />} label="Rising" metaphor="The Stalk" sign={userChart.rising.sign} symbol={userChart.rising.symbol} element={userChart.rising.element} elementColors={elementColors} />
+                      <ChartRow icon={<Sun className="w-5 h-5" style={{ color: '#FFD700' }} />} label="Sun" metaphor="The Fruit" sign={userChart.sun.sign} symbol={userChart.sun.symbol} element={userChart.sun.element} elementColors={elementColors} formatted={userChart.sun.formatted} />
+                      <ChartRow icon={<Moon className="w-5 h-5" style={{ color: '#B0BEC5' }} />} label="Moon" metaphor="The Root" sign={userChart.moon.sign} symbol={userChart.moon.symbol} element={userChart.moon.element} elementColors={elementColors} formatted={userChart.moon.formatted} />
+                      <ChartRow icon={<ArrowUp className="w-5 h-5" style={{ color: '#CE93D8' }} />} label="Rising" metaphor="The Stalk" sign={userChart.rising.sign} symbol={userChart.rising.symbol} element={userChart.rising.element} elementColors={elementColors} formatted={userChart.rising.formatted} />
                     </div>
                   </motion.div>
 
@@ -633,9 +623,18 @@ const StarMapping = () => {
                   transition={{ delay: 0.55 }}
                 >
                   <p className="text-xs" style={{ color: '#8D6E63' }}>
-                    <strong className="text-white/60">☽ Moon &amp; ↑ Rising signs</strong> are approximations.
-                    Precise calculations require exact birth time, date, and geographic coordinates (city latitude/longitude)
-                    cross-referenced against astronomical ephemeris tables. Your Sun sign is accurate based on your birth date.
+                    {isPrecise ? (
+                      <>
+                        <strong className="text-white/60">✧ Precision Ephemeris Active</strong> — Your Sun, Moon &amp; Rising signs
+                        are calculated using the Celestine astronomical engine, validated against NASA/JPL Horizons &amp; Swiss Ephemeris data.
+                        Coordinates based on your state's geographic center.
+                      </>
+                    ) : (
+                      <>
+                        <strong className="text-white/60">☽ Moon &amp; ↑ Rising signs</strong> could not be calculated precisely.
+                        Your Sun sign is accurate based on your birth date.
+                      </>
+                    )}
                   </p>
                 </motion.div>
 
@@ -746,9 +745,10 @@ interface ChartRowProps {
   symbol: string;
   element: string;
   elementColors: Record<string, string>;
+  formatted?: string;
 }
 
-const ChartRow = ({ icon, label, metaphor, sign, symbol, element, elementColors }: ChartRowProps) => (
+const ChartRow = ({ icon, label, metaphor, sign, symbol, element, elementColors, formatted }: ChartRowProps) => (
   <div className="flex items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }}>
     <div className="flex-shrink-0">{icon}</div>
     <div className="flex-1">
@@ -756,6 +756,11 @@ const ChartRow = ({ icon, label, metaphor, sign, symbol, element, elementColors 
         <span className="text-white font-medium text-sm">{label}</span>
         <span className="text-xs" style={{ color: '#8D6E63' }}>({metaphor})</span>
       </div>
+      {formatted && (
+        <span className="text-[10px] font-mono block mt-0.5" style={{ color: 'rgba(255, 215, 0, 0.6)' }}>
+          {formatted}
+        </span>
+      )}
     </div>
     <div className="text-right flex items-center gap-1">
       <span className="text-2xl">{symbol}</span>
