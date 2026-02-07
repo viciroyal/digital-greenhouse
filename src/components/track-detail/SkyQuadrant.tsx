@@ -168,6 +168,55 @@ const SkyQuadrant = ({ track }: SkyQuadrantProps) => {
           </div>
         </div>
       </div>
+
+      {/* Zodiac Section - The Glyph */}
+      <div className="mt-6 pt-6 border-t border-glass-border">
+        <div className="flex items-center gap-4">
+          {/* Glowing Zodiac Glyph */}
+          <motion.div
+            className="relative flex-shrink-0"
+            animate={{
+              textShadow: [
+                `0 0 10px hsl(${track.colorHsl}), 0 0 20px hsl(${track.colorHsl}), 0 0 30px hsl(${track.colorHsl})`,
+                `0 0 15px hsl(${track.colorHsl}), 0 0 30px hsl(${track.colorHsl}), 0 0 45px hsl(${track.colorHsl})`,
+                `0 0 10px hsl(${track.colorHsl}), 0 0 20px hsl(${track.colorHsl}), 0 0 30px hsl(${track.colorHsl})`,
+              ]
+            }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            <span 
+              className="text-5xl font-bold"
+              style={{ 
+                color: `hsl(${track.colorHsl})`,
+                filter: `drop-shadow(0 0 8px hsl(${track.colorHsl}))`,
+              }}
+            >
+              {track.zodiacGlyph}
+            </span>
+          </motion.div>
+
+          {/* Zodiac Info */}
+          <div className="flex-1">
+            <p className="text-muted-foreground/60 font-mono text-xs uppercase tracking-wider mb-1">
+              Zodiac Sign
+            </p>
+            <p 
+              className="font-mono text-lg font-bold"
+              style={{ color: `hsl(${track.colorHsl})` }}
+            >
+              {track.zodiacSign}
+            </p>
+            <p className="font-mono text-sm text-muted-foreground">
+              {track.zodiacName}
+            </p>
+          </div>
+        </div>
+
+        {/* Zodiac Logic */}
+        <p className="mt-3 font-mono text-xs text-muted-foreground/80 italic leading-relaxed">
+          "{track.zodiacLogic}"
+        </p>
+      </div>
     </motion.div>
   );
 };
