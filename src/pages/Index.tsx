@@ -14,12 +14,20 @@ import MycelialMenu from '@/components/bio-digital/MycelialMenu';
 import { AudioBiomeManager, ConchShellControl } from '@/components/audio';
 import GriotOracle from '@/components/GriotOracle';
 import { SedimentRuler, GhostArtifacts } from '@/components/scrollytelling';
+import { MycelialCursor } from '@/components/cursor';
+import { ChakraSpine } from '@/components/navigation';
 
 const Index = () => {
   const [isStarMappingOpen, setIsStarMappingOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-background overflow-x-hidden relative">
+      {/* Dark Mode Womb Overlay - Color Harmonization */}
+      <div className="darkroom-overlay" />
+      
+      {/* Mycelial Cursor - The Wood Wide Web Thread */}
+      <MycelialCursor />
+      
       {/* Grand Unified Cosmogram - The Living Tapestry */}
       <RespiratorySystem>
         <GrandCosmogram />
@@ -33,6 +41,9 @@ const Index = () => {
       
       {/* Mycelial Navigation */}
       <MycelialMenu />
+      
+      {/* Chakra Spine Navigator */}
+      <ChakraSpine />
       
       {/* Audio Biome System */}
       <AudioBiomeManager />

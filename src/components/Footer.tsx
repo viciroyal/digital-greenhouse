@@ -62,25 +62,25 @@ const Footer = () => {
       <div className="absolute inset-0 mosaic-pattern opacity-30 pointer-events-none" />
       
       <div className="max-w-6xl mx-auto relative z-10">
-        {/* THE COSMIC COUNCIL - Main Section */}
+        {/* THE FORMULATORS - Main Section */}
         <div className="text-center mb-16">
           {/* Title with organic frames */}
           <div className="flex items-center justify-center gap-6 mb-4">
             <VineIcon className="w-8 h-12 text-gem-emerald opacity-80" />
-            <h3 className="text-3xl md:text-4xl root-text font-bubble" data-text="THE COSMIC COUNCIL">
-              THE COSMIC COUNCIL
+            <h3 className="text-3xl md:text-4xl root-text font-bubble" data-text="THE FORMULATORS">
+              THE FORMULATORS
             </h3>
             <VineIcon className="w-8 h-12 text-gem-emerald opacity-80 scale-x-[-1]" />
           </div>
           <p className="text-cream-muted/60 font-body text-sm italic">
-            The Garden Keepers • The Root Weavers
+            The Compound Masters • The Root Weavers
           </p>
         </div>
 
         {/* The Council Grid */}
         <div className="grid md:grid-cols-3 gap-8 md:gap-12 mb-16">
           
-          {/* THE ROOT KEEPER - Vici Royàl */}
+          {/* THE HEAD PHARMACIST - Vici Royàl */}
           <motion.div 
             className="root-card p-6 text-center"
             whileHover={{ y: -4 }}
@@ -89,21 +89,21 @@ const Footer = () => {
             <div className="flex items-center justify-center gap-3 mb-4">
               <RootClusterIcon className="w-7 h-7 text-gem-topaz" />
               <h4 className="font-bubble text-xl text-cream tracking-wider">
-                THE ROOT KEEPER
+                HEAD PHARMACIST
               </h4>
             </div>
             <p className="text-gem-topaz font-body font-bold text-lg mb-2">
               Vici Royàl
             </p>
             <p className="text-cream-muted/50 font-body text-xs italic">
-              Gardener of Souls
+              Chief Compound Officer
             </p>
             <p className="text-cream-muted/40 font-body text-xs mt-2">
-              "The one who plants the seeds of sound"
+              "The one who formulates the frequencies"
             </p>
           </motion.div>
 
-          {/* THE GEM SMITH - Èks */}
+          {/* THE ALCHEMIST - Èks */}
           <motion.div 
             className="gem-card p-6 text-center"
             whileHover={{ y: -4 }}
@@ -112,21 +112,21 @@ const Footer = () => {
             <div className="flex items-center justify-center gap-3 mb-4">
               <GemstoneIcon className="w-7 h-7 text-gem-ruby" />
               <h4 className="font-bubble text-xl text-cream tracking-wider">
-                THE GEM SMITH
+                THE ALCHEMIST
               </h4>
             </div>
             <p className="text-gem-ruby font-body font-bold text-lg mb-2">
               Èks
             </p>
             <p className="text-cream-muted/50 font-body text-xs italic">
-              Shaper of Frequencies
+              Frequency Synthesist
             </p>
             <p className="text-cream-muted/40 font-body text-xs mt-2">
-              "The forger of sonic gemstones"
+              "The forger of sonic compounds"
             </p>
           </motion.div>
 
-          {/* THE COSMIC SPIRITS - Featured Artists */}
+          {/* THE ACTIVE INGREDIENTS - Featured Artists */}
           <motion.div 
             className="forest-card p-6 text-center"
             whileHover={{ y: -4 }}
@@ -135,11 +135,11 @@ const Footer = () => {
             <div className="flex items-center justify-center gap-3 mb-4">
               <CosmicSwirlIcon className="w-8 h-5 text-gem-sapphire" />
               <h4 className="font-bubble text-xl text-cream tracking-wider">
-                THE COSMIC SPIRITS
+                ACTIVE INGREDIENTS
               </h4>
             </div>
             <p className="text-cream-muted/50 font-body text-xs italic mb-3">
-              The Wandering Stars • The Voices
+              The Wandering Essences • The Voices
             </p>
             <div className="space-y-1">
               {cosmicArtists.map((artist) => (
@@ -149,35 +149,35 @@ const Footer = () => {
               ))}
             </div>
             <p className="text-cream-muted/40 font-body text-xs mt-3">
-              "Voices woven through the tapestry"
+              "Elements woven through the formula"
             </p>
           </motion.div>
         </div>
 
         {/* Connect Section */}
         <div className="text-center py-8 border-t border-border/20 mb-8">
-          <h5 className="font-bubble text-lg text-cream-muted/80 mb-6 tracking-wider">CONNECT</h5>
+          <h5 className="font-bubble text-lg text-cream-muted/80 mb-6 tracking-wider">JOIN THE REGIMEN</h5>
           <div className="flex flex-wrap justify-center gap-6">
             <motion.a
               href="#"
               className="text-cream-muted/60 hover:text-gem-ruby transition-colors font-body text-sm"
               whileHover={{ y: -2 }}
             >
-              → Listen on Streaming
+              → Administer via Streaming
             </motion.a>
             <motion.a
               href="#"
               className="text-cream-muted/60 hover:text-gem-ruby transition-colors font-body text-sm"
               whileHover={{ y: -2 }}
             >
-              → Follow Vici Royàl
+              → Follow the Pharmacist
             </motion.a>
             <motion.a
               href="#"
               className="text-cream-muted/60 hover:text-gem-ruby transition-colors font-body text-sm"
               whileHover={{ y: -2 }}
             >
-              → Enter the Garden
+              → Enter the Dispensary
             </motion.a>
             <motion.a
               href="https://instagram.com/officialpharmboi"
