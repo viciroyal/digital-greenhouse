@@ -83,7 +83,7 @@ const Footer = () => {
           {/* Title with Kanaga Masks */}
           <div className="flex items-center justify-center gap-6 mb-4">
             <KanagaMaskIcon className="w-8 h-12 text-throne-gold/80" />
-            <h3 className="font-display text-3xl md:text-4xl carved-text tracking-widest">
+            <h3 className="text-3xl md:text-4xl pillar-text" data-text="THE TOGU NA">
               THE TOGU NA
             </h3>
             <KanagaMaskIcon className="w-8 h-12 text-throne-gold/80 scale-x-[-1]" />
