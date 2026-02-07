@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CalendarIcon, Clock, MapPin, User, Sparkles, Sun, Moon, ArrowUp, RotateCcw } from 'lucide-react';
+import { CalendarIcon, Clock, MapPin, User, Sparkles, Sun, Moon, ArrowUp, RotateCcw, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { calculateBirthChart, type ChartResult } from '@/lib/astroCalculator';
+import { geocodeCity, type GeoResult } from '@/lib/geocoding';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
@@ -157,6 +158,8 @@ const StarMapping = () => {
   const [calcText, setCalcText] = useState('');
   const [userChart, setUserChart] = useState<UserChart | null>(null);
   const [isPrecise, setIsPrecise] = useState(false);
+  const [geoResult, setGeoResult] = useState<GeoResult | null>(null);
+  const [isGeocoding, setIsGeocoding] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const hasAnyField = fullName.trim() !== '';
@@ -187,6 +190,26 @@ const StarMapping = () => {
     return () => { clearInterval(phraseInt); clearInterval(progressInt); };
   }, [step]);
 
+  // Debounced geocoding when city or state changes
+  useEffect(() => {
+    if (!birthCity.trim() || !birthState) {
+      setGeoResult(null);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setIsGeocoding(true);
+      try {
+        const result = await geocodeCity(birthCity, birthState);
+        setGeoResult(result);
+      } catch {
+        setGeoResult(null);
+      } finally {
+        setIsGeocoding(false);
+      }
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [birthCity, birthState]);
+
   const handleCalculate = () => {
     if (!isFormComplete || !birthDate) return;
     const year = birthDate.getFullYear();
@@ -196,7 +219,11 @@ const StarMapping = () => {
 
     try {
       // Use precise celestine ephemeris calculations
-      const chart = calculateBirthChart(year, month, day, hours, minutes || 0, birthState);
+      // Pass geocoded lat/lon if available for city-level precision
+      const chart = calculateBirthChart(
+        year, month, day, hours, minutes || 0, birthState,
+        geoResult?.lat, geoResult?.lon
+      );
       setUserChart({
         sun: chart.sun,
         moon: chart.moon,
@@ -227,6 +254,7 @@ const StarMapping = () => {
     setBirthState('');
     setUserChart(null);
     setIsPrecise(false);
+    setGeoResult(null);
     setProgress(0);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -347,16 +375,29 @@ const StarMapping = () => {
               {/* Location of Birth - City */}
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2" style={{ color: '#5D4037' }}>
-                  <MapPin className="w-4 h-4" /> Location of Birth
+                  <MapPin className="w-4 h-4" /> City of Birth
                 </label>
-                <Input
-                  type="text"
-                  placeholder="City (optional)"
-                  value={birthCity}
-                  onChange={(e) => setBirthCity(e.target.value)}
-                  className="h-12 rounded-xl border-2 bg-white/80 placeholder:text-stone-400 transition-all duration-200"
-                  style={{ borderColor: '#D7CCC8', color: '#3E2723' }}
-                />
+                <div className="relative">
+                  <Input
+                    type="text"
+                    placeholder="City (optional — improves precision)"
+                    value={birthCity}
+                    onChange={(e) => setBirthCity(e.target.value)}
+                    className="h-12 rounded-xl border-2 bg-white/80 placeholder:text-stone-400 transition-all duration-200 pr-10"
+                    style={{ borderColor: '#D7CCC8', color: '#3E2723' }}
+                  />
+                  {isGeocoding && (
+                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin" style={{ color: '#8D6E63' }} />
+                  )}
+                  {!isGeocoding && geoResult && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 text-sm">✓</span>
+                  )}
+                </div>
+                {geoResult && (
+                  <p className="text-[10px] font-mono" style={{ color: '#8D6E63' }}>
+                    📍 {geoResult.lat.toFixed(4)}°, {geoResult.lon.toFixed(4)}°
+                  </p>
+                )}
               </div>
 
               {/* State Dropdown — directly under birth location */}
@@ -627,7 +668,9 @@ const StarMapping = () => {
                       <>
                         <strong className="text-white/60">✧ Precision Ephemeris Active</strong> — Your Sun, Moon &amp; Rising signs
                         are calculated using the Celestine astronomical engine, validated against NASA/JPL Horizons &amp; Swiss Ephemeris data.
-                        Coordinates based on your state's geographic center.
+                        {geoResult
+                          ? ` City-level coordinates: ${geoResult.lat.toFixed(4)}°, ${geoResult.lon.toFixed(4)}°. DST-aware timezone applied.`
+                          : " Coordinates based on your state's geographic center. Add a city for higher precision."}
                       </>
                     ) : (
                       <>
