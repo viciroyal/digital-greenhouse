@@ -2,85 +2,92 @@
 @tailwind components;
 @tailwind utilities;
 
-/* PHARMBOI - The Granary Door Design System
-   Dogon Cosmology: Where Earth meets Sirius
+/* PHARMBOI - The Rooted Mosaic Design System
+   Organic, Cosmic, Psychedelic
    All colors in HSL
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Staatliches&family=Space+Mono:wght@400;700&family=Kelly+Slab&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chewy&family=Space+Mono:wght@400;700&display=swap');
 
 @layer base {
   :root {
-    /* Core: Deep Indigo Night Sky - "The Cliff of Bandiagara" palette */
-    --background: 230 60% 10%;
-    --foreground: 40 30% 90%;
+    /* Core: Deep Cosmic Blue & Amethyst - "The Cosmic Garden" palette */
+    --background: 250 60% 12%;
+    --foreground: 40 50% 95%;
 
-    /* Card/Popover: Ebony wood with indigo tints */
-    --card: 230 40% 12%;
-    --card-foreground: 40 30% 90%;
-    --popover: 230 50% 8%;
-    --popover-foreground: 40 30% 90%;
+    /* Card/Popover: Deep Root Brown & Forest Green */
+    --card: 20 40% 12%;
+    --card-foreground: 40 50% 95%;
+    --popover: 280 50% 10%;
+    --popover-foreground: 40 50% 95%;
 
-    /* Primary: Red Clay / Laterite */
-    --primary: 20 85% 38%;
-    --primary-foreground: 40 30% 95%;
+    /* Primary: Ruby Red gemstone */
+    --primary: 350 75% 50%;
+    --primary-foreground: 40 50% 95%;
 
-    /* Secondary: Mahogany wood */
-    --secondary: 20 40% 18%;
-    --secondary-foreground: 40 30% 90%;
+    /* Secondary: Forest Green */
+    --secondary: 120 50% 18%;
+    --secondary-foreground: 40 50% 95%;
 
-    /* Muted: Deep ebony */
-    --muted: 230 30% 15%;
-    --muted-foreground: 40 25% 65%;
+    /* Muted: Deep cosmic */
+    --muted: 260 40% 15%;
+    --muted-foreground: 40 40% 70%;
 
-    /* Accent: Millet Gold */
-    --accent: 40 50% 75%;
-    --accent-foreground: 230 60% 10%;
+    /* Accent: Topaz Yellow */
+    --accent: 45 90% 60%;
+    --accent-foreground: 250 60% 12%;
 
     /* Destructive */
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders & Inputs - Clay edges */
-    --border: 20 30% 25%;
-    --input: 230 30% 18%;
-    --ring: 20 85% 38%;
+    /* Borders & Inputs - Organic root edges */
+    --border: 20 40% 25%;
+    --input: 260 40% 18%;
+    --ring: 350 75% 50%;
 
-    --radius: 0.5rem;
+    --radius: 1.5rem;
 
-    /* Custom PHARMBOI Colors - Dogon Earth & Sky */
-    --deep-indigo: 230 60% 15%;
-    --night-sky: 230 50% 8%;
-    --laterite-red: 20 85% 38%;
-    --red-clay: 20 70% 30%;
-    --millet-gold: 40 50% 75%;
-    --pale-straw: 40 35% 88%;
-    --ebony-black: 20 30% 8%;
-    --mahogany: 20 40% 15%;
-    --sirius-blue: 220 50% 55%;
-    --bone-white: 40 30% 92%;
-    --throne-gold: 40 50% 75%;
-    --glass-border: 20 30% 25%;
-    --glass-bg: 230 40% 12%;
+    /* Custom PHARMBOI Colors - The Cosmic Garden */
+    --cosmic-blue: 250 60% 15%;
+    --cosmic-deep: 250 50% 8%;
+    --amethyst: 280 50% 25%;
+    --amethyst-dark: 280 60% 15%;
+    --root-brown: 20 40% 15%;
+    --root-dark: 20 30% 10%;
+    --forest-green: 120 50% 18%;
+    --forest-dark: 120 40% 12%;
+    --cream: 40 50% 95%;
+    --cream-muted: 40 40% 85%;
+    
+    /* Gemstone Colors */
+    --gem-ruby: 350 75% 50%;
+    --gem-sapphire: 220 75% 55%;
+    --gem-emerald: 140 60% 45%;
+    --gem-topaz: 45 90% 60%;
+    --gem-amethyst: 280 60% 55%;
+    
+    /* Root texture reference */
+    --root-texture-url: url('/images/root-texture.png');
 
-    /* Chakra Colors - Geometric/Angular style */
-    --chakra-root: 0 60% 35%;
-    --chakra-sacral: 25 80% 50%;
+    /* Chakra Colors - Organic style */
+    --chakra-root: 350 75% 45%;
+    --chakra-sacral: 25 85% 55%;
     --chakra-solar: 45 90% 55%;
-    --chakra-heart: 140 50% 45%;
-    --chakra-throat: 210 70% 55%;
+    --chakra-heart: 140 60% 45%;
+    --chakra-throat: 220 75% 55%;
     --chakra-vision: 280 60% 55%;
-    --chakra-source: 40 30% 92%;
+    --chakra-source: 40 50% 95%;
 
     /* Sidebar */
-    --sidebar-background: 230 50% 8%;
-    --sidebar-foreground: 40 30% 90%;
-    --sidebar-primary: 20 85% 38%;
-    --sidebar-primary-foreground: 40 30% 95%;
-    --sidebar-accent: 40 50% 75%;
-    --sidebar-accent-foreground: 230 60% 10%;
-    --sidebar-border: 20 30% 25%;
-    --sidebar-ring: 20 85% 38%;
+    --sidebar-background: 250 50% 8%;
+    --sidebar-foreground: 40 50% 95%;
+    --sidebar-primary: 350 75% 50%;
+    --sidebar-primary-foreground: 40 50% 95%;
+    --sidebar-accent: 45 90% 60%;
+    --sidebar-accent-foreground: 250 60% 12%;
+    --sidebar-border: 20 40% 25%;
+    --sidebar-ring: 350 75% 50%;
   }
 }
 
@@ -95,263 +102,337 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Space Mono', 'Space Grotesk', monospace;
-    background: linear-gradient(180deg, 
-      hsl(230 60% 15%) 0%, 
-      hsl(230 50% 8%) 40%,
-      hsl(230 60% 5%) 100%
-    );
+    font-family: 'Space Mono', monospace;
+    color: hsl(var(--cream));
+    background: 
+      radial-gradient(ellipse at 30% 20%, hsl(280 50% 20% / 0.5) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 60%, hsl(250 60% 20% / 0.5) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 100%, hsl(20 40% 15% / 0.8) 0%, transparent 40%),
+      linear-gradient(180deg, 
+        hsl(250 60% 12%) 0%, 
+        hsl(280 50% 10%) 40%,
+        hsl(250 50% 8%) 100%
+      );
     background-attachment: fixed;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Staatliches', sans-serif;
+    font-family: 'Chewy', cursive;
     font-weight: 400;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.02em;
   }
 }
 
-/* Weathered Ebony Wood texture for pillar headers */
-.pillar-text {
-  font-family: 'Staatliches', sans-serif;
-  letter-spacing: 0.1em;
-  background: linear-gradient(
-    180deg,
-    hsl(var(--pale-straw)) 0%,
-    hsl(var(--millet-gold)) 30%,
-    hsl(var(--red-clay)) 70%,
-    hsl(20 30% 15%) 100%
-  );
+/* Root Bubble Typography - Organic textured headers */
+.root-text {
+  font-family: 'Chewy', cursive;
+  position: relative;
+  display: inline-block;
+  color: hsl(var(--cream));
+  text-shadow: 
+    3px 3px 0 hsl(var(--root-dark)),
+    -1px -1px 0 hsl(var(--root-dark)),
+    1px -1px 0 hsl(var(--root-dark)),
+    -1px 1px 0 hsl(var(--root-dark)),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.4));
+}
+
+/* Root texture mask for headers */
+.root-textured {
+  font-family: 'Chewy', cursive;
+  position: relative;
+  display: inline-block;
+  background: url('/images/root-texture.png'), 
+              linear-gradient(180deg, hsl(20 30% 35%) 0%, hsl(20 40% 20%) 100%);
+  background-size: cover;
+  background-position: center;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: 
-    drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.8))
-    drop-shadow(0 0 4px rgba(183, 65, 14, 0.2));
-  position: relative;
+    drop-shadow(3px 4px 0 hsl(var(--root-dark)))
+    drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6));
 }
 
-.pillar-text::before {
+/* Add organic outline effect */
+.root-textured::before {
   content: attr(data-text);
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0px,
-    transparent 2px,
-    rgba(0, 0, 0, 0.15) 2px,
-    rgba(0, 0, 0, 0.15) 3px
+  -webkit-text-stroke: 4px hsl(var(--root-dark));
+  z-index: -1;
+  opacity: 0.8;
+}
+
+/* Cosmic glow variation */
+.cosmic-text {
+  font-family: 'Chewy', cursive;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--gem-topaz)) 0%,
+    hsl(var(--gem-ruby)) 50%,
+    hsl(var(--gem-amethyst)) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  pointer-events: none;
-  animation: grain-sweep 1.2s ease-out forwards;
+  filter: drop-shadow(0 0 20px hsl(var(--gem-ruby) / 0.5));
 }
 
-@keyframes grain-sweep {
-  0% {
-    clip-path: inset(0 100% 0 0);
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    clip-path: inset(0 0 0 0);
-    opacity: 1;
-  }
-}
-
-/* Staggered animation delays for cascading reveal */
-.pillar-text-delay-1::before {
-  animation-delay: 0.1s;
-}
-
-.pillar-text-delay-2::before {
-  animation-delay: 0.2s;
-}
-
-.pillar-text-delay-3::before {
-  animation-delay: 0.3s;
-}
-
-.pillar-text-delay-4::before {
-  animation-delay: 0.4s;
-}
-
-.pillar-text-delay-5::before {
-  animation-delay: 0.5s;
-}
-
-/* Sirius Map - Astronomical data font */
-.sirius-text {
+/* Body text styling */
+.body-text {
   font-family: 'Space Mono', monospace;
-  letter-spacing: 0.02em;
-}
-
-/* Carving font - Angular Kanaga mask style */
-.carving-text {
-  font-family: 'Kelly Slab', serif;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  color: hsl(var(--cream));
+  letter-spacing: 0.01em;
 }
 
 @layer utilities {
-  /* Sandstone noise texture overlay */
-  .noise-texture {
+  /* Cosmic swirl background overlay */
+  .cosmic-swirl {
     position: relative;
   }
   
-  .noise-texture::before {
+  .cosmic-swirl::before {
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    opacity: 0.03;
+    background: 
+      radial-gradient(ellipse at 20% 30%, hsl(var(--gem-sapphire) / 0.15) 0%, transparent 40%),
+      radial-gradient(ellipse at 80% 70%, hsl(var(--gem-amethyst) / 0.15) 0%, transparent 40%),
+      radial-gradient(ellipse at 50% 50%, hsl(var(--gem-ruby) / 0.1) 0%, transparent 50%);
     pointer-events: none;
-    z-index: 1;
+    z-index: 0;
+    animation: swirl-drift 20s ease-in-out infinite;
   }
 
-  /* Dogon Wood Card - Carved panel style */
-  .glass-card {
+  @keyframes swirl-drift {
+    0%, 100% { 
+      background-position: 0% 0%, 100% 100%, 50% 50%;
+    }
+    50% { 
+      background-position: 20% 30%, 80% 70%, 60% 40%;
+    }
+  }
+
+  /* Organic Root Card - Heavily rounded, warm */
+  .root-card {
     background: linear-gradient(
       145deg,
-      hsl(var(--mahogany)) 0%,
-      hsl(var(--ebony-black)) 100%
+      hsl(var(--root-brown)) 0%,
+      hsl(var(--root-dark)) 100%
     );
-    border: 2px solid hsl(var(--red-clay) / 0.4);
+    border: 3px solid hsl(var(--root-brown));
+    border-radius: 2rem;
     box-shadow: 
-      0 8px 32px hsl(var(--night-sky)),
-      inset 0 1px 0 hsl(var(--millet-gold) / 0.05);
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 hsl(var(--cream) / 0.1),
+      inset 0 -2px 0 hsl(var(--root-dark) / 0.5);
   }
 
-  .glass-card-strong {
+  /* Gemstone Card - Crystal container */
+  .gem-card {
     background: linear-gradient(
       145deg,
-      hsl(var(--mahogany)) 0%,
-      hsl(var(--ebony-black)) 100%
+      hsl(var(--cosmic-blue)) 0%,
+      hsl(var(--amethyst-dark)) 100%
     );
-    border: 2px solid hsl(var(--laterite-red) / 0.5);
+    border: 2px solid hsl(var(--gem-amethyst) / 0.4);
+    border-radius: 2rem;
     box-shadow: 
-      0 8px 32px hsl(var(--night-sky)),
-      inset 0 1px 0 hsl(var(--millet-gold) / 0.08);
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 0 40px hsl(var(--gem-amethyst) / 0.1),
+      inset 0 1px 0 hsl(var(--gem-sapphire) / 0.2);
   }
 
-  /* Sirius night sky gradient */
-  .gradient-root-throne {
+  /* Forest Card - Green organic container */
+  .forest-card {
     background: linear-gradient(
-      180deg,
-      hsl(var(--sirius-blue)) 0%,
-      hsl(var(--deep-indigo)) 50%,
-      hsl(var(--laterite-red)) 100%
+      145deg,
+      hsl(var(--forest-green)) 0%,
+      hsl(var(--forest-dark)) 100%
+    );
+    border: 2px solid hsl(var(--gem-emerald) / 0.4);
+    border-radius: 2rem;
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 hsl(var(--gem-emerald) / 0.15);
+  }
+
+  /* Gemstone Button - Glowing internal light */
+  .gem-button {
+    background: linear-gradient(
+      145deg,
+      hsl(var(--gem-ruby)) 0%,
+      hsl(350 75% 35%) 100%
+    );
+    border: 2px solid hsl(var(--gem-ruby));
+    border-radius: 1.5rem;
+    box-shadow: 
+      0 4px 20px hsl(var(--gem-ruby) / 0.4),
+      inset 0 2px 4px hsl(var(--gem-topaz) / 0.3),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .gem-button:hover {
+    box-shadow: 
+      0 6px 30px hsl(var(--gem-ruby) / 0.6),
+      0 0 40px hsl(var(--gem-ruby) / 0.3),
+      inset 0 2px 4px hsl(var(--gem-topaz) / 0.4),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+  }
+
+  /* Sapphire Button variant */
+  .gem-button-sapphire {
+    background: linear-gradient(
+      145deg,
+      hsl(var(--gem-sapphire)) 0%,
+      hsl(220 75% 40%) 100%
+    );
+    border: 2px solid hsl(var(--gem-sapphire));
+    border-radius: 1.5rem;
+    box-shadow: 
+      0 4px 20px hsl(var(--gem-sapphire) / 0.4),
+      inset 0 2px 4px hsl(var(--cream) / 0.2),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .gem-button-sapphire:hover {
+    box-shadow: 
+      0 6px 30px hsl(var(--gem-sapphire) / 0.6),
+      0 0 40px hsl(var(--gem-sapphire) / 0.3),
+      inset 0 2px 4px hsl(var(--cream) / 0.3);
+    transform: translateY(-2px);
+  }
+
+  /* Organic vine divider */
+  .vine-divider {
+    position: relative;
+    height: 3rem;
+    overflow: hidden;
+  }
+
+  .vine-divider::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 24 Q50 8 100 24 T200 24 T300 24 T400 24' stroke='%234a3728' stroke-width='3' fill='none'/%3E%3Cpath d='M0 24 Q50 40 100 24 T200 24 T300 24 T400 24' stroke='%234a3728' stroke-width='2' fill='none' opacity='0.5'/%3E%3C/svg%3E") repeat-x;
+    background-size: 400px 48px;
+    animation: vine-flow 15s linear infinite;
+  }
+
+  @keyframes vine-flow {
+    0% { background-position: 0 0; }
+    100% { background-position: 400px 0; }
+  }
+
+  /* Cosmic gradient background */
+  .gradient-cosmic {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--cosmic-blue)) 0%,
+      hsl(var(--amethyst)) 50%,
+      hsl(var(--cosmic-deep)) 100%
     );
   }
 
-  .gradient-root-throne-text {
+  /* Gemstone gradient text */
+  .gradient-gem-text {
     background: linear-gradient(
-      180deg,
-      hsl(var(--pale-straw)) 0%,
-      hsl(var(--millet-gold)) 50%,
-      hsl(var(--laterite-red)) 100%
+      90deg,
+      hsl(var(--gem-ruby)) 0%,
+      hsl(var(--gem-topaz)) 50%,
+      hsl(var(--gem-emerald)) 100%
     );
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
-  .gradient-crystal {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--laterite-red)) 0%,
-      hsl(var(--millet-gold)) 50%,
-      hsl(var(--sirius-blue)) 100%
-    );
+  /* Floating animation - Organic drift */
+  .float-organic {
+    animation: float-organic 8s ease-in-out infinite;
   }
 
-  /* Floating animation - Sirius orbital */
-  .float-slow {
-    animation: float-slow 8s ease-in-out infinite;
-  }
-
-  .float-medium {
-    animation: float-medium 5s ease-in-out infinite;
-  }
-
-  @keyframes float-slow {
+  @keyframes float-organic {
     0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-15px) rotate(0.5deg); }
+    25% { transform: translateY(-10px) rotate(1deg); }
+    50% { transform: translateY(-5px) rotate(-0.5deg); }
+    75% { transform: translateY(-15px) rotate(0.5deg); }
   }
 
-  @keyframes float-medium {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+  /* Pulse glow effect - Gemstone warmth */
+  .pulse-gem {
+    animation: pulse-gem 3s ease-in-out infinite;
   }
 
-  /* Pulse glow effect - Laterite warmth */
-  .pulse-glow {
-    animation: pulse-glow 3s ease-in-out infinite;
-  }
-
-  @keyframes pulse-glow {
+  @keyframes pulse-gem {
     0%, 100% { 
       box-shadow: 
-        0 0 20px hsl(var(--laterite-red) / 0.3),
-        0 0 40px hsl(var(--laterite-red) / 0.2);
+        0 0 20px hsl(var(--gem-ruby) / 0.3),
+        0 0 40px hsl(var(--gem-ruby) / 0.2);
     }
     50% { 
       box-shadow: 
-        0 0 30px hsl(var(--laterite-red) / 0.5),
-        0 0 60px hsl(var(--laterite-red) / 0.3);
+        0 0 30px hsl(var(--gem-ruby) / 0.5),
+        0 0 60px hsl(var(--gem-ruby) / 0.3),
+        0 0 80px hsl(var(--gem-amethyst) / 0.2);
     }
   }
 
-  /* Dogon carved wood panel */
-  .cassette-shell {
-    background: linear-gradient(
-      145deg,
-      hsl(var(--mahogany)) 0%,
-      hsl(var(--ebony-black)) 100%
-    );
-    border: 2px solid hsl(var(--red-clay) / 0.4);
+  /* Mosaic bead pattern overlay */
+  .mosaic-pattern {
+    background-image: 
+      radial-gradient(circle at 10% 20%, hsl(var(--gem-ruby) / 0.1) 2px, transparent 2px),
+      radial-gradient(circle at 30% 60%, hsl(var(--gem-sapphire) / 0.1) 2px, transparent 2px),
+      radial-gradient(circle at 50% 40%, hsl(var(--gem-emerald) / 0.1) 2px, transparent 2px),
+      radial-gradient(circle at 70% 80%, hsl(var(--gem-topaz) / 0.1) 2px, transparent 2px),
+      radial-gradient(circle at 90% 30%, hsl(var(--gem-amethyst) / 0.1) 2px, transparent 2px);
+    background-size: 100px 100px;
   }
 
-  /* Matrix cell hover - Carved panel lift */
-  .matrix-cell {
+  /* Organic matrix cell */
+  .matrix-cell-organic {
+    border-radius: 1.5rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
   }
 
-  .matrix-cell:hover {
+  .matrix-cell-organic:hover {
     transform: translateY(-4px) scale(1.01);
     box-shadow: 
-      0 12px 40px hsl(var(--laterite-red) / 0.3),
-      0 0 0 2px hsl(var(--millet-gold) / 0.3);
+      0 12px 40px rgba(0, 0, 0, 0.4),
+      0 0 30px hsl(var(--gem-ruby) / 0.2);
   }
 
-  /* Spirit float - Nommo animation */
-  .spirit-float {
-    animation: spirit-float 8s ease-in-out infinite;
+  /* Cosmic star field effect */
+  .starfield {
+    position: relative;
   }
 
-  @keyframes spirit-float {
-    0%, 100% { transform: translateY(0) translateX(0); }
-    25% { transform: translateY(-12px) translateX(8px); }
-    50% { transform: translateY(-4px) translateX(-4px); }
-    75% { transform: translateY(-16px) translateX(4px); }
-  }
-
-  /* Indigo night sky effect */
-  .roots-pattern {
+  .starfield::after {
+    content: '';
+    position: absolute;
+    inset: 0;
     background-image: 
-      radial-gradient(circle at 30% 80%, hsl(var(--deep-indigo) / 0.5) 0%, transparent 40%),
-      radial-gradient(circle at 70% 90%, hsl(var(--laterite-red) / 0.3) 0%, transparent 35%);
+      radial-gradient(1px 1px at 20% 30%, white 1px, transparent 0),
+      radial-gradient(1px 1px at 40% 70%, white 0.5px, transparent 0),
+      radial-gradient(1.5px 1.5px at 60% 20%, hsl(var(--gem-topaz)) 1px, transparent 0),
+      radial-gradient(1px 1px at 80% 60%, white 0.5px, transparent 0),
+      radial-gradient(2px 2px at 10% 80%, hsl(var(--gem-sapphire)) 1px, transparent 0),
+      radial-gradient(1px 1px at 90% 10%, white 1px, transparent 0);
+    background-size: 200px 200px;
+    opacity: 0.4;
+    pointer-events: none;
+    animation: twinkle 4s ease-in-out infinite;
   }
 
-  /* Sirius glow effect */
-  .throne-glow {
-    background-image: 
-      radial-gradient(ellipse at 50% 20%, hsl(var(--sirius-blue) / 0.3) 0%, transparent 50%),
-      radial-gradient(circle at 50% 0%, hsl(var(--millet-gold) / 0.15) 0%, transparent 40%);
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.6; }
   }
 
   /* Scroll reveal animations */
@@ -370,73 +451,41 @@
     }
   }
 
-  /* Carved Wood Title - Dogon Granary Door style */
-  .carved-text {
-    font-family: 'Staatliches', sans-serif;
-    background: linear-gradient(
-      180deg,
-      hsl(var(--pale-straw)) 0%,
-      hsl(var(--millet-gold)) 40%,
-      hsl(var(--red-clay)) 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.8))
-            drop-shadow(0 0 8px rgba(183, 65, 14, 0.3));
-    letter-spacing: 0.1em;
+  /* Rounded Everything utilities */
+  .rounded-organic {
+    border-radius: 2rem;
   }
 
-  /* Wood grain texture for carved effect */
-  .wood-grain {
-    position: relative;
+  .rounded-organic-lg {
+    border-radius: 3rem;
   }
 
-  .wood-grain::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: 
-      repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent 3px,
-        rgba(0,0,0,0.05) 3px,
-        rgba(0,0,0,0.05) 6px
-      );
-    pointer-events: none;
+  .rounded-organic-xl {
+    border-radius: 4rem;
   }
 
-  /* Bogolanfini (Mud Cloth) pattern overlay */
-  .mudcloth-pattern {
-    background-image: 
-      repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 8px,
-        hsl(var(--millet-gold) / 0.05) 8px,
-        hsl(var(--millet-gold) / 0.05) 10px
-      ),
-      repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent 8px,
-        hsl(var(--millet-gold) / 0.05) 8px,
-        hsl(var(--millet-gold) / 0.05) 10px
-      );
+  /* Legacy support - map old classes to new */
+  .glass-card {
+    @apply root-card;
   }
 
-  /* Nommo zigzag animation */
-  .nommo-wave {
-    animation: nommo-wave 2s ease-in-out infinite;
+  .glass-card-strong {
+    @apply gem-card;
   }
 
-  @keyframes nommo-wave {
-    0%, 100% { 
-      clip-path: polygon(0% 50%, 10% 30%, 20% 50%, 30% 30%, 40% 50%, 50% 30%, 60% 50%, 70% 30%, 80% 50%, 90% 30%, 100% 50%, 100% 100%, 0% 100%);
-    }
-    50% { 
-      clip-path: polygon(0% 50%, 10% 70%, 20% 50%, 30% 70%, 40% 50%, 50% 70%, 60% 50%, 70% 70%, 80% 50%, 90% 70%, 100% 50%, 100% 100%, 0% 100%);
-    }
+  .pillar-text {
+    @apply root-text;
+  }
+
+  .noise-texture {
+    @apply cosmic-swirl;
+  }
+
+  .cassette-shell {
+    @apply root-card;
+  }
+
+  .matrix-cell {
+    @apply matrix-cell-organic;
   }
 }

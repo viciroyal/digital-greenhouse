@@ -1,66 +1,50 @@
 import { motion } from 'framer-motion';
 import { Instagram } from 'lucide-react';
 
-// Kanaga Mask Icon - Dogon ceremonial mask
-const KanagaMaskIcon = ({ className = "" }: { className?: string }) => (
+// Organic Vine Icon
+const VineIcon = ({ className = "" }: { className?: string }) => (
   <svg viewBox="0 0 40 60" className={className} fill="currentColor">
-    {/* Vertical staff */}
-    <rect x="18" y="20" width="4" height="40" />
-    {/* Top horizontal bar */}
-    <rect x="5" y="5" width="30" height="4" />
-    {/* Upper angled arms */}
-    <rect x="5" y="5" width="4" height="15" />
-    <rect x="31" y="5" width="4" height="15" />
-    {/* Lower angled extensions */}
-    <rect x="0" y="0" width="4" height="10" />
-    <rect x="36" y="0" width="4" height="10" />
+    <path 
+      d="M20 0 Q10 15, 20 30 Q30 45, 20 60" 
+      stroke="currentColor" 
+      strokeWidth="3" 
+      fill="none"
+    />
+    <ellipse cx="12" cy="15" rx="6" ry="4" transform="rotate(-30 12 15)" />
+    <ellipse cx="28" cy="25" rx="6" ry="4" transform="rotate(30 28 25)" />
+    <ellipse cx="12" cy="45" rx="5" ry="3" transform="rotate(-20 12 45)" />
   </svg>
 );
 
-// Tortoise Icon - Sacred animal of the Hogon
-const TortoiseIcon = ({ className = "" }: { className?: string }) => (
-  <svg viewBox="0 0 32 24" className={className} fill="currentColor">
-    {/* Shell - geometric hexagonal */}
-    <polygon points="16,2 26,7 26,17 16,22 6,17 6,7" />
-    {/* Shell pattern - angular lines */}
-    <line x1="16" y1="2" x2="16" y2="22" stroke="hsl(230 60% 10%)" strokeWidth="1" />
-    <line x1="6" y1="12" x2="26" y2="12" stroke="hsl(230 60% 10%)" strokeWidth="1" />
-    {/* Head */}
-    <circle cx="16" cy="0" r="2" />
-    {/* Legs - angular */}
-    <rect x="3" y="8" width="4" height="3" />
-    <rect x="25" y="8" width="4" height="3" />
-    <rect x="3" y="14" width="4" height="3" />
-    <rect x="25" y="14" width="4" height="3" />
-    {/* Tail */}
-    <rect x="15" y="22" width="2" height="2" />
+// Gemstone Icon
+const GemstoneIcon = ({ className = "", color = "currentColor" }: { className?: string; color?: string }) => (
+  <svg viewBox="0 0 32 32" className={className} fill={color}>
+    <path d="M16 2 L28 12 L16 30 L4 12 Z" />
+    <path d="M4 12 L16 16 L28 12" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
   </svg>
 );
 
-// Anvil/Hammer Icon - Blacksmith symbol
-const AnvilIcon = ({ className = "" }: { className?: string }) => (
-  <svg viewBox="0 0 32 28" className={className} fill="currentColor">
-    {/* Anvil base */}
-    <polygon points="4,20 28,20 30,28 2,28" />
-    {/* Anvil body */}
-    <rect x="6" y="14" width="20" height="6" />
-    {/* Anvil horn */}
-    <polygon points="26,14 32,17 26,20" />
-    {/* Hammer */}
-    <rect x="12" y="2" width="8" height="5" />
-    <rect x="15" y="7" width="2" height="7" />
+// Root Cluster Icon
+const RootClusterIcon = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 40 40" className={className} stroke="currentColor" fill="none" strokeWidth="2">
+    <path d="M20 5 Q20 15, 15 25 Q10 35, 5 40" strokeLinecap="round" />
+    <path d="M20 5 Q20 20, 20 30 Q20 35, 20 40" strokeLinecap="round" />
+    <path d="M20 5 Q20 15, 25 25 Q30 35, 35 40" strokeLinecap="round" />
+    <circle cx="20" cy="5" r="3" fill="currentColor" />
   </svg>
 );
 
-// Nommo Zigzag Icon - Water/Serpent spirit
-const NommoWaveIcon = ({ className = "" }: { className?: string }) => (
-  <svg viewBox="0 0 40 24" className={className} fill="none" stroke="currentColor" strokeWidth="3">
-    <polyline points="2,18 8,6 14,18 20,6 26,18 32,6 38,18" strokeLinecap="round" strokeLinejoin="round" />
+// Cosmic Swirl Icon
+const CosmicSwirlIcon = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 40 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M2 12 Q10 4, 20 12 Q30 20, 38 12" strokeLinecap="round" />
+    <circle cx="8" cy="8" r="2" fill="hsl(350 75% 50%)" />
+    <circle cx="32" cy="16" r="2" fill="hsl(220 75% 55%)" />
   </svg>
 );
 
 const Footer = () => {
-  const nommoArtists = [
+  const cosmicArtists = [
     'Sistah Moon',
     'Nichollé McKoy',
     'Sarafina Ethereal',
@@ -74,132 +58,132 @@ const Footer = () => {
 
   return (
     <footer className="relative py-16 px-4 border-t border-border/30">
-      {/* Bogolanfini (Mud Cloth) texture overlay */}
-      <div className="absolute inset-0 mudcloth-pattern opacity-30 pointer-events-none" />
+      {/* Mosaic pattern overlay */}
+      <div className="absolute inset-0 mosaic-pattern opacity-30 pointer-events-none" />
       
       <div className="max-w-6xl mx-auto relative z-10">
-        {/* THE TOGU NA - Main Council Section */}
+        {/* THE COSMIC COUNCIL - Main Section */}
         <div className="text-center mb-16">
-          {/* Title with Kanaga Masks */}
+          {/* Title with organic frames */}
           <div className="flex items-center justify-center gap-6 mb-4">
-            <KanagaMaskIcon className="w-8 h-12 text-throne-gold/80" />
-            <h3 className="text-3xl md:text-4xl pillar-text" data-text="THE TOGU NA">
-              THE TOGU NA
+            <VineIcon className="w-8 h-12 text-gem-emerald opacity-80" />
+            <h3 className="text-3xl md:text-4xl root-text font-bubble" data-text="THE COSMIC COUNCIL">
+              THE COSMIC COUNCIL
             </h3>
-            <KanagaMaskIcon className="w-8 h-12 text-throne-gold/80 scale-x-[-1]" />
+            <VineIcon className="w-8 h-12 text-gem-emerald opacity-80 scale-x-[-1]" />
           </div>
-          <p className="text-[#eaddca]/60 font-body text-sm italic">
-            The House of Words • The Great Shelter
+          <p className="text-cream-muted/60 font-body text-sm italic">
+            The Garden Keepers • The Root Weavers
           </p>
         </div>
 
         {/* The Council Grid */}
         <div className="grid md:grid-cols-3 gap-8 md:gap-12 mb-16">
           
-          {/* THE HOGON - Vici Royàl */}
+          {/* THE ROOT KEEPER - Vici Royàl */}
           <motion.div 
-            className="glass-card p-6 text-center"
+            className="root-card p-6 text-center"
             whileHover={{ y: -4 }}
             transition={{ duration: 0.3 }}
           >
             <div className="flex items-center justify-center gap-3 mb-4">
-              <TortoiseIcon className="w-7 h-5 text-throne-gold" />
-              <h4 className="font-display text-xl text-[#eaddca] tracking-wider">
-                THE HOGON
+              <RootClusterIcon className="w-7 h-7 text-gem-topaz" />
+              <h4 className="font-bubble text-xl text-cream tracking-wider">
+                THE ROOT KEEPER
               </h4>
             </div>
-            <p className="text-throne-gold font-body font-bold text-lg mb-2">
+            <p className="text-gem-topaz font-body font-bold text-lg mb-2">
               Vici Royàl
             </p>
-            <p className="text-[#eaddca]/50 font-body text-xs italic">
-              Spiritual Earth Priest
+            <p className="text-cream-muted/50 font-body text-xs italic">
+              Gardener of Souls
             </p>
-            <p className="text-[#eaddca]/40 font-body text-xs mt-2">
-              "The Guardian of the Soil and the Seed"
+            <p className="text-cream-muted/40 font-body text-xs mt-2">
+              "The one who plants the seeds of sound"
             </p>
           </motion.div>
 
-          {/* THE BLACKSMITH - Èks */}
+          {/* THE GEM SMITH - Èks */}
           <motion.div 
-            className="glass-card p-6 text-center"
+            className="gem-card p-6 text-center"
             whileHover={{ y: -4 }}
             transition={{ duration: 0.3 }}
           >
             <div className="flex items-center justify-center gap-3 mb-4">
-              <AnvilIcon className="w-7 h-6 text-throne-gold" />
-              <h4 className="font-display text-xl text-[#eaddca] tracking-wider">
-                THE BLACKSMITH
+              <GemstoneIcon className="w-7 h-7 text-gem-ruby" />
+              <h4 className="font-bubble text-xl text-cream tracking-wider">
+                THE GEM SMITH
               </h4>
             </div>
-            <p className="text-throne-gold font-body font-bold text-lg mb-2">
+            <p className="text-gem-ruby font-body font-bold text-lg mb-2">
               Èks
             </p>
-            <p className="text-[#eaddca]/50 font-body text-xs italic">
-              Shaper of Reality
+            <p className="text-cream-muted/50 font-body text-xs italic">
+              Shaper of Frequencies
             </p>
-            <p className="text-[#eaddca]/40 font-body text-xs mt-2">
-              "The Forger of Frequencies and Iron"
+            <p className="text-cream-muted/40 font-body text-xs mt-2">
+              "The forger of sonic gemstones"
             </p>
           </motion.div>
 
-          {/* THE NOMMO - Featured Artists */}
+          {/* THE COSMIC SPIRITS - Featured Artists */}
           <motion.div 
-            className="glass-card p-6 text-center"
+            className="forest-card p-6 text-center"
             whileHover={{ y: -4 }}
             transition={{ duration: 0.3 }}
           >
             <div className="flex items-center justify-center gap-3 mb-4">
-              <NommoWaveIcon className="w-8 h-5 text-throne-gold" />
-              <h4 className="font-display text-xl text-[#eaddca] tracking-wider">
-                THE NOMMO
+              <CosmicSwirlIcon className="w-8 h-5 text-gem-sapphire" />
+              <h4 className="font-bubble text-xl text-cream tracking-wider">
+                THE COSMIC SPIRITS
               </h4>
             </div>
-            <p className="text-[#eaddca]/50 font-body text-xs italic mb-3">
-              The Water Spirits • The Teachers
+            <p className="text-cream-muted/50 font-body text-xs italic mb-3">
+              The Wandering Stars • The Voices
             </p>
             <div className="space-y-1">
-              {nommoArtists.map((artist) => (
-                <p key={artist} className="text-throne-gold/80 font-body text-sm">
+              {cosmicArtists.map((artist) => (
+                <p key={artist} className="text-gem-emerald/80 font-body text-sm">
                   {artist}
                 </p>
               ))}
             </div>
-            <p className="text-[#eaddca]/40 font-body text-xs mt-3">
-              "The Voices from the Deep"
+            <p className="text-cream-muted/40 font-body text-xs mt-3">
+              "Voices woven through the tapestry"
             </p>
           </motion.div>
         </div>
 
         {/* Connect Section */}
         <div className="text-center py-8 border-t border-border/20 mb-8">
-          <h5 className="font-display text-lg text-[#eaddca]/80 mb-6 tracking-wider">CONNECT</h5>
+          <h5 className="font-bubble text-lg text-cream-muted/80 mb-6 tracking-wider">CONNECT</h5>
           <div className="flex flex-wrap justify-center gap-6">
             <motion.a
               href="#"
-              className="text-[#eaddca]/60 hover:text-throne-gold transition-colors font-body text-sm"
+              className="text-cream-muted/60 hover:text-gem-ruby transition-colors font-body text-sm"
               whileHover={{ y: -2 }}
             >
               → Listen on Streaming
             </motion.a>
             <motion.a
               href="#"
-              className="text-[#eaddca]/60 hover:text-throne-gold transition-colors font-body text-sm"
+              className="text-cream-muted/60 hover:text-gem-ruby transition-colors font-body text-sm"
               whileHover={{ y: -2 }}
             >
               → Follow Vici Royàl
             </motion.a>
             <motion.a
               href="#"
-              className="text-[#eaddca]/60 hover:text-throne-gold transition-colors font-body text-sm"
+              className="text-cream-muted/60 hover:text-gem-ruby transition-colors font-body text-sm"
               whileHover={{ y: -2 }}
             >
-              → Join the Greenhouse
+              → Enter the Garden
             </motion.a>
             <motion.a
               href="https://instagram.com/officialpharmboi"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-[#eaddca]/60 hover:text-throne-gold transition-colors font-body text-sm"
+              className="inline-flex items-center gap-2 text-cream-muted/60 hover:text-gem-ruby transition-colors font-body text-sm"
               whileHover={{ y: -2 }}
             >
               <Instagram size={18} />
@@ -208,16 +192,16 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Soil Spirits */}
+        {/* Cosmic Spirits */}
         <div className="text-center py-8 border-t border-border/20">
-          <p className="text-[#eaddca]/40 font-body text-xs mb-2">
-            Guided by the Soil Spirits
+          <p className="text-cream-muted/40 font-body text-xs mb-2">
+            Guided by the Cosmic Spirits
           </p>
           <div className="flex justify-center gap-6">
             {['Spirit', 'Sunny', 'Rocky', 'River'].map((spirit) => (
               <motion.span
                 key={spirit}
-                className="text-throne-gold/60 font-display text-sm spirit-float"
+                className="text-gem-amethyst/60 font-bubble text-sm float-organic"
                 style={{ animationDelay: `${Math.random() * 2}s` }}
               >
                 {spirit}
@@ -228,8 +212,8 @@ const Footer = () => {
 
         {/* Copyright */}
         <div className="text-center pt-8 border-t border-border/20">
-          <p className="text-[#eaddca]/30 font-body text-xs">
-            © 2025 PHARMBOI. All rights reserved. No black boxes. No secrets.
+          <p className="text-cream-muted/30 font-body text-xs">
+            © 2025 PHARMBOI. All rights reserved. Roots run deep. Gems shine bright.
           </p>
         </div>
       </div>
