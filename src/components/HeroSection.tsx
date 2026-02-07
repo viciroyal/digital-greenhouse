@@ -83,10 +83,10 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
           >
             <p className="text-muted-foreground font-body text-sm">
-              by <span className="text-primary">Vici Royàl</span>
+              by <strong className="text-foreground font-bold">Vici Royàl</strong>
             </p>
             <p className="text-muted-foreground/60 font-body text-xs mt-1">
-              Produced by Eks
+              Produced by <strong className="text-throne-gold font-bold">Vici Royàl</strong> & <span className="text-throne-gold">Èks</span>
             </p>
           </motion.div>
 
