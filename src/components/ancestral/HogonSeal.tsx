@@ -2,26 +2,46 @@ import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface HogonSealProps {
-  status: 'pending' | 'approved';
+  status: 'pending' | 'reviewed' | 'certified';
   color: string;
   onApprove?: () => void; // For demo purposes
 }
 
 /**
  * The Hogon's Seal - Validation Stamp
- * A Dogon Granary Door design that transforms when approved
+ * A Dogon Granary Door design that transforms from stone-grey to gold when certified
+ * Status progression: pending (grey) → reviewed (silver) → certified (gold)
  */
 const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
   const [showLevelUp, setShowLevelUp] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
 
-  // Play level up sound
+  const isCertified = status === 'certified';
+  const isReviewed = status === 'reviewed';
+  const isPending = status === 'pending';
+  
+  // Color states: stone-grey → silver → gold
+  const sealColors = {
+    primary: isCertified ? 'hsl(51 100% 50%)' : isReviewed ? 'hsl(0 0% 70%)' : 'hsl(0 0% 30%)',
+    secondary: isCertified ? 'hsl(51 80% 40%)' : isReviewed ? 'hsl(0 0% 50%)' : 'hsl(0 0% 20%)',
+    tertiary: isCertified ? 'hsl(51 100% 60%)' : isReviewed ? 'hsl(0 0% 60%)' : 'hsl(0 0% 40%)',
+    text: isCertified ? 'hsl(51 100% 50%)' : isReviewed ? 'hsl(0 0% 70%)' : 'hsl(0 0% 50%)',
+    background: isCertified 
+      ? 'linear-gradient(135deg, hsl(51 50% 15%), hsl(40 40% 10%))'
+      : isReviewed 
+        ? 'linear-gradient(135deg, hsl(0 0% 15%), hsl(0 0% 10%))'
+        : 'hsl(0 0% 10%)',
+    border: isCertified ? 'hsl(51 100% 50%)' : isReviewed ? 'hsl(0 0% 50%)' : 'hsl(0 0% 25%)',
+    glow: isCertified ? '0 0 30px hsl(51 80% 40% / 0.4)' : 'none',
+  };
+
+  // Play level up sound (ascending arpeggio)
   const playLevelUpSound = useCallback(() => {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     audioContextRef.current = audioContext;
 
-    // Ascending arpeggio
-    const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5
+    // Ascending arpeggio - C4, E4, G4, C5
+    const notes = [261.63, 329.63, 392.00, 523.25];
     notes.forEach((freq, i) => {
       const osc = audioContext.createOscillator();
       const gain = audioContext.createGain();
@@ -51,7 +71,7 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
   }, []);
 
   const handleDemoApprove = () => {
-    if (status === 'pending' && onApprove) {
+    if (!isCertified && onApprove) {
       playLevelUpSound();
       setShowLevelUp(true);
       setTimeout(() => {
@@ -60,8 +80,6 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
       }, 500);
     }
   };
-
-  const isApproved = status === 'approved';
 
   return (
     <div className="relative">
@@ -131,25 +149,19 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
       <motion.div
         className="flex flex-col items-center p-6 rounded-2xl cursor-pointer"
         style={{
-          background: isApproved 
-            ? 'linear-gradient(135deg, hsl(51 50% 15%), hsl(40 40% 10%))'
-            : 'hsl(0 0% 10%)',
-          border: isApproved 
-            ? '2px solid hsl(51 100% 50%)'
-            : '2px solid hsl(0 0% 25%)',
-          boxShadow: isApproved 
-            ? '0 0 30px hsl(51 80% 40% / 0.4)'
-            : 'none',
+          background: sealColors.background,
+          border: `2px solid ${sealColors.border}`,
+          boxShadow: sealColors.glow,
         }}
         onClick={handleDemoApprove}
-        whileHover={!isApproved ? { scale: 1.02 } : {}}
-        whileTap={!isApproved ? { scale: 0.98 } : {}}
+        whileHover={!isCertified ? { scale: 1.02 } : {}}
+        whileTap={!isCertified ? { scale: 0.98 } : {}}
       >
         {/* Dogon Granary Door Seal */}
         <motion.svg
           viewBox="0 0 100 100"
           className="w-24 h-24 md:w-32 md:h-32"
-          animate={isApproved ? {
+          animate={isCertified ? {
             filter: [
               'drop-shadow(0 0 10px hsl(51 100% 50%))',
               'drop-shadow(0 0 20px hsl(51 100% 60%))',
@@ -163,7 +175,7 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
             cx="50"
             cy="50"
             r="45"
-            stroke={isApproved ? 'hsl(51 100% 50%)' : 'hsl(0 0% 30%)'}
+            stroke={sealColors.primary}
             strokeWidth="3"
             fill="none"
           />
@@ -175,7 +187,7 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
             y1="15"
             x2="50"
             y2="85"
-            stroke={isApproved ? 'hsl(51 100% 50%)' : 'hsl(0 0% 35%)'}
+            stroke={sealColors.primary}
             strokeWidth="2"
           />
           <line
@@ -183,7 +195,7 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
             y1="50"
             x2="85"
             y2="50"
-            stroke={isApproved ? 'hsl(51 100% 50%)' : 'hsl(0 0% 35%)'}
+            stroke={sealColors.primary}
             strokeWidth="2"
           />
           
@@ -195,13 +207,13 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
             width="8"
             height="16"
             rx="2"
-            fill={isApproved ? 'hsl(51 100% 50%)' : 'hsl(0 0% 30%)'}
+            fill={sealColors.primary}
           />
           <circle
             cx="26"
             cy="20"
             r="4"
-            fill={isApproved ? 'hsl(51 100% 50%)' : 'hsl(0 0% 30%)'}
+            fill={sealColors.primary}
           />
           
           {/* Top right */}
@@ -211,13 +223,13 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
             width="8"
             height="16"
             rx="2"
-            fill={isApproved ? 'hsl(51 100% 50%)' : 'hsl(0 0% 30%)'}
+            fill={sealColors.primary}
           />
           <circle
             cx="74"
             cy="20"
             r="4"
-            fill={isApproved ? 'hsl(51 100% 50%)' : 'hsl(0 0% 30%)'}
+            fill={sealColors.primary}
           />
           
           {/* Bottom left */}
@@ -227,13 +239,13 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
             width="8"
             height="16"
             rx="2"
-            fill={isApproved ? 'hsl(51 100% 50%)' : 'hsl(0 0% 30%)'}
+            fill={sealColors.primary}
           />
           <circle
             cx="26"
             cy="60"
             r="4"
-            fill={isApproved ? 'hsl(51 100% 50%)' : 'hsl(0 0% 30%)'}
+            fill={sealColors.primary}
           />
           
           {/* Bottom right */}
@@ -243,13 +255,13 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
             width="8"
             height="16"
             rx="2"
-            fill={isApproved ? 'hsl(51 100% 50%)' : 'hsl(0 0% 30%)'}
+            fill={sealColors.primary}
           />
           <circle
             cx="74"
             cy="60"
             r="4"
-            fill={isApproved ? 'hsl(51 100% 50%)' : 'hsl(0 0% 30%)'}
+            fill={sealColors.primary}
           />
           
           {/* Central granary symbol */}
@@ -259,8 +271,8 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
             width="20"
             height="30"
             rx="3"
-            fill={isApproved ? 'hsl(51 80% 40%)' : 'hsl(0 0% 20%)'}
-            stroke={isApproved ? 'hsl(51 100% 50%)' : 'hsl(0 0% 35%)'}
+            fill={sealColors.secondary}
+            stroke={sealColors.primary}
             strokeWidth="2"
           />
           {/* Granary door pattern */}
@@ -269,7 +281,7 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
             y1="40"
             x2="45"
             y2="60"
-            stroke={isApproved ? 'hsl(51 100% 60%)' : 'hsl(0 0% 40%)'}
+            stroke={sealColors.tertiary}
             strokeWidth="1"
           />
           <line
@@ -277,7 +289,7 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
             y1="40"
             x2="50"
             y2="60"
-            stroke={isApproved ? 'hsl(51 100% 60%)' : 'hsl(0 0% 40%)'}
+            stroke={sealColors.tertiary}
             strokeWidth="1"
           />
           <line
@@ -285,7 +297,7 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
             y1="40"
             x2="55"
             y2="60"
-            stroke={isApproved ? 'hsl(51 100% 60%)' : 'hsl(0 0% 40%)'}
+            stroke={sealColors.tertiary}
             strokeWidth="1"
           />
         </motion.svg>
@@ -293,9 +305,9 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
         {/* Status Text */}
         <motion.div className="mt-4 text-center">
           <AnimatePresence mode="wait">
-            {isApproved ? (
+            {isCertified ? (
               <motion.div
-                key="approved"
+                key="certified"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
@@ -316,6 +328,25 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
                   The Ancestors Recognize You
                 </p>
               </motion.div>
+            ) : isReviewed ? (
+              <motion.div
+                key="reviewed"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <p 
+                  className="text-sm font-mono tracking-wider"
+                  style={{ color: 'hsl(0 0% 70%)' }}
+                >
+                  UNDER REVIEW
+                </p>
+                <p 
+                  className="text-xs font-mono mt-1 opacity-60"
+                  style={{ color: 'hsl(0 0% 60%)' }}
+                >
+                  The Hogon is Examining Your Work
+                </p>
+              </motion.div>
             ) : (
               <motion.div
                 key="pending"
@@ -326,20 +357,22 @@ const HogonSeal = ({ status, color, onApprove }: HogonSealProps) => {
                   className="text-sm font-mono tracking-wider"
                   style={{ color: 'hsl(0 0% 50%)' }}
                 >
-                  PENDING REVIEW
+                  AWAITING SUBMISSION
                 </p>
                 <p 
                   className="text-xs font-mono mt-1 opacity-50"
                   style={{ color: 'hsl(0 0% 40%)' }}
                 >
-                  Awaiting the Hogon's Judgment
+                  Plant Your Evidence to Begin
                 </p>
-                <p 
-                  className="text-xs font-mono mt-3 opacity-70"
-                  style={{ color }}
-                >
-                  (Click to preview approval)
-                </p>
+                {onApprove && (
+                  <p 
+                    className="text-xs font-mono mt-3 opacity-70"
+                    style={{ color }}
+                  >
+                    (Click to preview certification)
+                  </p>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

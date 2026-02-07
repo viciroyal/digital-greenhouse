@@ -52,7 +52,15 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
   const isCurrentLessonCompleted = currentLesson ? isLessonCompleted(currentLesson.id) : false;
   const journalEntries = currentLesson ? getJournalEntriesForLesson(currentLesson.id) : [];
   const hasPendingUpload = journalEntries.some(e => e.status === 'pending');
+  const hasReviewedUpload = journalEntries.some(e => e.status === 'reviewed');
   const hasCertifiedUpload = journalEntries.some(e => e.status === 'certified');
+  
+  // Determine seal status: certified > reviewed > pending
+  const getSealStatus = (): 'pending' | 'reviewed' | 'certified' => {
+    if (hasCertifiedUpload) return 'certified';
+    if (hasReviewedUpload) return 'reviewed';
+    return 'pending';
+  };
 
   const handleFileUpload = async (file: File) => {
     if (!currentLesson) return;
@@ -483,7 +491,7 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                           THE HOGON'S SEAL
                         </h3>
                         <HogonSeal 
-                          status={hasCertifiedUpload ? 'approved' : 'pending'}
+                          status={getSealStatus()}
                           color={module.color}
                         />
                       </motion.div>
