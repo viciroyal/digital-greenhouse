@@ -75,44 +75,77 @@ const prescriptionData: Record<number, {
   },
 };
 
-// Dreaming Spiral Symbol
+// Dreaming Spiral Symbol with animation
 const DreamingSpiral = ({ color }: { color: string }) => (
-  <svg viewBox="0 0 60 60" className="w-14 h-14">
-    {/* Outer dot ring */}
-    {[...Array(12)].map((_, i) => {
-      const angle = (i / 12) * Math.PI * 2;
-      const x = 30 + Math.cos(angle) * 26;
-      const y = 30 + Math.sin(angle) * 26;
-      return <circle key={`outer-${i}`} cx={x} cy={y} r="2" fill="#eaddca" opacity="0.7" />;
-    })}
-    
-    {/* Inner dot ring */}
-    {[...Array(8)].map((_, i) => {
-      const angle = (i / 8) * Math.PI * 2 + 0.2;
-      const x = 30 + Math.cos(angle) * 18;
-      const y = 30 + Math.sin(angle) * 18;
-      return <circle key={`inner-${i}`} cx={x} cy={y} r="1.5" fill="#d4a24e" opacity="0.8" />;
-    })}
-    
-    {/* Spiral path */}
-    <path
-      d="M30 30 
-         C 30 26, 34 26, 34 30
-         C 34 36, 26 36, 26 30
-         C 26 22, 38 22, 38 30
-         C 38 40, 22 40, 22 30
-         C 22 18, 42 18, 42 30
-         C 42 44, 18 44, 18 30"
-      fill="none"
-      stroke="#eaddca"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-    
-    {/* Center dot - The Source */}
-    <circle cx="30" cy="30" r="4" fill={`hsl(${color})`} />
-    <circle cx="30" cy="30" r="2" fill="#eaddca" />
-  </svg>
+  <motion.div
+    animate={{
+      rotate: [0, 360],
+      scale: [1, 1.05, 1],
+    }}
+    transition={{
+      rotate: {
+        duration: 20,
+        repeat: Infinity,
+        ease: "linear",
+      },
+      scale: {
+        duration: 3,
+        repeat: Infinity,
+        ease: "easeInOut",
+      },
+    }}
+  >
+    <svg viewBox="0 0 60 60" className="w-14 h-14">
+      {/* Outer dot ring */}
+      {[...Array(12)].map((_, i) => {
+        const angle = (i / 12) * Math.PI * 2;
+        const x = 30 + Math.cos(angle) * 26;
+        const y = 30 + Math.sin(angle) * 26;
+        return <circle key={`outer-${i}`} cx={x} cy={y} r="2" fill="#eaddca" opacity="0.7" />;
+      })}
+      
+      {/* Inner dot ring */}
+      {[...Array(8)].map((_, i) => {
+        const angle = (i / 8) * Math.PI * 2 + 0.2;
+        const x = 30 + Math.cos(angle) * 18;
+        const y = 30 + Math.sin(angle) * 18;
+        return <circle key={`inner-${i}`} cx={x} cy={y} r="1.5" fill="#d4a24e" opacity="0.8" />;
+      })}
+      
+      {/* Spiral path */}
+      <path
+        d="M30 30 
+           C 30 26, 34 26, 34 30
+           C 34 36, 26 36, 26 30
+           C 26 22, 38 22, 38 30
+           C 38 40, 22 40, 22 30
+           C 22 18, 42 18, 42 30
+           C 42 44, 18 44, 18 30"
+        fill="none"
+        stroke="#eaddca"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      
+      {/* Center dot - The Source with glow */}
+      <motion.circle 
+        cx="30" 
+        cy="30" 
+        r="4" 
+        fill={`hsl(${color})`}
+        animate={{
+          opacity: [0.8, 1, 0.8],
+          r: [4, 4.5, 4],
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+      <circle cx="30" cy="30" r="2" fill="#eaddca" />
+    </svg>
+  </motion.div>
 );
 
 // Dot painting border pattern
