@@ -33,15 +33,15 @@ const KeyholeButton = ({ onClick }: KeyholeButtonProps) => {
       onClick={onClick}
       aria-label="Enter The Initiation"
     >
-      {/* Keyhole SVG Icon */}
+      {/* Root-Intertwined Keyhole Icon */}
       <motion.svg
-        viewBox="0 0 24 32"
-        className="w-5 h-7"
+        viewBox="0 0 28 36"
+        className="w-6 h-8"
         fill="none"
         animate={{
           filter: [
             'drop-shadow(0 0 4px hsl(200 80% 60%))',
-            'drop-shadow(0 0 8px hsl(200 80% 70%))',
+            'drop-shadow(0 0 10px hsl(200 80% 70%))',
             'drop-shadow(0 0 4px hsl(200 80% 60%))',
           ],
         }}
@@ -51,44 +51,105 @@ const KeyholeButton = ({ onClick }: KeyholeButtonProps) => {
           ease: 'easeInOut',
         }}
       >
-        {/* Outer keyhole shape */}
-        <path
-          d="M12 2C7.58 2 4 5.58 4 10c0 2.85 1.5 5.35 3.75 6.75V26c0 1.1.9 2 2 2h4.5c1.1 0 2-.9 2-2V16.75C18.5 15.35 20 12.85 20 10c0-4.42-3.58-8-8-8z"
-          fill="hsl(220 60% 8%)"
-          stroke="hsl(200 70% 50%)"
-          strokeWidth="1.5"
+        {/* Left root tendril forming keyhole */}
+        <motion.path
+          d="M6 32 C4 28, 2 24, 3 20 C4 16, 6 14, 8 12 C10 10, 11 8, 11 6 C11 4, 10 2, 14 2"
+          stroke="hsl(200 70% 45%)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          fill="none"
+          animate={{
+            strokeOpacity: [0.7, 1, 0.7],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
         />
         
-        {/* Inner keyhole opening */}
+        {/* Right root tendril forming keyhole */}
+        <motion.path
+          d="M22 32 C24 28, 26 24, 25 20 C24 16, 22 14, 20 12 C18 10, 17 8, 17 6 C17 4, 18 2, 14 2"
+          stroke="hsl(200 70% 45%)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          fill="none"
+          animate={{
+            strokeOpacity: [0.7, 1, 0.7],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 0.5,
+          }}
+        />
+        
+        {/* Small root tendrils branching off */}
+        <path
+          d="M4 22 C2 21, 1 19, 2 17"
+          stroke="hsl(200 60% 40%)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <path
+          d="M24 22 C26 21, 27 19, 26 17"
+          stroke="hsl(200 60% 40%)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          fill="none"
+        />
+        
+        {/* Central keyhole void */}
         <ellipse
-          cx="12"
+          cx="14"
           cy="10"
-          rx="3"
-          ry="3.5"
-          fill="hsl(200 80% 15%)"
+          rx="4"
+          ry="5"
+          fill="hsl(220 80% 6%)"
         />
         <rect
-          x="10"
-          y="12"
-          width="4"
-          height="8"
-          rx="1"
-          fill="hsl(200 80% 15%)"
+          x="11"
+          y="14"
+          width="6"
+          height="12"
+          rx="2"
+          fill="hsl(220 80% 6%)"
         />
         
-        {/* Bioluminescent glow center */}
+        {/* Bioluminescent glow within keyhole */}
         <motion.ellipse
-          cx="12"
+          cx="14"
           cy="10"
-          rx="1.5"
-          ry="2"
-          fill="hsl(200 80% 60%)"
+          rx="2"
+          ry="2.5"
+          fill="hsl(200 80% 55%)"
           animate={{
-            opacity: [0.6, 1, 0.6],
-            scale: [0.9, 1.1, 0.9],
+            opacity: [0.5, 1, 0.5],
+            scale: [0.8, 1.2, 0.8],
           }}
           transition={{
             duration: 1.5,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+        
+        {/* Inner glow trail down keyhole */}
+        <motion.rect
+          x="12.5"
+          y="15"
+          width="3"
+          height="8"
+          rx="1.5"
+          fill="hsl(200 70% 50%)"
+          animate={{
+            opacity: [0.3, 0.7, 0.3],
+          }}
+          transition={{
+            duration: 2,
             repeat: Infinity,
             ease: 'easeInOut',
           }}

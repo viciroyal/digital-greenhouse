@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -8,32 +8,36 @@ interface PharmersPledgeModalProps {
   onClose: () => void;
 }
 
-const pledgeText = [
-  "We do not just grow food. We grow frequency.",
-  "",
-  "We Pharm because the soil holds the memory.",
-  "",
-  "The Muscogee who built the mounds.",
-  "",
-  "The Maroons who hid the seeds of freedom in the hills.",
-  "",
-  "The Dogon who mapped the stars to the harvest.",
-  "",
-  "The Kemetic Priests who mastered the alchemy of gold.",
-  "",
-  "To enter this school is to remember them."
+// Chakra-aligned ancestral lineages
+const pledgeLines = [
+  { text: "We do not just grow food. We grow frequency.", color: "hsl(0 0% 95%)" },
+  { text: "", color: "transparent" },
+  { text: "We Pharm because the soil holds the memory...", color: "hsl(0 0% 95%)" },
+  { text: "", color: "transparent" },
+  { text: "...of the MUSCOGEE who built the mounds to honor this clay.", color: "hsl(0 100% 50%)", chakra: "Root" },
+  { text: "", color: "transparent" },
+  { text: "...of the MAROONS who hid the seeds of freedom in the hills.", color: "hsl(16 100% 50%)", chakra: "Sacral" },
+  { text: "", color: "transparent" },
+  { text: "...of the DOGON who mapped the stars to the harvest.", color: "hsl(195 100% 50%)", chakra: "Throat" },
+  { text: "", color: "transparent" },
+  { text: "...of the ABORIGINAL Elders who sang the Dreamlines.", color: "hsl(275 100% 25%)", chakra: "Third Eye" },
+  { text: "", color: "transparent" },
+  { text: "...of the KEMETIC PRIESTS who mastered the alchemy of gold.", color: "hsl(51 100% 50%)", chakra: "Crown" },
+  { text: "", color: "transparent" },
+  { text: "To enter this school is to remember them.", color: "hsl(0 0% 95%)" },
 ];
 
 /**
- * The Pharmer's Pledge Modal - "The Gatekeeper"
+ * The Pharmer's Pledge Modal - "The Soil Chamber"
  * 
- * A sacred scroll experience that serves as the initiation
- * into the Pharmer's Portal (The School).
+ * A sacred scroll experience with Chakra-aligned ancestral colors,
+ * Shepard Tone audio, and spore dissolution animation.
  */
 const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
   const [scrollComplete, setScrollComplete] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [sporeParticles, setSporeParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
+  const audioContextRef = useRef<AudioContext | null>(null);
   const navigate = useNavigate();
 
   // Reset state when modal opens
@@ -41,35 +45,123 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
     if (isOpen) {
       setScrollComplete(false);
       setIsUnlocking(false);
+      setSporeParticles([]);
     }
   }, [isOpen]);
 
-  // Auto-scroll the text like Star Wars opening crawl
+  // Auto-scroll completion timer
   useEffect(() => {
     if (!isOpen) return;
 
     const timer = setTimeout(() => {
       setScrollComplete(true);
-    }, 12000); // 12 seconds for the full scroll
+    }, 14000); // 14 seconds for the full scroll
 
     return () => clearTimeout(timer);
   }, [isOpen]);
 
+  // Shepard Tone Generator - Creates an infinitely ascending auditory illusion
+  const playShepardTone = useCallback(() => {
+    if (audioContextRef.current) return;
+    
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    audioContextRef.current = audioContext;
+
+    const baseFreq = 110; // A2
+    const numVoices = 6;
+    const duration = 4;
+
+    // Create multiple oscillators at octave intervals
+    for (let i = 0; i < numVoices; i++) {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      const freq = baseFreq * Math.pow(2, i);
+      oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+      oscillator.type = 'sine';
+      
+      // Fade envelope for smooth blending
+      const peakTime = audioContext.currentTime + duration * 0.3;
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.08 / numVoices, peakTime);
+      gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
+      
+      // Frequency sweep upward
+      oscillator.frequency.exponentialRampToValueAtTime(
+        freq * 2,
+        audioContext.currentTime + duration
+      );
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+    }
+
+    // Deep drum heartbeat
+    const drumOsc = audioContext.createOscillator();
+    const drumGain = audioContext.createGain();
+    drumOsc.type = 'sine';
+    drumOsc.frequency.setValueAtTime(60, audioContext.currentTime);
+    drumGain.gain.setValueAtTime(0.3, audioContext.currentTime);
+    drumGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+    drumOsc.connect(drumGain);
+    drumGain.connect(audioContext.destination);
+    drumOsc.start(audioContext.currentTime);
+    drumOsc.stop(audioContext.currentTime + 0.5);
+
+    // Second heartbeat
+    setTimeout(() => {
+      if (!audioContextRef.current) return;
+      const drum2 = audioContext.createOscillator();
+      const drum2Gain = audioContext.createGain();
+      drum2.type = 'sine';
+      drum2.frequency.setValueAtTime(55, audioContext.currentTime);
+      drum2Gain.gain.setValueAtTime(0.25, audioContext.currentTime);
+      drum2Gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+      drum2.connect(drum2Gain);
+      drum2Gain.connect(audioContext.destination);
+      drum2.start(audioContext.currentTime);
+      drum2.stop(audioContext.currentTime + 0.6);
+    }, 400);
+  }, []);
+
+  // Generate spore particles for dissolution effect
+  const generateSpores = useCallback(() => {
+    const newSpores = Array.from({ length: 50 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 200 - 100,
+      y: Math.random() * 200 - 100,
+    }));
+    setSporeParticles(newSpores);
+  }, []);
+
   const handleRemember = () => {
     setIsUnlocking(true);
+    playShepardTone();
+    generateSpores();
     
-    // Play stone door sound effect
-    const audio = new Audio();
-    audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleR8LT5fUyoZlKytcltjJf1swN2eY0sB3XDQ5bp7PuHRdOT1yosywb1xAQ3Wlx6hrX0VHeanCoWddSkt9rcCcY1tNUIGwvZZgWk9UhbO5kV1YUViItrWMWlZTV4u4sohWU1VbjbqvhFNRV1+RvKuAT09aY5S+p3tMTl1mmcCjdklNYGqcwaB0R0tibaDBnXFFSmVwoMKackRJaHOjw5lvQkhrdqbEnGxAR255qcWYaT5GcHurxpVmPEVzfq7HkmM6RHWBsMiPYDhDeISyyY1dNkJ7h7TKil02QnyJtsuHWjVBfYu3zIRXM0B/jbjNgVQyP4GOuc59UjE+go+6z3xQLz6Dkb3PeU4tPYSTvtB2TC08hpW/0XNKKzuHl8DRcUgqOoiZwdJvRik5iZrC025EKDmLnMPTa0InOIyexNRpQCY3jp/F1WY+JTePocbVZDwkNpCix9ZiOiM1kaTI12A5IjWSpcnYXjchNJOmy9hdNyE0lKfL2Vs2IDSVqMzZWTUfM5apzdlXNB4ylqrO2VUzHTGXq8/ZUzIdMZiszthRMRwwmK3Q2E8wGy+Zrs/YTi8aLpqv0NhMLhktm7DR2EotGCycsdHYSSsYLJ2y0thHKhcrnbPS2EUpFiqetNPYQygWKZ+109hBJxUon7bU2D8mFCegtdTYPSUTJqG21Ng7JBMlorfV2DojEiSjuNbYOCIRJKS51tg2IRAjpbrW2TQgDyKmutfZMh8OIae72NkxHg4hqLzY2S8dDSCpvNjZLRwNIKq92dkrGwwfrb7Z2SkaCx6uv9rZJxoLHq+/2tklGQodr8Db2iQYCh2wwd3aIxgJHLHC3dohFwkbssLd2h8WCBuzw97aHhYIG7TE3toeFQcatMTe2h0VBxq1xd/aHBQGGbbF39oaFAYZtsbg2xkTBRi3x+DbGBIFGLjH4NsXEgQXucjh2xYRBBe6yOHbFREEF7rJ4tsUEAMWu8ni2xMQAxW8yuPbEg8DFb3K49sRDgIVvsvk3BAOAhS/zOTcDw0CFMDMpnsPDQEUwc2hewBvbWs=';
-    audio.volume = 0.3;
-    audio.play().catch(() => {}); // Ignore if autoplay blocked
-    
-    // Delay navigation for dramatic effect
+    // Delay navigation for the full experience
     setTimeout(() => {
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
       onClose();
       navigate('/ancestral-path');
-    }, 2000);
+    }, 3000);
   };
+
+  // Cleanup audio context on unmount
+  useEffect(() => {
+    return () => {
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <AnimatePresence>
@@ -81,73 +173,124 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Aged Parchment over Dark Soil Background */}
+          {/* The Soil Chamber Background */}
           <div 
             className="absolute inset-0"
             style={{
-              background: `
-                linear-gradient(180deg,
-                  hsl(30 30% 10%) 0%,
-                  hsl(25 35% 8%) 30%,
-                  hsl(20 40% 6%) 60%,
-                  hsl(15 45% 5%) 100%
-                )
-              `,
+              background: 'hsl(0 0% 10%)',
             }}
           />
           
-          {/* Parchment texture overlay */}
-          <div 
-            className="absolute inset-0 opacity-20"
+          {/* Animated Mycelial Network Texture */}
+          <div className="absolute inset-0 overflow-hidden opacity-30">
+            {[...Array(20)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  width: `${100 + Math.random() * 200}px`,
+                  height: '1px',
+                  background: `linear-gradient(90deg, transparent, hsl(40 30% 30%), transparent)`,
+                  transformOrigin: 'left center',
+                  transform: `rotate(${Math.random() * 360}deg)`,
+                }}
+                animate={{
+                  opacity: [0.2, 0.6, 0.2],
+                  scaleX: [0.8, 1.2, 0.8],
+                }}
+                transition={{
+                  duration: 3 + Math.random() * 2,
+                  repeat: Infinity,
+                  delay: Math.random() * 2,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Stars at the top (where text disappears into) */}
+          <div className="absolute top-0 left-0 right-0 h-1/3 pointer-events-none">
+            {[...Array(30)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute rounded-full"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  width: `${1 + Math.random() * 2}px`,
+                  height: `${1 + Math.random() * 2}px`,
+                  background: 'hsl(0 0% 90%)',
+                }}
+                animate={{
+                  opacity: [0.3, 1, 0.3],
+                }}
+                transition={{
+                  duration: 1 + Math.random() * 2,
+                  repeat: Infinity,
+                  delay: Math.random(),
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Gold Leaf Border - Ancient & Chipped */}
+          <motion.div
+            className="absolute inset-4 md:inset-8 pointer-events-none"
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-              mixBlendMode: 'overlay',
+              border: '3px solid transparent',
+              borderImage: `linear-gradient(
+                135deg,
+                hsl(51 100% 50%) 0%,
+                hsl(40 80% 35%) 20%,
+                hsl(51 100% 50%) 40%,
+                hsl(35 70% 30%) 60%,
+                hsl(51 100% 50%) 80%,
+                hsl(40 80% 35%) 100%
+              ) 1`,
+              filter: 'drop-shadow(0 0 10px hsl(51 80% 40% / 0.3))',
             }}
-          />
-          
-          {/* Soil texture at bottom */}
-          <div 
-            className="absolute bottom-0 left-0 right-0 h-1/3"
-            style={{
-              background: `
-                linear-gradient(0deg,
-                  hsl(20 50% 8%) 0%,
-                  transparent 100%
-                )
-              `,
-            }}
-          />
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 1 }}
+          >
+            {/* Chipped corner effects */}
+            <div className="absolute -top-1 -left-1 w-6 h-6 bg-[hsl(0_0%_10%)]" style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-[hsl(0_0%_10%)]" style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 0)' }} />
+            <div className="absolute -bottom-1 -left-1 w-5 h-5 bg-[hsl(0_0%_10%)]" style={{ clipPath: 'polygon(0 0, 0 100%, 100% 100%)' }} />
+            <div className="absolute -bottom-1 -right-1 w-8 h-3 bg-[hsl(0_0%_10%)]" style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }} />
+          </motion.div>
 
           {/* Close button */}
           <motion.button
-            className="absolute top-6 right-6 p-3 rounded-full z-10"
+            className="absolute top-8 right-8 md:top-12 md:right-12 p-3 rounded-full z-20"
             style={{
-              background: 'hsl(20 30% 15% / 0.8)',
-              border: '1px solid hsl(40 40% 30%)',
+              background: 'hsl(0 0% 15% / 0.8)',
+              border: '1px solid hsl(51 80% 40% / 0.5)',
             }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             onClick={onClose}
           >
-            <X className="w-6 h-6 text-cream-muted" />
+            <X className="w-5 h-5" style={{ color: 'hsl(40 30% 70%)' }} />
           </motion.button>
 
           {/* Content Container */}
-          <div className="relative w-full max-w-3xl mx-auto px-8 h-full flex flex-col items-center justify-center overflow-hidden">
+          <div className="relative w-full max-w-4xl mx-auto px-8 h-full flex flex-col items-center justify-center overflow-hidden">
             
-            {/* The Title - Wood-carved style */}
+            {/* The Title - Staatliches Carved Wood Style */}
             <motion.h1
-              className="text-4xl md:text-6xl text-center mb-12 tracking-[0.2em]"
+              className="text-3xl md:text-5xl lg:text-6xl text-center mb-8 tracking-[0.15em] z-10"
               style={{
                 fontFamily: "'Staatliches', 'Chewy', sans-serif",
-                color: 'hsl(40 60% 70%)',
+                color: 'hsl(51 100% 50%)',
                 textShadow: `
-                  2px 2px 0 hsl(20 50% 15%),
-                  4px 4px 8px rgba(0,0,0,0.6),
-                  0 0 40px hsl(40 50% 40% / 0.3)
+                  2px 2px 0 hsl(20 50% 10%),
+                  4px 4px 8px rgba(0,0,0,0.8),
+                  0 0 40px hsl(51 80% 40% / 0.4)
                 `,
               }}
-              initial={{ opacity: 0, y: -30 }}
+              initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.5 }}
             >
@@ -156,109 +299,133 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
 
             {/* Star Wars style scrolling text container */}
             <div 
-              ref={scrollContainerRef}
-              className="relative w-full h-[40vh] overflow-hidden"
+              className="relative w-full h-[45vh] overflow-hidden"
               style={{
-                perspective: '400px',
+                perspective: '350px',
                 perspectiveOrigin: 'center top',
               }}
             >
-              {/* Fade gradients */}
+              {/* Top fade into stars */}
               <div 
-                className="absolute inset-x-0 top-0 h-20 z-10 pointer-events-none"
+                className="absolute inset-x-0 top-0 h-24 z-10 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(180deg, hsl(25 35% 8%) 0%, transparent 100%)',
+                  background: 'linear-gradient(180deg, hsl(0 0% 10%) 0%, transparent 100%)',
                 }}
               />
+              {/* Bottom fade */}
               <div 
-                className="absolute inset-x-0 bottom-0 h-20 z-10 pointer-events-none"
+                className="absolute inset-x-0 bottom-0 h-24 z-10 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(0deg, hsl(25 35% 8%) 0%, transparent 100%)',
+                  background: 'linear-gradient(0deg, hsl(0 0% 10%) 0%, transparent 100%)',
                 }}
               />
 
               {/* Scrolling text */}
               <motion.div
-                className="absolute inset-x-0 text-center"
+                className="absolute inset-x-0 text-center px-4"
                 style={{
                   transformStyle: 'preserve-3d',
-                  transform: 'rotateX(25deg)',
+                  transform: 'rotateX(20deg)',
                 }}
-                initial={{ y: '100%' }}
-                animate={{ y: '-100%' }}
+                initial={{ y: '120%' }}
+                animate={{ y: '-120%' }}
                 transition={{
-                  duration: 12,
+                  duration: 14,
                   ease: 'linear',
                 }}
               >
-                {pledgeText.map((line, index) => (
+                {pledgeLines.map((line, index) => (
                   <p
                     key={index}
-                    className="text-xl md:text-2xl font-body leading-relaxed mb-6"
+                    className="text-lg md:text-xl lg:text-2xl leading-relaxed mb-5"
                     style={{
-                      color: line ? 'hsl(40 50% 85%)' : 'transparent',
-                      textShadow: line ? '0 0 20px hsl(40 50% 60% / 0.5)' : 'none',
+                      fontFamily: "'Staatliches', sans-serif",
+                      letterSpacing: '0.05em',
+                      color: line.text ? line.color : 'transparent',
+                      textShadow: line.text && line.chakra 
+                        ? `0 0 20px ${line.color}, 0 0 40px ${line.color}` 
+                        : line.text 
+                          ? '0 0 10px hsl(0 0% 70% / 0.3)' 
+                          : 'none',
                     }}
                   >
-                    {line || '\u00A0'}
+                    {line.text || '\u00A0'}
                   </p>
                 ))}
               </motion.div>
             </div>
 
-            {/* The Lock Mechanism */}
+            {/* The Blood Oath Button */}
             <motion.div
-              className="mt-12"
+              className="mt-8 relative z-10"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 2 }}
             >
               <motion.button
-                className="relative px-12 py-4 rounded-full font-bubble text-lg tracking-wider overflow-hidden"
+                className="relative px-14 py-5 rounded-lg font-bubble text-lg tracking-wider overflow-hidden"
                 style={{
+                  fontFamily: "'Staatliches', sans-serif",
                   background: scrollComplete 
-                    ? 'linear-gradient(135deg, hsl(40 60% 35%), hsl(30 50% 25%))'
-                    : 'hsl(0 0% 30%)',
+                    ? 'linear-gradient(135deg, hsl(0 70% 40%), hsl(0 80% 30%))'
+                    : 'hsl(0 0% 25%)',
                   border: scrollComplete
-                    ? '2px solid hsl(40 70% 50%)'
-                    : '2px solid hsl(0 0% 40%)',
-                  color: scrollComplete ? 'hsl(40 60% 90%)' : 'hsl(0 0% 60%)',
+                    ? '2px solid hsl(0 60% 50%)'
+                    : '2px solid hsl(0 0% 35%)',
+                  color: scrollComplete ? 'hsl(0 0% 95%)' : 'hsl(0 0% 50%)',
                   boxShadow: scrollComplete 
-                    ? '0 0 30px hsl(40 60% 40% / 0.5), inset 0 2px 10px hsl(40 80% 60% / 0.2)'
+                    ? '0 0 30px hsl(0 70% 40% / 0.5), inset 0 2px 10px hsl(0 80% 60% / 0.2)'
                     : 'none',
                   cursor: scrollComplete ? 'pointer' : 'not-allowed',
                 }}
-                disabled={!scrollComplete}
-                whileHover={scrollComplete ? { scale: 1.05 } : {}}
-                whileTap={scrollComplete ? { scale: 0.98 } : {}}
+                disabled={!scrollComplete || isUnlocking}
+                whileHover={scrollComplete && !isUnlocking ? { 
+                  scale: 1.05,
+                  boxShadow: '0 0 50px hsl(0 70% 50% / 0.7), inset 0 2px 15px hsl(0 80% 60% / 0.3)',
+                } : {}}
+                whileTap={scrollComplete && !isUnlocking ? { scale: 0.98 } : {}}
                 onClick={handleRemember}
+                animate={isUnlocking ? { scale: [1, 1.1, 0], opacity: [1, 1, 0] } : {}}
+                transition={isUnlocking ? { duration: 1.5, ease: 'easeOut' } : {}}
               >
-                {/* Unlocking animation overlay */}
-                {isUnlocking && (
-                  <motion.div
-                    className="absolute inset-0 rounded-full"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent, hsl(40 80% 60%), transparent)',
-                    }}
-                    animate={{
-                      x: ['-100%', '200%'],
-                    }}
-                    transition={{
-                      duration: 1,
-                      repeat: Infinity,
-                    }}
-                  />
-                )}
+                {/* Spore dissolution particles */}
+                <AnimatePresence>
+                  {isUnlocking && sporeParticles.map((spore) => (
+                    <motion.div
+                      key={spore.id}
+                      className="absolute w-2 h-2 rounded-full"
+                      style={{
+                        background: 'hsl(51 100% 50%)',
+                        left: '50%',
+                        top: '50%',
+                      }}
+                      initial={{ x: 0, y: 0, opacity: 1 }}
+                      animate={{
+                        x: spore.x * 3,
+                        y: spore.y * 3,
+                        opacity: 0,
+                        scale: [1, 0.5, 0],
+                      }}
+                      transition={{
+                        duration: 2,
+                        ease: 'easeOut',
+                      }}
+                    />
+                  ))}
+                </AnimatePresence>
                 
-                <span className="relative z-10">
-                  {isUnlocking ? 'UNLOCKING...' : 'I REMEMBER'}
+                <span className="relative z-10" style={{ opacity: isUnlocking ? 0 : 1 }}>
+                  I REMEMBER
                 </span>
               </motion.button>
               
-              {!scrollComplete && (
+              {!scrollComplete && !isUnlocking && (
                 <motion.p
-                  className="text-center mt-4 text-sm font-body"
-                  style={{ color: 'hsl(40 30% 50%)' }}
+                  className="text-center mt-4 text-sm"
+                  style={{ 
+                    fontFamily: "'Space Mono', monospace",
+                    color: 'hsl(40 30% 50%)' 
+                  }}
                   animate={{ opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
@@ -268,31 +435,22 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
             </motion.div>
           </div>
 
-          {/* Stone door effect when unlocking */}
+          {/* Ascending light effect when unlocking */}
           <AnimatePresence>
             {isUnlocking && (
-              <>
-                <motion.div
-                  className="absolute left-0 top-0 bottom-0 w-1/2"
-                  style={{
-                    background: 'linear-gradient(90deg, hsl(20 40% 10%), hsl(25 35% 15%))',
-                    boxShadow: 'inset -10px 0 30px rgba(0,0,0,0.5)',
-                  }}
-                  initial={{ x: 0 }}
-                  animate={{ x: '-100%' }}
-                  transition={{ duration: 1.5, ease: 'easeInOut', delay: 0.3 }}
-                />
-                <motion.div
-                  className="absolute right-0 top-0 bottom-0 w-1/2"
-                  style={{
-                    background: 'linear-gradient(-90deg, hsl(20 40% 10%), hsl(25 35% 15%))',
-                    boxShadow: 'inset 10px 0 30px rgba(0,0,0,0.5)',
-                  }}
-                  initial={{ x: 0 }}
-                  animate={{ x: '100%' }}
-                  transition={{ duration: 1.5, ease: 'easeInOut', delay: 0.3 }}
-                />
-              </>
+              <motion.div
+                className="absolute inset-0 pointer-events-none"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 0.8, 0] }}
+                transition={{ duration: 3 }}
+                style={{
+                  background: `radial-gradient(
+                    ellipse at center bottom,
+                    hsl(51 100% 50% / 0.3) 0%,
+                    transparent 70%
+                  )`,
+                }}
+              />
             )}
           </AnimatePresence>
         </motion.div>
