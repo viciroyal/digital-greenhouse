@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import CassettePlayer from './CassettePlayer';
 import PharmerTooltip from './PharmerTooltip';
 import albumArt from '@/assets/pharmboi-artwork.png';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Organic Vine Frame
 const VineFrame = ({ side }: { side: 'left' | 'right' }) => (
@@ -123,36 +124,53 @@ const ParallaxMosaicBead = ({
   );
 };
 
+// Full bead configuration for desktop
+const fullBeadConfigs = [
+  // Ruby beads - move slower (background layer)
+  { size: 12, color: 'hsl(350 75% 55%)', glow: 'hsl(350 75% 40% / 0.6)', startX: 15, startY: 85, duration: 12, delay: 0, parallaxSpeed: -80 },
+  { size: 8, color: 'hsl(350 80% 60%)', glow: 'hsl(350 75% 45% / 0.5)', startX: 25, startY: 90, duration: 14, delay: 2, parallaxSpeed: -120 },
+  { size: 6, color: 'hsl(350 70% 50%)', glow: 'hsl(350 75% 35% / 0.4)', startX: 10, startY: 75, duration: 10, delay: 4, parallaxSpeed: -60 },
+  // Sapphire beads - move medium speed (mid layer)
+  { size: 10, color: 'hsl(220 75% 60%)', glow: 'hsl(220 75% 45% / 0.6)', startX: 75, startY: 80, duration: 13, delay: 1, parallaxSpeed: -150 },
+  { size: 14, color: 'hsl(220 80% 55%)', glow: 'hsl(220 75% 40% / 0.5)', startX: 85, startY: 88, duration: 15, delay: 3, parallaxSpeed: -200 },
+  { size: 7, color: 'hsl(220 70% 65%)', glow: 'hsl(220 75% 50% / 0.4)', startX: 90, startY: 70, duration: 11, delay: 5, parallaxSpeed: -100 },
+  // Topaz beads - move faster (foreground layer)
+  { size: 9, color: 'hsl(45 90% 55%)', glow: 'hsl(45 90% 40% / 0.6)', startX: 45, startY: 92, duration: 11, delay: 0.5, parallaxSpeed: -250 },
+  { size: 11, color: 'hsl(45 85% 60%)', glow: 'hsl(45 90% 45% / 0.5)', startX: 55, startY: 85, duration: 13, delay: 2.5, parallaxSpeed: -180 },
+  { size: 5, color: 'hsl(45 80% 65%)', glow: 'hsl(45 90% 50% / 0.4)', startX: 50, startY: 78, duration: 9, delay: 4.5, parallaxSpeed: -300 },
+  // Amethyst beads - varied speeds for depth
+  { size: 8, color: 'hsl(280 60% 55%)', glow: 'hsl(280 60% 40% / 0.6)', startX: 30, startY: 82, duration: 14, delay: 1.5, parallaxSpeed: -140 },
+  { size: 13, color: 'hsl(280 65% 50%)', glow: 'hsl(280 60% 35% / 0.5)', startX: 70, startY: 95, duration: 16, delay: 3.5, parallaxSpeed: -220 },
+  { size: 6, color: 'hsl(280 55% 60%)', glow: 'hsl(280 60% 45% / 0.4)', startX: 35, startY: 70, duration: 10, delay: 5.5, parallaxSpeed: -90 },
+  // Emerald beads - mixed layer positions
+  { size: 10, color: 'hsl(140 60% 45%)', glow: 'hsl(140 60% 30% / 0.6)', startX: 20, startY: 88, duration: 12, delay: 0.8, parallaxSpeed: -170 },
+  { size: 7, color: 'hsl(140 55% 50%)', glow: 'hsl(140 60% 35% / 0.5)', startX: 80, startY: 75, duration: 11, delay: 2.8, parallaxSpeed: -110 },
+  { size: 9, color: 'hsl(140 65% 40%)', glow: 'hsl(140 60% 25% / 0.4)', startX: 65, startY: 90, duration: 13, delay: 4.8, parallaxSpeed: -240 },
+  // Extra scattered beads - fast foreground
+  { size: 4, color: 'hsl(350 75% 60%)', glow: 'hsl(350 75% 45% / 0.3)', startX: 5, startY: 95, duration: 8, delay: 6, parallaxSpeed: -280 },
+  { size: 5, color: 'hsl(220 75% 65%)', glow: 'hsl(220 75% 50% / 0.3)', startX: 95, startY: 85, duration: 9, delay: 7, parallaxSpeed: -320 },
+  { size: 4, color: 'hsl(45 90% 60%)', glow: 'hsl(45 90% 45% / 0.3)', startX: 40, startY: 98, duration: 8, delay: 6.5, parallaxSpeed: -350 },
+  { size: 5, color: 'hsl(280 60% 58%)', glow: 'hsl(280 60% 42% / 0.3)', startX: 60, startY: 80, duration: 9, delay: 7.5, parallaxSpeed: -130 },
+  { size: 4, color: 'hsl(140 60% 48%)', glow: 'hsl(140 60% 32% / 0.3)', startX: 48, startY: 72, duration: 8, delay: 8, parallaxSpeed: -160 },
+];
+
+// Reduced bead configuration for mobile (one per gemstone type)
+const mobileBeadConfigs = [
+  // One ruby
+  { size: 10, color: 'hsl(350 75% 55%)', glow: 'hsl(350 75% 40% / 0.6)', startX: 15, startY: 85, duration: 12, delay: 0, parallaxSpeed: -80 },
+  // One sapphire
+  { size: 12, color: 'hsl(220 80% 55%)', glow: 'hsl(220 75% 40% / 0.5)', startX: 85, startY: 88, duration: 15, delay: 2, parallaxSpeed: -150 },
+  // One topaz
+  { size: 9, color: 'hsl(45 90% 55%)', glow: 'hsl(45 90% 40% / 0.6)', startX: 50, startY: 90, duration: 11, delay: 1, parallaxSpeed: -200 },
+  // One amethyst
+  { size: 10, color: 'hsl(280 65% 50%)', glow: 'hsl(280 60% 35% / 0.5)', startX: 70, startY: 82, duration: 14, delay: 3, parallaxSpeed: -180 },
+  // One emerald
+  { size: 8, color: 'hsl(140 60% 45%)', glow: 'hsl(140 60% 30% / 0.6)', startX: 25, startY: 88, duration: 12, delay: 1.5, parallaxSpeed: -140 },
+];
+
 // Mosaic Bead Particles with Parallax Scrolling
-const MosaicBeadParticles = ({ scrollYProgress }: { scrollYProgress: any }) => {
-  const beadConfigs = [
-    // Ruby beads - move slower (background layer)
-    { size: 12, color: 'hsl(350 75% 55%)', glow: 'hsl(350 75% 40% / 0.6)', startX: 15, startY: 85, duration: 12, delay: 0, parallaxSpeed: -80 },
-    { size: 8, color: 'hsl(350 80% 60%)', glow: 'hsl(350 75% 45% / 0.5)', startX: 25, startY: 90, duration: 14, delay: 2, parallaxSpeed: -120 },
-    { size: 6, color: 'hsl(350 70% 50%)', glow: 'hsl(350 75% 35% / 0.4)', startX: 10, startY: 75, duration: 10, delay: 4, parallaxSpeed: -60 },
-    // Sapphire beads - move medium speed (mid layer)
-    { size: 10, color: 'hsl(220 75% 60%)', glow: 'hsl(220 75% 45% / 0.6)', startX: 75, startY: 80, duration: 13, delay: 1, parallaxSpeed: -150 },
-    { size: 14, color: 'hsl(220 80% 55%)', glow: 'hsl(220 75% 40% / 0.5)', startX: 85, startY: 88, duration: 15, delay: 3, parallaxSpeed: -200 },
-    { size: 7, color: 'hsl(220 70% 65%)', glow: 'hsl(220 75% 50% / 0.4)', startX: 90, startY: 70, duration: 11, delay: 5, parallaxSpeed: -100 },
-    // Topaz beads - move faster (foreground layer)
-    { size: 9, color: 'hsl(45 90% 55%)', glow: 'hsl(45 90% 40% / 0.6)', startX: 45, startY: 92, duration: 11, delay: 0.5, parallaxSpeed: -250 },
-    { size: 11, color: 'hsl(45 85% 60%)', glow: 'hsl(45 90% 45% / 0.5)', startX: 55, startY: 85, duration: 13, delay: 2.5, parallaxSpeed: -180 },
-    { size: 5, color: 'hsl(45 80% 65%)', glow: 'hsl(45 90% 50% / 0.4)', startX: 50, startY: 78, duration: 9, delay: 4.5, parallaxSpeed: -300 },
-    // Amethyst beads - varied speeds for depth
-    { size: 8, color: 'hsl(280 60% 55%)', glow: 'hsl(280 60% 40% / 0.6)', startX: 30, startY: 82, duration: 14, delay: 1.5, parallaxSpeed: -140 },
-    { size: 13, color: 'hsl(280 65% 50%)', glow: 'hsl(280 60% 35% / 0.5)', startX: 70, startY: 95, duration: 16, delay: 3.5, parallaxSpeed: -220 },
-    { size: 6, color: 'hsl(280 55% 60%)', glow: 'hsl(280 60% 45% / 0.4)', startX: 35, startY: 70, duration: 10, delay: 5.5, parallaxSpeed: -90 },
-    // Emerald beads - mixed layer positions
-    { size: 10, color: 'hsl(140 60% 45%)', glow: 'hsl(140 60% 30% / 0.6)', startX: 20, startY: 88, duration: 12, delay: 0.8, parallaxSpeed: -170 },
-    { size: 7, color: 'hsl(140 55% 50%)', glow: 'hsl(140 60% 35% / 0.5)', startX: 80, startY: 75, duration: 11, delay: 2.8, parallaxSpeed: -110 },
-    { size: 9, color: 'hsl(140 65% 40%)', glow: 'hsl(140 60% 25% / 0.4)', startX: 65, startY: 90, duration: 13, delay: 4.8, parallaxSpeed: -240 },
-    // Extra scattered beads - fast foreground
-    { size: 4, color: 'hsl(350 75% 60%)', glow: 'hsl(350 75% 45% / 0.3)', startX: 5, startY: 95, duration: 8, delay: 6, parallaxSpeed: -280 },
-    { size: 5, color: 'hsl(220 75% 65%)', glow: 'hsl(220 75% 50% / 0.3)', startX: 95, startY: 85, duration: 9, delay: 7, parallaxSpeed: -320 },
-    { size: 4, color: 'hsl(45 90% 60%)', glow: 'hsl(45 90% 45% / 0.3)', startX: 40, startY: 98, duration: 8, delay: 6.5, parallaxSpeed: -350 },
-    { size: 5, color: 'hsl(280 60% 58%)', glow: 'hsl(280 60% 42% / 0.3)', startX: 60, startY: 80, duration: 9, delay: 7.5, parallaxSpeed: -130 },
-    { size: 4, color: 'hsl(140 60% 48%)', glow: 'hsl(140 60% 32% / 0.3)', startX: 48, startY: 72, duration: 8, delay: 8, parallaxSpeed: -160 },
-  ];
+const MosaicBeadParticles = ({ scrollYProgress, isMobile }: { scrollYProgress: any; isMobile: boolean }) => {
+  const beadConfigs = isMobile ? mobileBeadConfigs : fullBeadConfigs;
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
@@ -231,6 +249,7 @@ const VineBorder = () => (
 
 const HeroSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
+  const isMobile = useIsMobile();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"]
@@ -249,7 +268,7 @@ const HeroSection = () => {
         }}
       />
       <CosmicBackground />
-      <MosaicBeadParticles scrollYProgress={scrollYProgress} />
+      <MosaicBeadParticles scrollYProgress={scrollYProgress} isMobile={isMobile} />
       
       {/* Root/earth glow from bottom */}
       <div 
