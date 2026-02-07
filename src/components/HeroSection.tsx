@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef } from 'react';
 import CassettePlayer from './CassettePlayer';
 import PharmerTooltip from './PharmerTooltip';
 import albumArt from '@/assets/pharmboi-artwork.png';
@@ -52,15 +53,17 @@ const VineFrame = ({ side }: { side: 'left' | 'right' }) => (
   </motion.svg>
 );
 
-// Mosaic Bead Particle - individual floating gemstone bead
-const MosaicBead = ({ 
+// Mosaic Bead Particle with Parallax - individual floating gemstone bead
+const ParallaxMosaicBead = ({ 
   size, 
   color, 
   glow, 
   startX, 
   startY, 
   duration, 
-  delay 
+  delay,
+  parallaxSpeed,
+  scrollYProgress,
 }: { 
   size: number; 
   color: string; 
@@ -68,76 +71,93 @@ const MosaicBead = ({
   startX: number; 
   startY: number; 
   duration: number; 
-  delay: number; 
-}) => (
-  <motion.div
-    className="absolute"
-    style={{
-      left: `${startX}%`,
-      top: `${startY}%`,
-    }}
-    initial={{ opacity: 0, scale: 0 }}
-    animate={{
-      opacity: [0, 0.8, 0.6, 0.9, 0],
-      scale: [0.5, 1, 1.1, 0.9, 0.5],
-      x: [0, 20, -15, 25, 0],
-      y: [0, -30, -60, -90, -120],
-      rotate: [0, 45, -30, 60, 0],
-    }}
-    transition={{
-      duration,
-      repeat: Infinity,
-      delay,
-      ease: "easeInOut",
-    }}
-  >
-    <div
-      className="rounded-full"
-      style={{
-        width: size,
-        height: size,
-        background: `radial-gradient(circle at 30% 30%, ${color}, ${glow})`,
-        boxShadow: `0 0 ${size * 2}px ${glow}, inset 0 0 ${size / 2}px rgba(255,255,255,0.3)`,
-      }}
-    />
-  </motion.div>
-);
+  delay: number;
+  parallaxSpeed: number;
+  scrollYProgress: any;
+}) => {
+  // Different beads move at different speeds based on their parallaxSpeed
+  const y = useTransform(scrollYProgress, [0, 1], [0, parallaxSpeed]);
+  const x = useTransform(scrollYProgress, [0, 1], [0, parallaxSpeed * 0.3]);
+  const rotate = useTransform(scrollYProgress, [0, 1], [0, parallaxSpeed * 0.5]);
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1 + Math.abs(parallaxSpeed) * 0.002, 0.8]);
 
-// Mosaic Bead Particles - floating gemstone beads
-const MosaicBeadParticles = () => {
+  return (
+    <motion.div
+      className="absolute"
+      style={{
+        left: `${startX}%`,
+        top: `${startY}%`,
+        y,
+        x,
+        rotate,
+        scale,
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{
+          opacity: [0, 0.8, 0.6, 0.9, 0],
+          scale: [0.5, 1, 1.1, 0.9, 0.5],
+          x: [0, 20, -15, 25, 0],
+          y: [0, -30, -60, -90, -120],
+          rotate: [0, 45, -30, 60, 0],
+        }}
+        transition={{
+          duration,
+          repeat: Infinity,
+          delay,
+          ease: "easeInOut",
+        }}
+      >
+        <div
+          className="rounded-full"
+          style={{
+            width: size,
+            height: size,
+            background: `radial-gradient(circle at 30% 30%, ${color}, ${glow})`,
+            boxShadow: `0 0 ${size * 2}px ${glow}, inset 0 0 ${size / 2}px rgba(255,255,255,0.3)`,
+          }}
+        />
+      </motion.div>
+    </motion.div>
+  );
+};
+
+// Mosaic Bead Particles with Parallax Scrolling
+const MosaicBeadParticles = ({ scrollYProgress }: { scrollYProgress: any }) => {
   const beadConfigs = [
-    // Ruby beads
-    { size: 12, color: 'hsl(350 75% 55%)', glow: 'hsl(350 75% 40% / 0.6)', startX: 15, startY: 85, duration: 12, delay: 0 },
-    { size: 8, color: 'hsl(350 80% 60%)', glow: 'hsl(350 75% 45% / 0.5)', startX: 25, startY: 90, duration: 14, delay: 2 },
-    { size: 6, color: 'hsl(350 70% 50%)', glow: 'hsl(350 75% 35% / 0.4)', startX: 10, startY: 75, duration: 10, delay: 4 },
-    // Sapphire beads
-    { size: 10, color: 'hsl(220 75% 60%)', glow: 'hsl(220 75% 45% / 0.6)', startX: 75, startY: 80, duration: 13, delay: 1 },
-    { size: 14, color: 'hsl(220 80% 55%)', glow: 'hsl(220 75% 40% / 0.5)', startX: 85, startY: 88, duration: 15, delay: 3 },
-    { size: 7, color: 'hsl(220 70% 65%)', glow: 'hsl(220 75% 50% / 0.4)', startX: 90, startY: 70, duration: 11, delay: 5 },
-    // Topaz beads
-    { size: 9, color: 'hsl(45 90% 55%)', glow: 'hsl(45 90% 40% / 0.6)', startX: 45, startY: 92, duration: 11, delay: 0.5 },
-    { size: 11, color: 'hsl(45 85% 60%)', glow: 'hsl(45 90% 45% / 0.5)', startX: 55, startY: 85, duration: 13, delay: 2.5 },
-    { size: 5, color: 'hsl(45 80% 65%)', glow: 'hsl(45 90% 50% / 0.4)', startX: 50, startY: 78, duration: 9, delay: 4.5 },
-    // Amethyst beads
-    { size: 8, color: 'hsl(280 60% 55%)', glow: 'hsl(280 60% 40% / 0.6)', startX: 30, startY: 82, duration: 14, delay: 1.5 },
-    { size: 13, color: 'hsl(280 65% 50%)', glow: 'hsl(280 60% 35% / 0.5)', startX: 70, startY: 95, duration: 16, delay: 3.5 },
-    { size: 6, color: 'hsl(280 55% 60%)', glow: 'hsl(280 60% 45% / 0.4)', startX: 35, startY: 70, duration: 10, delay: 5.5 },
-    // Emerald beads
-    { size: 10, color: 'hsl(140 60% 45%)', glow: 'hsl(140 60% 30% / 0.6)', startX: 20, startY: 88, duration: 12, delay: 0.8 },
-    { size: 7, color: 'hsl(140 55% 50%)', glow: 'hsl(140 60% 35% / 0.5)', startX: 80, startY: 75, duration: 11, delay: 2.8 },
-    { size: 9, color: 'hsl(140 65% 40%)', glow: 'hsl(140 60% 25% / 0.4)', startX: 65, startY: 90, duration: 13, delay: 4.8 },
-    // Extra scattered beads
-    { size: 4, color: 'hsl(350 75% 60%)', glow: 'hsl(350 75% 45% / 0.3)', startX: 5, startY: 95, duration: 8, delay: 6 },
-    { size: 5, color: 'hsl(220 75% 65%)', glow: 'hsl(220 75% 50% / 0.3)', startX: 95, startY: 85, duration: 9, delay: 7 },
-    { size: 4, color: 'hsl(45 90% 60%)', glow: 'hsl(45 90% 45% / 0.3)', startX: 40, startY: 98, duration: 8, delay: 6.5 },
-    { size: 5, color: 'hsl(280 60% 58%)', glow: 'hsl(280 60% 42% / 0.3)', startX: 60, startY: 80, duration: 9, delay: 7.5 },
-    { size: 4, color: 'hsl(140 60% 48%)', glow: 'hsl(140 60% 32% / 0.3)', startX: 48, startY: 72, duration: 8, delay: 8 },
+    // Ruby beads - move slower (background layer)
+    { size: 12, color: 'hsl(350 75% 55%)', glow: 'hsl(350 75% 40% / 0.6)', startX: 15, startY: 85, duration: 12, delay: 0, parallaxSpeed: -80 },
+    { size: 8, color: 'hsl(350 80% 60%)', glow: 'hsl(350 75% 45% / 0.5)', startX: 25, startY: 90, duration: 14, delay: 2, parallaxSpeed: -120 },
+    { size: 6, color: 'hsl(350 70% 50%)', glow: 'hsl(350 75% 35% / 0.4)', startX: 10, startY: 75, duration: 10, delay: 4, parallaxSpeed: -60 },
+    // Sapphire beads - move medium speed (mid layer)
+    { size: 10, color: 'hsl(220 75% 60%)', glow: 'hsl(220 75% 45% / 0.6)', startX: 75, startY: 80, duration: 13, delay: 1, parallaxSpeed: -150 },
+    { size: 14, color: 'hsl(220 80% 55%)', glow: 'hsl(220 75% 40% / 0.5)', startX: 85, startY: 88, duration: 15, delay: 3, parallaxSpeed: -200 },
+    { size: 7, color: 'hsl(220 70% 65%)', glow: 'hsl(220 75% 50% / 0.4)', startX: 90, startY: 70, duration: 11, delay: 5, parallaxSpeed: -100 },
+    // Topaz beads - move faster (foreground layer)
+    { size: 9, color: 'hsl(45 90% 55%)', glow: 'hsl(45 90% 40% / 0.6)', startX: 45, startY: 92, duration: 11, delay: 0.5, parallaxSpeed: -250 },
+    { size: 11, color: 'hsl(45 85% 60%)', glow: 'hsl(45 90% 45% / 0.5)', startX: 55, startY: 85, duration: 13, delay: 2.5, parallaxSpeed: -180 },
+    { size: 5, color: 'hsl(45 80% 65%)', glow: 'hsl(45 90% 50% / 0.4)', startX: 50, startY: 78, duration: 9, delay: 4.5, parallaxSpeed: -300 },
+    // Amethyst beads - varied speeds for depth
+    { size: 8, color: 'hsl(280 60% 55%)', glow: 'hsl(280 60% 40% / 0.6)', startX: 30, startY: 82, duration: 14, delay: 1.5, parallaxSpeed: -140 },
+    { size: 13, color: 'hsl(280 65% 50%)', glow: 'hsl(280 60% 35% / 0.5)', startX: 70, startY: 95, duration: 16, delay: 3.5, parallaxSpeed: -220 },
+    { size: 6, color: 'hsl(280 55% 60%)', glow: 'hsl(280 60% 45% / 0.4)', startX: 35, startY: 70, duration: 10, delay: 5.5, parallaxSpeed: -90 },
+    // Emerald beads - mixed layer positions
+    { size: 10, color: 'hsl(140 60% 45%)', glow: 'hsl(140 60% 30% / 0.6)', startX: 20, startY: 88, duration: 12, delay: 0.8, parallaxSpeed: -170 },
+    { size: 7, color: 'hsl(140 55% 50%)', glow: 'hsl(140 60% 35% / 0.5)', startX: 80, startY: 75, duration: 11, delay: 2.8, parallaxSpeed: -110 },
+    { size: 9, color: 'hsl(140 65% 40%)', glow: 'hsl(140 60% 25% / 0.4)', startX: 65, startY: 90, duration: 13, delay: 4.8, parallaxSpeed: -240 },
+    // Extra scattered beads - fast foreground
+    { size: 4, color: 'hsl(350 75% 60%)', glow: 'hsl(350 75% 45% / 0.3)', startX: 5, startY: 95, duration: 8, delay: 6, parallaxSpeed: -280 },
+    { size: 5, color: 'hsl(220 75% 65%)', glow: 'hsl(220 75% 50% / 0.3)', startX: 95, startY: 85, duration: 9, delay: 7, parallaxSpeed: -320 },
+    { size: 4, color: 'hsl(45 90% 60%)', glow: 'hsl(45 90% 45% / 0.3)', startX: 40, startY: 98, duration: 8, delay: 6.5, parallaxSpeed: -350 },
+    { size: 5, color: 'hsl(280 60% 58%)', glow: 'hsl(280 60% 42% / 0.3)', startX: 60, startY: 80, duration: 9, delay: 7.5, parallaxSpeed: -130 },
+    { size: 4, color: 'hsl(140 60% 48%)', glow: 'hsl(140 60% 32% / 0.3)', startX: 48, startY: 72, duration: 8, delay: 8, parallaxSpeed: -160 },
   ];
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
       {beadConfigs.map((config, i) => (
-        <MosaicBead key={i} {...config} />
+        <ParallaxMosaicBead key={i} {...config} scrollYProgress={scrollYProgress} />
       ))}
     </div>
   );
@@ -210,8 +230,17 @@ const VineBorder = () => (
 );
 
 const HeroSection = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"]
+  });
+
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden starfield">
+    <section 
+      ref={sectionRef}
+      className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden starfield"
+    >
       {/* Deep cosmic blue/purple background */}
       <div 
         className="absolute inset-0"
@@ -220,7 +249,7 @@ const HeroSection = () => {
         }}
       />
       <CosmicBackground />
-      <MosaicBeadParticles />
+      <MosaicBeadParticles scrollYProgress={scrollYProgress} />
       
       {/* Root/earth glow from bottom */}
       <div 
