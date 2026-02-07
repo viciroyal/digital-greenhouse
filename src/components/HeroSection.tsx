@@ -258,27 +258,18 @@ const HeroSection = () => {
   return (
     <section 
       ref={sectionRef}
-      className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden starfield"
+      className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden"
     >
-      {/* Deep cosmic blue/purple background */}
+      {/* Subtle overlay to enhance contrast with cosmogram */}
       <div 
-        className="absolute inset-0"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'linear-gradient(180deg, hsl(250 60% 12%) 0%, hsl(280 50% 10%) 40%, hsl(250 50% 8%) 100%)',
+          background: 'radial-gradient(ellipse at 50% 50%, transparent 0%, hsl(250 50% 5% / 0.3) 100%)',
         }}
       />
-      <CosmicBackground />
+      
+      {/* Mosaic bead particles still active */}
       <MosaicBeadParticles scrollYProgress={scrollYProgress} isMobile={isMobile} />
-      
-      {/* Root/earth glow from bottom */}
-      <div 
-        className="absolute inset-x-0 bottom-0 h-1/3"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 100%, hsl(20 40% 20% / 0.6) 0%, transparent 70%)',
-        }}
-      />
-      
-      <VineBorder />
 
       {/* Main content */}
       <div className="relative z-10 max-w-5xl w-full flex flex-col items-center gap-8 lg:gap-12">
