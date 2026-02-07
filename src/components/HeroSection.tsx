@@ -43,7 +43,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <PharmerTooltip 
-            tip="As Above, So Below. The party starts in the dirt so it can shine in the sky."
+            tip="The song of the star is born in the deep hum of the earth. What shines above is but the celebration of the soil."
             position="right"
           >
             <div className="relative group">
