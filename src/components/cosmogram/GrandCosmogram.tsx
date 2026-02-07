@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { useScroll } from 'framer-motion';
+import { useScroll, motion } from 'framer-motion';
 import CosmicVisionLayer from './CosmicVisionLayer';
 import AlchemicalSpineLayer from './AlchemicalSpineLayer';
 import RootsResistanceLayer from './RootsResistanceLayer';
@@ -9,6 +9,8 @@ import RootsResistanceLayer from './RootsResistanceLayer';
  * 
  * A parallax "Living Tapestry" that tells the story of Ascension:
  * From the Roots of Resistance (Earth) → To the Structure of Civilization (Body) → To the Cosmic Source (Spirit)
+ * 
+ * Now includes the Respiratory System - breathing animation (6s cycle)
  * 
  * Three layers that blend seamlessly as One Single Organism:
  * - Layer C (Top): Cosmic Vision - Aboriginal Songlines + Hermetic Sacred Geometry
@@ -24,10 +26,22 @@ const GrandCosmogram = () => {
   });
 
   return (
-    <div 
+    <motion.div 
       ref={containerRef}
       className="fixed inset-0 pointer-events-none z-0"
       aria-hidden="true"
+      animate={{
+        scale: [1, 1.02, 1.02, 1, 1],
+      }}
+      transition={{
+        duration: 6,
+        repeat: Infinity,
+        ease: "easeInOut",
+        times: [0, 0.4, 0.5, 0.9, 1],
+      }}
+      style={{
+        transformOrigin: 'center center',
+      }}
     >
       {/* Base cosmic gradient - the unifying fabric */}
       <div 
@@ -115,7 +129,7 @@ const GrandCosmogram = () => {
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
         }}
       />
-    </div>
+    </motion.div>
   );
 };
 

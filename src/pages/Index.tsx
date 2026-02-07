@@ -7,6 +7,10 @@ import ShopSection from '@/components/ShopSection';
 import Footer from '@/components/Footer';
 import StarMappingModal from '@/components/StarMappingModal';
 import GrandCosmogram from '@/components/cosmogram/GrandCosmogram';
+import RespiratorySystem from '@/components/bio-digital/RespiratorySystem';
+import BioluminescentVeins from '@/components/bio-digital/BioluminescentVeins';
+import CircadianOverlay from '@/components/bio-digital/CircadianOverlay';
+import MycelialMenu from '@/components/bio-digital/MycelialMenu';
 
 const Index = () => {
   const [isStarMappingOpen, setIsStarMappingOpen] = useState(false);
@@ -14,7 +18,18 @@ const Index = () => {
   return (
     <main className="min-h-screen bg-background overflow-x-hidden relative">
       {/* Grand Unified Cosmogram - The Living Tapestry */}
-      <GrandCosmogram />
+      <RespiratorySystem>
+        <GrandCosmogram />
+      </RespiratorySystem>
+      
+      {/* Bioluminescent Veins - Pulse on exhale */}
+      <BioluminescentVeins />
+      
+      {/* Circadian Rhythm Overlay */}
+      <CircadianOverlay />
+      
+      {/* Mycelial Navigation */}
+      <MycelialMenu />
       
       {/* Content layers */}
       <div className="relative z-10">
