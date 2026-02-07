@@ -11,70 +11,72 @@
 
 @layer base {
   :root {
-    /* Core: Deep Organic Dark Mode */
-    --background: 270 50% 7%;
-    --foreground: 270 20% 95%;
+    /* Core: Deep Root Brown/Red - "The Root System" palette */
+    --background: 10 25% 12%;
+    --foreground: 112 64% 96%;
 
-    /* Card/Popover: Glassmorphism base */
-    --card: 270 30% 12%;
-    --card-foreground: 270 20% 95%;
-    --popover: 270 30% 10%;
-    --popover-foreground: 270 20% 95%;
+    /* Card/Popover: Glassmorphism base with clay tones */
+    --card: 10 20% 15%;
+    --card-foreground: 112 64% 96%;
+    --popover: 10 25% 10%;
+    --popover-foreground: 112 64% 96%;
 
-    /* Primary: Neon Violet (Source/Sky) */
+    /* Primary: Crystal Violet (The Throne) */
     --primary: 280 80% 65%;
-    --primary-foreground: 270 50% 7%;
+    --primary-foreground: 10 25% 12%;
 
-    /* Secondary: Deep Root Brown */
-    --secondary: 15 60% 25%;
-    --secondary-foreground: 30 60% 90%;
+    /* Secondary: Clay Red accent */
+    --secondary: 16 20% 29%;
+    --secondary-foreground: 112 64% 96%;
 
-    /* Muted: Organic Earth */
-    --muted: 270 20% 15%;
-    --muted-foreground: 270 15% 60%;
+    /* Muted: Deep earth */
+    --muted: 10 20% 18%;
+    --muted-foreground: 112 40% 70%;
 
     /* Accent: Crystal Violet */
     --accent: 290 70% 50%;
-    --accent-foreground: 270 20% 95%;
+    --accent-foreground: 112 64% 96%;
 
     /* Destructive */
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders & Inputs */
-    --border: 270 30% 25%;
-    --input: 270 30% 20%;
+    /* Borders & Inputs - Clay Red */
+    --border: 16 20% 29%;
+    --input: 10 20% 20%;
     --ring: 280 80% 65%;
 
     --radius: 0.75rem;
 
-    /* Custom PHARMBOI Colors */
-    --soil-deep: 270 50% 7%;
-    --soil-brown: 15 60% 18%;
-    --root-red: 0 60% 35%;
+    /* Custom PHARMBOI Colors - Deep Earth Tones */
+    --soil-deep: 0 100% 5%;
+    --soil-brown: 10 25% 19%;
+    --root-red: 0 60% 25%;
+    --clay-red: 16 20% 29%;
     --crystal-violet: 280 80% 65%;
-    --source-white: 270 20% 95%;
+    --source-white: 112 64% 96%;
+    --bone-white: 112 64% 96%;
     --throne-gold: 45 80% 55%;
-    --glass-border: 270 30% 40%;
-    --glass-bg: 270 30% 15%;
+    --glass-border: 16 25% 35%;
+    --glass-bg: 10 20% 15%;
 
     /* Chakra Colors */
-    --chakra-root: 0 60% 40%;
+    --chakra-root: 0 60% 35%;
     --chakra-sacral: 25 80% 50%;
     --chakra-solar: 45 90% 55%;
     --chakra-heart: 140 50% 45%;
     --chakra-throat: 210 70% 55%;
     --chakra-vision: 280 60% 55%;
-    --chakra-source: 270 30% 90%;
+    --chakra-source: 112 64% 96%;
 
     /* Sidebar */
-    --sidebar-background: 270 50% 8%;
-    --sidebar-foreground: 270 20% 90%;
+    --sidebar-background: 10 25% 10%;
+    --sidebar-foreground: 112 64% 96%;
     --sidebar-primary: 280 80% 65%;
-    --sidebar-primary-foreground: 270 50% 7%;
+    --sidebar-primary-foreground: 10 25% 12%;
     --sidebar-accent: 290 70% 50%;
-    --sidebar-accent-foreground: 270 20% 95%;
-    --sidebar-border: 270 30% 20%;
+    --sidebar-accent-foreground: 112 64% 96%;
+    --sidebar-border: 16 20% 29%;
     --sidebar-ring: 280 80% 65%;
   }
 }
@@ -92,9 +94,9 @@
     @apply bg-background text-foreground antialiased;
     font-family: 'Space Grotesk', sans-serif;
     background: linear-gradient(180deg, 
-      hsl(270 50% 7%) 0%, 
-      hsl(280 40% 5%) 50%,
-      hsl(0 0% 2%) 100%
+      hsl(10 25% 19%) 0%, 
+      hsl(10 25% 12%) 30%,
+      hsl(0 100% 5%) 100%
     );
     background-attachment: fixed;
   }
