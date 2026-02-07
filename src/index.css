@@ -7,7 +7,7 @@
    All colors in HSL
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Staatliches&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Staatliches&family=Space+Mono:wght@400;700&family=Kelly+Slab&display=swap');
 
 @layer base {
   :root {
@@ -95,7 +95,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Space Mono', 'Space Grotesk', monospace;
     background: linear-gradient(180deg, 
       hsl(230 60% 15%) 0%, 
       hsl(230 50% 8%) 40%,
@@ -107,8 +107,58 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Staatliches', sans-serif;
     font-weight: 400;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
   }
+}
+
+/* Weathered Ebony Wood texture for pillar headers */
+.pillar-text {
+  font-family: 'Staatliches', sans-serif;
+  letter-spacing: 0.1em;
+  background: linear-gradient(
+    180deg,
+    hsl(var(--pale-straw)) 0%,
+    hsl(var(--millet-gold)) 30%,
+    hsl(var(--red-clay)) 70%,
+    hsl(20 30% 15%) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: 
+    drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.8))
+    drop-shadow(0 0 4px rgba(183, 65, 14, 0.2));
+  position: relative;
+}
+
+.pillar-text::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 3px
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  pointer-events: none;
+}
+
+/* Sirius Map - Astronomical data font */
+.sirius-text {
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 0.02em;
+}
+
+/* Carving font - Angular Kanaga mask style */
+.carving-text {
+  font-family: 'Kelly Slab', serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 @layer utilities {
