@@ -6,6 +6,7 @@ import WaveformPlayer from './track-detail/WaveformPlayer';
 import BodyQuadrant from './track-detail/BodyQuadrant';
 import SkyQuadrant from './track-detail/SkyQuadrant';
 import EarthQuadrant from './track-detail/EarthQuadrant';
+import CrystalQuadrant from './track-detail/CrystalQuadrant';
 import LogicQuadrant from './track-detail/LogicQuadrant';
 import ActivationQuadrant from './track-detail/ActivationQuadrant';
 
@@ -108,13 +109,16 @@ const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
                 {/* Quadrant B: The Sky */}
                 <SkyQuadrant track={track} />
 
-                {/* Quadrant C: The Earth */}
+                {/* Quadrant C: The Earth (Mineral) */}
                 <EarthQuadrant track={track} />
 
-                {/* Quadrant D: The Logic */}
+                {/* Quadrant D: The Crystal */}
+                <CrystalQuadrant track={track} />
+
+                {/* Quadrant E: The Logic */}
                 <LogicQuadrant track={track} />
 
-                {/* Quadrant E: The Activation (The Ritual) */}
+                {/* Quadrant F: The Activation (The Ritual) */}
                 <ActivationQuadrant track={track} />
               </div>
 
