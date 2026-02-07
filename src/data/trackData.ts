@@ -301,7 +301,7 @@ export const trackData: TrackData[] = [
   {
     row: 11,
     track: 'Awaken',
-    featuring: 'Vitoria, Dara Carter & Briar Blakley',
+    featuring: 'Victoria, Dara Carter & Briar Blakley',
     chakra: 'Vision',
     frequency: '963Hz',
     mineral: 'Phosphorus',
