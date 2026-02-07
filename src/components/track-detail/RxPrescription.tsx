@@ -150,6 +150,61 @@ const DotBorder = ({ position }: { position: 'top' | 'bottom' | 'left' | 'right'
   );
 };
 
+// Ceremonial sound generator using Web Audio API
+const playCeremonialSound = () => {
+  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  
+  // Create a deep resonant drone
+  const oscillator1 = audioContext.createOscillator();
+  const oscillator2 = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  
+  // Deep earth tone
+  oscillator1.type = 'sine';
+  oscillator1.frequency.setValueAtTime(60, audioContext.currentTime);
+  oscillator1.frequency.exponentialRampToValueAtTime(40, audioContext.currentTime + 1.5);
+  
+  // Harmonic overtone
+  oscillator2.type = 'triangle';
+  oscillator2.frequency.setValueAtTime(120, audioContext.currentTime);
+  oscillator2.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 1.5);
+  
+  // Fade envelope
+  gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+  gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
+  
+  oscillator1.connect(gainNode);
+  oscillator2.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  oscillator1.start(audioContext.currentTime);
+  oscillator2.start(audioContext.currentTime);
+  oscillator1.stop(audioContext.currentTime + 2);
+  oscillator2.stop(audioContext.currentTime + 2);
+  
+  // Add a brief chime/bell tone
+  const chime = audioContext.createOscillator();
+  const chimeGain = audioContext.createGain();
+  chime.type = 'sine';
+  chime.frequency.setValueAtTime(528, audioContext.currentTime); // 528Hz - healing frequency
+  chime.frequency.exponentialRampToValueAtTime(264, audioContext.currentTime + 1);
+  chimeGain.gain.setValueAtTime(0.15, audioContext.currentTime);
+  chimeGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1.5);
+  chime.connect(chimeGain);
+  chimeGain.connect(audioContext.destination);
+  chime.start(audioContext.currentTime + 0.05);
+  chime.stop(audioContext.currentTime + 1.5);
+};
+
+// Haptic vibration pattern for ritual initiation
+const triggerHapticFeedback = () => {
+  if ('vibrate' in navigator) {
+    // Pattern: short pulse, pause, longer resonance
+    navigator.vibrate([50, 100, 150, 100, 300]);
+  }
+};
+
 const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
   const [isActivated, setIsActivated] = useState(false);
   const rx = prescriptionData[track.row];
@@ -158,6 +213,15 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
 
   const handleActivate = () => {
     setIsActivated(true);
+    
+    // Trigger ceremonial effects
+    try {
+      playCeremonialSound();
+    } catch (e) {
+      console.log('Audio not available');
+    }
+    triggerHapticFeedback();
+    
     onActivate();
   };
 
