@@ -94,71 +94,88 @@ const MasterMatrix = () => {
 
         {/* Matrix Grid */}
         <div className="max-w-7xl mx-auto">
-          {/* Header Row */}
-          <div className="hidden lg:grid grid-cols-7 gap-2 mb-4 px-4">
+          {/* Header Row - refined styling */}
+          <div className="hidden lg:grid grid-cols-7 gap-3 mb-6 px-4">
             {['#', 'Chakra', 'Track', 'Frequency', 'Mineral', 'Crystal', 'Featuring'].map((header) => (
-              <p key={header} className="text-muted-foreground/60 text-xs font-mono tracking-wider uppercase text-center">
-                {header}
-              </p>
+              <div key={header} className="text-center">
+                <span className="text-throne-gold/70 text-xs font-mono tracking-[0.15em] uppercase px-3 py-1.5 rounded-full bg-throne-gold/5 border border-throne-gold/10">
+                  {header}
+                </span>
+              </div>
             ))}
           </div>
 
-          {/* Matrix Rows */}
-          <div className="space-y-2">
+          {/* Matrix Rows - refined spacing and styling */}
+          <div className="space-y-3">
             {trackData.map((element, index) => (
               <motion.div
                 key={element.row}
-                className="matrix-cell glass-card rounded-xl overflow-hidden cursor-pointer"
+                className="matrix-cell glass-card rounded-xl overflow-hidden cursor-pointer group"
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
+                transition={{ duration: 0.5, delay: index * 0.04 }}
                 onClick={() => handleTrackClick(element)}
                 whileHover={{ scale: 1.01 }}
               >
                 {/* Mobile Layout */}
-                <div className="lg:hidden p-4">
-                  <div className="flex items-center gap-4 mb-3">
+                <div className="lg:hidden p-5">
+                  <div className="flex items-center gap-4 mb-4">
                     <div 
-                      className="w-10 h-10 rounded-lg flex items-center justify-center border"
+                      className="w-12 h-12 rounded-xl flex items-center justify-center border-2 transition-all duration-300 group-hover:scale-110"
                       style={{ 
                         backgroundColor: `hsl(${element.colorHsl} / 0.15)`,
-                        borderColor: `hsl(${element.colorHsl} / 0.4)`
+                        borderColor: `hsl(${element.colorHsl} / 0.5)`
                       }}
                     >
-                      <span className="font-mono text-sm font-bold" style={{ color: `hsl(${element.colorHsl})` }}>
+                      <span className="font-mono text-base font-bold" style={{ color: `hsl(${element.colorHsl})` }}>
                         {element.mineralSymbol}
                       </span>
                     </div>
-                    <div>
-                      <p className="text-foreground font-mono text-base">{element.track}</p>
-                      <p className="text-muted-foreground text-xs font-mono">{element.chakra} • {element.frequency}</p>
+                    <div className="flex-1">
+                      <p className="text-foreground font-mono text-lg font-medium">{element.track}</p>
+                      <p className="text-muted-foreground text-sm font-mono">{element.chakra} • {element.frequency}</p>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 rounded-full bg-muted/50 text-xs text-muted-foreground font-mono">
+                    <span 
+                      className="px-3 py-1.5 rounded-full text-xs font-mono border"
+                      style={{ 
+                        borderColor: `hsl(${element.colorHsl} / 0.3)`,
+                        backgroundColor: `hsl(${element.colorHsl} / 0.1)`,
+                        color: `hsl(${element.colorHsl})`
+                      }}
+                    >
                       {element.mineral}
                     </span>
-                    <span className="px-3 py-1 rounded-full bg-muted/50 text-xs text-muted-foreground font-mono">
+                    <span 
+                      className="px-3 py-1.5 rounded-full text-xs font-mono border"
+                      style={{ 
+                        borderColor: `hsl(${element.colorHsl} / 0.3)`,
+                        backgroundColor: `hsl(${element.colorHsl} / 0.1)`,
+                        color: `hsl(${element.colorHsl})`
+                      }}
+                    >
                       💎 {element.crystal}
                     </span>
                     {element.featuring && (
-                      <span className="px-3 py-1 rounded-full bg-primary/20 text-xs text-primary font-mono">
+                      <span className="px-3 py-1.5 rounded-full bg-primary/20 text-xs text-primary font-mono border border-primary/30">
                         ft. {formatFeaturing(element.featuring)}
                       </span>
                     )}
                   </div>
                 </div>
 
-                {/* Desktop Layout */}
-                <div className="hidden lg:grid grid-cols-7 gap-2 p-3 items-center">
+                {/* Desktop Layout - refined */}
+                <div className="hidden lg:grid grid-cols-7 gap-3 p-4 items-center">
                   {/* Row Number */}
                   <div className="flex justify-center">
                     <div 
-                      className="w-8 h-8 rounded-lg flex items-center justify-center border"
+                      className="w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg"
                       style={{ 
                         backgroundColor: `hsl(${element.colorHsl} / 0.15)`,
-                        borderColor: `hsl(${element.colorHsl} / 0.4)`
+                        borderColor: `hsl(${element.colorHsl} / 0.5)`,
+                        boxShadow: `0 0 0 0 hsl(${element.colorHsl} / 0)`
                       }}
                     >
                       <span className="font-mono text-sm font-bold" style={{ color: `hsl(${element.colorHsl})` }}>
@@ -170,7 +187,7 @@ const MasterMatrix = () => {
                   {/* Chakra */}
                   <div className="text-center">
                     <p 
-                      className="font-mono text-xs uppercase tracking-wide"
+                      className="font-mono text-xs uppercase tracking-wide font-medium"
                       style={{ color: `hsl(${element.colorHsl})` }}
                     >
                       {element.chakra}
@@ -179,12 +196,21 @@ const MasterMatrix = () => {
 
                   {/* Track */}
                   <div className="text-center">
-                    <p className="text-foreground font-mono text-sm">{element.track}</p>
+                    <p className="text-foreground font-mono text-sm font-medium group-hover:text-throne-gold transition-colors">
+                      {element.track}
+                    </p>
                   </div>
 
                   {/* Frequency */}
                   <div className="text-center">
-                    <span className="px-3 py-1 rounded-full bg-muted/50 text-xs font-mono text-muted-foreground">
+                    <span 
+                      className="px-4 py-1.5 rounded-full text-xs font-mono font-medium border"
+                      style={{ 
+                        borderColor: `hsl(${element.colorHsl} / 0.3)`,
+                        backgroundColor: `hsl(${element.colorHsl} / 0.1)`,
+                        color: `hsl(${element.colorHsl})`
+                      }}
+                    >
                       {element.frequency}
                     </span>
                   </div>
@@ -212,16 +238,16 @@ const MasterMatrix = () => {
                         ft. {formatFeaturing(element.featuring)}
                       </p>
                     ) : (
-                      <span className="text-muted-foreground/40 font-mono">—</span>
+                      <span className="text-muted-foreground/30 font-mono">—</span>
                     )}
                   </div>
                 </div>
 
-                {/* Gradient accent line */}
+                {/* Gradient accent line - enhanced */}
                 <div 
-                  className="h-0.5 w-full"
+                  className="h-1 w-full transition-all duration-300 group-hover:h-1.5"
                   style={{ 
-                    background: `linear-gradient(90deg, hsl(${element.colorHsl} / 0.6) 0%, transparent 100%)`
+                    background: `linear-gradient(90deg, hsl(${element.colorHsl}) 0%, hsl(${element.colorHsl} / 0.5) 50%, transparent 100%)`
                   }}
                 />
               </motion.div>
