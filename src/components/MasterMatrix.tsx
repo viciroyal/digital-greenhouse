@@ -181,7 +181,7 @@ const MasterMatrix = () => {
           and amplified through its corresponding crystal. Music grown, not made.
         </p>
         <p className="text-muted-foreground/60 text-sm mt-4 font-mono">
-          Produced by <strong className="text-throne-gold">Vici Royàl</strong> & <span className="text-throne-gold">Èks</span>
+          Produced by <strong className="text-throne-gold font-bold">Vici Royàl</strong> & <span className="text-throne-gold">Èks</span>
         </p>
       </motion.div>
 
