@@ -16,6 +16,7 @@ import GriotOracle from '@/components/GriotOracle';
 import { SedimentRuler, GhostArtifacts } from '@/components/scrollytelling';
 import { MycelialCursor } from '@/components/cursor';
 import { ChakraSpine } from '@/components/navigation';
+import { ResonantChamber } from '@/components/community';
 
 const Index = () => {
   const [isStarMappingOpen, setIsStarMappingOpen] = useState(false);
@@ -63,6 +64,10 @@ const Index = () => {
         <MasterMatrix />
         <CosmicResonanceButton onClick={() => setIsStarMappingOpen(true)} />
         <ShopSection />
+        
+        {/* The Resonant Chamber - Mycelial Network (Community Map) */}
+        <ResonantChamber />
+        
         <Footer />
         <StarMappingModal 
           isOpen={isStarMappingOpen} 
