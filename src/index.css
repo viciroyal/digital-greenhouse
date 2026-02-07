@@ -163,6 +163,27 @@
   }
 }
 
+/* Staggered animation delays for cascading reveal */
+.pillar-text-delay-1::before {
+  animation-delay: 0.1s;
+}
+
+.pillar-text-delay-2::before {
+  animation-delay: 0.2s;
+}
+
+.pillar-text-delay-3::before {
+  animation-delay: 0.3s;
+}
+
+.pillar-text-delay-4::before {
+  animation-delay: 0.4s;
+}
+
+.pillar-text-delay-5::before {
+  animation-delay: 0.5s;
+}
+
 /* Sirius Map - Astronomical data font */
 .sirius-text {
   font-family: 'Space Mono', monospace;
