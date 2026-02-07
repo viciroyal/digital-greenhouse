@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        display: ['"Cormorant Garamond"', 'serif'],
+        body: ['"Space Grotesk"', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -47,6 +51,36 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // PHARMBOI Custom Colors
+        soil: {
+          deep: "hsl(var(--soil-deep))",
+          brown: "hsl(var(--soil-brown))",
+        },
+        root: {
+          red: "hsl(var(--root-red))",
+        },
+        crystal: {
+          violet: "hsl(var(--crystal-violet))",
+        },
+        source: {
+          white: "hsl(var(--source-white))",
+        },
+        throne: {
+          gold: "hsl(var(--throne-gold))",
+        },
+        glass: {
+          border: "hsl(var(--glass-border))",
+          bg: "hsl(var(--glass-bg))",
+        },
+        chakra: {
+          root: "hsl(var(--chakra-root))",
+          sacral: "hsl(var(--chakra-sacral))",
+          solar: "hsl(var(--chakra-solar))",
+          heart: "hsl(var(--chakra-heart))",
+          throat: "hsl(var(--chakra-throat))",
+          vision: "hsl(var(--chakra-vision))",
+          source: "hsl(var(--chakra-source))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -65,25 +99,31 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "shimmer": {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        "rotate-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "shimmer": "shimmer 3s linear infinite",
+        "rotate-slow": "rotate-slow 20s linear infinite",
+      },
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
     },
   },
