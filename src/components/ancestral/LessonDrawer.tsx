@@ -477,25 +477,26 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                       </div>
                     )}
 
-                    {/* The Hogon's Seal - Only show after upload */}
-                    {(hasPendingUpload || hasCertifiedUpload) && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
+                    {/* The Hogon's Seal - Always show for demo preview */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <h3 
+                        className="text-sm font-mono mb-4 text-center"
+                        style={{ color: 'hsl(40 50% 60%)' }}
                       >
-                        <h3 
-                          className="text-sm font-mono mb-4 text-center"
-                          style={{ color: 'hsl(40 50% 60%)' }}
-                        >
-                          THE HOGON'S SEAL
-                        </h3>
-                        <HogonSeal 
-                          status={getSealStatus()}
-                          color={module.color}
-                        />
-                      </motion.div>
-                    )}
+                        THE HOGON'S SEAL
+                      </h3>
+                      <HogonSeal 
+                        status={getSealStatus()}
+                        color={module.color}
+                        onApprove={() => {
+                          // Demo only - triggers level up animation preview
+                        }}
+                      />
+                    </motion.div>
 
                     {/* Instructions if not uploaded */}
                     {journalEntries.length === 0 && user && (
