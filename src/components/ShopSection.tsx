@@ -18,7 +18,7 @@ const ShopSection = () => {
           <p className="text-throne-gold/80 font-body text-sm tracking-[0.3em] uppercase mb-3">
             The Harvest
           </p>
-          <h2 className="section-header text-4xl md:text-6xl mb-4">
+          <h2 className="font-display text-4xl md:text-6xl text-foreground mb-4">
             The Source Bundle
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto font-body">

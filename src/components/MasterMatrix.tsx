@@ -66,7 +66,7 @@ const MasterMatrix = () => {
           <p className="text-throne-gold/80 font-body text-sm tracking-[0.3em] uppercase mb-3">
             The Pharmer Logic
           </p>
-          <h2 className="section-header text-4xl md:text-6xl mb-4">
+          <h2 className="font-display text-4xl md:text-6xl text-foreground mb-4">
             The Master Matrix
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-body">

@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="grid md:grid-cols-3 gap-12 mb-12">
           {/* Brand */}
           <div>
-            <h4 className="font-bubble text-2xl gradient-root-throne-text mb-4">PHARMBOI</h4>
+            <h4 className="font-display text-2xl gradient-root-throne-text mb-4">PHARMBOI</h4>
             <p className="text-muted-foreground font-body text-sm mb-4">
               Music grown, not made. The Digital Greenhouse experience.
             </p>
