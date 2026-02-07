@@ -72,10 +72,10 @@ const HeroSection = () => {
           <img 
             src={pharmboiLogo} 
             alt="PHARMBOI" 
-            className="w-full max-w-md mx-auto mb-3 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]"
+            className="w-full max-w-md mx-auto mb-3"
             style={{
-              maskImage: 'radial-gradient(ellipse 90% 80% at center, black 55%, black 65%, transparent 85%)',
-              WebkitMaskImage: 'radial-gradient(ellipse 90% 80% at center, black 55%, black 65%, transparent 85%)',
+              mixBlendMode: 'multiply',
+              filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.6))',
             }}
           />
           <p className="text-source-white/60 font-body text-base md:text-lg max-w-lg mx-auto leading-relaxed">
