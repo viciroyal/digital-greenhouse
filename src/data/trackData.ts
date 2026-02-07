@@ -26,6 +26,10 @@ export interface TrackData {
   yogaPoseSanskrit: string;
   yogaWhy: string;
   ritualAction: string;
+  // AgroMajic Designation (The Function Seal)
+  soilInput: string;
+  designation: string;
+  designationContext: string;
 }
 
 export const trackData: TrackData[] = [
@@ -51,6 +55,9 @@ export const trackData: TrackData[] = [
     yogaPoseSanskrit: 'Malasana',
     yogaWhy: 'It brings the hips close to the Earth, mimicking the weeding motion.',
     ritualAction: 'Plant your feet flat. Touch the floor with your fingertips. Ground the root.',
+    soilInput: 'Kelp Meal',
+    designation: 'THE ROOT',
+    designationContext: 'The mineral anchor that holds the plant in the storm.',
   },
   {
     row: 2,
@@ -75,6 +82,9 @@ export const trackData: TrackData[] = [
     yogaPoseSanskrit: 'Marjaryasana-Bitilasana',
     yogaWhy: 'It activates the spinal fluid and Sacral chakra flow.',
     ritualAction: 'Move your spine like a wave. Drink a glass of water immediately after.',
+    soilInput: 'Humates',
+    designation: 'THE ALCHEMY',
+    designationContext: 'The carbon shelter where chemistry transforms into biology.',
   },
   {
     row: 3,
@@ -98,6 +108,9 @@ export const trackData: TrackData[] = [
     yogaPoseSanskrit: 'Navasana',
     yogaWhy: 'It engages the core (Solar Plexus) and ignites the "I Am" fire.',
     ritualAction: 'Hold the core tight. Breathe rapidly through the nose (Fire Breath).',
+    soilInput: 'Alfalfa Meal',
+    designation: 'THE SPARK',
+    designationContext: 'The growth hormone (Triacontanol) that ignites the engine.',
   },
   {
     row: 4,
@@ -122,6 +135,9 @@ export const trackData: TrackData[] = [
     yogaPoseSanskrit: 'Virabhadrasana II',
     yogaWhy: 'It claims territory and builds leg strength.',
     ritualAction: 'Stomp the foot. Gaze over the front hand. Claim your space.',
+    soilInput: 'Soybean Meal',
+    designation: 'THE FUEL',
+    designationContext: 'Pure Nitrogen energy for expanding the canopy.',
   },
   {
     row: 5,
@@ -145,6 +161,9 @@ export const trackData: TrackData[] = [
     yogaPoseSanskrit: 'Ustrasana',
     yogaWhy: 'It physically cracks the chest/heart open.',
     ritualAction: 'Place hands on the lower back. Arch back. Exhale "Ahhh".',
+    soilInput: 'Worm Castings',
+    designation: 'THE BRIDGE',
+    designationContext: 'The microbial connector between the soil and the root.',
   },
   {
     row: 6,
@@ -169,6 +188,9 @@ export const trackData: TrackData[] = [
     yogaPoseSanskrit: 'Vrksasana',
     yogaWhy: 'It requires balance and connection between sky and earth.',
     ritualAction: 'Palms together at the heart. Root the standing leg. Sway slightly.',
+    soilInput: 'Fish Hydrolysate',
+    designation: 'THE FLOW',
+    designationContext: 'Liquid nutrition that circulates immediately.',
   },
   {
     row: 7,
@@ -193,6 +215,9 @@ export const trackData: TrackData[] = [
     yogaPoseSanskrit: 'Matsyasana',
     yogaWhy: 'It stretches the throat and thyroid.',
     ritualAction: 'Tilt the head back. Hum a low tone against the roof of the mouth.',
+    soilInput: 'Harmony (Gypsum)',
+    designation: 'THE CARRY',
+    designationContext: 'Calcium is the truck that carries all other nutrients into the plant.',
   },
   {
     row: 8,
@@ -216,6 +241,9 @@ export const trackData: TrackData[] = [
     yogaPoseSanskrit: 'Tadasana',
     yogaWhy: 'It aligns the skeletal structure (Silica).',
     ritualAction: 'Stand perfectly still. Stack the vertebrae. Be the stalk.',
+    soilInput: 'Silica',
+    designation: 'THE STRUCTURE',
+    designationContext: 'The internal skeleton that keeps the stalk upright.',
   },
   {
     row: 9,
@@ -240,6 +268,9 @@ export const trackData: TrackData[] = [
     yogaPoseSanskrit: 'Balasana',
     yogaWhy: 'It puts pressure on the Third Eye point.',
     ritualAction: 'Press the forehead into the mat/floor. Close eyes. Watch the internal screen.',
+    soilInput: 'Sea Agri Minerals',
+    designation: 'THE SIGNAL',
+    designationContext: 'Salt minerals that increase electrical conductivity (EC) for clear vision.',
   },
   {
     row: 10,
@@ -263,6 +294,9 @@ export const trackData: TrackData[] = [
     yogaPoseSanskrit: 'Garudasana',
     yogaWhy: 'It binds the body to force laser focus.',
     ritualAction: 'Squeeze the arms and legs together. Fix your gaze on one point. Do not blink.',
+    soilInput: 'Foliar Spray',
+    designation: 'THE FOCUS',
+    designationContext: 'Targeted application for instant manifestation.',
   },
   {
     row: 11,
@@ -287,6 +321,9 @@ export const trackData: TrackData[] = [
     yogaPoseSanskrit: 'Padmasana',
     yogaWhy: 'The traditional seat of enlightenment.',
     ritualAction: 'Palms open on knees. Crown lifting to the sky. Receive the download.',
+    soilInput: 'Mycorrhizae',
+    designation: 'THE VISION',
+    designationContext: 'The fungal web that sees beyond the root zone.',
   },
   {
     row: 12,
@@ -310,6 +347,9 @@ export const trackData: TrackData[] = [
     yogaPoseSanskrit: 'Savasana',
     yogaWhy: 'It mimics the "death" of the season (Compost).',
     ritualAction: 'Lie completely flat. Palms down. Let the body rot into the earth.',
+    soilInput: 'Compost',
+    designation: 'THE SHELTER',
+    designationContext: 'The home for the microbes during the dormant season.',
   },
 ];
 

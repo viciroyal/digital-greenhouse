@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import type { TrackData } from '@/data/trackData';
+import FunctionSeal from './track-detail/FunctionSeal';
 import WaveformPlayer from './track-detail/WaveformPlayer';
 import BodyQuadrant from './track-detail/BodyQuadrant';
 import SkyQuadrant from './track-detail/SkyQuadrant';
@@ -92,6 +93,9 @@ const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
                   Lab Report #{String(track.row).padStart(2, '0')}
                 </h1>
               </motion.div>
+
+              {/* Function Seal - AgroMajic Protocol Designation */}
+              <FunctionSeal track={track} />
 
               {/* Audio Player */}
               <WaveformPlayer track={track} />
