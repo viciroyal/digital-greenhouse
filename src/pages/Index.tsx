@@ -17,9 +17,11 @@ import { SedimentRuler, GhostArtifacts } from '@/components/scrollytelling';
 import { MycelialCursor } from '@/components/cursor';
 import { ChakraSpine } from '@/components/navigation';
 import { ResonantChamber } from '@/components/community';
+import { PharmersPledgeModal } from '@/components/portal';
 
 const Index = () => {
   const [isStarMappingOpen, setIsStarMappingOpen] = useState(false);
+  const [isPledgeModalOpen, setIsPledgeModalOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-background overflow-x-hidden relative">
@@ -40,8 +42,14 @@ const Index = () => {
       {/* Circadian Rhythm Overlay */}
       <CircadianOverlay />
       
-      {/* Mycelial Navigation */}
-      <MycelialMenu />
+      {/* Mycelial Navigation with Initiation Gateway */}
+      <MycelialMenu onInitiationClick={() => setIsPledgeModalOpen(true)} />
+      
+      {/* The Pharmer's Pledge Modal */}
+      <PharmersPledgeModal 
+        isOpen={isPledgeModalOpen} 
+        onClose={() => setIsPledgeModalOpen(false)} 
+      />
       
       {/* Chakra Spine Navigator */}
       <ChakraSpine />
