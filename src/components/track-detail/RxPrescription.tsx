@@ -7,7 +7,7 @@ interface RxPrescriptionProps {
   onActivate: () => void;
 }
 
-// Master Prescription Data - exact copy from the specification
+// Master Prescription Data - exact same logic retained
 const prescriptionData: Record<number, {
   action: string;
   dosage: string;
@@ -75,51 +75,80 @@ const prescriptionData: Record<number, {
   },
 };
 
-// Rx Symbol with Sprouting Seed
-const RxSeedIcon = ({ color }: { color: string }) => (
-  <svg viewBox="0 0 48 48" className="w-12 h-12">
-    {/* Rx Symbol */}
-    <text
-      x="6"
-      y="32"
-      fontFamily="Georgia, serif"
-      fontSize="24"
-      fontWeight="bold"
-      fill={`hsl(${color})`}
-      opacity="0.9"
-    >
-      Rx
-    </text>
+// Dreaming Spiral Symbol
+const DreamingSpiral = ({ color }: { color: string }) => (
+  <svg viewBox="0 0 60 60" className="w-14 h-14">
+    {/* Outer dot ring */}
+    {[...Array(12)].map((_, i) => {
+      const angle = (i / 12) * Math.PI * 2;
+      const x = 30 + Math.cos(angle) * 26;
+      const y = 30 + Math.sin(angle) * 26;
+      return <circle key={`outer-${i}`} cx={x} cy={y} r="2" fill="#eaddca" opacity="0.7" />;
+    })}
     
-    {/* Sprouting Seed */}
-    <g transform="translate(28, 8)">
-      {/* Seed body */}
-      <ellipse cx="8" cy="28" rx="6" ry="4" fill="#8B4513" opacity="0.8" />
-      {/* Stem */}
-      <path
-        d="M8 28 Q6 20 8 12 Q10 20 8 28"
-        stroke="#228B22"
-        strokeWidth="2"
-        fill="none"
-      />
-      {/* Leaves */}
-      <path
-        d="M8 16 Q4 12 2 8 Q6 10 8 16"
-        fill="#32CD32"
-        opacity="0.9"
-      />
-      <path
-        d="M8 14 Q12 10 16 8 Q12 12 8 14"
-        fill="#228B22"
-        opacity="0.9"
-      />
-      {/* Root dots */}
-      <circle cx="6" cy="32" r="1" fill="#8B4513" opacity="0.5" />
-      <circle cx="10" cy="33" r="1" fill="#8B4513" opacity="0.5" />
-      <circle cx="8" cy="35" r="1" fill="#8B4513" opacity="0.4" />
-    </g>
+    {/* Inner dot ring */}
+    {[...Array(8)].map((_, i) => {
+      const angle = (i / 8) * Math.PI * 2 + 0.2;
+      const x = 30 + Math.cos(angle) * 18;
+      const y = 30 + Math.sin(angle) * 18;
+      return <circle key={`inner-${i}`} cx={x} cy={y} r="1.5" fill="#d4a24e" opacity="0.8" />;
+    })}
+    
+    {/* Spiral path */}
+    <path
+      d="M30 30 
+         C 30 26, 34 26, 34 30
+         C 34 36, 26 36, 26 30
+         C 26 22, 38 22, 38 30
+         C 38 40, 22 40, 22 30
+         C 22 18, 42 18, 42 30
+         C 42 44, 18 44, 18 30"
+      fill="none"
+      stroke="#eaddca"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    
+    {/* Center dot - The Source */}
+    <circle cx="30" cy="30" r="4" fill={`hsl(${color})`} />
+    <circle cx="30" cy="30" r="2" fill="#eaddca" />
   </svg>
 );
+
+// Dot painting border pattern
+const DotBorder = ({ position }: { position: 'top' | 'bottom' | 'left' | 'right' }) => {
+  const isHorizontal = position === 'top' || position === 'bottom';
+  const dotCount = isHorizontal ? 20 : 12;
+  
+  return (
+    <div 
+      className={`absolute ${
+        position === 'top' ? 'top-2 left-4 right-4' :
+        position === 'bottom' ? 'bottom-2 left-4 right-4' :
+        position === 'left' ? 'left-2 top-4 bottom-4' :
+        'right-2 top-4 bottom-4'
+      } flex ${isHorizontal ? 'flex-row justify-between' : 'flex-col justify-between'}`}
+    >
+      {[...Array(dotCount)].map((_, i) => (
+        <div key={i} className="flex gap-0.5">
+          <div 
+            className="w-1.5 h-1.5 rounded-full"
+            style={{ 
+              backgroundColor: i % 3 === 0 ? '#d4a24e' : '#eaddca',
+              opacity: 0.6 + (i % 2) * 0.2,
+            }}
+          />
+          {i % 4 === 0 && (
+            <div 
+              className="w-1 h-1 rounded-full"
+              style={{ backgroundColor: '#9c3c1a', opacity: 0.5 }}
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
   const [isActivated, setIsActivated] = useState(false);
@@ -134,244 +163,279 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
 
   return (
     <motion.div
-      className="relative overflow-hidden rounded-xl"
+      className="relative overflow-hidden rounded-lg"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.15 }}
       style={{
-        background: 'linear-gradient(135deg, #fefefe 0%, #f8f6f0 50%, #f4f1ea 100%)',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(139,69,19,0.1)',
+        background: `
+          linear-gradient(135deg, #9c3c1a 0%, #6d3319 40%, #4e342e 100%)
+        `,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(234,221,202,0.1)',
       }}
     >
-      {/* Paper texture overlay */}
+      {/* Bark/Hide texture overlay */}
       <div 
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        className="absolute inset-0 opacity-20 pointer-events-none"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='bark'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23bark)'/%3E%3C/svg%3E")`,
+        }}
+      />
+      
+      {/* Crack/fiber texture */}
+      <div 
+        className="absolute inset-0 opacity-10 pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(45deg, transparent 40%, rgba(0,0,0,0.3) 45%, transparent 50%),
+            linear-gradient(-45deg, transparent 40%, rgba(0,0,0,0.2) 45%, transparent 50%)
+          `,
+          backgroundSize: '30px 30px',
         }}
       />
 
-      {/* Torn edge effect at top */}
+      {/* Earth stain effect */}
       <div 
-        className="absolute top-0 left-0 right-0 h-2"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(139,69,19,0.1) 10%, transparent 20%, rgba(139,69,19,0.05) 40%, transparent 50%, rgba(139,69,19,0.1) 70%, transparent 80%, rgba(139,69,19,0.05) 90%, transparent 100%)',
+          background: `
+            radial-gradient(ellipse at 20% 30%, rgba(78, 52, 46, 0.4) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 70%, rgba(156, 60, 26, 0.3) 0%, transparent 40%)
+          `,
         }}
       />
 
-      <div className="relative p-6">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-4 border-b-2 border-dashed border-amber-800/20 pb-4">
+      {/* Dot painting borders */}
+      <DotBorder position="top" />
+      <DotBorder position="bottom" />
+      <DotBorder position="left" />
+      <DotBorder position="right" />
+
+      {/* Torn edge effect - top */}
+      <div 
+        className="absolute top-0 left-0 right-0 h-3 pointer-events-none"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(78,52,46,0.8), transparent)',
+          maskImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0 Q5 8 10 2 T20 3 T30 1 T40 4 T50 2 T60 5 T70 1 T80 3 T90 2 T100 4 L100 10 L0 10 Z\' fill=\'white\'/%3E%3C/svg%3E")',
+          WebkitMaskImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0 Q5 8 10 2 T20 3 T30 1 T40 4 T50 2 T60 5 T70 1 T80 3 T90 2 T100 4 L100 10 L0 10 Z\' fill=\'white\'/%3E%3C/svg%3E")',
+          maskSize: '100% 100%',
+          WebkitMaskSize: '100% 100%',
+        }}
+      />
+
+      <div className="relative p-6 pt-8">
+        {/* Header with Dreaming Spiral */}
+        <div className="flex items-start justify-between mb-5 border-b border-dashed pb-4" style={{ borderColor: 'rgba(234,221,202,0.2)' }}>
           <div className="flex items-center gap-3">
-            <RxSeedIcon color={track.colorHsl} />
+            <DreamingSpiral color={track.colorHsl} />
             <div>
               <p 
-                className="text-xs tracking-[0.15em] uppercase font-bold"
+                className="text-sm tracking-[0.12em] uppercase font-bold"
                 style={{ 
-                  fontFamily: "'Courier New', Courier, monospace",
-                  color: '#8B4513',
+                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  color: '#eaddca',
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+                  letterSpacing: '0.15em',
                 }}
               >
-                LISTENER Rx
+                SPIRIT INSTRUCTION
               </p>
               <p 
-                className="text-[10px] tracking-wider uppercase mt-0.5"
+                className="text-xs tracking-wider uppercase mt-0.5"
                 style={{ 
-                  fontFamily: "'Courier New', Courier, monospace",
-                  color: '#666',
+                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  color: '#d4a24e',
                 }}
               >
-                OFFICIAL PRESCRIPTION
+                VICI ROYÀL
               </p>
             </div>
           </div>
           <div className="text-right">
             <p 
-              className="text-xs font-bold"
-              style={{ 
-                fontFamily: "'Courier New', Courier, monospace",
-                color: '#333',
-              }}
+              className="text-[10px] uppercase tracking-widest"
+              style={{ color: 'rgba(234,221,202,0.5)' }}
             >
-              DR. VICI ROYÀL
+              TRACK {String(track.row).padStart(2, '0')}
             </p>
             <p 
-              className="text-[10px] mt-0.5"
+              className="text-xs mt-0.5 font-semibold"
               style={{ 
-                fontFamily: "'Courier New', Courier, monospace",
-                color: '#888',
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                color: `hsl(${track.colorHsl})`,
               }}
-            >
-              Holistic Pharmacist
-            </p>
-          </div>
-        </div>
-
-        {/* Patient / Track Info */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2 mb-1">
-            <span 
-              className="text-[10px] uppercase tracking-wider"
-              style={{ fontFamily: "'Courier New', Courier, monospace", color: '#666' }}
-            >
-              FOR:
-            </span>
-            <span 
-              className="text-sm font-bold"
-              style={{ fontFamily: "'Courier New', Courier, monospace", color: '#222' }}
-            >
-              {track.track}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span 
-              className="text-[10px] uppercase tracking-wider"
-              style={{ fontFamily: "'Courier New', Courier, monospace", color: '#666' }}
-            >
-              FREQ:
-            </span>
-            <span 
-              className="text-xs font-bold"
-              style={{ fontFamily: "'Courier New', Courier, monospace", color: `hsl(${track.colorHsl})` }}
             >
               {track.frequency}
-            </span>
+            </p>
           </div>
         </div>
 
-        {/* Prescription Details */}
+        {/* Track Name */}
+        <div className="mb-4">
+          <p 
+            className="text-lg font-bold"
+            style={{ 
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              color: '#eaddca',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.4)',
+            }}
+          >
+            {track.track}
+          </p>
+        </div>
+
+        {/* Sacred Instruction Details */}
         <div 
-          className="rounded-lg p-4 mb-4"
+          className="rounded-lg p-4 mb-5"
           style={{ 
-            background: 'rgba(139,69,19,0.05)',
-            border: '1px solid rgba(139,69,19,0.1)',
+            background: 'rgba(0,0,0,0.25)',
+            border: '1px solid rgba(234,221,202,0.15)',
           }}
         >
-          {/* Rx Action */}
-          <div className="mb-3">
+          {/* Spirit Action */}
+          <div className="mb-4">
             <p 
               className="text-[10px] uppercase tracking-[0.2em] mb-1"
-              style={{ fontFamily: "'Courier New', Courier, monospace", color: '#888' }}
+              style={{ color: '#d4a24e' }}
             >
-              Rx ACTION
+              ◈ SACRED ACTION
             </p>
             <p 
               className="text-base font-bold"
-              style={{ fontFamily: "'Courier New', Courier, monospace", color: '#333' }}
+              style={{ 
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                color: '#eaddca',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.4)',
+              }}
             >
               {rx.action}
             </p>
           </div>
 
-          {/* Dosage */}
-          <div className="mb-3">
+          {/* Earth Medicine Dosage */}
+          <div className="mb-4">
             <p 
               className="text-[10px] uppercase tracking-[0.2em] mb-1"
-              style={{ fontFamily: "'Courier New', Courier, monospace", color: '#888' }}
+              style={{ color: '#d4a24e' }}
             >
-              DOSAGE
+              ◈ EARTH MEDICINE
             </p>
             <p 
               className="text-sm"
-              style={{ fontFamily: "'Courier New', Courier, monospace", color: '#444' }}
+              style={{ 
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                color: 'rgba(234,221,202,0.9)',
+              }}
             >
               {rx.dosage}
             </p>
           </div>
 
-          {/* Instructions */}
+          {/* Spirit Journey Instructions */}
           <div>
             <p 
               className="text-[10px] uppercase tracking-[0.2em] mb-1"
-              style={{ fontFamily: "'Courier New', Courier, monospace", color: '#888' }}
+              style={{ color: '#d4a24e' }}
             >
-              INSTRUCTIONS
+              ◈ THE DREAMING
             </p>
             <p 
               className="text-sm leading-relaxed italic"
-              style={{ fontFamily: "'Courier New', Courier, monospace", color: '#555' }}
+              style={{ 
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                color: 'rgba(234,221,202,0.8)',
+              }}
             >
               "{rx.instruction}"
             </p>
           </div>
         </div>
 
-        {/* Signature Area */}
-        <div className="flex items-end justify-between mb-4">
-          <div>
-            <p 
-              className="text-[9px] uppercase tracking-wider mb-1"
-              style={{ fontFamily: "'Courier New', Courier, monospace", color: '#999' }}
-            >
-              AUTHORIZED BY
-            </p>
-            <p 
-              className="text-sm italic"
-              style={{ fontFamily: "Georgia, serif", color: '#333' }}
-            >
-              Vici Royàl
-            </p>
-            <div className="w-20 h-px bg-amber-800/30 mt-1" />
-          </div>
-          <div className="text-right">
-            <p 
-              className="text-[9px] uppercase tracking-wider"
-              style={{ fontFamily: "'Courier New', Courier, monospace", color: '#999' }}
-            >
-              #{String(track.row).padStart(3, '0')}-{track.frequency.replace('Hz', '')}
-            </p>
-          </div>
+        {/* Decorative dot divider */}
+        <div className="flex justify-center gap-2 mb-5">
+          {[...Array(7)].map((_, i) => (
+            <div 
+              key={i}
+              className="rounded-full"
+              style={{
+                width: i === 3 ? '8px' : '4px',
+                height: i === 3 ? '8px' : '4px',
+                backgroundColor: i === 3 ? `hsl(${track.colorHsl})` : '#d4a24e',
+                opacity: 0.7 + (i === 3 ? 0.3 : 0),
+              }}
+            />
+          ))}
         </div>
 
-        {/* Activate Button */}
+        {/* Ritual Activation Button - Carved Stone Style */}
         <motion.button
-          className="w-full py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-all duration-300"
+          className="w-full py-3.5 rounded-lg font-bold text-sm tracking-wider uppercase transition-all duration-300 relative overflow-hidden"
           style={{
-            fontFamily: "'Courier New', Courier, monospace",
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
             background: isActivated 
-              ? `linear-gradient(135deg, hsl(${track.colorHsl}), hsl(${track.colorHsl} / 0.8))`
-              : 'linear-gradient(135deg, #2d2d2d, #1a1a1a)',
-            color: isActivated ? '#fff' : '#f0f0f0',
-            border: isActivated ? 'none' : '2px solid #444',
+              ? `linear-gradient(135deg, hsl(${track.colorHsl}), hsl(${track.colorHsl} / 0.7))`
+              : 'linear-gradient(135deg, #5d4e3c 0%, #3d3229 50%, #2a2420 100%)',
+            color: '#eaddca',
+            border: '1px solid rgba(234,221,202,0.2)',
             boxShadow: isActivated 
-              ? `0 4px 20px hsl(${track.colorHsl} / 0.4)`
-              : '0 2px 10px rgba(0,0,0,0.2)',
+              ? `0 4px 20px hsl(${track.colorHsl} / 0.4), inset 0 1px 0 rgba(255,255,255,0.1)`
+              : '0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -2px 4px rgba(0,0,0,0.3)',
+            textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
           }}
           whileHover={{ scale: 1.02, y: -1 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleActivate}
           disabled={isActivated}
         >
-          {isActivated ? (
-            <span className="flex items-center justify-center gap-2">
-              <span>✓</span> PRESCRIPTION ACTIVATED
-            </span>
-          ) : (
-            <span className="flex items-center justify-center gap-2">
-              <span>⚡</span> I COMPLY (ACTIVATE TRACK)
-            </span>
-          )}
+          {/* Stone texture overlay */}
+          <div 
+            className="absolute inset-0 opacity-10 pointer-events-none"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='stone'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.1' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23stone)'/%3E%3C/svg%3E")`,
+            }}
+          />
+          
+          <span className="relative z-10 flex items-center justify-center gap-2">
+            {isActivated ? (
+              <>
+                <span>✧</span> RITUAL ACTIVATED <span>✧</span>
+              </>
+            ) : (
+              <>
+                <span>◎</span> INITIATE RITUAL (BEGIN TRACK)
+              </>
+            )}
+          </span>
         </motion.button>
 
-        {/* Disclaimer */}
+        {/* Sacred footer text */}
         <p 
-          className="text-center text-[8px] mt-3 uppercase tracking-wider"
-          style={{ fontFamily: "'Courier New', Courier, monospace", color: '#aaa' }}
+          className="text-center text-[9px] mt-3 uppercase tracking-widest"
+          style={{ color: 'rgba(234,221,202,0.4)' }}
         >
-          This prescription is for vibrational purposes only.
+          ✦ Earth Medicine for the Spirit ✦
         </p>
       </div>
 
-      {/* Perforated edge indicator on the side */}
-      <div className="absolute left-0 top-8 bottom-8 w-1 flex flex-col justify-evenly">
-        {[...Array(12)].map((_, i) => (
-          <div 
-            key={i} 
-            className="w-1 h-1 rounded-full"
-            style={{ background: 'rgba(139,69,19,0.15)' }}
-          />
-        ))}
-      </div>
+      {/* Corner dot accents */}
+      {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map((corner) => (
+        <div 
+          key={corner}
+          className={`absolute w-6 h-6 ${
+            corner === 'top-left' ? 'top-3 left-3' :
+            corner === 'top-right' ? 'top-3 right-3' :
+            corner === 'bottom-left' ? 'bottom-3 left-3' :
+            'bottom-3 right-3'
+          }`}
+        >
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#d4a24e', opacity: 0.4 }} />
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#eaddca', opacity: 0.6 }} />
+          </div>
+        </div>
+      ))}
     </motion.div>
   );
 };
