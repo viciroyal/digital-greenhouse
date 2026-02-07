@@ -23,8 +23,10 @@ const Footer = () => {
               <li>Sistah Moon</li>
               <li>Nichollé McKoy</li>
               <li>Sarafina Ethereal</li>
+              <li>James Cambridge IV</li>
               <li>Briar Blakley</li>
-              <li>Tori Dara Carter</li>
+              <li>Vitoria</li>
+              <li>Dara Carter</li>
               <li>Shellie Sweets</li>
               <li>Yamau</li>
             </ul>
