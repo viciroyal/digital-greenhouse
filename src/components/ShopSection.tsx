@@ -119,7 +119,7 @@ const ShopSection = () => {
                     </div>
                     <div>
                       <p className="text-foreground font-body font-medium">PHARMBOI Cassette Tape</p>
-                      <p className="text-muted-foreground text-sm">7 tracks, tuned to sacred frequencies</p>
+                      <p className="text-muted-foreground text-sm">12 tracks, tuned to sacred frequencies</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
