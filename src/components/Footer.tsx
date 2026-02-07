@@ -12,7 +12,7 @@ const Footer = () => {
               Music grown, not made. The Digital Greenhouse experience.
             </p>
             <p className="text-muted-foreground/60 font-body text-xs">
-              by <strong className="text-foreground">Vici Royàl</strong> • Produced by <span className="text-throne-gold">Vici Royàl</span> & <span className="text-throne-gold">Èks</span>
+              by <strong className="text-foreground font-bold">Vici Royàl</strong> • Produced by <strong className="text-throne-gold font-bold">Vici Royàl</strong> & <span className="text-throne-gold">Èks</span>
             </p>
           </div>
 
