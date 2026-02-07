@@ -87,25 +87,34 @@ const getResonanceType = (elements: string[]) => {
     return {
       type: 'HIGH RESONANCE',
       subtitle: 'COMPANION PLANT',
-      description: 'Your fire energy aligns with the creative spark of Vici Royàl. You are a natural growth partner in the Digital Greenhouse.',
-      color: 'hsl(0 60% 50%)',
-      showCTA: true,
+      description: 'Your fire feeds the vision. Claim your share of the harvest.',
+      color: 'hsl(45 100% 50%)', // Gold/Solar
+      buttonText: 'JOIN THE 2026 CSA (YOU ARE A MATCH)',
+      buttonClass: 'bg-gradient-to-r from-yellow-500 via-amber-400 to-yellow-500 text-black shadow-[0_0_30px_rgba(251,191,36,0.6),0_0_60px_rgba(251,191,36,0.3)]',
+      buttonHoverClass: 'hover:shadow-[0_0_40px_rgba(251,191,36,0.8),0_0_80px_rgba(251,191,36,0.5)]',
+      glowColor: 'rgba(251, 191, 36, 0.6)',
     };
   } else if (earthCount >= 2) {
     return {
       type: 'GROUNDING FORCE',
       subtitle: 'SOIL BUILDER',
-      description: 'Your earth energy provides the stable foundation that roots need to thrive. You are the mineral layer beneath the music.',
-      color: 'hsl(25 50% 40%)',
-      showCTA: true,
+      description: 'Your earth holds the roots. We need your stability.',
+      color: 'hsl(140 40% 30%)', // Deep Green/Root
+      buttonText: 'ANCHOR THE HARVEST (SECURE YOUR SPOT)',
+      buttonClass: 'bg-gradient-to-r from-green-800 via-green-700 to-green-800 text-white shadow-[0_0_30px_rgba(34,197,94,0.4),0_0_60px_rgba(34,197,94,0.2)]',
+      buttonHoverClass: 'hover:shadow-[0_0_40px_rgba(34,197,94,0.6),0_0_80px_rgba(34,197,94,0.4)]',
+      glowColor: 'rgba(34, 197, 94, 0.5)',
     };
   } else {
     return {
       type: 'ALCHEMICAL MIX',
-      subtitle: 'NEEDS IRRIGATION',
-      description: 'Your elemental blend brings unique moisture and movement to the ecosystem. With proper cultivation, rare compounds emerge.',
-      color: 'hsl(210 60% 50%)',
-      showCTA: false,
+      subtitle: 'ESSENTIAL BALANCE',
+      description: 'You bring the rain and the breath. Complete the ecosystem.',
+      color: 'hsl(200 80% 55%)', // Glass/Blue
+      buttonText: 'BALANCE THE SOIL (JOIN THE MIX)',
+      buttonClass: 'bg-gradient-to-r from-sky-600/80 via-blue-500/90 to-sky-600/80 text-white backdrop-blur-sm border border-sky-400/30 shadow-[0_0_30px_rgba(56,189,248,0.4),0_0_60px_rgba(56,189,248,0.2)]',
+      buttonHoverClass: 'hover:shadow-[0_0_40px_rgba(56,189,248,0.6),0_0_80px_rgba(56,189,248,0.4)]',
+      glowColor: 'rgba(56, 189, 248, 0.5)',
     };
   }
 };
@@ -518,25 +527,77 @@ const StarMappingModal = ({ isOpen, onClose }: StarMappingModalProps) => {
                   </p>
                 </motion.div>
 
-                {/* CTAs */}
+                {/* Golden Ticket CTA - Floats up from bottom */}
                 <motion.div
-                  className="flex flex-col sm:flex-row items-center justify-center gap-4"
-                  initial={{ y: 20, opacity: 0 }}
+                  className="flex flex-col items-center gap-6"
+                  initial={{ y: 100, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.6 }}
+                  transition={{ 
+                    delay: 0.8, 
+                    duration: 0.8, 
+                    type: 'spring', 
+                    stiffness: 80,
+                    damping: 15 
+                  }}
                 >
-                  {resonance.showCTA && (
-                    <Button
-                      className="px-8 py-6 text-lg glass-card-strong border-throne-gold/50 hover:bg-throne-gold/20 text-foreground font-body"
+                  {/* Glowing CTA Button */}
+                  <motion.div
+                    className="relative group"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                  >
+                    {/* Pulsing glow behind button */}
+                    <motion.div
+                      className="absolute inset-0 rounded-xl blur-xl"
+                      style={{ backgroundColor: resonance.glowColor }}
+                      animate={{
+                        opacity: [0.5, 0.8, 0.5],
+                        scale: [1, 1.1, 1],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                      }}
+                    />
+                    
+                    <a 
+                      href="#shop" 
+                      onClick={onClose}
+                      className="relative block"
                     >
-                      <Sparkles className="w-5 h-5 mr-2 text-throne-gold" />
-                      JOIN THE 2026 CSA (YOU ARE A MATCH)
-                    </Button>
-                  )}
+                      <Button
+                        className={`
+                          relative px-10 py-8 text-lg font-body font-bold tracking-wide
+                          rounded-xl transition-all duration-300
+                          ${resonance.buttonClass}
+                          ${resonance.buttonHoverClass}
+                        `}
+                      >
+                        <Sparkles className="w-6 h-6 mr-3" />
+                        {resonance.buttonText}
+                      </Button>
+                    </a>
+
+                    {/* Hover tooltip with price/details */}
+                    <motion.div
+                      className="absolute left-1/2 -translate-x-1/2 -bottom-16 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    >
+                      <div className="glass-card-strong px-4 py-2 rounded-lg text-center whitespace-nowrap">
+                        <p className="text-foreground font-body text-sm font-medium">
+                          2026 CSA Share • Limited Availability
+                        </p>
+                        <p className="text-muted-foreground text-xs">
+                          Click to view pricing & details
+                        </p>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+
                   <Button
                     variant="ghost"
                     onClick={handleReset}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground mt-4"
                   >
                     Calculate Again
                   </Button>
