@@ -60,71 +60,89 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
     return () => clearTimeout(timer);
   }, [isOpen]);
 
-  // Shepard Tone Generator - Creates an infinitely ascending auditory illusion
-  const playShepardTone = useCallback(() => {
+  // Heavy Stone Door Rumble - Deep grinding stone with reverberant echoes
+  const playStoneDoorRumble = useCallback(() => {
     if (audioContextRef.current) return;
     
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     audioContextRef.current = audioContext;
 
-    const baseFreq = 110; // A2
-    const numVoices = 6;
-    const duration = 4;
-
-    // Create multiple oscillators at octave intervals
-    for (let i = 0; i < numVoices; i++) {
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      const freq = baseFreq * Math.pow(2, i);
-      oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
-      oscillator.type = 'sine';
-      
-      // Fade envelope for smooth blending
-      const peakTime = audioContext.currentTime + duration * 0.3;
-      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.08 / numVoices, peakTime);
-      gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
-      
-      // Frequency sweep upward
-      oscillator.frequency.exponentialRampToValueAtTime(
-        freq * 2,
-        audioContext.currentTime + duration
-      );
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + duration);
+    // Create noise buffer for stone grinding texture
+    const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 3, audioContext.sampleRate);
+    const noiseData = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < noiseData.length; i++) {
+      noiseData[i] = (Math.random() * 2 - 1) * 0.5;
     }
 
-    // Deep drum heartbeat
-    const drumOsc = audioContext.createOscillator();
-    const drumGain = audioContext.createGain();
-    drumOsc.type = 'sine';
-    drumOsc.frequency.setValueAtTime(60, audioContext.currentTime);
-    drumGain.gain.setValueAtTime(0.3, audioContext.currentTime);
-    drumGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-    drumOsc.connect(drumGain);
-    drumGain.connect(audioContext.destination);
-    drumOsc.start(audioContext.currentTime);
-    drumOsc.stop(audioContext.currentTime + 0.5);
+    // Stone grinding noise layer
+    const noiseSource = audioContext.createBufferSource();
+    noiseSource.buffer = noiseBuffer;
+    const noiseFilter = audioContext.createBiquadFilter();
+    noiseFilter.type = 'lowpass';
+    noiseFilter.frequency.setValueAtTime(200, audioContext.currentTime);
+    noiseFilter.frequency.linearRampToValueAtTime(80, audioContext.currentTime + 2.5);
+    const noiseGain = audioContext.createGain();
+    noiseGain.gain.setValueAtTime(0, audioContext.currentTime);
+    noiseGain.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.3);
+    noiseGain.gain.linearRampToValueAtTime(0.08, audioContext.currentTime + 1.5);
+    noiseGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 2.8);
+    noiseSource.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(audioContext.destination);
+    noiseSource.start(audioContext.currentTime);
+    noiseSource.stop(audioContext.currentTime + 3);
 
-    // Second heartbeat
+    // Deep resonant bass rumble (stone mass)
+    const bassOsc = audioContext.createOscillator();
+    bassOsc.type = 'sine';
+    bassOsc.frequency.setValueAtTime(35, audioContext.currentTime);
+    bassOsc.frequency.linearRampToValueAtTime(25, audioContext.currentTime + 2);
+    const bassGain = audioContext.createGain();
+    bassGain.gain.setValueAtTime(0, audioContext.currentTime);
+    bassGain.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.2);
+    bassGain.gain.linearRampToValueAtTime(0.25, audioContext.currentTime + 1);
+    bassGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2.8);
+    bassOsc.connect(bassGain);
+    bassGain.connect(audioContext.destination);
+    bassOsc.start(audioContext.currentTime);
+    bassOsc.stop(audioContext.currentTime + 3);
+
+    // Mid-frequency grinding resonance
+    const grindOsc = audioContext.createOscillator();
+    grindOsc.type = 'sawtooth';
+    grindOsc.frequency.setValueAtTime(55, audioContext.currentTime);
+    grindOsc.frequency.setValueAtTime(48, audioContext.currentTime + 0.5);
+    grindOsc.frequency.setValueAtTime(52, audioContext.currentTime + 1);
+    grindOsc.frequency.linearRampToValueAtTime(40, audioContext.currentTime + 2.5);
+    const grindFilter = audioContext.createBiquadFilter();
+    grindFilter.type = 'lowpass';
+    grindFilter.frequency.value = 150;
+    const grindGain = audioContext.createGain();
+    grindGain.gain.setValueAtTime(0, audioContext.currentTime);
+    grindGain.gain.linearRampToValueAtTime(0.08, audioContext.currentTime + 0.3);
+    grindGain.gain.linearRampToValueAtTime(0.04, audioContext.currentTime + 1.5);
+    grindGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2.5);
+    grindOsc.connect(grindFilter);
+    grindFilter.connect(grindGain);
+    grindGain.connect(audioContext.destination);
+    grindOsc.start(audioContext.currentTime);
+    grindOsc.stop(audioContext.currentTime + 3);
+
+    // Final thud impact when door settles
     setTimeout(() => {
       if (!audioContextRef.current) return;
-      const drum2 = audioContext.createOscillator();
-      const drum2Gain = audioContext.createGain();
-      drum2.type = 'sine';
-      drum2.frequency.setValueAtTime(55, audioContext.currentTime);
-      drum2Gain.gain.setValueAtTime(0.25, audioContext.currentTime);
-      drum2Gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
-      drum2.connect(drum2Gain);
-      drum2Gain.connect(audioContext.destination);
-      drum2.start(audioContext.currentTime);
-      drum2.stop(audioContext.currentTime + 0.6);
-    }, 400);
+      const thudOsc = audioContext.createOscillator();
+      thudOsc.type = 'sine';
+      thudOsc.frequency.setValueAtTime(45, audioContext.currentTime);
+      thudOsc.frequency.exponentialRampToValueAtTime(20, audioContext.currentTime + 0.4);
+      const thudGain = audioContext.createGain();
+      thudGain.gain.setValueAtTime(0.5, audioContext.currentTime);
+      thudGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.6);
+      thudOsc.connect(thudGain);
+      thudGain.connect(audioContext.destination);
+      thudOsc.start(audioContext.currentTime);
+      thudOsc.stop(audioContext.currentTime + 0.8);
+    }, 2200);
   }, []);
 
   // Generate spore particles for dissolution effect
@@ -139,7 +157,7 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
 
   const handleRemember = () => {
     setIsUnlocking(true);
-    playShepardTone();
+    playStoneDoorRumble();
     generateSpores();
     
     // Delay navigation for the full experience
