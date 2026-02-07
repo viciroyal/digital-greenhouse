@@ -125,7 +125,7 @@ const Footer = () => {
               Kristopher Sampson
             </p>
             <p className="text-cream-muted/50 font-body text-xs italic">
-              Mix Architect
+              Master Distiller
             </p>
             <p className="text-cream-muted/40 font-body text-xs mt-2">
               "The forgers of sonic compounds"
