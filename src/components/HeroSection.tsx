@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import CassettePlayer from './CassettePlayer';
 import PharmerTooltip from './PharmerTooltip';
 import albumArt from '@/assets/pharmboi-artwork.png';
+import pharmboiLogo from '@/assets/pharmboi-logo-textured.png';
 
 const HeroSection = () => {
   return (
@@ -64,15 +65,14 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <p className="text-throne-gold/80 font-body text-sm tracking-[0.3em] uppercase mb-2">
+            <p className="text-throne-gold/80 font-body text-sm tracking-[0.3em] uppercase mb-4">
               The Digital Greenhouse Presents
             </p>
-            <h1 
-              className="lignified-text text-6xl md:text-8xl lg:text-9xl mb-4 relative"
-              data-text="PHARMBOI"
-            >
-              PHARMBOI
-            </h1>
+            <img 
+              src={pharmboiLogo} 
+              alt="PHARMBOI" 
+              className="w-full max-w-xl mx-auto lg:mx-0 mb-4 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]"
+            />
             <p className="text-source-white/60 font-body text-lg md:text-xl max-w-xl mx-auto lg:mx-0">
               "To listen when the soil whispers, to act when the stars signal."
             </p>
