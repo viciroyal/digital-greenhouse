@@ -52,6 +52,97 @@ const VineFrame = ({ side }: { side: 'left' | 'right' }) => (
   </motion.svg>
 );
 
+// Mosaic Bead Particle - individual floating gemstone bead
+const MosaicBead = ({ 
+  size, 
+  color, 
+  glow, 
+  startX, 
+  startY, 
+  duration, 
+  delay 
+}: { 
+  size: number; 
+  color: string; 
+  glow: string; 
+  startX: number; 
+  startY: number; 
+  duration: number; 
+  delay: number; 
+}) => (
+  <motion.div
+    className="absolute"
+    style={{
+      left: `${startX}%`,
+      top: `${startY}%`,
+    }}
+    initial={{ opacity: 0, scale: 0 }}
+    animate={{
+      opacity: [0, 0.8, 0.6, 0.9, 0],
+      scale: [0.5, 1, 1.1, 0.9, 0.5],
+      x: [0, 20, -15, 25, 0],
+      y: [0, -30, -60, -90, -120],
+      rotate: [0, 45, -30, 60, 0],
+    }}
+    transition={{
+      duration,
+      repeat: Infinity,
+      delay,
+      ease: "easeInOut",
+    }}
+  >
+    <div
+      className="rounded-full"
+      style={{
+        width: size,
+        height: size,
+        background: `radial-gradient(circle at 30% 30%, ${color}, ${glow})`,
+        boxShadow: `0 0 ${size * 2}px ${glow}, inset 0 0 ${size / 2}px rgba(255,255,255,0.3)`,
+      }}
+    />
+  </motion.div>
+);
+
+// Mosaic Bead Particles - floating gemstone beads
+const MosaicBeadParticles = () => {
+  const beadConfigs = [
+    // Ruby beads
+    { size: 12, color: 'hsl(350 75% 55%)', glow: 'hsl(350 75% 40% / 0.6)', startX: 15, startY: 85, duration: 12, delay: 0 },
+    { size: 8, color: 'hsl(350 80% 60%)', glow: 'hsl(350 75% 45% / 0.5)', startX: 25, startY: 90, duration: 14, delay: 2 },
+    { size: 6, color: 'hsl(350 70% 50%)', glow: 'hsl(350 75% 35% / 0.4)', startX: 10, startY: 75, duration: 10, delay: 4 },
+    // Sapphire beads
+    { size: 10, color: 'hsl(220 75% 60%)', glow: 'hsl(220 75% 45% / 0.6)', startX: 75, startY: 80, duration: 13, delay: 1 },
+    { size: 14, color: 'hsl(220 80% 55%)', glow: 'hsl(220 75% 40% / 0.5)', startX: 85, startY: 88, duration: 15, delay: 3 },
+    { size: 7, color: 'hsl(220 70% 65%)', glow: 'hsl(220 75% 50% / 0.4)', startX: 90, startY: 70, duration: 11, delay: 5 },
+    // Topaz beads
+    { size: 9, color: 'hsl(45 90% 55%)', glow: 'hsl(45 90% 40% / 0.6)', startX: 45, startY: 92, duration: 11, delay: 0.5 },
+    { size: 11, color: 'hsl(45 85% 60%)', glow: 'hsl(45 90% 45% / 0.5)', startX: 55, startY: 85, duration: 13, delay: 2.5 },
+    { size: 5, color: 'hsl(45 80% 65%)', glow: 'hsl(45 90% 50% / 0.4)', startX: 50, startY: 78, duration: 9, delay: 4.5 },
+    // Amethyst beads
+    { size: 8, color: 'hsl(280 60% 55%)', glow: 'hsl(280 60% 40% / 0.6)', startX: 30, startY: 82, duration: 14, delay: 1.5 },
+    { size: 13, color: 'hsl(280 65% 50%)', glow: 'hsl(280 60% 35% / 0.5)', startX: 70, startY: 95, duration: 16, delay: 3.5 },
+    { size: 6, color: 'hsl(280 55% 60%)', glow: 'hsl(280 60% 45% / 0.4)', startX: 35, startY: 70, duration: 10, delay: 5.5 },
+    // Emerald beads
+    { size: 10, color: 'hsl(140 60% 45%)', glow: 'hsl(140 60% 30% / 0.6)', startX: 20, startY: 88, duration: 12, delay: 0.8 },
+    { size: 7, color: 'hsl(140 55% 50%)', glow: 'hsl(140 60% 35% / 0.5)', startX: 80, startY: 75, duration: 11, delay: 2.8 },
+    { size: 9, color: 'hsl(140 65% 40%)', glow: 'hsl(140 60% 25% / 0.4)', startX: 65, startY: 90, duration: 13, delay: 4.8 },
+    // Extra scattered beads
+    { size: 4, color: 'hsl(350 75% 60%)', glow: 'hsl(350 75% 45% / 0.3)', startX: 5, startY: 95, duration: 8, delay: 6 },
+    { size: 5, color: 'hsl(220 75% 65%)', glow: 'hsl(220 75% 50% / 0.3)', startX: 95, startY: 85, duration: 9, delay: 7 },
+    { size: 4, color: 'hsl(45 90% 60%)', glow: 'hsl(45 90% 45% / 0.3)', startX: 40, startY: 98, duration: 8, delay: 6.5 },
+    { size: 5, color: 'hsl(280 60% 58%)', glow: 'hsl(280 60% 42% / 0.3)', startX: 60, startY: 80, duration: 9, delay: 7.5 },
+    { size: 4, color: 'hsl(140 60% 48%)', glow: 'hsl(140 60% 32% / 0.3)', startX: 48, startY: 72, duration: 8, delay: 8 },
+  ];
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
+      {beadConfigs.map((config, i) => (
+        <MosaicBead key={i} {...config} />
+      ))}
+    </div>
+  );
+};
+
 // Cosmic Swirl Background
 const CosmicBackground = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -67,26 +158,26 @@ const CosmicBackground = () => (
       }}
     />
     
-    {/* Floating gemstone particles */}
-    {[...Array(40)].map((_, i) => (
+    {/* Small twinkling star particles */}
+    {[...Array(30)].map((_, i) => (
       <motion.div
         key={i}
         className="absolute rounded-full"
         style={{
-          width: Math.random() > 0.8 ? '3px' : Math.random() > 0.5 ? '2px' : '1px',
-          height: Math.random() > 0.8 ? '3px' : Math.random() > 0.5 ? '2px' : '1px',
-          backgroundColor: ['hsl(350 75% 60%)', 'hsl(220 75% 65%)', 'hsl(45 90% 60%)', 'hsl(280 60% 60%)', 'hsl(140 60% 50%)'][i % 5],
+          width: Math.random() > 0.7 ? '2px' : '1px',
+          height: Math.random() > 0.7 ? '2px' : '1px',
+          backgroundColor: 'hsl(40 50% 90%)',
           left: `${Math.random() * 100}%`,
           top: `${Math.random() * 100}%`,
         }}
         animate={{
-          opacity: [0.2, 0.8, 0.2],
-          scale: [1, 1.5, 1],
+          opacity: [0.1, 0.6, 0.1],
+          scale: [1, 1.3, 1],
         }}
         transition={{
-          duration: 3 + Math.random() * 4,
+          duration: 2 + Math.random() * 3,
           repeat: Infinity,
-          delay: Math.random() * 3,
+          delay: Math.random() * 2,
         }}
       />
     ))}
@@ -129,6 +220,7 @@ const HeroSection = () => {
         }}
       />
       <CosmicBackground />
+      <MosaicBeadParticles />
       
       {/* Root/earth glow from bottom */}
       <div 
