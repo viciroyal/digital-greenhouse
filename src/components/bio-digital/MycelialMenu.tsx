@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { KeyholeButton } from '@/components/portal';
 
 interface MenuNode {
   id: string;
@@ -14,13 +15,17 @@ const menuNodes: MenuNode[] = [
   { id: 'top', label: 'Return to Top', href: '#' },
 ];
 
+interface MycelialMenuProps {
+  onInitiationClick?: () => void;
+}
+
 /**
  * Mycelial Navigation - "The Growing Menu"
  * 
  * Navigation that sprouts outward like branching mycelium.
  * Includes cursor-following hyphae connections.
  */
-const MycelialMenu = () => {
+const MycelialMenu = ({ onInitiationClick }: MycelialMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
@@ -58,8 +63,10 @@ const MycelialMenu = () => {
   return (
     <div 
       ref={containerRef}
-      className="fixed top-6 right-6 z-50"
+      className="fixed top-6 right-6 z-50 flex items-center gap-3"
     >
+      {/* The Initiation Keyhole */}
+      <KeyholeButton onClick={onInitiationClick || (() => {})} />
       {/* Spore/Seed Button */}
       <motion.button
         className="relative w-14 h-14 rounded-full flex items-center justify-center"
