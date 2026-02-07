@@ -162,7 +162,7 @@ const Footer = () => {
 
         {/* Connect Section */}
         <div className="text-center py-8 border-t border-border/20 mb-8">
-          <h5 className="font-bubble text-lg text-cream-muted/80 mb-6 tracking-wider">JOIN THE REGIMEN</h5>
+          <h5 className="font-bubble text-lg text-cream-muted/80 mb-6 tracking-wider">ENTER THE REGIMEN</h5>
           <div className="flex flex-wrap justify-center gap-6">
             <motion.a
               href="#"

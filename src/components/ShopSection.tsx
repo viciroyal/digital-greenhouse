@@ -155,7 +155,7 @@ const ShopSection = () => {
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setIsContractOpen(true)}
                     >
-                      Begin Treatment
+                      Secure Dosage
                     </motion.button>
                   </div>
 
