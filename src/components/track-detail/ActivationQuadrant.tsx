@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { forwardRef } from 'react';
 import type { TrackData } from '@/data/trackData';
 
 interface ActivationQuadrantProps {
@@ -285,9 +286,11 @@ const YogaPoseSvg = ({ pose, color }: { pose: string; color: string }) => {
   );
 };
 
-const ActivationQuadrant = ({ track }: ActivationQuadrantProps) => {
+const ActivationQuadrant = forwardRef<HTMLDivElement, ActivationQuadrantProps>(
+  ({ track }, ref) => {
   return (
     <motion.div
+      ref={ref}
       className="root-card p-6 md:col-span-2"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -385,6 +388,8 @@ const ActivationQuadrant = ({ track }: ActivationQuadrantProps) => {
       </div>
     </motion.div>
   );
-};
+});
+
+ActivationQuadrant.displayName = 'ActivationQuadrant';
 
 export default ActivationQuadrant;
