@@ -11,6 +11,7 @@ import RespiratorySystem from '@/components/bio-digital/RespiratorySystem';
 import BioluminescentVeins from '@/components/bio-digital/BioluminescentVeins';
 import CircadianOverlay from '@/components/bio-digital/CircadianOverlay';
 import MycelialMenu from '@/components/bio-digital/MycelialMenu';
+import { AudioBiomeManager, ConchShellControl } from '@/components/audio';
 
 const Index = () => {
   const [isStarMappingOpen, setIsStarMappingOpen] = useState(false);
@@ -30,6 +31,10 @@ const Index = () => {
       
       {/* Mycelial Navigation */}
       <MycelialMenu />
+      
+      {/* Audio Biome System */}
+      <AudioBiomeManager />
+      <ConchShellControl />
       
       {/* Content layers */}
       <div className="relative z-10">
