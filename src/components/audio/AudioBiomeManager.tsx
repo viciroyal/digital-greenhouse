@@ -1,12 +1,14 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useAudioBiome } from '@/contexts/AudioBiomeContext';
-
 // Ambient audio URLs - using free ambient sound samples
 const AUDIO_SOURCES = {
   ether: 'https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3', // Wind ambience
   labor: 'https://assets.mixkit.co/active_storage/sfx/2515/2515-preview.mp3', // Nature/birds
   roots: 'https://assets.mixkit.co/active_storage/sfx/78/78-preview.mp3', // Water stream
 };
+
+// Maximum volume cap for ambient audio (40% = background ambiance level)
+const MAX_VOLUME = 0.4;
 
 const AudioBiomeManager = () => {
   const { isAudioEnabled, setZoneVolumes, setCurrentZone } = useAudioBiome();
@@ -60,7 +62,8 @@ const AudioBiomeManager = () => {
         
         const audio = audioRefs.current[zone];
         if (audio) {
-          audio.volume = Math.max(0, Math.min(1, currentVolumesRef.current[zone]));
+          // Apply MAX_VOLUME cap for background ambiance level
+          audio.volume = Math.max(0, Math.min(MAX_VOLUME, currentVolumesRef.current[zone] * MAX_VOLUME));
         }
       } else {
         currentVolumesRef.current[zone] = target;
