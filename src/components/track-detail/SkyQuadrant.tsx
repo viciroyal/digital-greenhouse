@@ -528,9 +528,8 @@ const SkyQuadrant = ({ track }: SkyQuadrantProps) => {
         {/* Sign Name */}
         <div>
           <p 
-            className="text-xl font-bold tracking-widest uppercase"
+            className="carving-text text-2xl tracking-widest"
             style={{ 
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
               color: DOGON_COLORS.paleStraw,
               textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
             }}
