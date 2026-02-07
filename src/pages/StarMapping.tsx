@@ -298,7 +298,7 @@ const StarMapping = () => {
               </span>
               <Sparkles className="w-5 h-5" style={{ color: '#5D4037' }} />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2" style={{ color: '#3E2723' }}>
+            <h1 className="text-3xl md:text-4xl pillar-text mb-2" data-text="Star Mapping">
               Star Mapping
             </h1>
             <p className="text-sm md:text-base max-w-xs mx-auto" style={{ color: '#6D4C41' }}>
