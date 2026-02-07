@@ -7,6 +7,17 @@ interface RxPrescriptionProps {
   onActivate: () => void;
 }
 
+// Dogon/Bogolanfini color palette
+const DOGON_COLORS = {
+  ebonyBlack: '#1a1410',
+  mudBrown: '#3d2a1a',
+  fermentedMud: '#2a1f16',
+  rustClay: '#8b3a1d',
+  milletYellow: '#d4b896',
+  paleStraw: '#e8dcc8',
+  boneWhite: '#f5f0e6',
+};
+
 // Master Prescription Data - exact same logic retained
 const prescriptionData: Record<number, {
   action: string;
@@ -75,134 +86,156 @@ const prescriptionData: Record<number, {
   },
 };
 
-// Dreaming Spiral Symbol with animation
-const DreamingSpiral = ({ color }: { color: string }) => (
-  <motion.div
-    animate={{
-      rotate: [0, 360],
-      scale: [1, 1.05, 1],
-    }}
-    transition={{
-      rotate: {
-        duration: 20,
-        repeat: Infinity,
-        ease: "linear",
-      },
-      scale: {
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut",
-      },
-    }}
-  >
-    <svg viewBox="0 0 60 60" className="w-14 h-14">
-      {/* Outer dot ring */}
-      {[...Array(12)].map((_, i) => {
-        const angle = (i / 12) * Math.PI * 2;
-        const x = 30 + Math.cos(angle) * 26;
-        const y = 30 + Math.sin(angle) * 26;
-        return <circle key={`outer-${i}`} cx={x} cy={y} r="2" fill="#eaddca" opacity="0.7" />;
-      })}
-      
-      {/* Inner dot ring */}
-      {[...Array(8)].map((_, i) => {
-        const angle = (i / 8) * Math.PI * 2 + 0.2;
-        const x = 30 + Math.cos(angle) * 18;
-        const y = 30 + Math.sin(angle) * 18;
-        return <circle key={`inner-${i}`} cx={x} cy={y} r="1.5" fill="#d4a24e" opacity="0.8" />;
-      })}
-      
-      {/* Spiral path */}
-      <path
-        d="M30 30 
-           C 30 26, 34 26, 34 30
-           C 34 36, 26 36, 26 30
-           C 26 22, 38 22, 38 30
-           C 38 40, 22 40, 22 30
-           C 22 18, 42 18, 42 30
-           C 42 44, 18 44, 18 30"
-        fill="none"
-        stroke="#eaddca"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      
-      {/* Center dot - The Source with glow */}
-      <motion.circle 
-        cx="30" 
-        cy="30" 
-        r="4" 
-        fill={`hsl(${color})`}
-        animate={{
-          opacity: [0.8, 1, 0.8],
-          r: [4, 4.5, 4],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <circle cx="30" cy="30" r="2" fill="#eaddca" />
+// Bogolanfini (Mud Cloth) geometric patterns
+const MudClothPattern = ({ variant = 0 }: { variant?: number }) => {
+  const patterns = [
+    // Pattern 1: Zigzag rows
+    <>
+      <path d="M0 10 L10 0 L20 10 L30 0 L40 10" stroke={DOGON_COLORS.paleStraw} strokeWidth="2" fill="none" />
+      <path d="M0 25 L10 15 L20 25 L30 15 L40 25" stroke={DOGON_COLORS.paleStraw} strokeWidth="2" fill="none" />
+      <rect x="15" y="30" width="10" height="10" fill={DOGON_COLORS.paleStraw} opacity="0.8" />
+    </>,
+    // Pattern 2: Cross pattern
+    <>
+      <path d="M20 0 L20 40" stroke={DOGON_COLORS.paleStraw} strokeWidth="2" />
+      <path d="M0 20 L40 20" stroke={DOGON_COLORS.paleStraw} strokeWidth="2" />
+      <rect x="5" y="5" width="8" height="8" fill={DOGON_COLORS.rustClay} opacity="0.6" />
+      <rect x="27" y="27" width="8" height="8" fill={DOGON_COLORS.rustClay} opacity="0.6" />
+    </>,
+    // Pattern 3: Diamond grid
+    <>
+      <path d="M20 0 L40 20 L20 40 L0 20 Z" stroke={DOGON_COLORS.paleStraw} strokeWidth="2" fill="none" />
+      <path d="M20 10 L30 20 L20 30 L10 20 Z" stroke={DOGON_COLORS.milletYellow} strokeWidth="1.5" fill="none" />
+      <circle cx="20" cy="20" r="3" fill={DOGON_COLORS.paleStraw} />
+    </>,
+    // Pattern 4: Parallel lines with dots
+    <>
+      <path d="M0 8 L40 8" stroke={DOGON_COLORS.paleStraw} strokeWidth="2" />
+      <path d="M0 20 L40 20" stroke={DOGON_COLORS.paleStraw} strokeWidth="2" />
+      <path d="M0 32 L40 32" stroke={DOGON_COLORS.paleStraw} strokeWidth="2" />
+      <circle cx="10" cy="14" r="2" fill={DOGON_COLORS.milletYellow} />
+      <circle cx="30" cy="14" r="2" fill={DOGON_COLORS.milletYellow} />
+      <circle cx="20" cy="26" r="2" fill={DOGON_COLORS.milletYellow} />
+    </>,
+  ];
+
+  return (
+    <svg viewBox="0 0 40 40" className="w-10 h-10">
+      {patterns[variant % patterns.length]}
     </svg>
-  </motion.div>
+  );
+};
+
+// Kanaga Symbol (Dogon sacred symbol)
+const KanagaSymbol = ({ color }: { color: string }) => (
+  <motion.svg 
+    viewBox="0 0 60 60" 
+    className="w-14 h-14"
+    animate={{ rotate: [0, 2, -2, 0] }}
+    transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+  >
+    {/* Central vertical */}
+    <path 
+      d="M30 10 L30 50" 
+      stroke={DOGON_COLORS.paleStraw} 
+      strokeWidth="3" 
+      strokeLinecap="square"
+    />
+    
+    {/* Upper arms (Kanaga shape) */}
+    <path 
+      d="M30 18 L18 10 L12 16" 
+      stroke={DOGON_COLORS.paleStraw} 
+      strokeWidth="3" 
+      strokeLinecap="square"
+      fill="none"
+    />
+    <path 
+      d="M30 18 L42 10 L48 16" 
+      stroke={DOGON_COLORS.paleStraw} 
+      strokeWidth="3" 
+      strokeLinecap="square"
+      fill="none"
+    />
+    
+    {/* Lower arms (inverted) */}
+    <path 
+      d="M30 42 L18 50 L12 44" 
+      stroke={DOGON_COLORS.paleStraw} 
+      strokeWidth="3" 
+      strokeLinecap="square"
+      fill="none"
+    />
+    <path 
+      d="M30 42 L42 50 L48 44" 
+      stroke={DOGON_COLORS.paleStraw} 
+      strokeWidth="3" 
+      strokeLinecap="square"
+      fill="none"
+    />
+    
+    {/* Center accent */}
+    <rect 
+      x="26" 
+      y="26" 
+      width="8" 
+      height="8" 
+      fill={`hsl(${color})`} 
+      opacity="0.8"
+    />
+  </motion.svg>
 );
 
-// Dot painting border pattern
-const DotBorder = ({ position }: { position: 'top' | 'bottom' | 'left' | 'right' }) => {
-  const isHorizontal = position === 'top' || position === 'bottom';
-  const dotCount = isHorizontal ? 20 : 12;
-  
+// Mud Cloth border pattern
+const MudClothBorder = ({ position }: { position: 'top' | 'bottom' }) => {
   return (
     <div 
-      className={`absolute ${
-        position === 'top' ? 'top-2 left-4 right-4' :
-        position === 'bottom' ? 'bottom-2 left-4 right-4' :
-        position === 'left' ? 'left-2 top-4 bottom-4' :
-        'right-2 top-4 bottom-4'
-      } flex ${isHorizontal ? 'flex-row justify-between' : 'flex-col justify-between'}`}
+      className={`absolute ${position === 'top' ? 'top-0' : 'bottom-0'} left-0 right-0 h-8 overflow-hidden`}
     >
-      {[...Array(dotCount)].map((_, i) => (
-        <div key={i} className="flex gap-0.5">
-          <div 
-            className="w-1.5 h-1.5 rounded-full"
-            style={{ 
-              backgroundColor: i % 3 === 0 ? '#d4a24e' : '#eaddca',
-              opacity: 0.6 + (i % 2) * 0.2,
-            }}
-          />
-          {i % 4 === 0 && (
-            <div 
-              className="w-1 h-1 rounded-full"
-              style={{ backgroundColor: '#9c3c1a', opacity: 0.5 }}
-            />
-          )}
-        </div>
-      ))}
+      <svg viewBox="0 0 400 32" className="w-full h-full" preserveAspectRatio="none">
+        {/* Zigzag pattern */}
+        <path 
+          d={position === 'top' 
+            ? "M0 32 L20 8 L40 32 L60 8 L80 32 L100 8 L120 32 L140 8 L160 32 L180 8 L200 32 L220 8 L240 32 L260 8 L280 32 L300 8 L320 32 L340 8 L360 32 L380 8 L400 32"
+            : "M0 0 L20 24 L40 0 L60 24 L80 0 L100 24 L120 0 L140 24 L160 0 L180 24 L200 0 L220 24 L240 0 L260 24 L280 0 L300 24 L320 0 L340 24 L360 0 L380 24 L400 0"
+          }
+          stroke={DOGON_COLORS.paleStraw}
+          strokeWidth="2"
+          fill="none"
+          opacity="0.5"
+        />
+        {/* Horizontal lines */}
+        <line 
+          x1="0" 
+          y1={position === 'top' ? "4" : "28"} 
+          x2="400" 
+          y2={position === 'top' ? "4" : "28"} 
+          stroke={DOGON_COLORS.milletYellow} 
+          strokeWidth="1" 
+          opacity="0.3"
+        />
+      </svg>
     </div>
   );
 };
 
-// Ceremonial sound generator using Web Audio API
+// Ceremonial sound generator
 const playCeremonialSound = () => {
   const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
   
-  // Create a deep resonant drone
+  // Deep resonant drone (Dogon drum-like)
   const oscillator1 = audioContext.createOscillator();
   const oscillator2 = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
   
-  // Deep earth tone
   oscillator1.type = 'sine';
-  oscillator1.frequency.setValueAtTime(60, audioContext.currentTime);
+  oscillator1.frequency.setValueAtTime(55, audioContext.currentTime);
   oscillator1.frequency.exponentialRampToValueAtTime(40, audioContext.currentTime + 1.5);
   
-  // Harmonic overtone
   oscillator2.type = 'triangle';
-  oscillator2.frequency.setValueAtTime(120, audioContext.currentTime);
+  oscillator2.frequency.setValueAtTime(110, audioContext.currentTime);
   oscillator2.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 1.5);
   
-  // Fade envelope
   gainNode.gain.setValueAtTime(0, audioContext.currentTime);
   gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
   gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
@@ -216,12 +249,12 @@ const playCeremonialSound = () => {
   oscillator1.stop(audioContext.currentTime + 2);
   oscillator2.stop(audioContext.currentTime + 2);
   
-  // Add a brief chime/bell tone
+  // Kora-like tone
   const chime = audioContext.createOscillator();
   const chimeGain = audioContext.createGain();
   chime.type = 'sine';
-  chime.frequency.setValueAtTime(528, audioContext.currentTime); // 528Hz - healing frequency
-  chime.frequency.exponentialRampToValueAtTime(264, audioContext.currentTime + 1);
+  chime.frequency.setValueAtTime(440, audioContext.currentTime);
+  chime.frequency.exponentialRampToValueAtTime(220, audioContext.currentTime + 1);
   chimeGain.gain.setValueAtTime(0.15, audioContext.currentTime);
   chimeGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1.5);
   chime.connect(chimeGain);
@@ -230,10 +263,9 @@ const playCeremonialSound = () => {
   chime.stop(audioContext.currentTime + 1.5);
 };
 
-// Haptic vibration pattern for ritual initiation
+// Haptic vibration pattern
 const triggerHapticFeedback = () => {
   if ('vibrate' in navigator) {
-    // Pattern: short pulse, pause, longer resonance
     navigator.vibrate([50, 100, 150, 100, 300]);
   }
 };
@@ -247,7 +279,6 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
   const handleActivate = () => {
     setIsActivated(true);
     
-    // Trigger ceremonial effects
     try {
       playCeremonialSound();
     } catch (e) {
@@ -265,72 +296,56 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.15 }}
       style={{
-        background: `
-          linear-gradient(135deg, #9c3c1a 0%, #6d3319 40%, #4e342e 100%)
-        `,
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(234,221,202,0.1)',
+        background: `linear-gradient(180deg, ${DOGON_COLORS.fermentedMud} 0%, ${DOGON_COLORS.ebonyBlack} 100%)`,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(232,220,200,0.05)',
       }}
     >
-      {/* Bark/Hide texture overlay */}
-      <div 
-        className="absolute inset-0 opacity-20 pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='bark'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.04' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23bark)'/%3E%3C/svg%3E")`,
-        }}
-      />
-      
-      {/* Crack/fiber texture */}
+      {/* Mud cloth texture overlay */}
       <div 
         className="absolute inset-0 opacity-10 pointer-events-none"
         style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='mud'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.08' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23mud)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      {/* Woven fabric texture */}
+      <div 
+        className="absolute inset-0 opacity-5 pointer-events-none"
+        style={{
           backgroundImage: `
-            linear-gradient(45deg, transparent 40%, rgba(0,0,0,0.3) 45%, transparent 50%),
-            linear-gradient(-45deg, transparent 40%, rgba(0,0,0,0.2) 45%, transparent 50%)
+            repeating-linear-gradient(
+              0deg,
+              transparent,
+              transparent 2px,
+              rgba(232,220,200,0.1) 2px,
+              rgba(232,220,200,0.1) 4px
+            ),
+            repeating-linear-gradient(
+              90deg,
+              transparent,
+              transparent 2px,
+              rgba(232,220,200,0.1) 2px,
+              rgba(232,220,200,0.1) 4px
+            )
           `,
-          backgroundSize: '30px 30px',
         }}
       />
 
-      {/* Earth stain effect */}
-      <div 
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `
-            radial-gradient(ellipse at 20% 30%, rgba(78, 52, 46, 0.4) 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 70%, rgba(156, 60, 26, 0.3) 0%, transparent 40%)
-          `,
-        }}
-      />
+      {/* Mud Cloth Border Patterns */}
+      <MudClothBorder position="top" />
+      <MudClothBorder position="bottom" />
 
-      {/* Dot painting borders */}
-      <DotBorder position="top" />
-      <DotBorder position="bottom" />
-      <DotBorder position="left" />
-      <DotBorder position="right" />
-
-      {/* Torn edge effect - top */}
-      <div 
-        className="absolute top-0 left-0 right-0 h-3 pointer-events-none"
-        style={{
-          background: 'linear-gradient(to bottom, rgba(78,52,46,0.8), transparent)',
-          maskImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0 Q5 8 10 2 T20 3 T30 1 T40 4 T50 2 T60 5 T70 1 T80 3 T90 2 T100 4 L100 10 L0 10 Z\' fill=\'white\'/%3E%3C/svg%3E")',
-          WebkitMaskImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0 Q5 8 10 2 T20 3 T30 1 T40 4 T50 2 T60 5 T70 1 T80 3 T90 2 T100 4 L100 10 L0 10 Z\' fill=\'white\'/%3E%3C/svg%3E")',
-          maskSize: '100% 100%',
-          WebkitMaskSize: '100% 100%',
-        }}
-      />
-
-      <div className="relative p-6 pt-8">
-        {/* Header with Dreaming Spiral */}
-        <div className="flex items-start justify-between mb-5 border-b border-dashed pb-4" style={{ borderColor: 'rgba(234,221,202,0.2)' }}>
+      <div className="relative p-6 pt-12 pb-12">
+        {/* Header with Kanaga Symbol */}
+        <div className="flex items-start justify-between mb-5 border-b border-dashed pb-4" style={{ borderColor: `${DOGON_COLORS.paleStraw}20` }}>
           <div className="flex items-center gap-3">
-            <DreamingSpiral color={track.colorHsl} />
+            <KanagaSymbol color={track.colorHsl} />
             <div>
               <p 
                 className="text-sm tracking-[0.12em] uppercase font-bold"
                 style={{ 
                   fontFamily: "'Cormorant Garamond', Georgia, serif",
-                  color: '#eaddca',
+                  color: DOGON_COLORS.paleStraw,
                   textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
                   letterSpacing: '0.15em',
                 }}
@@ -341,7 +356,7 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
                 className="text-xs tracking-wider uppercase mt-0.5"
                 style={{ 
                   fontFamily: "'Cormorant Garamond', Georgia, serif",
-                  color: '#d4a24e',
+                  color: DOGON_COLORS.rustClay,
                 }}
               >
                 VICI ROYÀL
@@ -351,7 +366,7 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
           <div className="text-right">
             <p 
               className="text-[10px] uppercase tracking-widest"
-              style={{ color: 'rgba(234,221,202,0.5)' }}
+              style={{ color: `${DOGON_COLORS.paleStraw}50` }}
             >
               TRACK {String(track.row).padStart(2, '0')}
             </p>
@@ -373,7 +388,7 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
             className="text-lg font-bold"
             style={{ 
               fontFamily: "'Cormorant Garamond', Georgia, serif",
-              color: '#eaddca',
+              color: DOGON_COLORS.paleStraw,
               textShadow: '2px 2px 4px rgba(0,0,0,0.4)',
             }}
           >
@@ -381,27 +396,35 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
           </p>
         </div>
 
-        {/* Sacred Instruction Details */}
+        {/* Sacred Instruction Details - Mud Cloth Panel */}
         <div 
-          className="rounded-lg p-4 mb-5"
+          className="rounded-lg p-4 mb-5 relative overflow-hidden"
           style={{ 
-            background: 'rgba(0,0,0,0.25)',
-            border: '1px solid rgba(234,221,202,0.15)',
+            background: `linear-gradient(135deg, ${DOGON_COLORS.mudBrown} 0%, ${DOGON_COLORS.fermentedMud} 100%)`,
+            border: `1px solid ${DOGON_COLORS.paleStraw}15`,
           }}
         >
+          {/* Geometric pattern decorations */}
+          <div className="absolute top-2 right-2 opacity-30">
+            <MudClothPattern variant={track.row % 4} />
+          </div>
+          <div className="absolute bottom-2 left-2 opacity-20">
+            <MudClothPattern variant={(track.row + 2) % 4} />
+          </div>
+
           {/* Spirit Action */}
-          <div className="mb-4">
+          <div className="mb-4 relative z-10">
             <p 
               className="text-[10px] uppercase tracking-[0.2em] mb-1"
-              style={{ color: '#d4a24e' }}
+              style={{ color: DOGON_COLORS.rustClay }}
             >
-              ◈ SACRED ACTION
+              ◆ SACRED ACTION
             </p>
             <p 
               className="text-base font-bold"
               style={{ 
                 fontFamily: "'Cormorant Garamond', Georgia, serif",
-                color: '#eaddca',
+                color: DOGON_COLORS.paleStraw,
                 textShadow: '1px 1px 2px rgba(0,0,0,0.4)',
               }}
             >
@@ -410,18 +433,18 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
           </div>
 
           {/* Earth Medicine Dosage */}
-          <div className="mb-4">
+          <div className="mb-4 relative z-10">
             <p 
               className="text-[10px] uppercase tracking-[0.2em] mb-1"
-              style={{ color: '#d4a24e' }}
+              style={{ color: DOGON_COLORS.rustClay }}
             >
-              ◈ EARTH MEDICINE
+              ◆ EARTH MEDICINE
             </p>
             <p 
               className="text-sm"
               style={{ 
                 fontFamily: "'Cormorant Garamond', Georgia, serif",
-                color: 'rgba(234,221,202,0.9)',
+                color: `${DOGON_COLORS.paleStraw}e6`,
               }}
             >
               {rx.dosage}
@@ -429,18 +452,18 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
           </div>
 
           {/* Spirit Journey Instructions */}
-          <div>
+          <div className="relative z-10">
             <p 
               className="text-[10px] uppercase tracking-[0.2em] mb-1"
-              style={{ color: '#d4a24e' }}
+              style={{ color: DOGON_COLORS.rustClay }}
             >
-              ◈ THE DREAMING
+              ◆ THE RITUAL
             </p>
             <p 
               className="text-sm leading-relaxed italic"
               style={{ 
                 fontFamily: "'Cormorant Garamond', Georgia, serif",
-                color: 'rgba(234,221,202,0.8)',
+                color: `${DOGON_COLORS.paleStraw}cc`,
               }}
             >
               "{rx.instruction}"
@@ -448,35 +471,48 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
           </div>
         </div>
 
-        {/* Decorative dot divider */}
-        <div className="flex justify-center gap-2 mb-5">
-          {[...Array(7)].map((_, i) => (
-            <div 
-              key={i}
-              className="rounded-full"
-              style={{
-                width: i === 3 ? '8px' : '4px',
-                height: i === 3 ? '8px' : '4px',
-                backgroundColor: i === 3 ? `hsl(${track.colorHsl})` : '#d4a24e',
-                opacity: 0.7 + (i === 3 ? 0.3 : 0),
-              }}
+        {/* Decorative geometric divider */}
+        <div className="flex justify-center items-center gap-3 mb-5">
+          <div 
+            className="h-px flex-1"
+            style={{ background: `linear-gradient(to right, transparent, ${DOGON_COLORS.rustClay}40, transparent)` }}
+          />
+          <svg viewBox="0 0 24 24" className="w-6 h-6">
+            <path 
+              d="M12 2 L22 12 L12 22 L2 12 Z" 
+              fill="none" 
+              stroke={DOGON_COLORS.rustClay} 
+              strokeWidth="1.5"
+              opacity="0.6"
             />
-          ))}
+            <rect 
+              x="9" 
+              y="9" 
+              width="6" 
+              height="6" 
+              fill={`hsl(${track.colorHsl})`}
+              opacity="0.8"
+            />
+          </svg>
+          <div 
+            className="h-px flex-1"
+            style={{ background: `linear-gradient(to left, transparent, ${DOGON_COLORS.rustClay}40, transparent)` }}
+          />
         </div>
 
-        {/* Ritual Activation Button - Carved Stone Style */}
+        {/* Ritual Activation Button - Carved Wood Style */}
         <motion.button
           className="w-full py-3.5 rounded-lg font-bold text-sm tracking-wider uppercase transition-all duration-300 relative overflow-hidden"
           style={{
             fontFamily: "'Cormorant Garamond', Georgia, serif",
             background: isActivated 
               ? `linear-gradient(135deg, hsl(${track.colorHsl}), hsl(${track.colorHsl} / 0.7))`
-              : 'linear-gradient(135deg, #5d4e3c 0%, #3d3229 50%, #2a2420 100%)',
-            color: '#eaddca',
-            border: '1px solid rgba(234,221,202,0.2)',
+              : `linear-gradient(180deg, ${DOGON_COLORS.mudBrown} 0%, ${DOGON_COLORS.ebonyBlack} 100%)`,
+            color: DOGON_COLORS.paleStraw,
+            border: `2px solid ${isActivated ? `hsl(${track.colorHsl} / 0.5)` : DOGON_COLORS.rustClay}40`,
             boxShadow: isActivated 
               ? `0 4px 20px hsl(${track.colorHsl} / 0.4), inset 0 1px 0 rgba(255,255,255,0.1)`
-              : '0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -2px 4px rgba(0,0,0,0.3)',
+              : '0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03)',
             textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
           }}
           whileHover={{ scale: 1.02, y: -1 }}
@@ -484,22 +520,30 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
           onClick={handleActivate}
           disabled={isActivated}
         >
-          {/* Stone texture overlay */}
+          {/* Wood grain texture */}
           <div 
             className="absolute inset-0 opacity-10 pointer-events-none"
             style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='stone'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.1' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23stone)'/%3E%3C/svg%3E")`,
+              backgroundImage: `
+                repeating-linear-gradient(
+                  90deg,
+                  transparent,
+                  transparent 3px,
+                  rgba(0,0,0,0.1) 3px,
+                  rgba(0,0,0,0.1) 6px
+                )
+              `,
             }}
           />
           
           <span className="relative z-10 flex items-center justify-center gap-2">
             {isActivated ? (
               <>
-                <span>✧</span> RITUAL ACTIVATED <span>✧</span>
+                <span>◆</span> RITUAL ACTIVATED <span>◆</span>
               </>
             ) : (
               <>
-                <span>◎</span> INITIATE RITUAL (BEGIN TRACK)
+                <span>◇</span> INITIATE RITUAL (BEGIN TRACK)
               </>
             )}
           </span>
@@ -508,29 +552,35 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
         {/* Sacred footer text */}
         <p 
           className="text-center text-[9px] mt-3 uppercase tracking-widest"
-          style={{ color: 'rgba(234,221,202,0.4)' }}
+          style={{ color: `${DOGON_COLORS.paleStraw}40` }}
         >
-          ✦ Earth Medicine for the Spirit ✦
+          ◆ Earth Medicine from the Granary ◆
         </p>
       </div>
 
-      {/* Corner dot accents */}
+      {/* Corner geometric carvings */}
       {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map((corner) => (
         <div 
           key={corner}
           className={`absolute w-6 h-6 ${
-            corner === 'top-left' ? 'top-3 left-3' :
-            corner === 'top-right' ? 'top-3 right-3' :
-            corner === 'bottom-left' ? 'bottom-3 left-3' :
-            'bottom-3 right-3'
+            corner === 'top-left' ? 'top-9 left-3' :
+            corner === 'top-right' ? 'top-9 right-3' :
+            corner === 'bottom-left' ? 'bottom-9 left-3' :
+            'bottom-9 right-3'
           }`}
         >
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#d4a24e', opacity: 0.4 }} />
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#eaddca', opacity: 0.6 }} />
-          </div>
+          <svg viewBox="0 0 24 24" className="w-full h-full">
+            <path
+              d={
+                corner === 'top-left' ? 'M4 12 L12 4 L12 12 Z' :
+                corner === 'top-right' ? 'M20 12 L12 4 L12 12 Z' :
+                corner === 'bottom-left' ? 'M4 12 L12 20 L12 12 Z' :
+                'M20 12 L12 20 L12 12 Z'
+              }
+              fill={DOGON_COLORS.rustClay}
+              opacity="0.3"
+            />
+          </svg>
         </div>
       ))}
     </motion.div>
