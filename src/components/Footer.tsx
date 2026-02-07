@@ -25,7 +25,7 @@ const Footer = () => {
               <li>Sarafina Ethereal</li>
               <li>James Cambridge IV</li>
               <li>Briar Blakley</li>
-              <li>Vitoria</li>
+              <li>Victoria</li>
               <li>Dara Carter</li>
               <li>Shellie Sweets</li>
               <li>Yamau</li>
