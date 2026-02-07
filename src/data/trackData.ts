@@ -21,6 +21,11 @@ export interface TrackData {
   cropExamples: string;
   // Logic quadrant
   pharmerNote: string;
+  // Activation quadrant (The Ritual)
+  yogaPose: string;
+  yogaPoseSanskrit: string;
+  yogaWhy: string;
+  ritualAction: string;
 }
 
 export const trackData: TrackData[] = [
@@ -42,6 +47,10 @@ export const trackData: TrackData[] = [
     cropType: 'Root Vegetables',
     cropExamples: 'Carrots, Beets',
     pharmerNote: 'Weeding is grounding. Like the skeleton holds the body, Iron holds the soil.',
+    yogaPose: 'Yogi Squat',
+    yogaPoseSanskrit: 'Malasana',
+    yogaWhy: 'It brings the hips close to the Earth, mimicking the weeding motion.',
+    ritualAction: 'Plant your feet flat. Touch the floor with your fingertips. Ground the root.',
   },
   {
     row: 2,
@@ -62,6 +71,10 @@ export const trackData: TrackData[] = [
     cropType: 'Water-Heavy Crops',
     cropExamples: 'Melons, Cucumbers',
     pharmerNote: 'The Sacral is the water center. Humates manage the moisture and flow.',
+    yogaPose: 'Cat-Cow Flow',
+    yogaPoseSanskrit: 'Marjaryasana-Bitilasana',
+    yogaWhy: 'It activates the spinal fluid and Sacral chakra flow.',
+    ritualAction: 'Move your spine like a wave. Drink a glass of water immediately after.',
   },
   {
     row: 3,
@@ -81,6 +94,10 @@ export const trackData: TrackData[] = [
     cropType: 'Leafy Greens',
     cropExamples: 'Kale, Lettuce',
     pharmerNote: 'The stomach digests fuel. Nitrogen digests sunlight into green growth.',
+    yogaPose: 'Boat Pose',
+    yogaPoseSanskrit: 'Navasana',
+    yogaWhy: 'It engages the core (Solar Plexus) and ignites the "I Am" fire.',
+    ritualAction: 'Hold the core tight. Breathe rapidly through the nose (Fire Breath).',
   },
   {
     row: 4,
@@ -101,6 +118,10 @@ export const trackData: TrackData[] = [
     cropType: 'Legumes',
     cropExamples: 'Beans, Peas',
     pharmerNote: 'Muscles build the nation. Soybeans build the soil nitrogen bank.',
+    yogaPose: 'Warrior II',
+    yogaPoseSanskrit: 'Virabhadrasana II',
+    yogaWhy: 'It claims territory and builds leg strength.',
+    ritualAction: 'Stomp the foot. Gaze over the front hand. Claim your space.',
   },
   {
     row: 5,
@@ -120,6 +141,10 @@ export const trackData: TrackData[] = [
     cropType: 'Chlorophyll-Dense Herbs',
     cropExamples: 'Basil, Cilantro',
     pharmerNote: 'The heart pumps blood. Magnesium pumps energy into the chlorophyll.',
+    yogaPose: 'Camel Pose',
+    yogaPoseSanskrit: 'Ustrasana',
+    yogaWhy: 'It physically cracks the chest/heart open.',
+    ritualAction: 'Place hands on the lower back. Arch back. Exhale "Ahhh".',
   },
   {
     row: 6,
@@ -140,6 +165,10 @@ export const trackData: TrackData[] = [
     cropType: 'Cover Crops',
     cropExamples: 'Clover, Vetch',
     pharmerNote: 'Hands serve others. Cover crops serve the soil ecosystem.',
+    yogaPose: 'Tree Pose',
+    yogaPoseSanskrit: 'Vrksasana',
+    yogaWhy: 'It requires balance and connection between sky and earth.',
+    ritualAction: 'Palms together at the heart. Root the standing leg. Sway slightly.',
   },
   {
     row: 7,
@@ -160,6 +189,10 @@ export const trackData: TrackData[] = [
     cropType: 'Fruiting Crops',
     cropExamples: 'Tomatoes, Peppers',
     pharmerNote: 'The throat speaks truth. Calcium builds the cell walls to hold the fruit.',
+    yogaPose: 'Fish Pose',
+    yogaPoseSanskrit: 'Matsyasana',
+    yogaWhy: 'It stretches the throat and thyroid.',
+    ritualAction: 'Tilt the head back. Hum a low tone against the roof of the mouth.',
   },
   {
     row: 8,
@@ -179,6 +212,10 @@ export const trackData: TrackData[] = [
     cropType: 'Stalk/Stem Crops',
     cropExamples: 'Corn, Sunflowers',
     pharmerNote: 'The spine holds you upright. Silica holds the corn stalk against the wind.',
+    yogaPose: 'Mountain Pose',
+    yogaPoseSanskrit: 'Tadasana',
+    yogaWhy: 'It aligns the skeletal structure (Silica).',
+    ritualAction: 'Stand perfectly still. Stack the vertebrae. Be the stalk.',
   },
   {
     row: 9,
@@ -199,6 +236,10 @@ export const trackData: TrackData[] = [
     cropType: 'High-Brix Fruit',
     cropExamples: 'Berries, Grapes',
     pharmerNote: 'The eye sees the vision. Sea Minerals conduct the electrical signal.',
+    yogaPose: "Child's Pose",
+    yogaPoseSanskrit: 'Balasana',
+    yogaWhy: 'It puts pressure on the Third Eye point.',
+    ritualAction: 'Press the forehead into the mat/floor. Close eyes. Watch the internal screen.',
   },
   {
     row: 10,
@@ -218,6 +259,10 @@ export const trackData: TrackData[] = [
     cropType: 'Medicinal Flowers',
     cropExamples: 'Echinacea, Calendula',
     pharmerNote: 'The mind focuses intent. Foliar spray targets the leaf directly.',
+    yogaPose: 'Eagle Pose',
+    yogaPoseSanskrit: 'Garudasana',
+    yogaWhy: 'It binds the body to force laser focus.',
+    ritualAction: 'Squeeze the arms and legs together. Fix your gaze on one point. Do not blink.',
   },
   {
     row: 11,
@@ -238,6 +283,10 @@ export const trackData: TrackData[] = [
     cropType: 'Seeds & Spores',
     cropExamples: 'Seeds, Spores',
     pharmerNote: 'The Pineal connects to Source. Mycorrhizae connects the entire forest.',
+    yogaPose: 'Lotus',
+    yogaPoseSanskrit: 'Padmasana',
+    yogaWhy: 'The traditional seat of enlightenment.',
+    ritualAction: 'Palms open on knees. Crown lifting to the sky. Receive the download.',
   },
   {
     row: 12,
@@ -257,6 +306,10 @@ export const trackData: TrackData[] = [
     cropType: 'Compost / Decaying Matter',
     cropExamples: 'Compost, Decay',
     pharmerNote: 'The Aura protects. Compost protects the future by recycling the past.',
+    yogaPose: 'Corpse Pose',
+    yogaPoseSanskrit: 'Savasana',
+    yogaWhy: 'It mimics the "death" of the season (Compost).',
+    ritualAction: 'Lie completely flat. Palms down. Let the body rot into the earth.',
   },
 ];
 

@@ -6,6 +6,7 @@ import BodyQuadrant from './track-detail/BodyQuadrant';
 import SkyQuadrant from './track-detail/SkyQuadrant';
 import EarthQuadrant from './track-detail/EarthQuadrant';
 import LogicQuadrant from './track-detail/LogicQuadrant';
+import ActivationQuadrant from './track-detail/ActivationQuadrant';
 
 interface TrackDetailViewProps {
   track: TrackData | null;
@@ -108,9 +109,12 @@ const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
 
                 {/* Quadrant D: The Logic */}
                 <LogicQuadrant track={track} />
+
+                {/* Quadrant E: The Activation (The Ritual) */}
+                <ActivationQuadrant track={track} />
               </div>
 
-              {/* Footer */}
+              {/* Footer with Producer Credits */}
               <motion.div
                 className="mt-12 text-center"
                 initial={{ opacity: 0 }}
@@ -133,7 +137,12 @@ const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
                   </p>
                 </div>
 
-                <p className="mt-6 font-mono text-xs text-muted-foreground/40">
+                {/* Producer credits in footer */}
+                <p className="mt-4 font-mono text-xs text-muted-foreground/60">
+                  Produced by <strong className="text-throne-gold font-bold">Vici Royàl</strong> & <span className="text-throne-gold">Èks</span>
+                </p>
+
+                <p className="mt-4 font-mono text-xs text-muted-foreground/40">
                   Press ESC or click outside to close
                 </p>
               </motion.div>
