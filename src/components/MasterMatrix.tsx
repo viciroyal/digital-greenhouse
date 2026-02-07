@@ -115,12 +115,8 @@ const GridHeader = () => (
       The Fox Divination Grid
     </p>
     <h2 
-      className="text-4xl md:text-6xl mb-4"
-      style={{ 
-        fontFamily: "'Staatliches', sans-serif",
-        color: DOGON.paleStraw,
-        letterSpacing: '0.1em',
-      }}
+      className="text-4xl md:text-6xl mb-4 pillar-text"
+      data-text="THE MASTER MATRIX"
     >
       THE MASTER MATRIX
     </h2>
