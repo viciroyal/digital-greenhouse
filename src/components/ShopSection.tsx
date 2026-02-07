@@ -16,13 +16,13 @@ const ShopSection = () => {
           transition={{ duration: 0.8 }}
         >
           <p className="text-gem-ruby/80 font-body text-sm tracking-[0.3em] uppercase mb-3">
-            The Harvest
+            The Dispensary
           </p>
-          <h2 className="text-4xl md:text-6xl root-text font-bubble mb-4" data-text="The Source Bundle">
-            The Source Bundle
+          <h2 className="text-4xl md:text-6xl root-text font-bubble mb-4" data-text="The Source Formula">
+            The Source Formula
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto font-body">
-            Everything you need to experience PHARMBOI as it was meant to be heard.
+            Everything you need to administer PHARMBOI as it was compounded to heal.
           </p>
         </motion.div>
 
@@ -99,22 +99,22 @@ const ShopSection = () => {
                 </div>
 
                 <h3 className="font-bubble text-3xl md:text-4xl text-foreground mb-4">
-                  The Source Bundle
+                  The Source Formula
                 </h3>
 
                 <p className="text-muted-foreground font-body mb-6">
-                  A complete journey from roots to cosmos. This bundle includes everything 
-                  grown in the Cosmic Garden.
+                  A complete treatment protocol from roots to cosmos. This formula includes every 
+                  active ingredient cultivated in the Cosmic Apothecary.
                 </p>
 
-                {/* What's included */}
+                {/* Active Ingredients */}
                 <div className="space-y-3 mb-8">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-gem-ruby/20 flex items-center justify-center text-gem-ruby">
                       📼
                     </div>
                     <div>
-                      <p className="text-foreground font-body font-medium">Transparent Cassette Player</p>
+                      <p className="text-foreground font-body font-medium">Delivery System</p>
                       <p className="text-muted-foreground text-sm font-body">Clear-Tech™ mechanics, no black boxes</p>
                     </div>
                   </div>
@@ -123,8 +123,8 @@ const ShopSection = () => {
                       🎵
                     </div>
                     <div>
-                      <p className="text-foreground font-body font-medium">PHARMBOI Cassette Tape</p>
-                      <p className="text-muted-foreground text-sm font-body">12 tracks, tuned to sacred frequencies</p>
+                      <p className="text-foreground font-body font-medium">Active Compound</p>
+                      <p className="text-muted-foreground text-sm font-body">12 doses, tuned to sacred frequencies</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -132,7 +132,7 @@ const ShopSection = () => {
                       🗺️
                     </div>
                     <div>
-                      <p className="text-foreground font-body font-medium">Digital Cosmic Map</p>
+                      <p className="text-foreground font-body font-medium">Dosage Chart</p>
                       <p className="text-muted-foreground text-sm font-body">Navigate the mineral-frequency matrix</p>
                     </div>
                   </div>
@@ -149,15 +149,15 @@ const ShopSection = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    Pre-Order Now
+                    Begin Treatment
                   </motion.button>
                 </div>
 
-                {/* Trust badges */}
+                {/* Certifications */}
                 <div className="mt-8 pt-6 border-t border-border/50 flex flex-wrap gap-4">
-                  <span className="text-muted-foreground/60 text-xs font-body">🌱 Sustainably sourced</span>
-                  <span className="text-muted-foreground/60 text-xs font-body">✨ Hand-assembled</span>
-                  <span className="text-muted-foreground/60 text-xs font-body">💎 Crystal-charged</span>
+                  <span className="text-muted-foreground/60 text-xs font-body">🌱 Organically Sourced</span>
+                  <span className="text-muted-foreground/60 text-xs font-body">✨ Hand-Compounded</span>
+                  <span className="text-muted-foreground/60 text-xs font-body">💎 Crystal-Activated</span>
                 </div>
               </div>
             </div>

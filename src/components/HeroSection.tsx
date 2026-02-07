@@ -418,7 +418,7 @@ const HeroSection = () => {
             whileTap={{ scale: 0.98 }}
           >
             <span className="flex items-center gap-2">
-              Enter The Garden
+              Begin The Regimen
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </span>
           </motion.a>
@@ -429,7 +429,7 @@ const HeroSection = () => {
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
           >
-            Get The Source Bundle
+            Acquire The Formula
           </motion.a>
         </motion.div>
 
