@@ -121,8 +121,14 @@ const Footer = () => {
             <p className="text-cream-muted/50 font-body text-xs italic">
               Frequency Synthesist
             </p>
+            <p className="text-gem-ruby/70 font-body font-bold text-base mt-3 mb-1">
+              Kristopher Sampson
+            </p>
+            <p className="text-cream-muted/50 font-body text-xs italic">
+              Mix Architect
+            </p>
             <p className="text-cream-muted/40 font-body text-xs mt-2">
-              "The forger of sonic compounds"
+              "The forgers of sonic compounds"
             </p>
           </motion.div>
 
