@@ -318,7 +318,7 @@ const StarMapping = () => {
             <div className="space-y-5">
               {/* Full Name */}
               <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2" style={{ color: '#5D4037' }}>
+                <label className="text-sm font-medium flex items-center gap-2 sirius-text" style={{ color: '#5D4037' }}>
                   <User className="w-4 h-4" /> Full Name
                 </label>
                 <Input
@@ -326,14 +326,14 @@ const StarMapping = () => {
                   placeholder="Enter your full name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="h-12 rounded-xl border-2 bg-white/80 placeholder:text-stone-400 transition-all duration-200"
+                  className="h-12 rounded-xl border-2 bg-white/80 placeholder:text-stone-400 transition-all duration-200 sirius-text"
                   style={{ borderColor: '#D7CCC8', color: '#3E2723' }}
                 />
               </div>
 
               {/* Date of Birth */}
               <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2" style={{ color: '#5D4037' }}>
+                <label className="text-sm font-medium flex items-center gap-2 sirius-text" style={{ color: '#5D4037' }}>
                   <CalendarIcon className="w-4 h-4" /> Date of Birth
                 </label>
                 <Popover>
@@ -369,7 +369,7 @@ const StarMapping = () => {
 
               {/* Time of Birth — Hour / Minute / AM-PM */}
               <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2" style={{ color: '#5D4037' }}>
+                <label className="text-sm font-medium flex items-center gap-2 sirius-text" style={{ color: '#5D4037' }}>
                   <Clock className="w-4 h-4" /> Time of Birth
                 </label>
                 <div className="flex gap-2">
@@ -448,7 +448,7 @@ const StarMapping = () => {
 
               {/* Location of Birth - City */}
               <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2" style={{ color: '#5D4037' }}>
+                <label className="text-sm font-medium flex items-center gap-2 sirius-text" style={{ color: '#5D4037' }}>
                   <MapPin className="w-4 h-4" /> City of Birth
                 </label>
                 <div className="relative">
@@ -457,7 +457,7 @@ const StarMapping = () => {
                     placeholder="City (optional — improves precision)"
                     value={birthCity}
                     onChange={(e) => setBirthCity(e.target.value)}
-                    className="h-12 rounded-xl border-2 bg-white/80 placeholder:text-stone-400 transition-all duration-200 pr-10"
+                    className="h-12 rounded-xl border-2 bg-white/80 placeholder:text-stone-400 transition-all duration-200 pr-10 sirius-text"
                     style={{ borderColor: '#D7CCC8', color: '#3E2723' }}
                   />
                   {isGeocoding && (
@@ -468,7 +468,7 @@ const StarMapping = () => {
                   )}
                 </div>
                 {geoResult && (
-                  <p className="text-[10px] font-mono" style={{ color: '#8D6E63' }}>
+                  <p className="text-[10px] sirius-text" style={{ color: '#8D6E63' }}>
                     📍 {geoResult.lat.toFixed(4)}°, {geoResult.lon.toFixed(4)}°
                   </p>
                 )}
@@ -476,7 +476,7 @@ const StarMapping = () => {
 
               {/* State Dropdown — directly under birth location */}
               <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2" style={{ color: '#5D4037' }}>
+                <label className="text-sm font-medium flex items-center gap-2 sirius-text" style={{ color: '#5D4037' }}>
                   <MapPin className="w-4 h-4" /> State
                 </label>
                 <Select value={birthState} onValueChange={setBirthState}>
