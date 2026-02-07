@@ -12,6 +12,7 @@ import BioluminescentVeins from '@/components/bio-digital/BioluminescentVeins';
 import CircadianOverlay from '@/components/bio-digital/CircadianOverlay';
 import MycelialMenu from '@/components/bio-digital/MycelialMenu';
 import { AudioBiomeManager, ConchShellControl } from '@/components/audio';
+import GriotOracle from '@/components/GriotOracle';
 
 const Index = () => {
   const [isStarMappingOpen, setIsStarMappingOpen] = useState(false);
@@ -35,6 +36,9 @@ const Index = () => {
       {/* Audio Biome System */}
       <AudioBiomeManager />
       <ConchShellControl />
+      
+      {/* Ancestral Oracle */}
+      <GriotOracle />
       
       {/* Content layers */}
       <div className="relative z-10">
