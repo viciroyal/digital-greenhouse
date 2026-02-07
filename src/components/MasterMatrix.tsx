@@ -63,12 +63,12 @@ const MasterMatrix = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="font-display text-4xl md:text-6xl text-foreground mb-3">
-            The Master Mix
-          </h2>
-          <p className="text-throne-gold/80 font-body text-sm tracking-[0.3em] uppercase mb-4">
+          <p className="text-throne-gold/80 font-body text-sm tracking-[0.3em] uppercase mb-3">
             The Pharmer Logic
           </p>
+          <h2 className="font-display text-4xl md:text-6xl text-foreground mb-4">
+            The Master Mix
+          </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-body">
             Each track is tuned to a sacred frequency, grounded in an essential soil mineral, 
             and amplified through its corresponding crystal. Music grown, not made.
