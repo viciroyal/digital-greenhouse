@@ -12,6 +12,8 @@ import EarthQuadrant from './track-detail/EarthQuadrant';
 import CrystalQuadrant from './track-detail/CrystalQuadrant';
 import LogicQuadrant from './track-detail/LogicQuadrant';
 import ActivationQuadrant from './track-detail/ActivationQuadrant';
+import SpectralVault from './track-detail/SpectralVault';
+import SpectralVaultTrigger from './track-detail/SpectralVaultTrigger';
 
 interface TrackDetailViewProps {
   track: TrackData | null;
@@ -21,6 +23,7 @@ interface TrackDetailViewProps {
 
 const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
   const [isRxActivated, setIsRxActivated] = useState(false);
+  const [isSpectralVaultOpen, setIsSpectralVaultOpen] = useState(false);
   
   if (!track) return null;
 
@@ -103,8 +106,8 @@ const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
               {/* Function Seal - AgroMajic Protocol Designation */}
               <FunctionSeal track={track} />
 
-              {/* Audio Player and Rx Prescription - Side by Side */}
-              <div className="grid md:grid-cols-3 gap-6 mb-8">
+              {/* Audio Player, Rx Prescription, Lunar Protocol, and Spectral Vault */}
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {/* Audio Player */}
                 <WaveformPlayer track={track} />
                 
@@ -113,6 +116,9 @@ const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
 
                 {/* Lunar Agronomy Module */}
                 <LunarAgronomyModule track={track} />
+
+                {/* Spectral Vault Trigger */}
+                <SpectralVaultTrigger track={track} onOpen={() => setIsSpectralVaultOpen(true)} />
               </div>
 
               {/* Data Quadrants Grid */}
@@ -143,31 +149,17 @@ const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
               >
-                <div 
-                  className="inline-block px-8 py-3 rounded-full border"
-                  style={{ 
-                    borderColor: `hsl(${track.colorHsl} / 0.3)`,
-                    background: `linear-gradient(90deg, hsl(${track.colorHsl} / 0.1), transparent, hsl(${track.colorHsl} / 0.1))`
-                  }}
-                >
-                  <p className="font-mono text-sm text-muted-foreground">
-                    <span style={{ color: `hsl(${track.colorHsl})` }}>{track.chakra}</span>
-                    {' · '}
-                    <span className="text-throne-gold">{track.frequency}</span>
-                    {' · '}
-                    <span style={{ color: `hsl(${track.colorHsl})` }}>{track.crystal}</span>
-                  </p>
-                </div>
-
-                {/* Producer credits in footer */}
-                <p className="mt-4 font-mono text-xs text-muted-foreground/60">
-                  Produced by <strong className="text-throne-gold font-bold">Vici Royàl</strong> & <span className="text-throne-gold">Èks</span>
-                </p>
-
-                <p className="mt-4 font-mono text-xs text-muted-foreground/40">
+                <p className="font-mono text-xs text-muted-foreground/40">
                   Press ESC or click outside to close
                 </p>
               </motion.div>
+
+              {/* Spectral Vault Drawer */}
+              <SpectralVault 
+                track={track} 
+                isOpen={isSpectralVaultOpen} 
+                onClose={() => setIsSpectralVaultOpen(false)} 
+              />
             </div>
           </motion.div>
         </motion.div>
