@@ -127,7 +127,7 @@ const matrixData: MatrixElement[] = [
     mineralSymbol: 'P',
     crystal: 'Clear Quartz',
     color: 'chakra-source',
-    featuring: 'Tori, Dara Carter & Briar Blakley',
+    featuring: 'Vitoria, Dara Carter & Briar Blakley',
   },
   {
     row: 12,
@@ -181,7 +181,7 @@ const MasterMatrix = () => {
           and amplified through its corresponding crystal. Music grown, not made.
         </p>
         <p className="text-muted-foreground/60 text-sm mt-4 font-mono">
-          Produced by <span className="text-throne-gold">Èks</span> • Artist: <strong className="text-foreground">Vici Royàl</strong>
+          Produced by <strong className="text-throne-gold">Vici Royàl</strong> & <span className="text-throne-gold">Èks</span>
         </p>
       </motion.div>
 
