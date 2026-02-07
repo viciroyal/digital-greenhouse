@@ -1,8 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useState } from 'react';
 import type { TrackData } from '@/data/trackData';
 import FunctionSeal from './track-detail/FunctionSeal';
 import WaveformPlayer from './track-detail/WaveformPlayer';
+import RxPrescription from './track-detail/RxPrescription';
 import BodyQuadrant from './track-detail/BodyQuadrant';
 import SkyQuadrant from './track-detail/SkyQuadrant';
 import EarthQuadrant from './track-detail/EarthQuadrant';
@@ -17,6 +19,8 @@ interface TrackDetailViewProps {
 }
 
 const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
+  const [isRxActivated, setIsRxActivated] = useState(false);
+  
   if (!track) return null;
 
   return (
@@ -98,8 +102,14 @@ const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
               {/* Function Seal - AgroMajic Protocol Designation */}
               <FunctionSeal track={track} />
 
-              {/* Audio Player */}
-              <WaveformPlayer track={track} />
+              {/* Audio Player and Rx Prescription - Side by Side */}
+              <div className="grid md:grid-cols-2 gap-6 mb-8">
+                {/* Audio Player */}
+                <WaveformPlayer track={track} />
+                
+                {/* Rx Prescription Pad */}
+                <RxPrescription track={track} onActivate={() => setIsRxActivated(true)} />
+              </div>
 
               {/* Data Quadrants Grid */}
               <div className="grid md:grid-cols-2 gap-6">
