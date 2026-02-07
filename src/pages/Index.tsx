@@ -18,10 +18,24 @@ import { MycelialCursor } from '@/components/cursor';
 import { ChakraSpine } from '@/components/navigation';
 import { ResonantChamber } from '@/components/community';
 import { PharmersPledgeModal } from '@/components/portal';
+import FieldModeToggle from '@/components/ui/FieldModeToggle';
+import FieldModeOverlay from '@/components/ui/FieldModeOverlay';
+import MasterSoilMixModal from '@/components/MasterSoilMixModal';
 
 const Index = () => {
   const [isStarMappingOpen, setIsStarMappingOpen] = useState(false);
   const [isPledgeModalOpen, setIsPledgeModalOpen] = useState(false);
+  const [isSoilMixOpen, setIsSoilMixOpen] = useState(false);
+  const [logoClickCount, setLogoClickCount] = useState(0);
+
+  const handleLogoClick = () => {
+    const newCount = logoClickCount + 1;
+    setLogoClickCount(newCount);
+    if (newCount >= 5) {
+      setIsSoilMixOpen(true);
+      setLogoClickCount(0);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-background overflow-x-hidden relative">
@@ -65,10 +79,20 @@ const Index = () => {
       <SedimentRuler />
       <GhostArtifacts />
       
+      {/* Field Mode System */}
+      <FieldModeToggle />
+      <FieldModeOverlay />
+      
+      {/* Master Soil Mix Easter Egg Modal */}
+      <MasterSoilMixModal 
+        isOpen={isSoilMixOpen} 
+        onClose={() => setIsSoilMixOpen(false)} 
+      />
+      
       {/* Content layers */}
       <div className="relative z-10">
         <GrowingRoots />
-        <HeroSection />
+        <HeroSection onLogoClick={handleLogoClick} />
         <MasterMatrix />
         <CosmicResonanceButton onClick={() => setIsStarMappingOpen(true)} />
         <ShopSection />

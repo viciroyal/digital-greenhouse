@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CircadianProvider } from "@/contexts/CircadianContext";
 import { AudioBiomeProvider } from "@/contexts/AudioBiomeContext";
+import { FieldModeProvider } from "@/contexts/FieldModeContext";
 import Index from "./pages/Index";
 import StarMapping from "./pages/StarMapping";
 import ResonanceReport from "./pages/ResonanceReport";
@@ -17,20 +18,22 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <CircadianProvider>
       <AudioBiomeProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/star-mapping" element={<StarMapping />} />
-              <Route path="/resonance-report" element={<ResonanceReport />} />
-              <Route path="/ancestral-path" element={<AncestralPath />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <FieldModeProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/star-mapping" element={<StarMapping />} />
+                <Route path="/resonance-report" element={<ResonanceReport />} />
+                <Route path="/ancestral-path" element={<AncestralPath />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </FieldModeProvider>
       </AudioBiomeProvider>
     </CircadianProvider>
   </QueryClientProvider>
