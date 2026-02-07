@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         display: ['"Cormorant Garamond"', 'serif'],
         body: ['"Space Grotesk"', 'sans-serif'],
+        lignified: ['"Eater"', 'cursive'],
       },
       colors: {
         border: "hsl(var(--border))",
