@@ -73,10 +73,21 @@ const MasterMatrix = () => {
             Each track is tuned to a sacred frequency, grounded in an essential soil mineral, 
             and amplified through its corresponding crystal. Music grown, not made.
           </p>
-          <p className="text-muted-foreground/60 text-sm mt-4 font-mono">
-            Produced by <strong className="text-throne-gold font-bold">Vici Royàl</strong> & <span className="text-throne-gold">Èks</span>
-          </p>
-          <p className="text-muted-foreground/40 text-xs mt-2 font-mono">
+          <div className="text-muted-foreground/60 text-sm mt-4 font-mono space-y-1">
+            <p>
+              Produced by <strong className="text-throne-gold font-bold">Vici Royàl</strong> & <span className="text-throne-gold">Èks</span>
+            </p>
+            <p className="text-xs text-muted-foreground/50">
+              Recorded at: <span className="text-muted-foreground/70">Atlanta Sound Factory</span>
+            </p>
+            <p className="text-xs text-muted-foreground/50">
+              Mixed by: <span className="text-throne-gold/80">Èks</span>
+            </p>
+            <p className="text-xs text-muted-foreground/50">
+              Mastered at: <span className="text-muted-foreground/70">Sampson Sound Studios</span> by <span className="text-muted-foreground/70">Kristofer Sampson</span>
+            </p>
+          </div>
+          <p className="text-muted-foreground/40 text-xs mt-3 font-mono">
             Click any track to view its Frequency Dashboard
           </p>
         </motion.div>
