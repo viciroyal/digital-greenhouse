@@ -13,6 +13,7 @@ import CircadianOverlay from '@/components/bio-digital/CircadianOverlay';
 import MycelialMenu from '@/components/bio-digital/MycelialMenu';
 import { AudioBiomeManager, ConchShellControl } from '@/components/audio';
 import GriotOracle from '@/components/GriotOracle';
+import { SedimentRuler, GhostArtifacts } from '@/components/scrollytelling';
 
 const Index = () => {
   const [isStarMappingOpen, setIsStarMappingOpen] = useState(false);
@@ -39,6 +40,10 @@ const Index = () => {
       
       {/* Ancestral Oracle */}
       <GriotOracle />
+      
+      {/* Scrollytelling Elements */}
+      <SedimentRuler />
+      <GhostArtifacts />
       
       {/* Content layers */}
       <div className="relative z-10">
