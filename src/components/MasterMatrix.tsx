@@ -3,15 +3,18 @@ import { useState, useEffect } from 'react';
 import { trackData, type TrackData } from '@/data/trackData';
 import TrackDetailView from './TrackDetailView';
 
-// Dogon colors
-const DOGON = {
-  ebony: '#1a1410',
-  mahogany: '#3d2317',
-  laterite: '#b7410e',
-  millet: '#e6cca0',
-  paleStraw: '#f5f0e6',
-  indigo: '#1a237e',
-  sirius: '#4a6fa5',
+// Cosmic Garden colors
+const COSMIC = {
+  cream: 'hsl(40 50% 95%)',
+  creamMuted: 'hsl(40 50% 85%)',
+  rootBrown: 'hsl(20 40% 15%)',
+  rootDark: 'hsl(20 30% 10%)',
+  cosmicBlue: 'hsl(250 60% 15%)',
+  amethyst: 'hsl(280 50% 25%)',
+  gemRuby: 'hsl(350 75% 50%)',
+  gemSapphire: 'hsl(220 75% 55%)',
+  gemEmerald: 'hsl(140 60% 45%)',
+  gemTopaz: 'hsl(45 90% 60%)',
 };
 
 // Helper to bold special names
@@ -22,7 +25,7 @@ const formatFeaturing = (featuring: string) => {
     <span>
       {featuring.split(/(\bSistah Moon\b|\bVici Royàl\b)/g).map((part, i) => 
         boldNames.includes(part) ? (
-          <strong key={i} style={{ color: DOGON.millet }} className="font-bold">{part}</strong>
+          <strong key={i} style={{ color: COSMIC.creamMuted }} className="font-bold">{part}</strong>
         ) : (
           <span key={i}>{part}</span>
         )
@@ -31,35 +34,37 @@ const formatFeaturing = (featuring: string) => {
   );
 };
 
-// Geometric Angular Chakra Symbol (Dogon style - no curves)
-const AngularChakraSymbol = ({ color, size = 32 }: { color: string; size?: number }) => (
+// Organic Mosaic Chakra Symbol (curved, gemstone style)
+const GemstoneChakra = ({ color, size = 32 }: { color: string; size?: number }) => (
   <svg viewBox="0 0 24 24" width={size} height={size}>
-    {/* Outer square */}
-    <rect 
-      x="2" y="2" 
-      width="20" height="20" 
+    {/* Outer organic circle */}
+    <circle 
+      cx="12" 
+      cy="12" 
+      r="10" 
       fill="none" 
       stroke={`hsl(${color})`} 
       strokeWidth="1.5"
     />
-    {/* Inner diamond */}
+    {/* Inner gemstone shape */}
     <path 
-      d="M12 4 L20 12 L12 20 L4 12 Z" 
-      fill={`hsl(${color} / 0.3)`} 
+      d="M12 3 L18 9 L12 21 L6 9 Z" 
+      fill={`hsl(${color} / 0.4)`} 
       stroke={`hsl(${color})`} 
       strokeWidth="1"
     />
-    {/* Center square */}
-    <rect 
-      x="9" y="9" 
-      width="6" height="6" 
+    {/* Center glow */}
+    <circle 
+      cx="12" 
+      cy="10" 
+      r="3" 
       fill={`hsl(${color})`}
     />
   </svg>
 );
 
-// Nommo Zigzag Waveform
-const NommoWaveform = ({ color, isAnimating = false }: { color: string; isAnimating?: boolean }) => (
+// Organic Waveform
+const OrganicWaveform = ({ color, isAnimating = false }: { color: string; isAnimating?: boolean }) => (
   <motion.svg 
     viewBox="0 0 80 20" 
     className="w-16 h-4"
@@ -67,16 +72,16 @@ const NommoWaveform = ({ color, isAnimating = false }: { color: string; isAnimat
     transition={{ duration: 1.5, repeat: Infinity }}
   >
     <motion.path 
-      d="M0 10 L8 3 L16 10 L24 3 L32 10 L40 3 L48 10 L56 3 L64 10 L72 3 L80 10"
+      d="M0 10 Q10 2, 20 10 T40 10 T60 10 T80 10"
       fill="none"
       stroke={`hsl(${color})`}
       strokeWidth="2"
-      strokeLinecap="square"
+      strokeLinecap="round"
       animate={isAnimating ? {
         d: [
-          "M0 10 L8 3 L16 10 L24 3 L32 10 L40 3 L48 10 L56 3 L64 10 L72 3 L80 10",
-          "M0 10 L8 17 L16 10 L24 17 L32 10 L40 17 L48 10 L56 17 L64 10 L72 17 L80 10",
-          "M0 10 L8 3 L16 10 L24 3 L32 10 L40 3 L48 10 L56 3 L64 10 L72 3 L80 10",
+          "M0 10 Q10 2, 20 10 T40 10 T60 10 T80 10",
+          "M0 10 Q10 18, 20 10 T40 10 T60 10 T80 10",
+          "M0 10 Q10 2, 20 10 T40 10 T60 10 T80 10",
         ]
       } : {}}
       transition={{ duration: 2, repeat: Infinity }}
@@ -84,14 +89,14 @@ const NommoWaveform = ({ color, isAnimating = false }: { color: string; isAnimat
   </motion.svg>
 );
 
-// Carved Panel Border Pattern
-const CarvedBorder = () => (
-  <div className="absolute inset-x-0 top-0 h-1 overflow-hidden">
-    <svg viewBox="0 0 200 4" className="w-full h-full" preserveAspectRatio="none">
+// Vine Accent Border
+const VineAccent = () => (
+  <div className="absolute inset-x-0 top-0 h-2 overflow-hidden">
+    <svg viewBox="0 0 200 8" className="w-full h-full" preserveAspectRatio="none">
       <path 
-        d="M0 2 L5 0 L10 2 L15 0 L20 2 L25 0 L30 2 L35 0 L40 2 L45 0 L50 2 L55 0 L60 2 L65 0 L70 2 L75 0 L80 2 L85 0 L90 2 L95 0 L100 2 L105 0 L110 2 L115 0 L120 2 L125 0 L130 2 L135 0 L140 2 L145 0 L150 2 L155 0 L160 2 L165 0 L170 2 L175 0 L180 2 L185 0 L190 2 L195 0 L200 2"
-        stroke={DOGON.millet}
-        strokeWidth="1"
+        d="M0 4 Q25 1, 50 4 T100 4 T150 4 T200 4"
+        stroke={COSMIC.gemEmerald}
+        strokeWidth="2"
         fill="none"
         opacity="0.4"
       />
@@ -99,7 +104,7 @@ const CarvedBorder = () => (
   </div>
 );
 
-// Fox Divination Grid Header
+// Grid Header
 const GridHeader = () => (
   <motion.div
     className="max-w-6xl mx-auto text-center mb-16"
@@ -109,38 +114,35 @@ const GridHeader = () => (
     transition={{ duration: 0.8 }}
   >
     <p 
-      className="text-sm tracking-[0.4em] uppercase mb-3"
-      style={{ color: DOGON.laterite }}
+      className="text-sm tracking-[0.4em] uppercase mb-3 font-body"
+      style={{ color: COSMIC.gemRuby }}
     >
-      The Fox Divination Grid
+      The Cosmic Garden Grid
     </p>
     <h2 
-      className="text-4xl md:text-6xl mb-4 pillar-text pillar-text-delay-1"
+      className="text-4xl md:text-6xl mb-4 root-text font-bubble"
       data-text="THE MASTER MATRIX"
     >
       THE MASTER MATRIX
     </h2>
     <p 
-      className="max-w-2xl mx-auto"
-      style={{ 
-        color: 'rgba(230, 204, 160, 0.7)',
-        fontFamily: "'Cormorant Garamond', Georgia, serif",
-      }}
+      className="max-w-2xl mx-auto font-body"
+      style={{ color: 'hsl(40 50% 85% / 0.7)' }}
     >
-      Each track is carved into the granary door—tuned to a sacred frequency, 
-      grounded in an essential soil mineral, and amplified through its corresponding crystal.
+      Each track is woven into the tapestry—tuned to a sacred frequency, 
+      grounded in an essential mineral, and amplified through its corresponding gemstone.
     </p>
-    <div className="mt-4 space-y-1" style={{ color: 'rgba(230, 204, 160, 0.5)' }}>
-      <p className="text-sm">
-        Produced by <strong style={{ color: DOGON.millet }}>Vici Royàl</strong> & <span style={{ color: DOGON.laterite }}>Èks</span>
+    <div className="mt-4 space-y-1" style={{ color: 'hsl(40 50% 85% / 0.5)' }}>
+      <p className="text-sm font-body">
+        Produced by <strong style={{ color: COSMIC.creamMuted }}>Vici Royàl</strong> & <span style={{ color: COSMIC.gemRuby }}>Èks</span>
       </p>
-      <p className="text-xs" style={{ color: 'rgba(230, 204, 160, 0.4)' }}>
-        Mixed by: <span style={{ color: DOGON.laterite }}>Èks</span> • 
+      <p className="text-xs font-body" style={{ color: 'hsl(40 50% 85% / 0.4)' }}>
+        Mixed by: <span style={{ color: COSMIC.gemRuby }}>Èks</span> • 
         Mastered at: Sampson Sound Studios by Kristofer Sampson
       </p>
     </div>
-    <p className="text-xs mt-4" style={{ color: 'rgba(230, 204, 160, 0.3)' }}>
-      ◆ Click any panel to view its Sirius Artifact ◆
+    <p className="text-xs mt-4 font-body" style={{ color: 'hsl(40 50% 85% / 0.3)' }}>
+      ◆ Click any panel to view its Cosmic Artifact ◆
     </p>
   </motion.div>
 );
@@ -179,30 +181,33 @@ const MasterMatrix = () => {
 
   return (
     <>
-      <section id="matrix" className="relative py-24 px-4 noise-texture">
-        {/* Indigo night sky gradient */}
+      <section id="matrix" className="relative py-24 px-4 cosmic-swirl">
+        {/* Cosmic gradient overlay */}
         <div 
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(180deg, ${DOGON.indigo}40 0%, transparent 30%, transparent 70%, ${DOGON.laterite}20 100%)`,
+            background: `linear-gradient(180deg, hsl(280 50% 15% / 0.4) 0%, transparent 30%, transparent 70%, hsl(20 40% 15% / 0.3) 100%)`,
           }}
         />
 
         <GridHeader />
 
-        {/* Matrix Grid - Fox Divination Style */}
+        {/* Matrix Grid - Organic Mosaic Style */}
         <div className="max-w-5xl mx-auto relative">
 
-          {/* Matrix Rows - Compact with hover reveal */}
-          <div className="space-y-2">
+          {/* Matrix Rows */}
+          <div className="space-y-3">
             {trackData.map((element, index) => (
               <motion.div
                 key={element.row}
                 className="relative cursor-pointer group overflow-hidden"
                 style={{
-                  background: `linear-gradient(145deg, ${DOGON.mahogany} 0%, ${DOGON.ebony} 100%)`,
-                  border: `2px solid ${hoveredRow === element.row ? DOGON.laterite : 'rgba(183, 65, 14, 0.3)'}`,
-                  borderRadius: '4px',
+                  background: `linear-gradient(145deg, ${COSMIC.rootBrown} 0%, ${COSMIC.rootDark} 100%)`,
+                  border: `3px solid ${hoveredRow === element.row ? `hsl(${element.colorHsl})` : 'hsl(20 40% 25% / 0.5)'}`,
+                  borderRadius: '1.5rem',
+                  boxShadow: hoveredRow === element.row 
+                    ? `0 8px 32px rgba(0,0,0,0.4), 0 0 30px hsl(${element.colorHsl} / 0.2)` 
+                    : '0 4px 16px rgba(0,0,0,0.3)',
                 }}
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -213,31 +218,15 @@ const MasterMatrix = () => {
                 onMouseLeave={() => setHoveredRow(null)}
                 whileHover={{ scale: 1.005 }}
               >
-                <CarvedBorder />
+                <VineAccent />
 
-                {/* Wood grain texture */}
-                <div 
-                  className="absolute inset-0 opacity-10 pointer-events-none"
-                  style={{
-                    backgroundImage: `
-                      repeating-linear-gradient(
-                        90deg,
-                        transparent,
-                        transparent 4px,
-                        rgba(0,0,0,0.1) 4px,
-                        rgba(0,0,0,0.1) 8px
-                      )
-                    `,
-                  }}
-                />
-
-                {/* Mobile Layout - Always expanded */}
+                {/* Mobile Layout */}
                 <div className="lg:hidden p-5 relative z-10">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="flex items-center gap-3">
-                      <AngularChakraSymbol color={element.colorHsl} size={40} />
+                      <GemstoneChakra color={element.colorHsl} size={40} />
                       <span 
-                        className="font-mono text-lg font-bold"
+                        className="font-body text-lg font-bold"
                         style={{ color: `hsl(${element.colorHsl})` }}
                       >
                         {String(element.row).padStart(2, '0')}
@@ -245,23 +234,22 @@ const MasterMatrix = () => {
                     </div>
                     <div className="flex-1">
                       <p 
-                        className="text-lg font-bold"
+                        className="text-lg font-bold font-bubble"
                         style={{ 
-                          fontFamily: "'Staatliches', sans-serif",
-                          color: DOGON.paleStraw,
-                          letterSpacing: '0.05em',
+                          color: COSMIC.cream,
+                          letterSpacing: '0.02em',
                         }}
                       >
                         {element.track}
                       </p>
-                      <p className="text-sm" style={{ color: `hsl(${element.colorHsl})` }}>
+                      <p className="text-sm font-body" style={{ color: `hsl(${element.colorHsl})` }}>
                         {element.chakra} • {element.frequency}
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <span 
-                      className="px-3 py-1 text-xs font-mono"
+                      className="px-4 py-1.5 text-xs font-body rounded-full"
                       style={{ 
                         border: `1px solid hsl(${element.colorHsl} / 0.4)`,
                         color: `hsl(${element.colorHsl})`,
@@ -271,7 +259,7 @@ const MasterMatrix = () => {
                       {element.mineralSymbol} {element.mineral}
                     </span>
                     <span 
-                      className="px-3 py-1 text-xs font-mono"
+                      className="px-4 py-1.5 text-xs font-body rounded-full"
                       style={{ 
                         border: `1px solid hsl(${element.colorHsl} / 0.4)`,
                         color: `hsl(${element.colorHsl})`,
@@ -282,10 +270,10 @@ const MasterMatrix = () => {
                     </span>
                     {element.featuring && (
                       <span 
-                        className="px-3 py-1 text-xs font-mono"
+                        className="px-4 py-1.5 text-xs font-body rounded-full"
                         style={{ 
-                          border: `1px solid ${DOGON.millet}40`,
-                          color: DOGON.millet,
+                          border: `1px solid hsl(40 50% 75% / 0.3)`,
+                          color: COSMIC.creamMuted,
                         }}
                       >
                         ft. {formatFeaturing(element.featuring)}
@@ -294,137 +282,91 @@ const MasterMatrix = () => {
                   </div>
                 </div>
 
-                {/* Desktop Layout - Centered with content swap on hover */}
+                {/* Desktop Layout */}
                 <div className="hidden lg:block relative z-10 overflow-hidden">
                   <div className="flex items-center p-4">
-                    {/* Left: Energy indicator - always visible */}
+                    {/* Left: Energy indicator */}
                     <div className="flex items-center gap-3 flex-shrink-0 w-20">
-                      <AngularChakraSymbol color={element.colorHsl} size={36} />
+                      <GemstoneChakra color={element.colorHsl} size={36} />
                       <span 
-                        className="font-mono text-sm font-bold"
+                        className="font-body text-sm font-bold"
                         style={{ color: `hsl(${element.colorHsl})` }}
                       >
                         {String(element.row).padStart(2, '0')}
                       </span>
                     </div>
 
-                    {/* Center: Content area - swaps between track name and details */}
+                    {/* Center: Content area */}
                     <div className="flex-1 relative h-14 flex items-center justify-center">
-                      {/* Track Name - visible by default, fades out on hover */}
+                      {/* Track Name */}
                       <motion.div 
                         className="absolute inset-0 flex items-center justify-center"
                         initial={{ opacity: 1 }}
-                        animate={{ 
-                          opacity: hoveredRow === element.row ? 0 : 1,
-                        }}
+                        animate={{ opacity: hoveredRow === element.row ? 0 : 1 }}
                         transition={{ duration: 0.2 }}
                       >
                         <p 
-                          className="font-bold text-xl tracking-wider"
-                          style={{ 
-                            fontFamily: "'Staatliches', sans-serif",
-                            color: DOGON.paleStraw,
-                            letterSpacing: '0.1em',
-                          }}
+                          className="font-bold text-xl tracking-wider font-bubble"
+                          style={{ color: COSMIC.cream }}
                         >
                           {element.track}
                         </p>
                       </motion.div>
 
-                      {/* Details - hidden by default, fades in on hover */}
+                      {/* Details on hover */}
                       <motion.div 
                         className="absolute inset-0 flex items-center justify-center gap-8"
                         initial={{ opacity: 0 }}
-                        animate={{ 
-                          opacity: hoveredRow === element.row ? 1 : 0,
-                        }}
+                        animate={{ opacity: hoveredRow === element.row ? 1 : 0 }}
                         transition={{ duration: 0.2, delay: hoveredRow === element.row ? 0.1 : 0 }}
                       >
-                        {/* Chakra */}
                         <div className="flex flex-col items-center">
-                          <span 
-                            className="text-[9px] uppercase tracking-wider mb-0.5"
-                            style={{ color: 'rgba(230, 204, 160, 0.4)' }}
-                          >
+                          <span className="text-[9px] uppercase tracking-wider mb-0.5 font-body" style={{ color: 'hsl(40 50% 75% / 0.4)' }}>
                             Energy
                           </span>
-                          <span 
-                            className="font-mono text-sm font-medium uppercase"
-                            style={{ color: `hsl(${element.colorHsl})` }}
-                          >
+                          <span className="font-body text-sm font-medium uppercase" style={{ color: `hsl(${element.colorHsl})` }}>
                             {element.chakra}
                           </span>
                         </div>
 
-                        {/* Frequency */}
                         <div className="flex flex-col items-center">
-                          <span 
-                            className="text-[9px] uppercase tracking-wider mb-0.5"
-                            style={{ color: 'rgba(230, 204, 160, 0.4)' }}
-                          >
+                          <span className="text-[9px] uppercase tracking-wider mb-0.5 font-body" style={{ color: 'hsl(40 50% 75% / 0.4)' }}>
                             Frequency
                           </span>
-                          <span 
-                            className="font-mono text-sm font-medium"
-                            style={{ color: `hsl(${element.colorHsl})` }}
-                          >
+                          <span className="font-body text-sm font-medium" style={{ color: `hsl(${element.colorHsl})` }}>
                             {element.frequency}
                           </span>
                         </div>
 
-                        {/* Mineral */}
                         <div className="flex flex-col items-center">
-                          <span 
-                            className="text-[9px] uppercase tracking-wider mb-0.5"
-                            style={{ color: 'rgba(230, 204, 160, 0.4)' }}
-                          >
+                          <span className="text-[9px] uppercase tracking-wider mb-0.5 font-body" style={{ color: 'hsl(40 50% 75% / 0.4)' }}>
                             Mineral
                           </span>
                           <div className="flex items-center gap-1">
-                            <span 
-                              className="font-mono text-sm font-bold"
-                              style={{ color: `hsl(${element.colorHsl})` }}
-                            >
+                            <span className="font-body text-sm font-bold" style={{ color: `hsl(${element.colorHsl})` }}>
                               {element.mineralSymbol}
                             </span>
-                            <span 
-                              className="text-xs font-mono"
-                              style={{ color: 'rgba(230, 204, 160, 0.7)' }}
-                            >
+                            <span className="text-xs font-body" style={{ color: 'hsl(40 50% 85% / 0.7)' }}>
                               {element.mineral}
                             </span>
                           </div>
                         </div>
 
-                        {/* Crystal */}
                         <div className="flex flex-col items-center">
-                          <span 
-                            className="text-[9px] uppercase tracking-wider mb-0.5"
-                            style={{ color: 'rgba(230, 204, 160, 0.4)' }}
-                          >
+                          <span className="text-[9px] uppercase tracking-wider mb-0.5 font-body" style={{ color: 'hsl(40 50% 75% / 0.4)' }}>
                             Crystal
                           </span>
-                          <span 
-                            className="text-sm font-mono"
-                            style={{ color: 'rgba(230, 204, 160, 0.8)' }}
-                          >
+                          <span className="text-sm font-body" style={{ color: 'hsl(40 50% 85% / 0.8)' }}>
                             {element.crystal}
                           </span>
                         </div>
 
-                        {/* Featuring */}
                         {element.featuring && (
                           <div className="flex flex-col items-center">
-                            <span 
-                              className="text-[9px] uppercase tracking-wider mb-0.5"
-                              style={{ color: 'rgba(230, 204, 160, 0.4)' }}
-                            >
+                            <span className="text-[9px] uppercase tracking-wider mb-0.5 font-body" style={{ color: 'hsl(40 50% 75% / 0.4)' }}>
                               Featuring
                             </span>
-                            <span 
-                              className="text-sm font-mono"
-                              style={{ color: DOGON.millet }}
-                            >
+                            <span className="text-sm font-body" style={{ color: COSMIC.creamMuted }}>
                               {formatFeaturing(element.featuring)}
                             </span>
                           </div>
@@ -432,9 +374,9 @@ const MasterMatrix = () => {
                       </motion.div>
                     </div>
 
-                    {/* Right: Nommo waveform indicator */}
+                    {/* Right: Waveform indicator */}
                     <div className="flex-shrink-0 w-20 flex justify-end">
-                      <NommoWaveform 
+                      <OrganicWaveform 
                         color={element.colorHsl} 
                         isAnimating={hoveredRow === element.row}
                       />
@@ -444,9 +386,10 @@ const MasterMatrix = () => {
 
                 {/* Gradient accent line */}
                 <div 
-                  className="h-1 w-full transition-all duration-300 group-hover:h-1.5"
+                  className="h-1.5 w-full transition-all duration-300 group-hover:h-2"
                   style={{ 
-                    background: `linear-gradient(90deg, hsl(${element.colorHsl}) 0%, ${DOGON.laterite} 50%, transparent 100%)`
+                    background: `linear-gradient(90deg, hsl(${element.colorHsl}) 0%, ${COSMIC.gemRuby} 50%, transparent 100%)`,
+                    borderRadius: '0 0 1.5rem 1.5rem',
                   }}
                 />
               </motion.div>
@@ -454,37 +397,18 @@ const MasterMatrix = () => {
           </div>
         </div>
 
-        {/* Soil Spirits credit - Dogon inscription */}
-        <motion.div
-          className="max-w-6xl mx-auto mt-16 text-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-        >
-          <div 
-            className="inline-block px-8 py-4 rounded"
-            style={{
-              background: `linear-gradient(145deg, ${DOGON.mahogany} 0%, ${DOGON.ebony} 100%)`,
-              border: `1px solid ${DOGON.laterite}40`,
-            }}
-          >
-            <p 
-              className="font-mono text-sm"
-              style={{ color: 'rgba(230, 204, 160, 0.7)' }}
-            >
-              Guided by the <span style={{ color: DOGON.millet }}>Soil Spirits</span>: Spirit, Sunny, Rocky & River
-            </p>
-          </div>
-        </motion.div>
+        {/* Vine Divider */}
+        <div className="vine-divider mt-16" />
       </section>
 
-      {/* Track Detail Modal */}
-      <TrackDetailView 
-        track={selectedTrack} 
-        isOpen={isDetailOpen} 
-        onClose={handleClose} 
-      />
+      {/* Detail View Modal */}
+      {selectedTrack && (
+        <TrackDetailView
+          track={selectedTrack}
+          isOpen={isDetailOpen}
+          onClose={handleClose}
+        />
+      )}
     </>
   );
 };

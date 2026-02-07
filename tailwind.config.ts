@@ -14,11 +14,14 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Cormorant Garamond"', 'serif'],
-        body: ['"Space Mono"', '"Space Grotesk"', 'monospace'],
-        pillar: ['"Staatliches"', 'sans-serif'],
-        carving: ['"Kelly Slab"', 'serif'],
-        lignified: ['"Eater"', 'cursive'],
+        display: ['"Chewy"', 'cursive'],
+        body: ['"Space Mono"', 'monospace'],
+        bubble: ['"Chewy"', 'cursive'],
+      },
+      borderRadius: {
+        organic: '2rem',
+        'organic-lg': '3rem',
+        'organic-xl': '4rem',
       },
       colors: {
         border: "hsl(var(--border))",
@@ -54,26 +57,33 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // PHARMBOI Custom Colors
-        soil: {
-          deep: "hsl(var(--soil-deep))",
-          brown: "hsl(var(--soil-brown))",
+        // PHARMBOI Custom Colors - The Cosmic Garden
+        cosmic: {
+          blue: "hsl(var(--cosmic-blue))",
+          deep: "hsl(var(--cosmic-deep))",
+        },
+        amethyst: {
+          DEFAULT: "hsl(var(--amethyst))",
+          dark: "hsl(var(--amethyst-dark))",
         },
         root: {
-          red: "hsl(var(--root-red))",
+          brown: "hsl(var(--root-brown))",
+          dark: "hsl(var(--root-dark))",
         },
-        crystal: {
-          violet: "hsl(var(--crystal-violet))",
+        forest: {
+          green: "hsl(var(--forest-green))",
+          dark: "hsl(var(--forest-dark))",
         },
-        source: {
-          white: "hsl(var(--source-white))",
+        cream: {
+          DEFAULT: "hsl(var(--cream))",
+          muted: "hsl(var(--cream-muted))",
         },
-        throne: {
-          gold: "hsl(var(--throne-gold))",
-        },
-        glass: {
-          border: "hsl(var(--glass-border))",
-          bg: "hsl(var(--glass-bg))",
+        gem: {
+          ruby: "hsl(var(--gem-ruby))",
+          sapphire: "hsl(var(--gem-sapphire))",
+          emerald: "hsl(var(--gem-emerald))",
+          topaz: "hsl(var(--gem-topaz))",
+          amethyst: "hsl(var(--gem-amethyst))",
         },
         chakra: {
           root: "hsl(var(--chakra-root))",

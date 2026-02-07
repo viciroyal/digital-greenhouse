@@ -2,164 +2,149 @@ import { motion } from 'framer-motion';
 import CassettePlayer from './CassettePlayer';
 import PharmerTooltip from './PharmerTooltip';
 import albumArt from '@/assets/pharmboi-artwork.png';
+import logoTextured from '@/assets/pharmboi-logo-textured.png';
 
-// Dogon Kanaga Mask Symbol
-const KanagaMask = ({ side }: { side: 'left' | 'right' }) => (
+// Organic Vine Frame
+const VineFrame = ({ side }: { side: 'left' | 'right' }) => (
   <motion.svg 
-    viewBox="0 0 60 80" 
-    className="w-10 h-14 md:w-12 md:h-16"
+    viewBox="0 0 60 120" 
+    className="w-10 h-20 md:w-12 md:h-24"
     initial={{ opacity: 0, x: side === 'left' ? -20 : 20 }}
     animate={{ opacity: 1, x: 0 }}
     transition={{ duration: 0.8, delay: 0.6 }}
   >
-    {/* Central vertical pillar */}
+    {/* Curving vine */}
     <path 
-      d="M30 10 L30 70" 
-      stroke="#e6cca0" 
+      d={side === 'left' 
+        ? "M50 0 Q30 30, 40 60 Q50 90, 30 120" 
+        : "M10 0 Q30 30, 20 60 Q10 90, 30 120"
+      }
+      stroke="hsl(140 60% 35%)" 
       strokeWidth="4" 
-      strokeLinecap="square"
+      fill="none"
+      strokeLinecap="round"
     />
     
-    {/* Upper Kanaga arms */}
-    <path 
-      d="M30 20 L15 10 L8 18" 
-      stroke="#e6cca0" 
-      strokeWidth="3" 
-      strokeLinecap="square"
-      fill="none"
+    {/* Leaves */}
+    <ellipse 
+      cx={side === 'left' ? 35 : 25} 
+      cy="30" 
+      rx="8" 
+      ry="5" 
+      fill="hsl(140 50% 40%)"
+      transform={`rotate(${side === 'left' ? -30 : 30} ${side === 'left' ? 35 : 25} 30)`}
     />
-    <path 
-      d="M30 20 L45 10 L52 18" 
-      stroke="#e6cca0" 
-      strokeWidth="3" 
-      strokeLinecap="square"
-      fill="none"
-    />
-    
-    {/* Lower Kanaga arms */}
-    <path 
-      d="M30 60 L15 70 L8 62" 
-      stroke="#e6cca0" 
-      strokeWidth="3" 
-      strokeLinecap="square"
-      fill="none"
-    />
-    <path 
-      d="M30 60 L45 70 L52 62" 
-      stroke="#e6cca0" 
-      strokeWidth="3" 
-      strokeLinecap="square"
-      fill="none"
+    <ellipse 
+      cx={side === 'left' ? 42 : 18} 
+      cy="70" 
+      rx="6" 
+      ry="4" 
+      fill="hsl(140 50% 35%)"
+      transform={`rotate(${side === 'left' ? 20 : -20} ${side === 'left' ? 42 : 18} 70)`}
     />
     
-    {/* Center accent square */}
-    <rect 
-      x="25" 
-      y="35" 
-      width="10" 
-      height="10" 
-      fill="#b7410e"
+    {/* Small gemstone accent */}
+    <circle 
+      cx={side === 'left' ? 40 : 20} 
+      cy="50" 
+      r="4" 
+      fill="hsl(350 75% 50%)"
     />
   </motion.svg>
 );
 
-// Sirius Star Background
-const SiriusBackground = () => (
+// Cosmic Swirl Background
+const CosmicBackground = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    {/* Sirius A - bright star */}
-    <motion.div
-      className="absolute w-2 h-2 rounded-full bg-white"
-      style={{ top: '15%', left: '30%' }}
-      animate={{
-        opacity: [0.6, 1, 0.6],
-        scale: [1, 1.2, 1],
+    {/* Swirling cosmic nebula gradients */}
+    <div 
+      className="absolute inset-0"
+      style={{
+        background: `
+          radial-gradient(ellipse at 30% 20%, hsl(280 50% 25% / 0.6) 0%, transparent 50%),
+          radial-gradient(ellipse at 70% 60%, hsl(220 60% 30% / 0.5) 0%, transparent 50%),
+          radial-gradient(ellipse at 50% 80%, hsl(20 40% 20% / 0.7) 0%, transparent 40%)
+        `,
       }}
-      transition={{ duration: 3, repeat: Infinity }}
     />
     
-    {/* Sirius B orbital path hint */}
-    <motion.div
-      className="absolute w-1 h-1 rounded-full"
-      style={{ 
-        top: '18%', 
-        left: '33%',
-        backgroundColor: '#4a6fa5',
-      }}
-      animate={{
-        x: [0, 30, 0, -30, 0],
-        y: [0, 15, 30, 15, 0],
-        opacity: [0.3, 0.6, 0.3],
-      }}
-      transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-    />
-    
-    {/* Scattered stars */}
-    {[...Array(30)].map((_, i) => (
+    {/* Floating gemstone particles */}
+    {[...Array(40)].map((_, i) => (
       <motion.div
         key={i}
         className="absolute rounded-full"
         style={{
-          width: Math.random() > 0.7 ? '2px' : '1px',
-          height: Math.random() > 0.7 ? '2px' : '1px',
-          backgroundColor: i % 3 === 0 ? '#e6cca0' : '#ffffff',
+          width: Math.random() > 0.8 ? '3px' : Math.random() > 0.5 ? '2px' : '1px',
+          height: Math.random() > 0.8 ? '3px' : Math.random() > 0.5 ? '2px' : '1px',
+          backgroundColor: ['hsl(350 75% 60%)', 'hsl(220 75% 65%)', 'hsl(45 90% 60%)', 'hsl(280 60% 60%)', 'hsl(140 60% 50%)'][i % 5],
           left: `${Math.random() * 100}%`,
-          top: `${Math.random() * 60}%`,
+          top: `${Math.random() * 100}%`,
         }}
         animate={{
-          opacity: [0.2, 0.6, 0.2],
+          opacity: [0.2, 0.8, 0.2],
+          scale: [1, 1.5, 1],
         }}
         transition={{
-          duration: 2 + Math.random() * 3,
+          duration: 3 + Math.random() * 4,
           repeat: Infinity,
-          delay: Math.random() * 2,
+          delay: Math.random() * 3,
         }}
       />
     ))}
   </div>
 );
 
-// Mud Cloth Border Pattern
-const MudClothBorder = () => (
-  <div className="absolute bottom-0 left-0 right-0 h-12 overflow-hidden opacity-30">
-    <svg viewBox="0 0 400 48" className="w-full h-full" preserveAspectRatio="none">
+// Organic Vine Border
+const VineBorder = () => (
+  <div className="absolute bottom-0 left-0 right-0 h-16 overflow-hidden opacity-40">
+    <svg viewBox="0 0 400 64" className="w-full h-full" preserveAspectRatio="none">
       <path 
-        d="M0 24 L20 8 L40 24 L60 8 L80 24 L100 8 L120 24 L140 8 L160 24 L180 8 L200 24 L220 8 L240 24 L260 8 L280 24 L300 8 L320 24 L340 8 L360 24 L380 8 L400 24"
-        stroke="#e6cca0"
-        strokeWidth="2"
+        d="M0 32 Q50 16, 100 32 T200 32 T300 32 T400 32"
+        stroke="hsl(140 50% 30%)"
+        strokeWidth="3"
         fill="none"
       />
       <path 
-        d="M0 36 L20 20 L40 36 L60 20 L80 36 L100 20 L120 36 L140 20 L160 36 L180 20 L200 36 L220 20 L240 36 L260 20 L280 36 L300 20 L320 36 L340 20 L360 36 L380 20 L400 36"
-        stroke="#b7410e"
-        strokeWidth="1.5"
+        d="M0 40 Q50 24, 100 40 T200 40 T300 40 T400 40"
+        stroke="hsl(20 40% 30%)"
+        strokeWidth="2"
         fill="none"
         opacity="0.6"
       />
+      {/* Small leaves along the vine */}
+      {[40, 120, 200, 280, 360].map((x) => (
+        <ellipse key={x} cx={x} cy={30} rx="6" ry="4" fill="hsl(140 50% 35%)" opacity="0.5" />
+      ))}
     </svg>
   </div>
 );
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden noise-texture">
-      {/* Sirius night sky background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1a237e] via-[#0f1628] to-[#0a0d14]" />
-      <SiriusBackground />
+    <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 overflow-hidden starfield">
+      {/* Deep cosmic blue/purple background */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(180deg, hsl(250 60% 12%) 0%, hsl(280 50% 10%) 40%, hsl(250 50% 8%) 100%)',
+        }}
+      />
+      <CosmicBackground />
       
-      {/* Laterite earth glow from bottom */}
+      {/* Root/earth glow from bottom */}
       <div 
         className="absolute inset-x-0 bottom-0 h-1/3"
         style={{
-          background: 'radial-gradient(ellipse at 50% 100%, rgba(183, 65, 14, 0.2) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse at 50% 100%, hsl(20 40% 20% / 0.6) 0%, transparent 70%)',
         }}
       />
       
-      <MudClothBorder />
+      <VineBorder />
 
       {/* Main content */}
       <div className="relative z-10 max-w-5xl w-full flex flex-col items-center gap-8 lg:gap-12">
         
-        {/* Album Artwork - floating in void */}
+        {/* Album Artwork - floating in cosmic void */}
         <motion.div
           className="flex-shrink-0"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -167,30 +152,30 @@ const HeroSection = () => {
           transition={{ duration: 1, delay: 0.2 }}
         >
           <PharmerTooltip 
-            tip="The Dogon knew: Sirius B orbits unseen, just as the soil feeds unseen. What shines above echoes below."
+            tip="The roots run deep. The gems shine bright. The cosmos swirls eternal."
             position="bottom"
           >
             <div className="relative group">
               <div 
-                className="absolute -inset-6 opacity-30 blur-3xl group-hover:opacity-50 transition-opacity"
+                className="absolute -inset-8 opacity-40 blur-3xl group-hover:opacity-60 transition-opacity"
                 style={{
-                  background: 'radial-gradient(circle, #b7410e 0%, #1a237e 50%, transparent 70%)',
+                  background: 'radial-gradient(circle, hsl(350 75% 50%) 0%, hsl(280 60% 40%) 50%, transparent 70%)',
                 }}
               />
               <img 
                 src={albumArt} 
                 alt="PHARMBOI Album Artwork" 
-                className="relative w-48 md:w-64 lg:w-72 rounded-lg shadow-2xl"
+                className="relative w-48 md:w-64 lg:w-72 rounded-3xl shadow-2xl"
                 style={{
-                  border: '3px solid rgba(183, 65, 14, 0.5)',
-                  boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(183, 65, 14, 0.2)',
+                  border: '4px solid hsl(20 40% 25%)',
+                  boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 60px hsl(350 75% 50% / 0.3)',
                 }}
               />
             </div>
           </PharmerTooltip>
         </motion.div>
 
-        {/* Title with Kanaga Masks - Togu Na style */}
+        {/* Title with Root-Textured Logo */}
         <motion.div
           className="text-center"
           initial={{ opacity: 0, y: 20 }}
@@ -198,44 +183,48 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.4 }}
         >
           <p 
-            className="text-xs tracking-[0.4em] uppercase mb-4"
-            style={{ color: '#e6cca0' }}
+            className="text-xs tracking-[0.4em] uppercase mb-4 font-body"
+            style={{ color: 'hsl(40 50% 85%)' }}
           >
-            The Granary Door Opens
+            The Cosmic Garden Awaits
           </p>
           
-          {/* Title with Kanaga flanks */}
+          {/* Logo with Vine Frames */}
           <div className="flex items-center justify-center gap-4 md:gap-6">
-            <KanagaMask side="left" />
+            <VineFrame side="left" />
             
-            <motion.h1 
-              className="text-5xl md:text-7xl lg:text-8xl pillar-text"
-              data-text="PHARMBOI"
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.5 }}
             >
-              PHARMBOI
-            </motion.h1>
+              <img 
+                src={logoTextured} 
+                alt="PHARMBOI" 
+                className="h-16 md:h-24 lg:h-32 w-auto drop-shadow-2xl"
+                style={{
+                  filter: 'drop-shadow(3px 4px 6px rgba(0,0,0,0.6))',
+                }}
+              />
+            </motion.div>
             
-            <KanagaMask side="right" />
+            <VineFrame side="right" />
           </div>
           
           <motion.p 
-            className="mt-6 text-base md:text-lg max-w-lg mx-auto leading-relaxed italic"
+            className="mt-6 text-base md:text-lg max-w-lg mx-auto leading-relaxed italic font-body"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
             style={{ 
-              color: 'rgba(230, 204, 160, 0.8)',
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              color: 'hsl(40 50% 85% / 0.8)',
             }}
           >
-            "The Fox traces patterns in the sand. The stars trace patterns in the sky. The Pharmer reads both."
+            "From the roots below, through the gems within, to the stars above."
           </motion.p>
         </motion.div>
 
-        {/* Artist credit - Dogon inscription style */}
+        {/* Artist credit - Organic style */}
         <motion.div
           className="text-center"
           initial={{ opacity: 0 }}
@@ -243,23 +232,22 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
         >
           <div 
-            className="inline-flex items-center gap-3 px-6 py-2 rounded"
+            className="inline-flex items-center gap-3 px-6 py-2 rounded-full"
             style={{
-              background: 'linear-gradient(90deg, transparent, rgba(183, 65, 14, 0.2), transparent)',
-              borderTop: '1px solid rgba(230, 204, 160, 0.2)',
-              borderBottom: '1px solid rgba(230, 204, 160, 0.2)',
+              background: 'linear-gradient(90deg, transparent, hsl(20 40% 20% / 0.4), transparent)',
+              border: '1px solid hsl(40 50% 75% / 0.2)',
             }}
           >
-            <span className="text-sm" style={{ color: 'rgba(230, 204, 160, 0.6)' }}>by</span>
-            <strong className="font-bold" style={{ color: '#e6cca0' }}>Vici Royàl</strong>
-            <span style={{ color: 'rgba(230, 204, 160, 0.3)' }}>◆</span>
-            <span className="text-xs" style={{ color: 'rgba(230, 204, 160, 0.5)' }}>
-              Produced by <strong style={{ color: '#e6cca0' }}>Vici Royàl</strong> & <span style={{ color: '#b7410e' }}>Èks</span>
+            <span className="text-sm font-body" style={{ color: 'hsl(40 50% 75% / 0.6)' }}>by</span>
+            <strong className="font-bold font-body" style={{ color: 'hsl(40 50% 85%)' }}>Vici Royàl</strong>
+            <span style={{ color: 'hsl(350 75% 50%)' }}>◆</span>
+            <span className="text-xs font-body" style={{ color: 'hsl(40 50% 75% / 0.5)' }}>
+              Produced by <strong style={{ color: 'hsl(40 50% 85%)' }}>Vici Royàl</strong> & <span style={{ color: 'hsl(350 75% 50%)' }}>Èks</span>
             </span>
           </div>
         </motion.div>
 
-        {/* CTA Buttons - Carved wood style */}
+        {/* CTA Buttons - Gemstone style */}
         <motion.div
           className="flex flex-wrap gap-4 justify-center"
           initial={{ opacity: 0, y: 20 }}
@@ -268,32 +256,21 @@ const HeroSection = () => {
         >
           <motion.a
             href="#matrix"
-            className="px-6 py-3 rounded font-bold text-sm tracking-wider uppercase transition-all group"
-            style={{
-              fontFamily: "'Staatliches', sans-serif",
-              background: 'linear-gradient(145deg, #3d2317 0%, #1a1410 100%)',
-              color: '#e6cca0',
-              border: '2px solid rgba(183, 65, 14, 0.5)',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-            }}
+            className="gem-button px-8 py-4 font-bold text-sm tracking-wider uppercase font-bubble"
+            style={{ color: 'hsl(40 50% 95%)' }}
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
           >
             <span className="flex items-center gap-2">
-              Enter The Grid
+              Enter The Garden
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </span>
           </motion.a>
           <motion.a
             href="#shop"
-            className="px-6 py-3 rounded font-bold text-sm tracking-wider uppercase transition-all"
-            style={{
-              fontFamily: "'Staatliches', sans-serif",
-              color: '#b7410e',
-              border: '2px solid rgba(183, 65, 14, 0.4)',
-              background: 'transparent',
-            }}
-            whileHover={{ scale: 1.02, y: -2, backgroundColor: 'rgba(183, 65, 14, 0.1)' }}
+            className="gem-button-sapphire px-8 py-4 font-bold text-sm tracking-wider uppercase font-bubble"
+            style={{ color: 'hsl(40 50% 95%)' }}
+            whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
           >
             Get The Source Bundle
@@ -311,7 +288,7 @@ const HeroSection = () => {
         </motion.div>
       </div>
 
-      {/* Scroll indicator - Geometric style */}
+      {/* Scroll indicator - Organic style */}
       <motion.div
         className="absolute bottom-16 left-1/2 -translate-x-1/2"
         animate={{ y: [0, 8, 0] }}
@@ -319,19 +296,20 @@ const HeroSection = () => {
       >
         <div className="flex flex-col items-center gap-2">
           <p 
-            className="text-[10px] tracking-[0.3em] uppercase"
-            style={{ color: 'rgba(230, 204, 160, 0.4)' }}
+            className="text-[10px] tracking-[0.3em] uppercase font-body"
+            style={{ color: 'hsl(40 50% 75% / 0.4)' }}
           >
             Descend
           </p>
           <svg viewBox="0 0 20 30" className="w-4 h-6">
             <path 
-              d="M10 0 L10 25 M5 20 L10 25 L15 20" 
-              stroke="#b7410e" 
+              d="M10 0 Q8 10, 10 15 Q12 20, 10 25" 
+              stroke="hsl(140 50% 40%)" 
               strokeWidth="2" 
               fill="none"
-              strokeLinecap="square"
+              strokeLinecap="round"
             />
+            <circle cx="10" cy="28" r="2" fill="hsl(350 75% 50%)" />
           </svg>
         </div>
       </motion.div>
