@@ -229,13 +229,26 @@ export function useAncestralProgress() {
 
     try {
       // Upload file to storage
+      // Path format: {user_id}/{lesson_id}/{timestamp}-{filename}
       const filePath = `${user.id}/${lessonId}/${Date.now()}-${file.name}`;
       
-      const { error: uploadError } = await supabase.storage
+      console.log('Uploading file:', { filePath, fileName: file.name, fileSize: file.size, fileType: file.type });
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('field-journal')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError);
+        toast({
+          title: "Upload Failed",
+          description: uploadError.message || "Could not upload file to storage",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      console.log('Upload successful:', uploadData);
 
       // Record in field_journal table
       const { error: dbError } = await supabase
@@ -250,7 +263,15 @@ export function useAncestralProgress() {
           status: 'pending',
         });
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        console.error('Database insert error:', dbError);
+        toast({
+          title: "Record Failed",
+          description: dbError.message || "File uploaded but could not save record",
+          variant: "destructive",
+        });
+        return false;
+      }
 
       // Refresh data
       await fetchData();
