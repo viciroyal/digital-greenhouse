@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import StarMapping from "./pages/StarMapping";
 import ResonanceReport from "./pages/ResonanceReport";
 import AncestralPath from "./pages/AncestralPath";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
                 <Route path="/star-mapping" element={<StarMapping />} />
                 <Route path="/resonance-report" element={<ResonanceReport />} />
                 <Route path="/ancestral-path" element={<AncestralPath />} />
+                <Route path="/auth" element={<Auth />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

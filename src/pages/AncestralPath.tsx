@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogIn } from 'lucide-react';
+import { ArrowLeft, LogIn, LogOut, User } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import {
   ModuleNode,
   SapRiseProgress,
@@ -194,7 +195,7 @@ const AncestralPath = () => {
       {/* Auth Status Indicator */}
       {!user && !isLoading && (
         <motion.div
-          className="fixed top-6 right-20 z-50"
+          className="fixed top-6 right-6 z-50"
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.7 }}
@@ -212,6 +213,45 @@ const AncestralPath = () => {
           >
             <LogIn className="w-3 h-3" />
             Sign In to Track Progress
+          </Button>
+        </motion.div>
+      )}
+
+      {/* User Menu when logged in */}
+      {user && !isLoading && (
+        <motion.div
+          className="fixed top-6 right-6 z-50 flex items-center gap-3"
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <div 
+            className="flex items-center gap-2 px-3 py-2 rounded-full font-mono text-xs"
+            style={{
+              background: 'hsl(20 30% 12% / 0.9)',
+              border: '1px solid hsl(140 40% 30%)',
+              color: 'hsl(140 50% 60%)',
+            }}
+          >
+            <User className="w-3 h-3" />
+            <span>Pharmer Active</span>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2 font-mono text-xs"
+            style={{
+              background: 'hsl(20 30% 12% / 0.9)',
+              border: '1px solid hsl(0 40% 30%)',
+              color: 'hsl(0 50% 60%)',
+            }}
+            onClick={async () => {
+              await supabase.auth.signOut();
+              navigate('/');
+            }}
+          >
+            <LogOut className="w-3 h-3" />
+            Sign Out
           </Button>
         </motion.div>
       )}
