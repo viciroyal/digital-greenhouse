@@ -195,25 +195,9 @@ const MasterMatrix = () => {
         <GridHeader />
 
         {/* Matrix Grid - Fox Divination Style */}
-        <div className="max-w-7xl mx-auto relative">
-          {/* Grid Header Row */}
-          <div className="hidden lg:grid grid-cols-7 gap-3 mb-4 px-4">
-            {['◆', 'ENERGY', 'TRACK', 'FREQUENCY', 'MINERAL', 'CRYSTAL', 'VOICES'].map((header) => (
-              <div key={header} className="text-center">
-                <span 
-                  className="text-[10px] tracking-[0.2em] uppercase px-3 py-1"
-                  style={{ 
-                    color: DOGON.laterite,
-                    borderBottom: `1px solid ${DOGON.laterite}40`,
-                  }}
-                >
-                  {header}
-                </span>
-              </div>
-            ))}
-          </div>
+        <div className="max-w-5xl mx-auto relative">
 
-          {/* Matrix Rows - Carved Granary Panels */}
+          {/* Matrix Rows - Compact with hover reveal */}
           <div className="space-y-2">
             {trackData.map((element, index) => (
               <motion.div
@@ -231,7 +215,7 @@ const MasterMatrix = () => {
                 onClick={() => handleTrackClick(element)}
                 onMouseEnter={() => setHoveredRow(element.row)}
                 onMouseLeave={() => setHoveredRow(null)}
-                whileHover={{ scale: 1.005, x: 4 }}
+                whileHover={{ scale: 1.005 }}
               >
                 <CarvedBorder />
 
@@ -251,7 +235,7 @@ const MasterMatrix = () => {
                   }}
                 />
 
-                {/* Mobile Layout */}
+                {/* Mobile Layout - Always expanded */}
                 <div className="lg:hidden p-5 relative z-10">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="flex items-center gap-3">
@@ -314,103 +298,147 @@ const MasterMatrix = () => {
                   </div>
                 </div>
 
-                {/* Desktop Layout - Carved Panel */}
-                <div className="hidden lg:grid grid-cols-7 gap-3 p-4 items-center relative z-10">
-                  {/* Row Number with Angular Chakra */}
-                  <div className="flex justify-center items-center gap-2">
-                    <AngularChakraSymbol color={element.colorHsl} size={36} />
-                    <span 
-                      className="font-mono text-sm font-bold"
-                      style={{ color: `hsl(${element.colorHsl})` }}
-                    >
-                      {String(element.row).padStart(2, '0')}
-                    </span>
-                  </div>
+                {/* Desktop Layout - Compact with hover scroll reveal */}
+                <div className="hidden lg:block relative z-10 overflow-hidden">
+                  <div className="flex items-center p-4">
+                    {/* Always visible: Energy indicator + Track name */}
+                    <div className="flex items-center gap-4 flex-shrink-0" style={{ minWidth: '320px' }}>
+                      <div className="flex items-center gap-3">
+                        <AngularChakraSymbol color={element.colorHsl} size={36} />
+                        <span 
+                          className="font-mono text-sm font-bold"
+                          style={{ color: `hsl(${element.colorHsl})` }}
+                        >
+                          {String(element.row).padStart(2, '0')}
+                        </span>
+                      </div>
+                      <div>
+                        <p 
+                          className="font-bold"
+                          style={{ 
+                            fontFamily: "'Staatliches', sans-serif",
+                            color: DOGON.paleStraw,
+                            letterSpacing: '0.05em',
+                          }}
+                        >
+                          {element.track}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <p 
+                            className="font-mono text-xs uppercase"
+                            style={{ color: `hsl(${element.colorHsl})` }}
+                          >
+                            {element.chakra}
+                          </p>
+                          <NommoWaveform 
+                            color={element.colorHsl} 
+                            isAnimating={hoveredRow === element.row}
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-                  {/* Chakra/Energy */}
-                  <div className="text-center">
-                    <p 
-                      className="font-mono text-xs uppercase tracking-wide font-medium"
-                      style={{ color: `hsl(${element.colorHsl})` }}
-                    >
-                      {element.chakra}
-                    </p>
-                    <NommoWaveform 
-                      color={element.colorHsl} 
-                      isAnimating={hoveredRow === element.row}
-                    />
-                  </div>
-
-                  {/* Track */}
-                  <div className="text-center">
-                    <p 
-                      className="font-bold group-hover:text-white transition-colors"
-                      style={{ 
-                        fontFamily: "'Staatliches', sans-serif",
-                        color: DOGON.paleStraw,
-                        letterSpacing: '0.05em',
+                    {/* Sliding details panel - appears on hover */}
+                    <motion.div 
+                      className="flex items-center gap-6 ml-4"
+                      initial={{ opacity: 0, x: 100 }}
+                      animate={{ 
+                        opacity: hoveredRow === element.row ? 1 : 0,
+                        x: hoveredRow === element.row ? 0 : 100,
                       }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
                     >
-                      {element.track}
-                    </p>
-                  </div>
+                      {/* Frequency */}
+                      <div className="flex flex-col items-center">
+                        <span 
+                          className="text-[10px] uppercase tracking-wider mb-1"
+                          style={{ color: 'rgba(230, 204, 160, 0.5)' }}
+                        >
+                          Freq
+                        </span>
+                        <span 
+                          className="px-3 py-1 text-xs font-mono font-medium"
+                          style={{ 
+                            border: `1px solid hsl(${element.colorHsl} / 0.4)`,
+                            color: `hsl(${element.colorHsl})`,
+                            background: `hsl(${element.colorHsl} / 0.15)`,
+                          }}
+                        >
+                          {element.frequency}
+                        </span>
+                      </div>
 
-                  {/* Frequency */}
-                  <div className="text-center">
-                    <span 
-                      className="px-4 py-1 text-xs font-mono font-medium"
-                      style={{ 
-                        border: `1px solid hsl(${element.colorHsl} / 0.4)`,
-                        color: `hsl(${element.colorHsl})`,
-                        background: `hsl(${element.colorHsl} / 0.1)`,
-                      }}
-                    >
-                      {element.frequency}
-                    </span>
-                  </div>
+                      {/* Mineral */}
+                      <div className="flex flex-col items-center">
+                        <span 
+                          className="text-[10px] uppercase tracking-wider mb-1"
+                          style={{ color: 'rgba(230, 204, 160, 0.5)' }}
+                        >
+                          Mineral
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <span 
+                            className="font-mono text-base font-bold"
+                            style={{ color: `hsl(${element.colorHsl})` }}
+                          >
+                            {element.mineralSymbol}
+                          </span>
+                          <span 
+                            className="text-xs font-mono"
+                            style={{ color: 'rgba(230, 204, 160, 0.7)' }}
+                          >
+                            {element.mineral}
+                          </span>
+                        </div>
+                      </div>
 
-                  {/* Mineral */}
-                  <div className="flex items-center justify-center gap-2">
-                    <span 
-                      className="font-mono text-lg font-bold"
-                      style={{ color: `hsl(${element.colorHsl})` }}
-                    >
-                      {element.mineralSymbol}
-                    </span>
-                    <span 
-                      className="text-xs font-mono"
-                      style={{ color: 'rgba(230, 204, 160, 0.6)' }}
-                    >
-                      {element.mineral}
-                    </span>
-                  </div>
+                      {/* Crystal */}
+                      <div className="flex flex-col items-center">
+                        <span 
+                          className="text-[10px] uppercase tracking-wider mb-1"
+                          style={{ color: 'rgba(230, 204, 160, 0.5)' }}
+                        >
+                          Crystal
+                        </span>
+                        <span 
+                          className="text-xs font-mono"
+                          style={{ color: 'rgba(230, 204, 160, 0.8)' }}
+                        >
+                          ◇ {element.crystal}
+                        </span>
+                      </div>
 
-                  {/* Crystal */}
-                  <div className="text-center">
-                    <p 
-                      className="font-mono text-xs"
-                      style={{ color: 'rgba(230, 204, 160, 0.7)' }}
-                    >
-                      ◇ {element.crystal}
-                    </p>
-                  </div>
+                      {/* Featuring */}
+                      {element.featuring && (
+                        <div className="flex flex-col items-center">
+                          <span 
+                            className="text-[10px] uppercase tracking-wider mb-1"
+                            style={{ color: 'rgba(230, 204, 160, 0.5)' }}
+                          >
+                            Voices
+                          </span>
+                          <span 
+                            className="text-xs font-mono"
+                            style={{ color: DOGON.millet }}
+                          >
+                            ft. {formatFeaturing(element.featuring)}
+                          </span>
+                        </div>
+                      )}
 
-                  {/* Featuring */}
-                  <div className="text-center">
-                    {element.featuring ? (
-                      <p 
-                        className="font-mono text-xs"
-                        style={{ color: DOGON.millet }}
+                      {/* View details arrow */}
+                      <motion.div
+                        className="ml-2"
+                        animate={{ x: [0, 4, 0] }}
+                        transition={{ duration: 1, repeat: Infinity }}
                       >
-                        ft. {formatFeaturing(element.featuring)}
-                      </p>
-                    ) : (
-                      <span style={{ color: 'rgba(230, 204, 160, 0.2)' }}>—</span>
-                    )}
+                        <span style={{ color: DOGON.laterite }}>→</span>
+                      </motion.div>
+                    </motion.div>
                   </div>
                 </div>
 
-                {/* Gradient accent line - Laterite */}
+                {/* Gradient accent line */}
                 <div 
                   className="h-1 w-full transition-all duration-300 group-hover:h-1.5"
                   style={{ 
