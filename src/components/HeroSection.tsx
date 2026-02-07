@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import CassettePlayer from './CassettePlayer';
 import PharmerTooltip from './PharmerTooltip';
 import albumArt from '@/assets/pharmboi-artwork.png';
-import logoTextured from '@/assets/pharmboi-logo-textured.png';
 
 // Organic Vine Frame
 const VineFrame = ({ side }: { side: 'left' | 'right' }) => (
@@ -197,15 +196,37 @@ const HeroSection = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.5 }}
+              className="relative"
             >
-              <img 
-                src={logoTextured} 
-                alt="PHARMBOI" 
-                className="h-16 md:h-24 lg:h-32 w-auto drop-shadow-2xl"
+              {/* Root-Textured PHARMBOI Logo */}
+              <h1 
+                className="text-5xl md:text-7xl lg:text-8xl font-bubble relative"
                 style={{
-                  filter: 'drop-shadow(3px 4px 6px rgba(0,0,0,0.6))',
+                  background: `url('/images/root-texture.png'), linear-gradient(180deg, hsl(20 30% 40%) 0%, hsl(20 40% 25%) 100%)`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  filter: 'drop-shadow(3px 4px 0 hsl(20 30% 12%)) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6))',
+                  textShadow: 'none',
                 }}
-              />
+              >
+                PHARMBOI
+              </h1>
+              {/* Organic outline layer */}
+              <h1 
+                className="text-5xl md:text-7xl lg:text-8xl font-bubble absolute inset-0 pointer-events-none"
+                aria-hidden="true"
+                style={{
+                  WebkitTextStroke: '3px hsl(20 30% 12%)',
+                  WebkitTextFillColor: 'transparent',
+                  opacity: 0.6,
+                  zIndex: -1,
+                }}
+              >
+                PHARMBOI
+              </h1>
             </motion.div>
             
             <VineFrame side="right" />
