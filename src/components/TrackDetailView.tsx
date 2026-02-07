@@ -5,6 +5,7 @@ import type { TrackData } from '@/data/trackData';
 import FunctionSeal from './track-detail/FunctionSeal';
 import WaveformPlayer from './track-detail/WaveformPlayer';
 import RxPrescription from './track-detail/RxPrescription';
+import LunarAgronomyModule from './track-detail/LunarAgronomyModule';
 import BodyQuadrant from './track-detail/BodyQuadrant';
 import SkyQuadrant from './track-detail/SkyQuadrant';
 import EarthQuadrant from './track-detail/EarthQuadrant';
@@ -103,12 +104,15 @@ const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
               <FunctionSeal track={track} />
 
               {/* Audio Player and Rx Prescription - Side by Side */}
-              <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
                 {/* Audio Player */}
                 <WaveformPlayer track={track} />
                 
                 {/* Rx Prescription Pad */}
                 <RxPrescription track={track} onActivate={() => setIsRxActivated(true)} />
+
+                {/* Lunar Agronomy Module */}
+                <LunarAgronomyModule track={track} />
               </div>
 
               {/* Data Quadrants Grid */}
