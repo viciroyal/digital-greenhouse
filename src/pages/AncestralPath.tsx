@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogIn, LogOut, User } from 'lucide-react';
+import { ArrowLeft, LogIn, LogOut, User, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   ModuleNode,
@@ -14,6 +14,7 @@ import {
   DjedPillarIcon,
 } from '@/components/ancestral';
 import { useAncestralProgress, Module } from '@/hooks/useAncestralProgress';
+import { useAdminRole } from '@/hooks/useAdminRole';
 import { Button } from '@/components/ui/button';
 
 // Icon mapping
@@ -50,6 +51,7 @@ const AncestralPath = () => {
   } | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { isAdmin } = useAdminRole();
 
   const {
     modules,
@@ -225,6 +227,25 @@ const AncestralPath = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.7 }}
         >
+          {/* Admin Link */}
+          {isAdmin && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2 font-mono text-xs"
+              style={{
+                background: 'linear-gradient(135deg, hsl(51 40% 15%), hsl(40 30% 12%))',
+                border: '1px solid hsl(51 100% 50%)',
+                color: 'hsl(51 100% 60%)',
+                boxShadow: '0 0 15px hsl(51 80% 40% / 0.3)',
+              }}
+              onClick={() => navigate('/hogon-review')}
+            >
+              <Shield className="w-3 h-3" />
+              Hogon's Chamber
+            </Button>
+          )}
+          
           <div 
             className="flex items-center gap-2 px-3 py-2 rounded-full font-mono text-xs"
             style={{
