@@ -298,55 +298,56 @@ const MasterMatrix = () => {
                   </div>
                 </div>
 
-                {/* Desktop Layout - Compact with hover scroll reveal */}
+                {/* Desktop Layout - Centered track name with hover reveal */}
                 <div className="hidden lg:block relative z-10 overflow-hidden">
-                  <div className="flex items-center p-4">
-                    {/* Always visible: Energy indicator + Track name */}
-                    <div className="flex items-center gap-4 flex-shrink-0" style={{ minWidth: '320px' }}>
-                      <div className="flex items-center gap-3">
-                        <AngularChakraSymbol color={element.colorHsl} size={36} />
-                        <span 
-                          className="font-mono text-sm font-bold"
+                  <div className="flex items-center justify-between p-4">
+                    {/* Left: Energy indicator */}
+                    <div className="flex items-center gap-3 flex-shrink-0 w-24">
+                      <AngularChakraSymbol color={element.colorHsl} size={36} />
+                      <span 
+                        className="font-mono text-sm font-bold"
+                        style={{ color: `hsl(${element.colorHsl})` }}
+                      >
+                        {String(element.row).padStart(2, '0')}
+                      </span>
+                    </div>
+
+                    {/* Center: Track name */}
+                    <div className="flex-1 text-center">
+                      <p 
+                        className="font-bold text-lg"
+                        style={{ 
+                          fontFamily: "'Staatliches', sans-serif",
+                          color: DOGON.paleStraw,
+                          letterSpacing: '0.08em',
+                        }}
+                      >
+                        {element.track}
+                      </p>
+                      <div className="flex items-center justify-center gap-2 mt-1">
+                        <p 
+                          className="font-mono text-xs uppercase"
                           style={{ color: `hsl(${element.colorHsl})` }}
                         >
-                          {String(element.row).padStart(2, '0')}
-                        </span>
-                      </div>
-                      <div>
-                        <p 
-                          className="font-bold"
-                          style={{ 
-                            fontFamily: "'Staatliches', sans-serif",
-                            color: DOGON.paleStraw,
-                            letterSpacing: '0.05em',
-                          }}
-                        >
-                          {element.track}
+                          {element.chakra}
                         </p>
-                        <div className="flex items-center gap-2">
-                          <p 
-                            className="font-mono text-xs uppercase"
-                            style={{ color: `hsl(${element.colorHsl})` }}
-                          >
-                            {element.chakra}
-                          </p>
-                          <NommoWaveform 
-                            color={element.colorHsl} 
-                            isAnimating={hoveredRow === element.row}
-                          />
-                        </div>
+                        <NommoWaveform 
+                          color={element.colorHsl} 
+                          isAnimating={hoveredRow === element.row}
+                        />
                       </div>
                     </div>
 
-                    {/* Sliding details panel - appears on hover */}
+                    {/* Right: Sliding details panel - appears on hover */}
                     <motion.div 
-                      className="flex items-center gap-6 ml-4"
-                      initial={{ opacity: 0, x: 100 }}
+                      className="flex items-center gap-4 flex-shrink-0"
+                      initial={{ opacity: 0, x: 50 }}
                       animate={{ 
                         opacity: hoveredRow === element.row ? 1 : 0,
-                        x: hoveredRow === element.row ? 0 : 100,
+                        x: hoveredRow === element.row ? 0 : 50,
                       }}
-                      transition={{ duration: 0.3, ease: "easeOut" }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                      style={{ minWidth: hoveredRow === element.row ? 'auto' : '0' }}
                     >
                       {/* Frequency */}
                       <div className="flex flex-col items-center">
