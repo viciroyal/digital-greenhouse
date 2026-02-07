@@ -248,7 +248,11 @@ const VineBorder = () => (
   </div>
 );
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  onLogoClick?: () => void;
+}
+
+const HeroSection = ({ onLogoClick }: HeroSectionProps) => {
   const sectionRef = useRef<HTMLElement>(null);
   const isMobile = useIsMobile();
   const { scrollYProgress } = useScroll({
@@ -331,11 +335,14 @@ const HeroSection = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="relative"
+              className="relative cursor-pointer"
+              onClick={onLogoClick}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               {/* Root-Textured PHARMBOI Logo */}
               <h1 
-                className="text-5xl md:text-7xl lg:text-8xl font-bubble relative"
+                className="text-5xl md:text-7xl lg:text-8xl font-bubble relative select-none"
                 style={{
                   background: `url('/images/root-texture.png'), linear-gradient(180deg, hsl(20 30% 40%) 0%, hsl(20 40% 25%) 100%)`,
                   backgroundSize: 'cover',
