@@ -1,5 +1,53 @@
 import { motion } from 'framer-motion';
 
+// Shimmer/Sparkle effect component for gemstones
+const GemstoneShimmer = ({ delay = 0 }: { delay?: number }) => (
+  <>
+    {/* Sweeping shimmer line */}
+    <motion.rect
+      x="-10"
+      y="0"
+      width="8"
+      height="40"
+      fill="url(#shimmer-gradient)"
+      initial={{ x: -10 }}
+      animate={{ x: 50 }}
+      transition={{
+        duration: 1.2,
+        delay: delay + 3,
+        repeat: Infinity,
+        repeatDelay: 4,
+        ease: "easeInOut"
+      }}
+    />
+    {/* Sparkle particles */}
+    {[
+      { cx: 16, cy: 12, r: 1.5, sparkleDelay: 0 },
+      { cx: 24, cy: 18, r: 1, sparkleDelay: 0.3 },
+      { cx: 18, cy: 24, r: 1.2, sparkleDelay: 0.6 },
+    ].map((spark, i) => (
+      <motion.circle
+        key={i}
+        cx={spark.cx}
+        cy={spark.cy}
+        r={spark.r}
+        fill="white"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ 
+          opacity: [0, 1, 0],
+          scale: [0, 1.5, 0]
+        }}
+        transition={{
+          duration: 0.6,
+          delay: delay + 5 + spark.sparkleDelay,
+          repeat: Infinity,
+          repeatDelay: 6,
+        }}
+      />
+    ))}
+  </>
+);
+
 // Organic Gemstone Chakra Symbol - matching the MasterMatrix style
 export const GemstoneChakraIcon = ({ color, size = 48, delay = 0 }: { color: string; size?: number; delay?: number }) => (
   <motion.div
@@ -31,6 +79,16 @@ export const GemstoneChakraIcon = ({ color, size = 48, delay = 0 }: { color: str
           <stop offset="0%" stopColor={`hsl(${color} / 0.6)`} />
           <stop offset="100%" stopColor="transparent" />
         </radialGradient>
+        {/* Shimmer gradient */}
+        <linearGradient id="shimmer-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="transparent" />
+          <stop offset="50%" stopColor="white" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="transparent" />
+        </linearGradient>
+        {/* Clip path for gemstone shape */}
+        <clipPath id={`gem-clip-${color.replace(/\s/g, '')}`}>
+          <polygon points="20,8 28,14 28,26 20,32 12,26 12,14" />
+        </clipPath>
       </defs>
       
       <motion.circle 
@@ -87,6 +145,11 @@ export const GemstoneChakraIcon = ({ color, size = 48, delay = 0 }: { color: str
         }}
         style={{ transformOrigin: "center" }}
       />
+      
+      {/* Shimmer effect clipped to gemstone */}
+      <g clipPath={`url(#gem-clip-${color.replace(/\s/g, '')})`}>
+        <GemstoneShimmer delay={delay} />
+      </g>
       
       {/* Facet lines */}
       <motion.g 
@@ -329,6 +392,26 @@ export const GemstoneBodySvg = ({ highlightArea, color }: { highlightArea: strin
         transition={{ duration: 1.5, repeat: Infinity }}
         style={{ transformOrigin: `${cx}px ${cy}px` }}
       />
+      {/* Sparkle effect for active chakras */}
+      {isActive && (
+        <motion.circle
+          cx={cx}
+          cy={cy}
+          r="1"
+          fill="white"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ 
+            opacity: [0, 1, 0],
+            scale: [0, 2, 0]
+          }}
+          transition={{
+            duration: 0.8,
+            delay: 2 + index * 0.5,
+            repeat: Infinity,
+            repeatDelay: 4,
+          }}
+        />
+      )}
       {/* Highlight */}
       {isActive && (
         <motion.ellipse 
@@ -425,7 +508,72 @@ export const GemstoneBodySvg = ({ highlightArea, color }: { highlightArea: strin
   );
 };
 
-// Crystal Gem Icon with entrance animation
+// Shimmer effect for crystal shapes
+const CrystalShimmer = ({ delay = 0 }: { delay?: number }) => (
+  <>
+    {/* Sweeping shimmer */}
+    <motion.rect
+      x="-8"
+      y="0"
+      width="6"
+      height="32"
+      fill="url(#crystal-shimmer)"
+      initial={{ x: -8 }}
+      animate={{ x: 40 }}
+      transition={{
+        duration: 1,
+        delay: delay + 2.5,
+        repeat: Infinity,
+        repeatDelay: 5,
+        ease: "easeInOut"
+      }}
+    />
+    {/* Sparkle bursts */}
+    {[
+      { cx: 12, cy: 8, sparkleDelay: 0 },
+      { cx: 20, cy: 16, sparkleDelay: 0.2 },
+      { cx: 14, cy: 22, sparkleDelay: 0.4 },
+    ].map((spark, i) => (
+      <motion.g key={i}>
+        <motion.circle
+          cx={spark.cx}
+          cy={spark.cy}
+          r="1"
+          fill="white"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ 
+            opacity: [0, 1, 0],
+            scale: [0, 2, 0]
+          }}
+          transition={{
+            duration: 0.5,
+            delay: delay + 4 + spark.sparkleDelay,
+            repeat: Infinity,
+            repeatDelay: 7,
+          }}
+        />
+        {/* Star rays */}
+        <motion.g
+          stroke="white"
+          strokeWidth="0.5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.8, 0] }}
+          transition={{
+            duration: 0.5,
+            delay: delay + 4 + spark.sparkleDelay,
+            repeat: Infinity,
+            repeatDelay: 7,
+          }}
+        >
+          <line x1={spark.cx - 2} y1={spark.cy} x2={spark.cx + 2} y2={spark.cy} />
+          <line x1={spark.cx} y1={spark.cy - 2} x2={spark.cx} y2={spark.cy + 2} />
+        </motion.g>
+      </motion.g>
+    ))}
+  </>
+);
+
+// Crystal Gem Icon with entrance animation and shimmer
 export const CrystalGemIcon = ({ color, size = 32, delay = 0 }: { color: string; size?: number; delay?: number }) => (
   <motion.div
     initial={{ opacity: 0, y: 20, rotate: -45 }}
@@ -450,6 +598,16 @@ export const CrystalGemIcon = ({ color, size = 32, delay = 0 }: { color: string;
           <stop offset="50%" stopColor={`hsl(${color})`} />
           <stop offset="100%" stopColor={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 35%)`} />
         </linearGradient>
+        {/* Shimmer gradient */}
+        <linearGradient id="crystal-shimmer" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="transparent" />
+          <stop offset="50%" stopColor="white" stopOpacity="0.7" />
+          <stop offset="100%" stopColor="transparent" />
+        </linearGradient>
+        {/* Clip path for crystal */}
+        <clipPath id={`crystal-clip-${color.replace(/\s/g, '')}`}>
+          <polygon points="16,2 24,10 24,22 16,30 8,22 8,10" />
+        </clipPath>
       </defs>
       
       {/* Glow */}
@@ -478,6 +636,11 @@ export const CrystalGemIcon = ({ color, size = 32, delay = 0 }: { color: string;
         }}
         style={{ transformOrigin: "center" }}
       />
+      
+      {/* Shimmer effect clipped to crystal */}
+      <g clipPath={`url(#crystal-clip-${color.replace(/\s/g, '')})`}>
+        <CrystalShimmer delay={delay} />
+      </g>
       
       {/* Facets */}
       <motion.g 
