@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import type { TrackData } from '@/data/trackData';
 
 interface SkyQuadrantProps {
@@ -120,6 +121,7 @@ const zodiacDotPatterns: Record<string, { points: [number, number][]; accent: [n
 
 // Aboriginal Dot Painting Zodiac Glyph Component
 const DotPaintingZodiacGlyph = ({ glyph, signName }: { glyph: string; signName: string }) => {
+  const [isHovered, setIsHovered] = useState(false);
   const pattern = zodiacDotPatterns[glyph] || zodiacDotPatterns['♈'];
   
   // Generate random variation for organic feel
@@ -135,19 +137,53 @@ const DotPaintingZodiacGlyph = ({ glyph, signName }: { glyph: string; signName: 
       transition={{ duration: 0.6 }}
     >
       {/* Ceremonial Stone/Wood Disk Background */}
-      <div 
-        className="relative w-52 h-52 md:w-64 md:h-64 rounded-full"
+      <motion.div 
+        className="relative w-52 h-52 md:w-64 md:h-64 rounded-full cursor-pointer"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        animate={{
+          boxShadow: isHovered 
+            ? `0 12px 48px rgba(196, 154, 61, 0.3), 0 0 60px rgba(196, 154, 61, 0.15), inset 0 2px 4px rgba(255,255,255,0.1), inset 0 -4px 8px rgba(0,0,0,0.5)`
+            : `0 8px 32px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.05), inset 0 -4px 8px rgba(0,0,0,0.5)`,
+        }}
+        transition={{ duration: 0.6, ease: "easeInOut" }}
         style={{
           background: `
             radial-gradient(ellipse at 30% 30%, ${OCHRE_COLORS.charcoalBlack} 0%, #0d0b09 100%)
           `,
-          boxShadow: `
-            0 8px 32px rgba(0,0,0,0.6),
-            inset 0 2px 4px rgba(255,255,255,0.05),
-            inset 0 -4px 8px rgba(0,0,0,0.5)
-          `,
         }}
       >
+        {/* Shimmer overlay on hover */}
+        <motion.div
+          className="absolute inset-0 rounded-full pointer-events-none overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isHovered ? 1 : 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <motion.div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(
+                135deg, 
+                transparent 20%, 
+                rgba(196, 154, 61, 0.15) 40%, 
+                rgba(212, 165, 116, 0.2) 50%, 
+                rgba(196, 154, 61, 0.15) 60%, 
+                transparent 80%
+              )`,
+              backgroundSize: '200% 200%',
+            }}
+            animate={isHovered ? {
+              backgroundPosition: ['200% 200%', '-100% -100%'],
+            } : {}}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+        </motion.div>
+
         {/* Smoked wood/stone texture overlay */}
         <div 
           className="absolute inset-0 rounded-full opacity-30"
@@ -307,17 +343,17 @@ const DotPaintingZodiacGlyph = ({ glyph, signName }: { glyph: string; signName: 
           />
         </motion.div>
 
-        {/* Subtle dust/patina overlay */}
-        <div 
+        {/* Subtle dust/patina overlay + enhanced glow on hover */}
+        <motion.div 
           className="absolute inset-0 rounded-full pointer-events-none"
-          style={{
-            background: `
-              radial-gradient(ellipse at 70% 20%, rgba(196, 154, 61, 0.1) 0%, transparent 40%),
-              radial-gradient(ellipse at 20% 80%, rgba(139, 58, 29, 0.08) 0%, transparent 30%)
-            `,
+          animate={{
+            background: isHovered
+              ? `radial-gradient(ellipse at 70% 20%, rgba(196, 154, 61, 0.25) 0%, transparent 50%), radial-gradient(ellipse at 20% 80%, rgba(181, 84, 30, 0.2) 0%, transparent 40%), radial-gradient(circle at 50% 50%, rgba(196, 154, 61, 0.1) 0%, transparent 60%)`
+              : `radial-gradient(ellipse at 70% 20%, rgba(196, 154, 61, 0.1) 0%, transparent 40%), radial-gradient(ellipse at 20% 80%, rgba(139, 58, 29, 0.08) 0%, transparent 30%)`
           }}
+          transition={{ duration: 0.5 }}
         />
-      </div>
+      </motion.div>
 
       {/* Floating artifact shadow */}
       <div 
