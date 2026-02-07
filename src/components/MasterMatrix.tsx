@@ -298,11 +298,11 @@ const MasterMatrix = () => {
                   </div>
                 </div>
 
-                {/* Desktop Layout - Centered track name with hover reveal */}
+                {/* Desktop Layout - Centered with content swap on hover */}
                 <div className="hidden lg:block relative z-10 overflow-hidden">
-                  <div className="flex items-center justify-between p-4">
-                    {/* Left: Energy indicator */}
-                    <div className="flex items-center gap-3 flex-shrink-0 w-24">
+                  <div className="flex items-center p-4">
+                    {/* Left: Energy indicator - always visible */}
+                    <div className="flex items-center gap-3 flex-shrink-0 w-20">
                       <AngularChakraSymbol color={element.colorHsl} size={36} />
                       <span 
                         className="font-mono text-sm font-bold"
@@ -312,130 +312,137 @@ const MasterMatrix = () => {
                       </span>
                     </div>
 
-                    {/* Center: Track name */}
-                    <div className="flex-1 text-center">
-                      <p 
-                        className="font-bold text-lg"
-                        style={{ 
-                          fontFamily: "'Staatliches', sans-serif",
-                          color: DOGON.paleStraw,
-                          letterSpacing: '0.08em',
+                    {/* Center: Content area - swaps between track name and details */}
+                    <div className="flex-1 relative h-14 flex items-center justify-center">
+                      {/* Track Name - visible by default, fades out on hover */}
+                      <motion.div 
+                        className="absolute inset-0 flex items-center justify-center"
+                        initial={{ opacity: 1 }}
+                        animate={{ 
+                          opacity: hoveredRow === element.row ? 0 : 1,
                         }}
+                        transition={{ duration: 0.2 }}
                       >
-                        {element.track}
-                      </p>
-                      <div className="flex items-center justify-center gap-2 mt-1">
                         <p 
-                          className="font-mono text-xs uppercase"
-                          style={{ color: `hsl(${element.colorHsl})` }}
-                        >
-                          {element.chakra}
-                        </p>
-                        <NommoWaveform 
-                          color={element.colorHsl} 
-                          isAnimating={hoveredRow === element.row}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Right: Sliding details panel - appears on hover */}
-                    <motion.div 
-                      className="flex items-center gap-4 flex-shrink-0"
-                      initial={{ opacity: 0, x: 50 }}
-                      animate={{ 
-                        opacity: hoveredRow === element.row ? 1 : 0,
-                        x: hoveredRow === element.row ? 0 : 50,
-                      }}
-                      transition={{ duration: 0.25, ease: "easeOut" }}
-                      style={{ minWidth: hoveredRow === element.row ? 'auto' : '0' }}
-                    >
-                      {/* Frequency */}
-                      <div className="flex flex-col items-center">
-                        <span 
-                          className="text-[10px] uppercase tracking-wider mb-1"
-                          style={{ color: 'rgba(230, 204, 160, 0.5)' }}
-                        >
-                          Freq
-                        </span>
-                        <span 
-                          className="px-3 py-1 text-xs font-mono font-medium"
+                          className="font-bold text-xl tracking-wider"
                           style={{ 
-                            border: `1px solid hsl(${element.colorHsl} / 0.4)`,
-                            color: `hsl(${element.colorHsl})`,
-                            background: `hsl(${element.colorHsl} / 0.15)`,
+                            fontFamily: "'Staatliches', sans-serif",
+                            color: DOGON.paleStraw,
+                            letterSpacing: '0.1em',
                           }}
                         >
-                          {element.frequency}
-                        </span>
-                      </div>
+                          {element.track}
+                        </p>
+                      </motion.div>
 
-                      {/* Mineral */}
-                      <div className="flex flex-col items-center">
-                        <span 
-                          className="text-[10px] uppercase tracking-wider mb-1"
-                          style={{ color: 'rgba(230, 204, 160, 0.5)' }}
-                        >
-                          Mineral
-                        </span>
-                        <div className="flex items-center gap-1">
-                          <span 
-                            className="font-mono text-base font-bold"
-                            style={{ color: `hsl(${element.colorHsl})` }}
-                          >
-                            {element.mineralSymbol}
-                          </span>
-                          <span 
-                            className="text-xs font-mono"
-                            style={{ color: 'rgba(230, 204, 160, 0.7)' }}
-                          >
-                            {element.mineral}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Crystal */}
-                      <div className="flex flex-col items-center">
-                        <span 
-                          className="text-[10px] uppercase tracking-wider mb-1"
-                          style={{ color: 'rgba(230, 204, 160, 0.5)' }}
-                        >
-                          Crystal
-                        </span>
-                        <span 
-                          className="text-xs font-mono"
-                          style={{ color: 'rgba(230, 204, 160, 0.8)' }}
-                        >
-                          ◇ {element.crystal}
-                        </span>
-                      </div>
-
-                      {/* Featuring */}
-                      {element.featuring && (
+                      {/* Details - hidden by default, fades in on hover */}
+                      <motion.div 
+                        className="absolute inset-0 flex items-center justify-center gap-8"
+                        initial={{ opacity: 0 }}
+                        animate={{ 
+                          opacity: hoveredRow === element.row ? 1 : 0,
+                        }}
+                        transition={{ duration: 0.2, delay: hoveredRow === element.row ? 0.1 : 0 }}
+                      >
+                        {/* Chakra */}
                         <div className="flex flex-col items-center">
                           <span 
-                            className="text-[10px] uppercase tracking-wider mb-1"
-                            style={{ color: 'rgba(230, 204, 160, 0.5)' }}
+                            className="text-[9px] uppercase tracking-wider mb-0.5"
+                            style={{ color: 'rgba(230, 204, 160, 0.4)' }}
                           >
-                            Voices
+                            Energy
                           </span>
                           <span 
-                            className="text-xs font-mono"
-                            style={{ color: DOGON.millet }}
+                            className="font-mono text-sm font-medium uppercase"
+                            style={{ color: `hsl(${element.colorHsl})` }}
                           >
-                            ft. {formatFeaturing(element.featuring)}
+                            {element.chakra}
                           </span>
                         </div>
-                      )}
 
-                      {/* View details arrow */}
-                      <motion.div
-                        className="ml-2"
-                        animate={{ x: [0, 4, 0] }}
-                        transition={{ duration: 1, repeat: Infinity }}
-                      >
-                        <span style={{ color: DOGON.laterite }}>→</span>
+                        {/* Frequency */}
+                        <div className="flex flex-col items-center">
+                          <span 
+                            className="text-[9px] uppercase tracking-wider mb-0.5"
+                            style={{ color: 'rgba(230, 204, 160, 0.4)' }}
+                          >
+                            Frequency
+                          </span>
+                          <span 
+                            className="font-mono text-sm font-medium"
+                            style={{ color: `hsl(${element.colorHsl})` }}
+                          >
+                            {element.frequency}
+                          </span>
+                        </div>
+
+                        {/* Mineral */}
+                        <div className="flex flex-col items-center">
+                          <span 
+                            className="text-[9px] uppercase tracking-wider mb-0.5"
+                            style={{ color: 'rgba(230, 204, 160, 0.4)' }}
+                          >
+                            Mineral
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <span 
+                              className="font-mono text-sm font-bold"
+                              style={{ color: `hsl(${element.colorHsl})` }}
+                            >
+                              {element.mineralSymbol}
+                            </span>
+                            <span 
+                              className="text-xs font-mono"
+                              style={{ color: 'rgba(230, 204, 160, 0.7)' }}
+                            >
+                              {element.mineral}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Crystal */}
+                        <div className="flex flex-col items-center">
+                          <span 
+                            className="text-[9px] uppercase tracking-wider mb-0.5"
+                            style={{ color: 'rgba(230, 204, 160, 0.4)' }}
+                          >
+                            Crystal
+                          </span>
+                          <span 
+                            className="text-sm font-mono"
+                            style={{ color: 'rgba(230, 204, 160, 0.8)' }}
+                          >
+                            {element.crystal}
+                          </span>
+                        </div>
+
+                        {/* Featuring */}
+                        {element.featuring && (
+                          <div className="flex flex-col items-center">
+                            <span 
+                              className="text-[9px] uppercase tracking-wider mb-0.5"
+                              style={{ color: 'rgba(230, 204, 160, 0.4)' }}
+                            >
+                              Featuring
+                            </span>
+                            <span 
+                              className="text-sm font-mono"
+                              style={{ color: DOGON.millet }}
+                            >
+                              {formatFeaturing(element.featuring)}
+                            </span>
+                          </div>
+                        )}
                       </motion.div>
-                    </motion.div>
+                    </div>
+
+                    {/* Right: Nommo waveform indicator */}
+                    <div className="flex-shrink-0 w-20 flex justify-end">
+                      <NommoWaveform 
+                        color={element.colorHsl} 
+                        isAnimating={hoveredRow === element.row}
+                      />
+                    </div>
                   </div>
                 </div>
 
