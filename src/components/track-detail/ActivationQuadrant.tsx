@@ -288,19 +288,28 @@ const YogaPoseSvg = ({ pose, color }: { pose: string; color: string }) => {
 const ActivationQuadrant = ({ track }: ActivationQuadrantProps) => {
   return (
     <motion.div
-      className="glass-card rounded-2xl p-6 md:col-span-2"
+      className="root-card p-6 md:col-span-2"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
     >
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-lg">🧘</span>
-        <h3 className="font-display text-xl text-foreground">The Activation</h3>
-        <span className="text-muted-foreground/60 font-mono text-xs ml-auto">THE RITUAL</span>
+      <div className="flex items-center gap-3 mb-4">
+        <svg viewBox="0 0 28 28" width={28} height={28} className="drop-shadow">
+          <circle cx="14" cy="14" r="12" fill="hsl(280 50% 20%)" stroke="hsl(280 60% 55%)" strokeWidth="1" />
+          <circle cx="14" cy="8" r="3" fill="hsl(40 50% 90%)" />
+          <path d="M14 11 L14 18" stroke="hsl(40 50% 90%)" strokeWidth="1.5" />
+          <path d="M14 14 L10 12" stroke="hsl(40 50% 90%)" strokeWidth="1" />
+          <path d="M14 14 L18 12" stroke="hsl(40 50% 90%)" strokeWidth="1" />
+          <path d="M11 18 L14 18 L17 18" stroke="hsl(40 50% 90%)" strokeWidth="1.5" />
+          <path d="M11 18 L10 24" stroke="hsl(40 50% 90%)" strokeWidth="1" />
+          <path d="M17 18 L18 24" stroke="hsl(40 50% 90%)" strokeWidth="1" />
+        </svg>
+        <h3 className="font-bubble text-xl text-foreground">The Activation</h3>
+        <span className="text-muted-foreground/60 font-body text-xs ml-auto tracking-wider">THE RITUAL</span>
       </div>
 
       {/* Instruction header */}
-      <p className="text-muted-foreground/80 font-mono text-xs italic mb-6 text-center">
+      <p className="text-muted-foreground/80 font-body text-xs italic mb-6 text-center">
         "To maximize absorption of this frequency, assume this posture."
       </p>
 
@@ -317,12 +326,12 @@ const ActivationQuadrant = ({ track }: ActivationQuadrantProps) => {
             <YogaPoseSvg pose={track.yogaPoseSanskrit} color={track.colorHsl} />
           </div>
           <p 
-            className="font-display text-lg font-bold text-center"
+            className="font-bubble text-lg font-bold text-center"
             style={{ color: `hsl(${track.colorHsl})` }}
           >
             {track.yogaPose}
           </p>
-          <p className="font-mono text-xs text-muted-foreground italic text-center">
+          <p className="font-body text-xs text-muted-foreground italic text-center">
             ({track.yogaPoseSanskrit})
           </p>
         </div>
@@ -331,10 +340,10 @@ const ActivationQuadrant = ({ track }: ActivationQuadrantProps) => {
         <div className="md:col-span-2 space-y-4">
           {/* Why this pose */}
           <div>
-            <p className="text-muted-foreground/60 font-mono text-xs uppercase tracking-wider mb-2">
+            <p className="text-muted-foreground/60 font-body text-xs uppercase tracking-wider mb-2">
               Why This Pose
             </p>
-            <p className="font-mono text-sm text-foreground leading-relaxed">
+            <p className="font-body text-sm text-foreground leading-relaxed">
               {track.yogaWhy}
             </p>
           </div>
@@ -347,11 +356,11 @@ const ActivationQuadrant = ({ track }: ActivationQuadrantProps) => {
               background: `linear-gradient(135deg, hsl(${track.colorHsl} / 0.08) 0%, transparent 100%)`
             }}
           >
-            <p className="text-muted-foreground/60 font-mono text-xs uppercase tracking-wider mb-2">
+            <p className="text-muted-foreground/60 font-body text-xs uppercase tracking-wider mb-2">
               The Action
             </p>
             <p 
-              className="font-mono text-base font-medium leading-relaxed"
+              className="font-body text-base font-medium leading-relaxed"
               style={{ color: `hsl(${track.colorHsl})` }}
             >
               "{track.ritualAction}"
