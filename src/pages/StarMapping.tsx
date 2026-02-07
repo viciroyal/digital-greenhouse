@@ -151,7 +151,9 @@ const StarMapping = () => {
   const [step, setStep] = useState<Step>('form');
   const [fullName, setFullName] = useState('');
   const [birthDate, setBirthDate] = useState<Date | undefined>();
-  const [birthTime, setBirthTime] = useState('');
+  const [birthHour, setBirthHour] = useState('');
+  const [birthMinute, setBirthMinute] = useState('');
+  const [birthAmPm, setBirthAmPm] = useState<'AM' | 'PM'>('AM');
   const [birthCity, setBirthCity] = useState('');
   const [birthState, setBirthState] = useState('');
   const [progress, setProgress] = useState(0);
@@ -163,7 +165,8 @@ const StarMapping = () => {
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const hasAnyField = fullName.trim() !== '';
-  const isFormComplete = hasAnyField && birthDate !== undefined && birthTime !== '' && birthState !== '';
+  const isTimeComplete = birthHour !== '' && birthMinute !== '';
+  const isFormComplete = hasAnyField && birthDate !== undefined && isTimeComplete && birthState !== '';
 
   // Calculation animation
   useEffect(() => {
@@ -215,7 +218,11 @@ const StarMapping = () => {
     const year = birthDate.getFullYear();
     const month = birthDate.getMonth() + 1;
     const day = birthDate.getDate();
-    const [hours, minutes] = birthTime.split(':').map(Number);
+    // Convert 12h to 24h
+    let hours = parseInt(birthHour, 10);
+    const minutes = parseInt(birthMinute, 10) || 0;
+    if (birthAmPm === 'PM' && hours !== 12) hours += 12;
+    if (birthAmPm === 'AM' && hours === 12) hours = 0;
 
     try {
       // Use precise celestine ephemeris calculations
@@ -249,7 +256,9 @@ const StarMapping = () => {
     setStep('form');
     setFullName('');
     setBirthDate(undefined);
-    setBirthTime('');
+    setBirthHour('');
+    setBirthMinute('');
+    setBirthAmPm('AM');
     setBirthCity('');
     setBirthState('');
     setUserChart(null);
@@ -358,18 +367,83 @@ const StarMapping = () => {
                 </Popover>
               </div>
 
-              {/* Time of Birth */}
+              {/* Time of Birth — Hour / Minute / AM-PM */}
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2" style={{ color: '#5D4037' }}>
                   <Clock className="w-4 h-4" /> Time of Birth
                 </label>
-                <Input
-                  type="time"
-                  value={birthTime}
-                  onChange={(e) => setBirthTime(e.target.value)}
-                  className="h-12 rounded-xl border-2 bg-white/80 transition-all duration-200"
-                  style={{ borderColor: '#D7CCC8', color: '#3E2723' }}
-                />
+                <div className="flex gap-2">
+                  {/* Hour */}
+                  <Select value={birthHour} onValueChange={setBirthHour}>
+                    <SelectTrigger
+                      className="h-12 rounded-xl border-2 bg-white/80 transition-all duration-200 flex-1"
+                      style={{ borderColor: '#D7CCC8', color: birthHour ? '#3E2723' : '#a8a29e' }}
+                    >
+                      <SelectValue placeholder="Hr" />
+                    </SelectTrigger>
+                    <SelectContent
+                      className="bg-white border-2 rounded-xl shadow-xl z-50 max-h-60"
+                      style={{ borderColor: '#D7CCC8' }}
+                    >
+                      {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
+                        <SelectItem key={h} value={String(h)} style={{ color: '#3E2723' }}>
+                          {h}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <span className="flex items-center text-xl font-bold" style={{ color: '#5D4037' }}>:</span>
+
+                  {/* Minute */}
+                  <Select value={birthMinute} onValueChange={setBirthMinute}>
+                    <SelectTrigger
+                      className="h-12 rounded-xl border-2 bg-white/80 transition-all duration-200 flex-1"
+                      style={{ borderColor: '#D7CCC8', color: birthMinute ? '#3E2723' : '#a8a29e' }}
+                    >
+                      <SelectValue placeholder="Min" />
+                    </SelectTrigger>
+                    <SelectContent
+                      className="bg-white border-2 rounded-xl shadow-xl z-50 max-h-60"
+                      style={{ borderColor: '#D7CCC8' }}
+                    >
+                      {Array.from({ length: 60 }, (_, i) => i).map((m) => (
+                        <SelectItem key={m} value={String(m)} style={{ color: '#3E2723' }}>
+                          {String(m).padStart(2, '0')}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* AM/PM Toggle */}
+                  <div
+                    className="flex rounded-xl border-2 overflow-hidden h-12"
+                    style={{ borderColor: '#D7CCC8' }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setBirthAmPm('AM')}
+                      className="px-3 text-sm font-bold transition-all duration-200"
+                      style={{
+                        backgroundColor: birthAmPm === 'AM' ? '#3E2723' : 'rgba(255,255,255,0.8)',
+                        color: birthAmPm === 'AM' ? '#FFD700' : '#8D6E63',
+                      }}
+                    >
+                      AM
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBirthAmPm('PM')}
+                      className="px-3 text-sm font-bold transition-all duration-200"
+                      style={{
+                        backgroundColor: birthAmPm === 'PM' ? '#3E2723' : 'rgba(255,255,255,0.8)',
+                        color: birthAmPm === 'PM' ? '#FFD700' : '#8D6E63',
+                      }}
+                    >
+                      PM
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Location of Birth - City */}
@@ -766,9 +840,6 @@ const StarMapping = () => {
       <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        input[type="time"]::-webkit-calendar-picker-indicator {
-          filter: invert(35%) sepia(20%) saturate(500%) hue-rotate(340deg);
-        }
         input:focus, button:focus {
           outline: none;
           border-color: #8D6E63 !important;
