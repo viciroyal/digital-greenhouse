@@ -14,8 +14,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Cormorant Garamond"', 'serif'],
+        display: ['"Chewy"', 'cursive'],
+        bubble: ['"Chewy"', 'cursive'],
         body: ['"Space Grotesk"', 'sans-serif'],
+        mono: ['"Space Mono"', 'monospace'],
+        serif: ['"Cormorant Garamond"', 'serif'],
         lignified: ['"Eater"', 'cursive'],
       },
       colors: {
