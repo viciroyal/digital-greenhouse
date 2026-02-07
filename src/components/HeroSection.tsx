@@ -67,7 +67,10 @@ const HeroSection = () => {
             <p className="text-throne-gold/80 font-body text-sm tracking-[0.3em] uppercase mb-2">
               The Digital Greenhouse Presents
             </p>
-            <h1 className="font-display text-6xl md:text-8xl lg:text-9xl gradient-root-throne-text mb-4">
+            <h1 
+              className="lignified-text text-6xl md:text-8xl lg:text-9xl mb-4 relative"
+              data-text="PHARMBOI"
+            >
               PHARMBOI
             </h1>
             <p className="text-source-white/60 font-body text-lg md:text-xl max-w-xl mx-auto lg:mx-0">
