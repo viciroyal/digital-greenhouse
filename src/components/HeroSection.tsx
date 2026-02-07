@@ -2,6 +2,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import CassettePlayer from './CassettePlayer';
 import PharmerTooltip from './PharmerTooltip';
+import SiriusMonitor from './SiriusMonitor';
 import albumArt from '@/assets/pharmboi-artwork.png';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -267,6 +268,9 @@ const HeroSection = () => {
           background: 'radial-gradient(ellipse at 50% 50%, transparent 0%, hsl(250 50% 5% / 0.3) 100%)',
         }}
       />
+      
+      {/* Sirius Monitor - Live Farm Biometrics Widget */}
+      <SiriusMonitor />
       
       {/* Mosaic bead particles still active */}
       <MosaicBeadParticles scrollYProgress={scrollYProgress} isMobile={isMobile} />
