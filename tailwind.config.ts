@@ -15,7 +15,9 @@ export default {
     extend: {
       fontFamily: {
         display: ['"Cormorant Garamond"', 'serif'],
-        body: ['"Space Grotesk"', 'sans-serif'],
+        body: ['"Space Mono"', '"Space Grotesk"', 'monospace'],
+        pillar: ['"Staatliches"', 'sans-serif'],
+        carving: ['"Kelly Slab"', 'serif'],
         lignified: ['"Eater"', 'cursive'],
       },
       colors: {
