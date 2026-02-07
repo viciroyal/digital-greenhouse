@@ -146,6 +146,21 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
   pointer-events: none;
+  animation: grain-sweep 1.2s ease-out forwards;
+}
+
+@keyframes grain-sweep {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
 }
 
 /* Sirius Map - Astronomical data font */
