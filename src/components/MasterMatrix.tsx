@@ -115,7 +115,7 @@ const GridHeader = () => (
       The Fox Divination Grid
     </p>
     <h2 
-      className="text-4xl md:text-6xl mb-4 pillar-text"
+      className="text-4xl md:text-6xl mb-4 pillar-text pillar-text-delay-1"
       data-text="THE MASTER MATRIX"
     >
       THE MASTER MATRIX
