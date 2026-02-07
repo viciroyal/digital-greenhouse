@@ -53,27 +53,72 @@ const SIGN_ORDER = [
   'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
 ];
 
+/**
+ * Determines Sun sign from month (1-12) and day.
+ * Uses day-of-year ranges to avoid edge-case bugs with month boundary checks.
+ */
+const ZODIAC_RANGES: { sign: string; startMonth: number; startDay: number; endMonth: number; endDay: number }[] = [
+  { sign: 'Aries',       startMonth: 3,  startDay: 21, endMonth: 4,  endDay: 19 },
+  { sign: 'Taurus',      startMonth: 4,  startDay: 20, endMonth: 5,  endDay: 20 },
+  { sign: 'Gemini',      startMonth: 5,  startDay: 21, endMonth: 6,  endDay: 20 },
+  { sign: 'Cancer',      startMonth: 6,  startDay: 21, endMonth: 7,  endDay: 22 },
+  { sign: 'Leo',         startMonth: 7,  startDay: 23, endMonth: 8,  endDay: 22 },
+  { sign: 'Virgo',       startMonth: 8,  startDay: 23, endMonth: 9,  endDay: 22 },
+  { sign: 'Libra',       startMonth: 9,  startDay: 23, endMonth: 10, endDay: 22 },
+  { sign: 'Scorpio',     startMonth: 10, startDay: 23, endMonth: 11, endDay: 21 },
+  { sign: 'Sagittarius', startMonth: 11, startDay: 22, endMonth: 12, endDay: 21 },
+  { sign: 'Capricorn',   startMonth: 12, startDay: 22, endMonth: 1,  endDay: 19 },
+  { sign: 'Aquarius',    startMonth: 1,  startDay: 20, endMonth: 2,  endDay: 18 },
+  { sign: 'Pisces',      startMonth: 2,  startDay: 19, endMonth: 3,  endDay: 20 },
+];
+
 const getZodiacSign = (month: number, day: number) => {
-  for (const z of ZODIAC_SIGNS) {
-    if (z.start[0] === 12 && z.end[0] === 1) {
-      if ((month === 12 && day >= z.start[1]) || (month === 1 && day <= z.end[1])) return z;
-    } else if (
-      (month === z.start[0] && day >= z.start[1]) ||
-      (month === z.end[0] && day <= z.end[1])
-    ) return z;
+  for (const range of ZODIAC_RANGES) {
+    // Handle Capricorn which wraps around year boundary (Dec 22 – Jan 19)
+    if (range.startMonth > range.endMonth) {
+      if (
+        (month === range.startMonth && day >= range.startDay) ||
+        (month === range.endMonth && day <= range.endDay)
+      ) {
+        return ZODIAC_SIGNS.find(z => z.sign === range.sign) || ZODIAC_SIGNS[0];
+      }
+    } else {
+      // Check if month/day falls within the range
+      const afterStart = month > range.startMonth || (month === range.startMonth && day >= range.startDay);
+      const beforeEnd = month < range.endMonth || (month === range.endMonth && day <= range.endDay);
+      if (afterStart && beforeEnd) {
+        return ZODIAC_SIGNS.find(z => z.sign === range.sign) || ZODIAC_SIGNS[0];
+      }
+    }
   }
-  return ZODIAC_SIGNS[0];
+  return ZODIAC_SIGNS[0]; // fallback
 };
 
-const getMoonSign = (date: Date) => {
-  const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / 86400000);
-  const idx = Math.floor((dayOfYear * 12) / 365) % 12;
+/**
+ * Simplified Moon sign approximation.
+ * True moon sign requires precise ephemeris data, birth time, and geographic coordinates.
+ * This uses birth date + time to generate a plausible (but not astronomically accurate) result.
+ */
+const getMoonSign = (month: number, day: number, hour: number) => {
+  // The moon moves through all 12 signs roughly every 27.3 days (~2.3 days per sign).
+  // We use a seed-based offset from the Sun sign to approximate.
+  const dayOfYear = Math.floor(((month - 1) * 30.44) + day);
+  // Shift by ~13 signs per year (moon cycle), offset by birth hour
+  const moonOffset = Math.floor((dayOfYear * 13.37 + hour) / 27.3) % 12;
+  const idx = Math.abs(moonOffset) % 12;
   return ZODIAC_SIGNS.find(z => z.sign === SIGN_ORDER[idx]) || ZODIAC_SIGNS[0];
 };
 
-const getRisingSign = (hour: number) => {
-  const idx = Math.floor(hour / 2) % 12;
-  return ZODIAC_SIGNS.find(z => z.sign === SIGN_ORDER[idx]) || ZODIAC_SIGNS[0];
+/**
+ * Simplified Rising sign (Ascendant) approximation.
+ * True rising sign requires exact birth time, date, AND geographic coordinates (latitude/longitude).
+ * This uses birth hour + sun sign offset for a plausible approximation.
+ */
+const getRisingSign = (hour: number, sunSignIndex: number) => {
+  // Rising sign is roughly the sign on the eastern horizon at birth.
+  // It cycles through all 12 signs every 24 hours, offset by the sun's position.
+  const risingIdx = (sunSignIndex + Math.floor(hour / 2)) % 12;
+  return ZODIAC_SIGNS.find(z => z.sign === SIGN_ORDER[risingIdx]) || ZODIAC_SIGNS[0];
 };
 
 const getResonance = (elements: string[]) => {
@@ -170,10 +215,15 @@ const StarMapping = () => {
 
   const handleCalculate = () => {
     if (!isFormComplete || !birthDate) return;
+    // Extract local date components to avoid UTC timezone drift
+    const month = birthDate.getFullYear() ? birthDate.getMonth() + 1 : 1;
+    const day = birthDate.getDate();
     const [hours] = birthTime.split(':').map(Number);
-    const sunSign = getZodiacSign(birthDate.getMonth() + 1, birthDate.getDate());
-    const moonSign = getMoonSign(birthDate);
-    const risingSign = getRisingSign(hours);
+    
+    const sunSign = getZodiacSign(month, day);
+    const sunIdx = SIGN_ORDER.indexOf(sunSign.sign);
+    const moonSign = getMoonSign(month, day, hours);
+    const risingSign = getRisingSign(hours, sunIdx >= 0 ? sunIdx : 0);
     setUserChart({ sun: sunSign, moon: moonSign, rising: risingSign });
     setProgress(0);
     setStep('calculating');
@@ -574,13 +624,28 @@ const StarMapping = () => {
                   </motion.div>
                 </div>
 
+                {/* Accuracy Note */}
+                <motion.div
+                  className="text-center max-w-lg mx-auto mb-6 p-4 rounded-xl"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.55 }}
+                >
+                  <p className="text-xs" style={{ color: '#8D6E63' }}>
+                    <strong className="text-white/60">☽ Moon &amp; ↑ Rising signs</strong> are approximations.
+                    Precise calculations require exact birth time, date, and geographic coordinates (city latitude/longitude)
+                    cross-referenced against astronomical ephemeris tables. Your Sun sign is accurate based on your birth date.
+                  </p>
+                </motion.div>
+
                 {/* Description */}
                 <motion.p
                   className="text-center max-w-xl mx-auto mb-10"
                   style={{ color: '#A1887F' }}
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5 }}
+                  transition={{ delay: 0.6 }}
                 >
                   {resonance.description}
                 </motion.p>
