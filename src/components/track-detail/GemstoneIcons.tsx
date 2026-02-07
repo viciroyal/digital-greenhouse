@@ -1,67 +1,138 @@
 import { motion } from 'framer-motion';
 
 // Organic Gemstone Chakra Symbol - matching the MasterMatrix style
-export const GemstoneChakraIcon = ({ color, size = 48 }: { color: string; size?: number }) => (
-  <svg viewBox="0 0 40 40" width={size} height={size} className="drop-shadow-lg">
-    <defs>
-      <radialGradient id={`gem-icon-${color.replace(/\s/g, '')}`} cx="35%" cy="35%" r="60%">
-        <stop offset="0%" stopColor={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 75%)`} />
-        <stop offset="50%" stopColor={`hsl(${color})`} />
-        <stop offset="100%" stopColor={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 25%)`} />
-      </radialGradient>
-      <radialGradient id={`glow-icon-${color.replace(/\s/g, '')}`} cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stopColor={`hsl(${color} / 0.6)`} />
-        <stop offset="100%" stopColor="transparent" />
-      </radialGradient>
-    </defs>
-    
-    <circle cx="20" cy="20" r="18" fill={`url(#glow-icon-${color.replace(/\s/g, '')})`} />
-    
-    {/* Vine tendrils */}
-    <g stroke="hsl(140 50% 35%)" strokeWidth="1.5" fill="none" strokeLinecap="round">
-      <path d="M20 2 Q24 6, 20 10 Q16 14, 18 18" opacity="0.7" />
-      <path d="M38 20 Q34 24, 30 20 Q26 16, 22 18" opacity="0.7" />
-      <path d="M20 38 Q16 34, 20 30 Q24 26, 22 22" opacity="0.7" />
-      <path d="M2 20 Q6 16, 10 20 Q14 24, 18 22" opacity="0.7" />
-    </g>
-    
-    {/* Leaf accents */}
-    <g fill="hsl(140 50% 40%)">
-      <ellipse cx="22" cy="5" rx="2" ry="1.2" transform="rotate(45 22 5)" />
-      <ellipse cx="35" cy="22" rx="2" ry="1.2" transform="rotate(-45 35 22)" />
-      <ellipse cx="18" cy="35" rx="2" ry="1.2" transform="rotate(45 18 35)" />
-      <ellipse cx="5" cy="18" rx="2" ry="1.2" transform="rotate(-45 5 18)" />
-    </g>
-    
-    {/* Main gemstone */}
-    <polygon 
-      points="20,8 28,14 28,26 20,32 12,26 12,14" 
-      fill={`url(#gem-icon-${color.replace(/\s/g, '')})`}
-      stroke={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 65%)`}
-      strokeWidth="0.8"
-    />
-    
-    {/* Facet lines */}
-    <g stroke={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 80% / 0.4)`} strokeWidth="0.4" fill="none">
-      <line x1="20" y1="8" x2="20" y2="20" />
-      <line x1="28" y1="14" x2="20" y2="20" />
-      <line x1="28" y1="26" x2="20" y2="20" />
-      <line x1="20" y1="32" x2="20" y2="20" />
-      <line x1="12" y1="26" x2="20" y2="20" />
-      <line x1="12" y1="14" x2="20" y2="20" />
-    </g>
-    
-    {/* Highlight */}
-    <ellipse cx="16" cy="14" rx="2.5" ry="1.5" fill="white" opacity="0.35" transform="rotate(-30 16 14)" />
-    
-    {/* Mosaic bead accents */}
-    <circle cx="20" cy="4" r="1.5" fill={`hsl(${color})`} opacity="0.7" />
-    <circle cx="32" cy="12" r="1" fill="hsl(45 90% 60%)" opacity="0.5" />
-    <circle cx="32" cy="28" r="1" fill="hsl(220 75% 55%)" opacity="0.5" />
-    <circle cx="20" cy="36" r="1.5" fill={`hsl(${color})`} opacity="0.7" />
-    <circle cx="8" cy="28" r="1" fill="hsl(280 60% 55%)" opacity="0.5" />
-    <circle cx="8" cy="12" r="1" fill="hsl(350 75% 50%)" opacity="0.5" />
-  </svg>
+export const GemstoneChakraIcon = ({ color, size = 48, delay = 0 }: { color: string; size?: number; delay?: number }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0, rotate: -180 }}
+    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+    transition={{ 
+      duration: 0.6, 
+      delay,
+      type: "spring",
+      stiffness: 200,
+      damping: 15
+    }}
+  >
+    <motion.svg 
+      viewBox="0 0 40 40" 
+      width={size} 
+      height={size} 
+      className="drop-shadow-lg"
+      whileHover={{ scale: 1.1, rotate: 15 }}
+      transition={{ type: "spring", stiffness: 300 }}
+    >
+      <defs>
+        <radialGradient id={`gem-icon-${color.replace(/\s/g, '')}`} cx="35%" cy="35%" r="60%">
+          <stop offset="0%" stopColor={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 75%)`} />
+          <stop offset="50%" stopColor={`hsl(${color})`} />
+          <stop offset="100%" stopColor={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 25%)`} />
+        </radialGradient>
+        <radialGradient id={`glow-icon-${color.replace(/\s/g, '')}`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor={`hsl(${color} / 0.6)`} />
+          <stop offset="100%" stopColor="transparent" />
+        </radialGradient>
+      </defs>
+      
+      <motion.circle 
+        cx="20" 
+        cy="20" 
+        r="18" 
+        fill={`url(#glow-icon-${color.replace(/\s/g, '')})`}
+        initial={{ r: 0 }}
+        animate={{ r: 18 }}
+        transition={{ duration: 0.4, delay: delay + 0.2 }}
+      />
+      
+      {/* Vine tendrils */}
+      <motion.g 
+        stroke="hsl(140 50% 35%)" 
+        strokeWidth="1.5" 
+        fill="none" 
+        strokeLinecap="round"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.7 }}
+        transition={{ duration: 0.4, delay: delay + 0.4 }}
+      >
+        <path d="M20 2 Q24 6, 20 10 Q16 14, 18 18" />
+        <path d="M38 20 Q34 24, 30 20 Q26 16, 22 18" />
+        <path d="M20 38 Q16 34, 20 30 Q24 26, 22 22" />
+        <path d="M2 20 Q6 16, 10 20 Q14 24, 18 22" />
+      </motion.g>
+      
+      {/* Leaf accents */}
+      <motion.g 
+        fill="hsl(140 50% 40%)"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.3, delay: delay + 0.5 }}
+      >
+        <ellipse cx="22" cy="5" rx="2" ry="1.2" transform="rotate(45 22 5)" />
+        <ellipse cx="35" cy="22" rx="2" ry="1.2" transform="rotate(-45 35 22)" />
+        <ellipse cx="18" cy="35" rx="2" ry="1.2" transform="rotate(45 18 35)" />
+        <ellipse cx="5" cy="18" rx="2" ry="1.2" transform="rotate(-45 5 18)" />
+      </motion.g>
+      
+      {/* Main gemstone */}
+      <motion.polygon 
+        points="20,8 28,14 28,26 20,32 12,26 12,14" 
+        fill={`url(#gem-icon-${color.replace(/\s/g, '')})`}
+        stroke={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 65%)`}
+        strokeWidth="0.8"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ 
+          type: "spring", 
+          stiffness: 300, 
+          delay: delay + 0.3 
+        }}
+        style={{ transformOrigin: "center" }}
+      />
+      
+      {/* Facet lines */}
+      <motion.g 
+        stroke={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 80% / 0.4)`} 
+        strokeWidth="0.4" 
+        fill="none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: delay + 0.6 }}
+      >
+        <line x1="20" y1="8" x2="20" y2="20" />
+        <line x1="28" y1="14" x2="20" y2="20" />
+        <line x1="28" y1="26" x2="20" y2="20" />
+        <line x1="20" y1="32" x2="20" y2="20" />
+        <line x1="12" y1="26" x2="20" y2="20" />
+        <line x1="12" y1="14" x2="20" y2="20" />
+      </motion.g>
+      
+      {/* Highlight */}
+      <motion.ellipse 
+        cx="16" 
+        cy="14" 
+        rx="2.5" 
+        ry="1.5" 
+        fill="white" 
+        transform="rotate(-30 16 14)"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.35 }}
+        transition={{ duration: 0.3, delay: delay + 0.7 }}
+      />
+      
+      {/* Mosaic bead accents */}
+      <motion.g
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, delay: delay + 0.5, staggerChildren: 0.1 }}
+      >
+        <circle cx="20" cy="4" r="1.5" fill={`hsl(${color})`} opacity="0.7" />
+        <circle cx="32" cy="12" r="1" fill="hsl(45 90% 60%)" opacity="0.5" />
+        <circle cx="32" cy="28" r="1" fill="hsl(220 75% 55%)" opacity="0.5" />
+        <circle cx="20" cy="36" r="1.5" fill={`hsl(${color})`} opacity="0.7" />
+        <circle cx="8" cy="28" r="1" fill="hsl(280 60% 55%)" opacity="0.5" />
+        <circle cx="8" cy="12" r="1" fill="hsl(350 75% 50%)" opacity="0.5" />
+      </motion.g>
+    </motion.svg>
+  </motion.div>
 );
 
 // Woven Vine Zodiac Glyph - organic mosaic style
@@ -224,27 +295,54 @@ export const WovenZodiacGlyph = ({ glyph, color, size = 120 }: { glyph: string; 
 export const GemstoneBodySvg = ({ highlightArea, color }: { highlightArea: string; color: string }) => {
   const isArea = (area: string) => highlightArea === area;
 
-  const ChakraGem = ({ cx, cy, isActive, gemColor }: { cx: number; cy: number; isActive: boolean; gemColor: string }) => (
-    <g>
+  const ChakraGem = ({ cx, cy, isActive, gemColor, index }: { cx: number; cy: number; isActive: boolean; gemColor: string; index: number }) => (
+    <motion.g
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ 
+        duration: 0.4, 
+        delay: 0.3 + index * 0.1,
+        type: "spring",
+        stiffness: 200 
+      }}
+    >
       {/* Outer glow */}
-      <circle 
+      <motion.circle 
         cx={cx} 
         cy={cy} 
         r={isActive ? 10 : 6} 
-        fill={`hsl(${gemColor} / ${isActive ? 0.4 : 0.15})`} 
+        fill={`hsl(${gemColor} / ${isActive ? 0.4 : 0.15})`}
+        animate={isActive ? { 
+          r: [10, 12, 10],
+          opacity: [0.4, 0.6, 0.4] 
+        } : {}}
+        transition={{ duration: 2, repeat: Infinity }}
       />
       {/* Gemstone shape */}
-      <polygon
+      <motion.polygon
         points={`${cx},${cy-5} ${cx+4},${cy-2} ${cx+4},${cy+3} ${cx},${cy+6} ${cx-4},${cy+3} ${cx-4},${cy-2}`}
         fill={isActive ? `hsl(${gemColor})` : `hsl(${gemColor} / 0.4)`}
         stroke={`hsl(${gemColor} / 0.8)`}
         strokeWidth="0.5"
+        whileHover={{ scale: 1.2 }}
+        animate={isActive ? { scale: [1, 1.1, 1] } : {}}
+        transition={{ duration: 1.5, repeat: Infinity }}
+        style={{ transformOrigin: `${cx}px ${cy}px` }}
       />
       {/* Highlight */}
       {isActive && (
-        <ellipse cx={cx-1} cy={cy-2} rx="1.5" ry="1" fill="white" opacity="0.4" />
+        <motion.ellipse 
+          cx={cx-1} 
+          cy={cy-2} 
+          rx="1.5" 
+          ry="1" 
+          fill="white" 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.4 }}
+          transition={{ delay: 0.5 + index * 0.1 }}
+        />
       )}
-    </g>
+    </motion.g>
   );
 
   return (
@@ -279,13 +377,13 @@ export const GemstoneBodySvg = ({ highlightArea, color }: { highlightArea: strin
       />
 
       {/* Chakra gemstones */}
-      <ChakraGem cx={50} cy={8} isActive={isArea('crown')} gemColor="280 60% 60%" />
-      <ChakraGem cx={50} cy={18} isActive={isArea('eyes')} gemColor="250 60% 55%" />
-      <ChakraGem cx={50} cy={32} isActive={isArea('throat')} gemColor="220 75% 55%" />
-      <ChakraGem cx={50} cy={48} isActive={isArea('heart')} gemColor="140 60% 45%" />
-      <ChakraGem cx={50} cy={60} isActive={isArea('stomach')} gemColor="45 90% 55%" />
-      <ChakraGem cx={50} cy={75} isActive={isArea('sacral')} gemColor="25 85% 55%" />
-      <ChakraGem cx={50} cy={90} isActive={isArea('feet')} gemColor={color} />
+      <ChakraGem cx={50} cy={8} isActive={isArea('crown')} gemColor="280 60% 60%" index={0} />
+      <ChakraGem cx={50} cy={18} isActive={isArea('eyes')} gemColor="250 60% 55%" index={1} />
+      <ChakraGem cx={50} cy={32} isActive={isArea('throat')} gemColor="220 75% 55%" index={2} />
+      <ChakraGem cx={50} cy={48} isActive={isArea('heart')} gemColor="140 60% 45%" index={3} />
+      <ChakraGem cx={50} cy={60} isActive={isArea('stomach')} gemColor="45 90% 55%" index={4} />
+      <ChakraGem cx={50} cy={75} isActive={isArea('sacral')} gemColor="25 85% 55%" index={5} />
+      <ChakraGem cx={50} cy={90} isActive={isArea('feet')} gemColor={color} index={6} />
 
       {/* Active area enhancement - floating beads */}
       {highlightArea && (
@@ -327,58 +425,186 @@ export const GemstoneBodySvg = ({ highlightArea, color }: { highlightArea: strin
   );
 };
 
-// Crystal Gem Icon
-export const CrystalGemIcon = ({ color, size = 32 }: { color: string; size?: number }) => (
-  <svg viewBox="0 0 32 32" width={size} height={size}>
-    <defs>
-      <linearGradient id={`crystal-grad-${color.replace(/\s/g, '')}`} x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 70%)`} />
-        <stop offset="50%" stopColor={`hsl(${color})`} />
-        <stop offset="100%" stopColor={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 35%)`} />
-      </linearGradient>
-    </defs>
-    
-    {/* Glow */}
-    <circle cx="16" cy="16" r="14" fill={`hsl(${color} / 0.2)`} />
-    
-    {/* Crystal shape */}
-    <polygon 
-      points="16,2 24,10 24,22 16,30 8,22 8,10" 
-      fill={`url(#crystal-grad-${color.replace(/\s/g, '')})`}
-      stroke={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 60%)`}
-      strokeWidth="0.5"
-    />
-    
-    {/* Facets */}
-    <g stroke={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 80% / 0.5)`} strokeWidth="0.3" fill="none">
-      <line x1="16" y1="2" x2="16" y2="16" />
-      <line x1="24" y1="10" x2="16" y2="16" />
-      <line x1="24" y1="22" x2="16" y2="16" />
-      <line x1="16" y1="30" x2="16" y2="16" />
-      <line x1="8" y1="22" x2="16" y2="16" />
-      <line x1="8" y1="10" x2="16" y2="16" />
-    </g>
-    
-    {/* Highlight */}
-    <ellipse cx="12" cy="8" rx="2" ry="1.5" fill="white" opacity="0.4" transform="rotate(-30 12 8)" />
-  </svg>
+// Crystal Gem Icon with entrance animation
+export const CrystalGemIcon = ({ color, size = 32, delay = 0 }: { color: string; size?: number; delay?: number }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20, rotate: -45 }}
+    animate={{ opacity: 1, y: 0, rotate: 0 }}
+    transition={{ 
+      duration: 0.5, 
+      delay,
+      type: "spring",
+      stiffness: 150
+    }}
+  >
+    <motion.svg 
+      viewBox="0 0 32 32" 
+      width={size} 
+      height={size}
+      whileHover={{ scale: 1.15, rotate: 10 }}
+      transition={{ type: "spring", stiffness: 300 }}
+    >
+      <defs>
+        <linearGradient id={`crystal-grad-${color.replace(/\s/g, '')}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 70%)`} />
+          <stop offset="50%" stopColor={`hsl(${color})`} />
+          <stop offset="100%" stopColor={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 35%)`} />
+        </linearGradient>
+      </defs>
+      
+      {/* Glow */}
+      <motion.circle 
+        cx="16" 
+        cy="16" 
+        r="14" 
+        fill={`hsl(${color} / 0.2)`}
+        initial={{ r: 0, opacity: 0 }}
+        animate={{ r: 14, opacity: 1 }}
+        transition={{ duration: 0.4, delay: delay + 0.1 }}
+      />
+      
+      {/* Crystal shape */}
+      <motion.polygon 
+        points="16,2 24,10 24,22 16,30 8,22 8,10" 
+        fill={`url(#crystal-grad-${color.replace(/\s/g, '')})`}
+        stroke={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 60%)`}
+        strokeWidth="0.5"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ 
+          type: "spring", 
+          stiffness: 200, 
+          delay: delay + 0.2 
+        }}
+        style={{ transformOrigin: "center" }}
+      />
+      
+      {/* Facets */}
+      <motion.g 
+        stroke={`hsl(${color.split(' ')[0]} ${color.split(' ')[1]} 80% / 0.5)`} 
+        strokeWidth="0.3" 
+        fill="none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: delay + 0.4 }}
+      >
+        <line x1="16" y1="2" x2="16" y2="16" />
+        <line x1="24" y1="10" x2="16" y2="16" />
+        <line x1="24" y1="22" x2="16" y2="16" />
+        <line x1="16" y1="30" x2="16" y2="16" />
+        <line x1="8" y1="22" x2="16" y2="16" />
+        <line x1="8" y1="10" x2="16" y2="16" />
+      </motion.g>
+      
+      {/* Highlight */}
+      <motion.ellipse 
+        cx="12" 
+        cy="8" 
+        rx="2" 
+        ry="1.5" 
+        fill="white" 
+        transform="rotate(-30 12 8)"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.4 }}
+        transition={{ duration: 0.3, delay: delay + 0.5 }}
+      />
+    </motion.svg>
+  </motion.div>
 );
 
-// Mineral Earth Icon
-export const MineralEarthIcon = ({ color, size = 32 }: { color: string; size?: number }) => (
-  <svg viewBox="0 0 32 32" width={size} height={size}>
-    {/* Earth base */}
-    <circle cx="16" cy="16" r="12" fill="hsl(20 40% 20%)" stroke="hsl(20 40% 30%)" strokeWidth="1" />
-    
-    {/* Mineral veins */}
-    <path d="M8 16 Q12 12 16 16 Q20 20 24 16" stroke={`hsl(${color})`} strokeWidth="1.5" fill="none" opacity="0.8" />
-    <path d="M12 8 Q16 14 12 24" stroke={`hsl(${color} / 0.6)`} strokeWidth="1" fill="none" />
-    <path d="M20 8 Q16 14 20 24" stroke={`hsl(${color} / 0.6)`} strokeWidth="1" fill="none" />
-    
-    {/* Gem deposits */}
-    <circle cx="14" cy="12" r="2" fill={`hsl(${color})`} />
-    <circle cx="18" cy="20" r="2" fill={`hsl(${color})`} />
-    <circle cx="10" cy="18" r="1.5" fill="hsl(45 90% 55%)" opacity="0.8" />
-    <circle cx="22" cy="14" r="1.5" fill="hsl(220 75% 55%)" opacity="0.8" />
-  </svg>
+// Mineral Earth Icon with entrance animation
+export const MineralEarthIcon = ({ color, size = 32, delay = 0 }: { color: string; size?: number; delay?: number }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.5, rotate: 180 }}
+    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+    transition={{ 
+      duration: 0.6, 
+      delay,
+      type: "spring",
+      stiffness: 120
+    }}
+  >
+    <motion.svg 
+      viewBox="0 0 32 32" 
+      width={size} 
+      height={size}
+      whileHover={{ scale: 1.1 }}
+      transition={{ type: "spring", stiffness: 300 }}
+    >
+      {/* Earth base */}
+      <motion.circle 
+        cx="16" 
+        cy="16" 
+        r="12" 
+        fill="hsl(20 40% 20%)" 
+        stroke="hsl(20 40% 30%)" 
+        strokeWidth="1"
+        initial={{ r: 0 }}
+        animate={{ r: 12 }}
+        transition={{ duration: 0.4, delay: delay + 0.1 }}
+      />
+      
+      {/* Mineral veins */}
+      <motion.g
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 1 }}
+        transition={{ duration: 0.6, delay: delay + 0.3 }}
+      >
+        <motion.path 
+          d="M8 16 Q12 12 16 16 Q20 20 24 16" 
+          stroke={`hsl(${color})`} 
+          strokeWidth="1.5" 
+          fill="none" 
+          opacity="0.8"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 0.6, delay: delay + 0.3 }}
+        />
+        <motion.path 
+          d="M12 8 Q16 14 12 24" 
+          stroke={`hsl(${color} / 0.6)`} 
+          strokeWidth="1" 
+          fill="none"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 0.5, delay: delay + 0.4 }}
+        />
+        <motion.path 
+          d="M20 8 Q16 14 20 24" 
+          stroke={`hsl(${color} / 0.6)`} 
+          strokeWidth="1" 
+          fill="none"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 0.5, delay: delay + 0.5 }}
+        />
+      </motion.g>
+      
+      {/* Gem deposits */}
+      <motion.g
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.3, delay: delay + 0.6 }}
+      >
+        <motion.circle 
+          cx="14" 
+          cy="12" 
+          r="2" 
+          fill={`hsl(${color})`}
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+        />
+        <motion.circle 
+          cx="18" 
+          cy="20" 
+          r="2" 
+          fill={`hsl(${color})`}
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+        />
+        <circle cx="10" cy="18" r="1.5" fill="hsl(45 90% 55%)" opacity="0.8" />
+        <circle cx="22" cy="14" r="1.5" fill="hsl(220 75% 55%)" opacity="0.8" />
+      </motion.g>
+    </motion.svg>
+  </motion.div>
 );
