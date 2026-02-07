@@ -441,9 +441,8 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
               ◆ EARTH MEDICINE
             </p>
             <p 
-              className="text-sm"
+              className="text-sm sirius-text"
               style={{ 
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
                 color: `${DOGON_COLORS.paleStraw}e6`,
               }}
             >
@@ -460,9 +459,8 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
               ◆ THE RITUAL
             </p>
             <p 
-              className="text-sm leading-relaxed italic"
+              className="text-sm leading-relaxed italic sirius-text"
               style={{ 
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
                 color: `${DOGON_COLORS.paleStraw}cc`,
               }}
             >
