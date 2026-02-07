@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import type { TrackData } from '@/data/trackData';
+import { CrystalGemIcon } from './GemstoneIcons';
 
 interface CrystalQuadrantProps {
   track: TrackData;
@@ -45,15 +46,15 @@ const CrystalQuadrant = ({ track }: CrystalQuadrantProps) => {
 
   return (
     <motion.div
-      className="glass-card rounded-2xl p-6 h-full"
+      className="gem-card p-6 h-full"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.35 }}
     >
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-lg">💎</span>
-        <h3 className="font-display text-xl text-foreground">The Crystal</h3>
-        <span className="text-muted-foreground/60 font-mono text-xs ml-auto">AMPLIFIER</span>
+      <div className="flex items-center gap-3 mb-4">
+        <CrystalGemIcon color={track.colorHsl} size={28} />
+        <h3 className="font-bubble text-xl text-foreground">The Crystal</h3>
+        <span className="text-muted-foreground/60 font-body text-xs ml-auto tracking-wider">AMPLIFIER</span>
       </div>
 
       <div className="flex flex-col items-center">
@@ -95,11 +96,12 @@ const CrystalQuadrant = ({ track }: CrystalQuadrantProps) => {
 
           {/* Crystal Image */}
           <motion.div
-            className="relative w-28 h-28 md:w-32 md:h-32 overflow-hidden rounded-xl"
+            className="relative w-28 h-28 md:w-32 md:h-32 overflow-hidden rounded-2xl"
             style={{
               boxShadow: isHovered 
                 ? `0 0 25px hsl(${track.colorHsl} / 0.6), 0 8px 24px hsl(${track.colorHsl} / 0.3)`
                 : `0 6px 24px hsl(${track.colorHsl} / 0.2)`,
+              border: `2px solid hsl(${track.colorHsl} / 0.3)`,
             }}
             animate={{
               scale: isHovered ? 1.05 : 1,
@@ -136,7 +138,7 @@ const CrystalQuadrant = ({ track }: CrystalQuadrantProps) => {
 
         {/* Crystal Name */}
         <p 
-          className="font-mono text-lg font-bold tracking-wide text-center"
+          className="font-body text-lg font-bold tracking-wide text-center"
           style={{ color: `hsl(${track.colorHsl})` }}
         >
           {track.crystal}
