@@ -76,16 +76,21 @@ const CassettePlayer = () => {
               </div>
             </PharmerTooltip>
 
-            {/* Controls */}
+            {/* Controls - Apothecary: "ADMINISTER FREQUENCY" */}
             <div className="flex justify-center gap-4">
-              {['⏮', '▶', '⏭'].map((icon, i) => (
+              {[
+                { icon: '⏮', label: 'Previous Dose' },
+                { icon: '▶', label: 'Administer' },
+                { icon: '⏭', label: 'Next Dose' }
+              ].map((control, i) => (
                 <motion.button
                   key={i}
                   className="w-10 h-10 rounded-full root-card flex items-center justify-center text-cream/70 hover:text-gem-topaz transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
+                  aria-label={control.label}
                 >
-                  {icon}
+                  {control.icon}
                 </motion.button>
               ))}
             </div>

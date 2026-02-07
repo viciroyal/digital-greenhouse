@@ -8,11 +8,19 @@ interface MenuNode {
   href: string;
 }
 
+/**
+ * Apothecary Menu Nomenclature ("THE INDEX"):
+ * - "Menu" → "THE INDEX"
+ * - "Play Music" → "ADMINISTER FREQUENCY"
+ * - "Buy/Cart" → "SECURE DOSAGE"
+ * - "Contact" → "CONSULT THE GRIOT"
+ */
 const menuNodes: MenuNode[] = [
-  { id: 'garden', label: 'The Garden', href: '#matrix' },
-  { id: 'source', label: 'Source Bundle', href: '#shop' },
+  { id: 'garden', label: 'The Living Garden', href: '#matrix' },
+  { id: 'source', label: 'Secure Dosage', href: '#shop' },
   { id: 'mapping', label: 'Star Mapping', href: '/star-mapping' },
-  { id: 'top', label: 'Return to Top', href: '#' },
+  { id: 'griot', label: 'Consult the Griot', href: '#oracle' },
+  { id: 'top', label: 'Return to Crown', href: '#' },
 ];
 
 interface MycelialMenuProps {
