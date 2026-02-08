@@ -27,51 +27,61 @@ const iconMap: Record<string, React.ComponentType<{ color: string }>> = {
   'sun-disc': DjedPillarIcon,
 };
 
-// Orisha data for each level
+// Orisha data for each level - matching the Grand Temple specifications
 const orishaMap: Record<number, {
   name: string;
   title: string;
   orisha: 'ogun' | 'babalu-aye' | 'shango' | 'oshun';
   Icon: React.ComponentType<{ className?: string; animated?: boolean }>;
+  lore: string;
   science: string;
   task: string;
   texture: string;
+  category: string;
 }> = {
   1: {
     name: 'OGUN',
     title: 'Lord of Iron & Labor',
     orisha: 'ogun',
     Icon: OgunIcon,
-    science: 'No-Till & Cover Cropping',
-    task: 'Upload: Broadforking or Drill Radishes',
+    lore: 'Ogun clears the path. Do not break the fungal spine.',
+    science: 'No-Till Protocol (Broadforking) & The Bug Tax (Trap Crops)',
+    task: 'Upload photo of Broadforking or Drill Radishes',
     texture: 'Red Clay + Iron Chain',
+    category: 'BIOLOGY',
   },
   2: {
     name: 'BABALU AYE',
-    title: 'Lord of Earth & Compost',
+    title: 'Lord of Earth & Healing',
     orisha: 'babalu-aye',
     Icon: BabaluAyeIcon,
-    science: 'Paramagnetism (Rock Dust) & Soil Biology',
-    task: 'Upload: Rock Dust Application or Compost',
+    lore: 'Babalu heals the sores of the soil. The Stone is alive.',
+    science: 'Paramagnetism (Basalt Rock Dust) & Compost Screening',
+    task: 'Upload photo of Rock Dust application',
     texture: 'Porous Stone + Grain Skep',
+    category: 'GEOLOGY',
   },
   3: {
     name: 'SHANGO',
     title: 'Lord of Lightning & Fire',
     orisha: 'shango',
     Icon: ShangoIcon,
-    science: 'Electroculture, Sonic Bloom & Agnihotra',
-    task: 'Upload: Copper Antenna or Agnihotra Ritual',
+    lore: 'Shango strikes the copper. The signal is ancient.',
+    science: 'Electroculture • Sonic Bloom • Earth Acupuncture • Agnihotra',
+    task: 'Upload photo of Copper Antenna or Agnihotra Ritual',
     texture: 'Copper + Star Map',
+    category: 'PHYSICS',
   },
   4: {
     name: 'OSHUN',
     title: 'Lady of Sweet Waters',
     orisha: 'oshun',
     Icon: OshunIcon,
-    science: 'High Brix & JADAM Ferments',
-    task: 'Upload: Refractometer (12+ Brix) or Ferment',
+    lore: 'Oshun brings the honey. Kemit brings the gold.',
+    science: 'High Brix (Nutrient Density) & JADAM (Fermented Plant Juice)',
+    task: 'Upload Refractometer Reading (12+ Brix) or Ferment Bucket',
     texture: 'Gold Leaf + Brass Mirror',
+    category: 'CHEMISTRY',
   },
 };
 
@@ -492,7 +502,7 @@ const AncestralPath = () => {
                         onSelect={() => handleModuleSelect(module)}
                       />
                       
-                      {/* Science & Task info (shown when unlocked) */}
+                      {/* Lore, Science & Task info (shown when unlocked) */}
                       {module.isUnlocked && orishaData && (
                         <motion.div
                           className="mt-3 ml-20 md:ml-24 space-y-2"
@@ -500,12 +510,32 @@ const AncestralPath = () => {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.5 }}
                         >
+                          {/* Category Badge */}
+                          <p 
+                            className="text-[10px] font-mono tracking-widest"
+                            style={{ color: module.color, opacity: 0.8 }}
+                          >
+                            ◆ {orishaData.category}
+                          </p>
+                          {/* Lore */}
+                          <p 
+                            className="text-xs italic"
+                            style={{ 
+                              fontFamily: "'Staatliches', sans-serif",
+                              color: 'hsl(40 40% 70%)',
+                              letterSpacing: '0.02em',
+                            }}
+                          >
+                            "{orishaData.lore}"
+                          </p>
+                          {/* Science */}
                           <p 
                             className="text-xs font-mono"
                             style={{ color: 'hsl(195 60% 60%)' }}
                           >
                             ⚗ {orishaData.science}
                           </p>
+                          {/* Task */}
                           <p 
                             className="text-xs font-mono"
                             style={{ color: 'hsl(40 50% 50%)' }}
