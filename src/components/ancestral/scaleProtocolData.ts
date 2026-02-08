@@ -40,7 +40,7 @@ export const level0Protocol: ScaleProtocolConfig = {
     seed: [
       { step: 1, title: 'Build the Worm Hotel', tool: 'Plastic Bin + Newspaper', source: 'Kitchen scavenger', action: 'Drill holes in bin. Layer damp newspaper. Add Red Wiggler worms (1 lb per sq ft).' },
       { step: 2, title: 'Feed the guests', tool: 'Kitchen Scraps', source: 'Kitchen', action: 'Add fruit/veggie scraps. No citrus, onion, or meat. Bury food under bedding.' },
-      { step: 3, title: 'Harvest the castings', tool: 'Light + Patience', action: 'Shine light on bin. Worms dive down. Scoop castings from top. This is Amazonian Gold.' },
+      { step: 3, title: 'Harvest the castings', tool: 'Light + Patience', action: 'Shine light on bin. Worms dive down. Scoop castings from top. This is Xingu Gold.' },
       { step: 4, title: 'Top-dress your pots', tool: 'Your Hands', action: 'Sprinkle castings on soil surface. Water in. The CEC of your pot just tripled.' },
     ],
   },
