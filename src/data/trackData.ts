@@ -148,6 +148,7 @@ export const trackData: TrackData[] = [
     crystal: "Tiger's Eye",
     colorKey: 'chakra-solar',
     colorHsl: '45 90% 55%',
+    audioUrl: 'https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/4.%20Vici%20Royal%20-%20Destined%20Nation%20.wav',
     organs: ['Muscles', 'Pancreas'],
     bodyArea: 'stomach',
     moonPhase: 'First Quarter',
