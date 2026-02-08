@@ -8,23 +8,19 @@ interface PharmersPledgeModalProps {
   onClose: () => void;
 }
 
-// Chakra-aligned ancestral lineages
+// Chakra-aligned ancestral lineages - The Grand Pledge
 const pledgeLines = [
-  { text: "We do not just grow food. We grow frequency.", color: "hsl(0 0% 95%)" },
-  { text: "", color: "transparent" },
-  { text: "We Pharm because the soil holds the memory...", color: "hsl(0 0% 95%)" },
-  { text: "", color: "transparent" },
-  { text: "...of the MUSCOGEE who built the mounds to honor this clay.", color: "hsl(0 100% 50%)", chakra: "Root" },
-  { text: "", color: "transparent" },
-  { text: "...of the MAROONS who hid the seeds of freedom in the hills.", color: "hsl(16 100% 50%)", chakra: "Sacral" },
-  { text: "", color: "transparent" },
-  { text: "...of the DOGON who mapped the stars to the harvest.", color: "hsl(195 100% 50%)", chakra: "Throat" },
-  { text: "", color: "transparent" },
-  { text: "...of the ABORIGINAL Elders who sang the Dreamlines.", color: "hsl(275 100% 25%)", chakra: "Third Eye" },
-  { text: "", color: "transparent" },
-  { text: "...of the KEMETIC PRIESTS who mastered the alchemy of gold.", color: "hsl(51 100% 50%)", chakra: "Crown" },
-  { text: "", color: "transparent" },
-  { text: "To enter this school is to remember them.", color: "hsl(0 0% 95%)" },
+  { text: "We Pharm because the soil holds the memory...", color: "hsl(0 0% 95%)", glow: false },
+  { text: "", color: "transparent", glow: false },
+  { text: "(ROOT)", color: "hsl(0 70% 50%)", glow: true, subtext: "Of the MUSCOGEE & MAROONS (The Land)." },
+  { text: "", color: "transparent", glow: false },
+  { text: "(STRUCTURE)", color: "hsl(35 80% 50%)", glow: true, subtext: "Of the OLMEC (The Stone)." },
+  { text: "", color: "transparent", glow: false },
+  { text: "(SIGNAL)", color: "hsl(210 90% 55%)", glow: true, subtext: "Of the DOGON, ABORIGINAL, CHINESE, & VEDIC (The Energy)." },
+  { text: "", color: "transparent", glow: false },
+  { text: "(ALCHEMY)", color: "hsl(51 100% 50%)", glow: true, subtext: "Of the KEMETIC PRIESTS (The Gold)." },
+  { text: "", color: "transparent", glow: false },
+  { text: "To enter this school is to remember them.", color: "hsl(0 0% 95%)", glow: false },
 ];
 
 /**
@@ -191,11 +187,11 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* The Soil Chamber Background */}
+          {/* The Soil Chamber Background - Dark Soil #1a1a00 */}
           <div 
             className="absolute inset-0"
             style={{
-              background: 'hsl(0 0% 10%)',
+              background: '#1a1a00',
             }}
           />
           
@@ -353,22 +349,37 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
                 }}
               >
                 {pledgeLines.map((line, index) => (
-                  <p
-                    key={index}
-                    className="text-lg md:text-xl lg:text-2xl leading-relaxed mb-5"
-                    style={{
-                      fontFamily: "'Staatliches', sans-serif",
-                      letterSpacing: '0.05em',
-                      color: line.text ? line.color : 'transparent',
-                      textShadow: line.text && line.chakra 
-                        ? `0 0 20px ${line.color}, 0 0 40px ${line.color}` 
-                        : line.text 
-                          ? '0 0 10px hsl(0 0% 70% / 0.3)' 
-                          : 'none',
-                    }}
-                  >
-                    {line.text || '\u00A0'}
-                  </p>
+                  <div key={index} className="mb-5">
+                    <p
+                      className="text-lg md:text-xl lg:text-2xl leading-relaxed"
+                      style={{
+                        fontFamily: "'Staatliches', sans-serif",
+                        letterSpacing: '0.08em',
+                        color: line.text ? line.color : 'transparent',
+                        textShadow: line.text && line.glow 
+                          ? `0 0 20px ${line.color}, 0 0 40px ${line.color}, 0 0 60px ${line.color}` 
+                          : line.text 
+                            ? '0 0 10px hsl(0 0% 70% / 0.3)' 
+                            : 'none',
+                      }}
+                    >
+                      {line.text || '\u00A0'}
+                    </p>
+                    {line.subtext && (
+                      <p
+                        className="text-base md:text-lg lg:text-xl mt-1"
+                        style={{
+                          fontFamily: "'Space Mono', monospace",
+                          letterSpacing: '0.02em',
+                          color: line.color,
+                          opacity: 0.85,
+                          textShadow: `0 0 15px ${line.color}`,
+                        }}
+                      >
+                        {line.subtext}
+                      </p>
+                    )}
+                  </div>
                 ))}
               </motion.div>
             </div>
