@@ -1,8 +1,9 @@
+import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { OrishaBlessingCard, ProfileStats } from '@/components/profile';
+import { OrishaBlessingCard, ProfileStats, GreenCornCeremony } from '@/components/profile';
 import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 // Map module names to Orisha types
@@ -15,6 +16,8 @@ const moduleToOrisha: Record<string, 'ogun' | 'babalu-aye' | 'shango' | 'oshun'>
 
 const PharmerProfile = () => {
   const navigate = useNavigate();
+  const [refreshKey, setRefreshKey] = useState(0);
+  
   const {
     modules,
     user,
@@ -25,7 +28,22 @@ const PharmerProfile = () => {
     getOverallProgress,
     lessonProgress,
     fieldJournal,
+    refreshData,
   } = useAncestralProgress();
+
+  // Handle reset from Green Corn Ceremony
+  const handleSeasonReset = useCallback(() => {
+    // Trigger a refetch of all data
+    if (refreshData) {
+      refreshData();
+    }
+    // Force component re-render
+    setRefreshKey(prev => prev + 1);
+  }, [refreshData]);
+
+  // Check if user has Master Steward badge (completed all 4 levels)
+  const hasMasterStewardBadge = modules.length >= 4 && 
+    modules.filter(m => m.order_index <= 4).every(m => isModuleCompleted(m.id));
 
   // Calculate stats
   const completedModules = modules.filter(m => isModuleCompleted(m.id)).length;
@@ -226,6 +244,15 @@ const PharmerProfile = () => {
               — The Pharmer's Creed
             </p>
           </motion.div>
+
+          {/* Green Corn Ceremony - Only show for logged in users */}
+          {user && (
+            <GreenCornCeremony
+              userId={user.id}
+              hasMasterStewardBadge={hasMasterStewardBadge}
+              onReset={handleSeasonReset}
+            />
+          )}
         </div>
       </div>
     </div>
