@@ -10,25 +10,134 @@
  * - Sankofa Bird: "Go back and fetch it"
  */
 
-// Bogolan / Mud Cloth Pattern (Mali)
-// Traditional geometric symbols representing earth, water, and spirit
-export const BogolanPattern = `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='0.5'%3E%3Cpath d='M0 15h15v15H0zM30 15h15v15H30zM15 0h15v15H15zM15 30h15v15H15zM45 0h15v15H45zM45 30h15v15H45zM0 45h15v15H0zM30 45h15v15H30z'/%3E%3Cpath d='M7.5 22.5l7.5-7.5M37.5 22.5l7.5-7.5M22.5 7.5l7.5 7.5M22.5 37.5l7.5 7.5M52.5 7.5l7.5 7.5M52.5 37.5l7.5 7.5M7.5 52.5l7.5-7.5M37.5 52.5l7.5-7.5'/%3E%3Ccircle cx='7.5' cy='7.5' r='2'/%3E%3Ccircle cx='52.5' cy='52.5' r='2'/%3E%3Ccircle cx='22.5' cy='22.5' r='1.5'/%3E%3Ccircle cx='37.5' cy='37.5' r='1.5'/%3E%3C/g%3E%3C/svg%3E")`;
+/**
+ * CSS-ONLY ANCESTRAL PATTERNS
+ * Pure CSS gradients simulating cultural textures
+ */
 
-// Inca Stone Wall Pattern (Andean)
-// Represents the precise masonry of Sacsayhuamán and water channels
-export const IncaStonePattern = `url("data:image/svg+xml,%3Csvg width='80' height='60' viewBox='0 0 80 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='0.5'%3E%3Cpath d='M0 0h25v20H0zM30 0h20v20H30zM55 0h25v20H55z'/%3E%3Cpath d='M0 25h15v15H0zM20 25h25v15H20zM50 25h15v15H50zM70 25h10v15H70z'/%3E%3Cpath d='M0 45h30v15H0zM35 45h20v15H35zM60 45h20v15H60z'/%3E%3Cpath d='M12.5 10v5M40 10v5M67.5 10v5M7.5 32.5h5M32.5 32.5h5M57.5 32.5h5M15 52.5v5M45 52.5v5M70 52.5v5'/%3E%3C/g%3E%3C/svg%3E")`;
+// THE ROOT (Level 1): Bogolan / Mud Cloth Pattern (Mali)
+// Geometric triangles and lines - the woven earth of the Maroons and Mali
+export const BogolanPattern = `
+  repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 28px,
+    rgba(255, 255, 255, 0.08) 28px,
+    rgba(255, 255, 255, 0.08) 30px
+  ),
+  repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 28px,
+    rgba(255, 255, 255, 0.08) 28px,
+    rgba(255, 255, 255, 0.08) 30px
+  ),
+  repeating-linear-gradient(
+    45deg,
+    transparent 0px,
+    transparent 18px,
+    rgba(255, 255, 255, 0.05) 18px,
+    rgba(255, 255, 255, 0.05) 20px
+  ),
+  repeating-linear-gradient(
+    -45deg,
+    transparent 0px,
+    transparent 18px,
+    rgba(255, 255, 255, 0.05) 18px,
+    rgba(255, 255, 255, 0.05) 20px
+  ),
+  radial-gradient(circle at 15px 15px, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+  radial-gradient(circle at 45px 45px, rgba(255, 255, 255, 0.1) 2px, transparent 2px)
+`;
 
-// Star Chart / Constellation Pattern (Dogon)
-// Represents Sirius, the Nommo, and celestial mapping
-export const StarChartPattern = `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' stroke='%23ffffff' stroke-width='0.3'%3E%3Ccircle cx='10' cy='20' r='1.5'/%3E%3Ccircle cx='25' cy='15' r='1'/%3E%3Ccircle cx='40' cy='8' r='2'/%3E%3Ccircle cx='60' cy='25' r='1.5'/%3E%3Ccircle cx='80' cy='10' r='1'/%3E%3Ccircle cx='90' cy='30' r='1.5'/%3E%3Ccircle cx='15' cy='50' r='2'/%3E%3Ccircle cx='35' cy='45' r='1'/%3E%3Ccircle cx='50' cy='50' r='3'/%3E%3Ccircle cx='70' cy='55' r='1'/%3E%3Ccircle cx='85' cy='45' r='1.5'/%3E%3Ccircle cx='5' cy='75' r='1'/%3E%3Ccircle cx='25' cy='80' r='1.5'/%3E%3Ccircle cx='45' cy='70' r='1'/%3E%3Ccircle cx='65' cy='85' r='2'/%3E%3Ccircle cx='80' cy='75' r='1'/%3E%3Ccircle cx='95' cy='90' r='1.5'/%3E%3Cpath d='M10 20L25 15L40 8M40 8L60 25L80 10M15 50L35 45L50 50M50 50L70 55L85 45M25 80L45 70L65 85' fill='none' stroke-dasharray='2,3'/%3E%3C/g%3E%3C/svg%3E")`;
+// THE FLOW (Level 2): Inca Stone Wall Pattern (Andean)
+// Irregular block masonry - the structure of water and stone
+export const IncaStonePattern = `
+  repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 38px,
+    rgba(255, 255, 255, 0.06) 38px,
+    rgba(255, 255, 255, 0.06) 40px
+  ),
+  repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 58px,
+    rgba(255, 255, 255, 0.06) 58px,
+    rgba(255, 255, 255, 0.06) 60px,
+    transparent 60px,
+    transparent 98px,
+    rgba(255, 255, 255, 0.06) 98px,
+    rgba(255, 255, 255, 0.06) 100px
+  ),
+  repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 18px,
+    rgba(255, 255, 255, 0.04) 18px,
+    rgba(255, 255, 255, 0.04) 20px,
+    transparent 20px,
+    transparent 78px,
+    rgba(255, 255, 255, 0.04) 78px,
+    rgba(255, 255, 255, 0.04) 80px
+  ),
+  repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 28px,
+    rgba(255, 255, 255, 0.03) 28px,
+    rgba(255, 255, 255, 0.03) 30px
+  )
+`;
 
-// Flower of Life Pattern (Kemetic Sacred Geometry)
-// The seed of creation from the Temple of Osiris at Abydos
-export const FlowerOfLifePattern = `url("data:image/svg+xml,%3Csvg width='80' height='92' viewBox='0 0 80 92' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='0.4'%3E%3Ccircle cx='40' cy='46' r='15'/%3E%3Ccircle cx='25' cy='37' r='15'/%3E%3Ccircle cx='55' cy='37' r='15'/%3E%3Ccircle cx='25' cy='55' r='15'/%3E%3Ccircle cx='55' cy='55' r='15'/%3E%3Ccircle cx='40' cy='28' r='15'/%3E%3Ccircle cx='40' cy='64' r='15'/%3E%3Ccircle cx='10' cy='46' r='15'/%3E%3Ccircle cx='70' cy='46' r='15'/%3E%3Ccircle cx='17.5' cy='19' r='15'/%3E%3Ccircle cx='62.5' cy='19' r='15'/%3E%3Ccircle cx='17.5' cy='73' r='15'/%3E%3Ccircle cx='62.5' cy='73' r='15'/%3E%3C/g%3E%3C/svg%3E")`;
+// THE SIGNAL (Level 3): Star Chart / Constellation Pattern (Dogon)
+// Stars and connecting lines - the Dogon map of the sky
+export const StarChartPattern = `
+  radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.9) 1.5px, transparent 1.5px),
+  radial-gradient(circle at 25% 15%, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
+  radial-gradient(circle at 40% 8%, rgba(255, 255, 255, 1) 2px, transparent 2px),
+  radial-gradient(circle at 60% 25%, rgba(255, 255, 255, 0.8) 1.5px, transparent 1.5px),
+  radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+  radial-gradient(circle at 90% 30%, rgba(255, 255, 255, 0.7) 1.5px, transparent 1.5px),
+  radial-gradient(circle at 15% 50%, rgba(255, 255, 255, 1) 2px, transparent 2px),
+  radial-gradient(circle at 35% 45%, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+  radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 3px, transparent 3px),
+  radial-gradient(circle at 70% 55%, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
+  radial-gradient(circle at 85% 45%, rgba(255, 255, 255, 0.8) 1.5px, transparent 1.5px),
+  radial-gradient(circle at 5% 75%, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+  radial-gradient(circle at 25% 80%, rgba(255, 255, 255, 0.8) 1.5px, transparent 1.5px),
+  radial-gradient(circle at 45% 70%, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
+  radial-gradient(circle at 65% 85%, rgba(255, 255, 255, 1) 2px, transparent 2px),
+  radial-gradient(circle at 80% 75%, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+  radial-gradient(circle at 95% 90%, rgba(255, 255, 255, 0.8) 1.5px, transparent 1.5px),
+  linear-gradient(25deg, transparent 0%, transparent 49.5%, rgba(255, 255, 255, 0.15) 49.5%, rgba(255, 255, 255, 0.15) 50.5%, transparent 50.5%),
+  linear-gradient(-15deg, transparent 0%, transparent 49.5%, rgba(255, 255, 255, 0.1) 49.5%, rgba(255, 255, 255, 0.1) 50.5%, transparent 50.5%)
+`;
+
+// THE CROWN (Level 4): Flower of Life Pattern (Kemetic Sacred Geometry)
+// Overlapping circles - the seed of creation from the Temple of Osiris at Abydos
+export const FlowerOfLifePattern = `
+  radial-gradient(circle at 50% 50%, transparent 12px, rgba(255, 255, 255, 0.15) 12px, rgba(255, 255, 255, 0.15) 14px, transparent 14px),
+  radial-gradient(circle at 35% 41%, transparent 12px, rgba(255, 255, 255, 0.12) 12px, rgba(255, 255, 255, 0.12) 14px, transparent 14px),
+  radial-gradient(circle at 65% 41%, transparent 12px, rgba(255, 255, 255, 0.12) 12px, rgba(255, 255, 255, 0.12) 14px, transparent 14px),
+  radial-gradient(circle at 35% 59%, transparent 12px, rgba(255, 255, 255, 0.12) 12px, rgba(255, 255, 255, 0.12) 14px, transparent 14px),
+  radial-gradient(circle at 65% 59%, transparent 12px, rgba(255, 255, 255, 0.12) 12px, rgba(255, 255, 255, 0.12) 14px, transparent 14px),
+  radial-gradient(circle at 50% 32%, transparent 12px, rgba(255, 255, 255, 0.10) 12px, rgba(255, 255, 255, 0.10) 14px, transparent 14px),
+  radial-gradient(circle at 50% 68%, transparent 12px, rgba(255, 255, 255, 0.10) 12px, rgba(255, 255, 255, 0.10) 14px, transparent 14px),
+  radial-gradient(circle at 20% 50%, transparent 12px, rgba(255, 255, 255, 0.08) 12px, rgba(255, 255, 255, 0.08) 14px, transparent 14px),
+  radial-gradient(circle at 80% 50%, transparent 12px, rgba(255, 255, 255, 0.08) 12px, rgba(255, 255, 255, 0.08) 14px, transparent 14px),
+  radial-gradient(circle at 27% 23%, transparent 12px, rgba(255, 255, 255, 0.06) 12px, rgba(255, 255, 255, 0.06) 14px, transparent 14px),
+  radial-gradient(circle at 73% 23%, transparent 12px, rgba(255, 255, 255, 0.06) 12px, rgba(255, 255, 255, 0.06) 14px, transparent 14px),
+  radial-gradient(circle at 27% 77%, transparent 12px, rgba(255, 255, 255, 0.06) 12px, rgba(255, 255, 255, 0.06) 14px, transparent 14px),
+  radial-gradient(circle at 73% 77%, transparent 12px, rgba(255, 255, 255, 0.06) 12px, rgba(255, 255, 255, 0.06) 14px, transparent 14px)
+`;
 
 // Speaker Mesh / Perforated Metal Pattern
 // The Sound System aesthetic - reggae culture meets ancestral tech
-export const SpeakerMeshPattern = `url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='8' cy='8' r='2' fill='%23ffffff'/%3E%3C/svg%3E")`;
+export const SpeakerMeshPattern = `
+  radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.15) 2px, transparent 2px)
+`;
 
 // Sankofa Bird SVG Component
 // "Se wo were fi na wosankofa a yenkyi" - Go back and fetch it
