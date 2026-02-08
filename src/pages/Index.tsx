@@ -99,13 +99,20 @@ const Index = () => {
         <HeroSection onLogoClick={handleLogoClick} />
         <section className="py-16 px-4 md:px-8 max-w-7xl mx-auto">
           {/* Vibrational Audio Player Test */}
-          <div className="mb-12">
+          <div className="space-y-8 mb-12">
             <VibrationalAudioPlayer 
               src="https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/1.%20Vici%20Royal%20-%20Pulling%20Weeds%20.wav"
               title="Pulling Weeds"
               artist="Vici Royàl"
               frequency="396Hz"
               colorHsl="0 70% 50%"
+            />
+            <VibrationalAudioPlayer 
+              src="https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/2.%20Vici%20Royal%20-%20Drugs%20(ft.%20Sistah%20Moon%20&%20Yamau).wav"
+              title="Drugs"
+              artist="Vici Royàl"
+              frequency="417Hz"
+              colorHsl="25 80% 55%"
             />
           </div>
           <AutomajicSoundSystem />
