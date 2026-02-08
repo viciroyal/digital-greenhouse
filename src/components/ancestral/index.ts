@@ -40,3 +40,5 @@ export { default as ScaleToggle, type AccessScale } from './ScaleToggle';
 export { default as ScaledProtocolSteps } from './ScaledProtocolSteps';
 export { default as ScavengerBadge } from './ScavengerBadge';
 export * from './scaleProtocolData';
+export { default as ViewModeToggle, type ViewMode } from './ViewModeToggle';
+export { default as GrimoireView } from './GrimoireView';

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, LogIn, LogOut, User, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,7 +18,10 @@ import {
   SovereignIcon,
   GoldenTicketCelebration,
   EmergencySOSButton,
+  ViewModeToggle,
+  GrimoireView,
 } from '@/components/ancestral';
+import { ViewMode } from '@/components/ancestral/ViewModeToggle';
 import { OgunIcon, BabaluAyeIcon, ShangoIcon, OshunIcon, OrishaBadge } from '@/components/ancestral/OrishaIcons';
 import { useAncestralProgress, Module } from '@/hooks/useAncestralProgress';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -133,6 +136,9 @@ const AncestralPath = () => {
 
   // Track currently open level for Sky Watcher Header
   const [currentOpenLevel, setCurrentOpenLevel] = useState<number | null>(null);
+
+  // View Mode: 'path' (gamified) or 'book' (textbook/grimoire)
+  const [viewMode, setViewMode] = useState<ViewMode>('path');
 
   // Golden Ticket Celebration state (for completing Level 4 / all levels)
   const [showGoldenTicket, setShowGoldenTicket] = useState(false);
@@ -512,7 +518,7 @@ const AncestralPath = () => {
         
         {/* Header */}
         <motion.div
-          className="text-center mb-16 px-4"
+          className="text-center mb-8 px-4"
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -521,22 +527,27 @@ const AncestralPath = () => {
             className="text-3xl md:text-5xl lg:text-6xl mb-4 tracking-[0.1em]"
             style={{
               fontFamily: "'Staatliches', sans-serif",
-              color: 'hsl(51 100% 50%)',
-              textShadow: `
-                2px 2px 0 hsl(20 50% 10%),
-                0 0 40px hsl(51 80% 40% / 0.4)
-              `,
+              color: viewMode === 'book' ? 'hsl(280 60% 70%)' : 'hsl(51 100% 50%)',
+              textShadow: viewMode === 'book'
+                ? '0 0 40px hsl(280 60% 50% / 0.4)'
+                : `2px 2px 0 hsl(20 50% 10%), 0 0 40px hsl(51 80% 40% / 0.4)`,
             }}
           >
-            THE ANCESTRAL PATH
+            {viewMode === 'book' ? 'THE GRIMOIRE' : 'THE ANCESTRAL PATH'}
           </h1>
           <p 
-            className="text-lg md:text-xl font-mono"
+            className="text-lg md:text-xl font-mono mb-6"
             style={{ color: 'hsl(40 50% 65%)' }}
           >
-            Ascend from Root to Crown
+            {viewMode === 'book' ? 'The Complete Pharmacological Manuscript' : 'Ascend from Root to Crown'}
           </p>
-          {user && (
+          
+          {/* View Mode Toggle */}
+          <div className="flex justify-center mb-4">
+            <ViewModeToggle value={viewMode} onChange={setViewMode} />
+          </div>
+
+          {user && viewMode === 'path' && (
             <motion.p
               className="mt-2 text-sm font-mono"
               style={{ color: 'hsl(140 50% 50%)' }}
@@ -548,6 +559,27 @@ const AncestralPath = () => {
             </motion.p>
           )}
         </motion.div>
+
+        {/* Conditional Content: Path View or Grimoire View */}
+        <AnimatePresence mode="wait">
+          {viewMode === 'book' ? (
+            <motion.div
+              key="grimoire"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <GrimoireView />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="path"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
 
         {/* Skill Tree Container */}
         <div className="max-w-3xl mx-auto px-6 md:px-12">
@@ -722,6 +754,9 @@ const AncestralPath = () => {
             </p>
           </motion.div>
         </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Lesson Drawer */}
