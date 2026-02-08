@@ -125,8 +125,8 @@ const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
           <div 
             className="fixed inset-0 pointer-events-none"
             style={{
-              backgroundImage: theme.pattern,
-              backgroundRepeat: 'repeat',
+              background: theme.pattern,
+              backgroundSize: theme.id === 'signal' ? '100px 100px' : theme.id === 'crown' ? '80px 92px' : '60px 60px',
               opacity: theme.patternOpacity,
               mixBlendMode: 'overlay',
             }}
