@@ -278,6 +278,7 @@ export const trackData: TrackData[] = [
     crystal: 'Turquoise',
     colorKey: 'chakra-throat',
     colorHsl: '210 70% 55%',
+    audioUrl: 'https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/8.%20Vici%20Royal%20-%20No%20Nouns%20(Official%20Acoustic)%20.wav',
     organs: ['Neck', 'Vertebrae', 'Vocal Cords'],
     bodyArea: 'throat',
     moonPhase: 'Full Moon',
