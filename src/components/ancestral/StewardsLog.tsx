@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   PenTool, 
@@ -31,8 +31,11 @@ interface LogEntry {
   photo_url?: string;
 }
 
-// Mock data for demonstration
-const mockEntries: LogEntry[] = [
+// Storage keys for persistence
+const STORAGE_KEY_ENTRIES = 'pharmer-stewards-log-entries';
+
+// Default entries for first-time users
+const defaultEntries: LogEntry[] = [
   {
     id: '1',
     created_at: '2026-02-08T10:00:00Z',
@@ -70,6 +73,28 @@ const mockEntries: LogEntry[] = [
     reflection: 'The kale leaf had an unexpectedly sweet finish. Refractometer confirmed 14 Brix — above the pest resistance threshold.',
   },
 ];
+
+// Load entries from localStorage
+const loadEntries = (): LogEntry[] => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY_ENTRIES);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (error) {
+    console.error('Failed to load entries:', error);
+  }
+  return defaultEntries;
+};
+
+// Save entries to localStorage
+const saveEntries = (entries: LogEntry[]) => {
+  try {
+    localStorage.setItem(STORAGE_KEY_ENTRIES, JSON.stringify(entries));
+  } catch (error) {
+    console.error('Failed to save entries:', error);
+  }
+};
 
 // Zone metadata
 const zoneMap: Record<ZoneKey, { label: string; sublabel: string; icon: typeof Mountain; color: string; scienceLabel: string; scienceUnit: string }> = {
@@ -119,8 +144,13 @@ interface StewardsLogProps {
  * Context-aware journaling with zone-specific prompts.
  */
 const StewardsLog = ({ userId, userName = 'Steward' }: StewardsLogProps) => {
-  const [entries, setEntries] = useState<LogEntry[]>(mockEntries);
+  const [entries, setEntries] = useState<LogEntry[]>(() => loadEntries());
   const [isNewEntryOpen, setIsNewEntryOpen] = useState(false);
+
+  // Persist entries to localStorage whenever they change
+  useEffect(() => {
+    saveEntries(entries);
+  }, [entries]);
   const [filterZone, setFilterZone] = useState<ZoneKey | null>(null);
 
   // Calculate zone counts for Sovereignty Map

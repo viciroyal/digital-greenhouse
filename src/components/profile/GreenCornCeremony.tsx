@@ -91,6 +91,20 @@ const GreenCornCeremony = ({ userId, hasMasterStewardBadge, onReset }: GreenCorn
     setIsProcessing(true);
 
     try {
+      // 0. Clear localStorage data (Steward's Log entries, checklist states)
+      const localStorageKeysToClear = [
+        'pharmer-stewards-log-entries',
+        'pharmer-body-check-completed',
+        'pharmer-protocol-checklists',
+      ];
+      localStorageKeysToClear.forEach(key => {
+        try {
+          localStorage.removeItem(key);
+        } catch (e) {
+          console.log('Could not clear localStorage key:', key);
+        }
+      });
+
       // 1. Archive field journal entries (update status to 'archived')
       const { error: archiveError } = await supabase
         .from('field_journal')

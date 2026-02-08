@@ -279,15 +279,15 @@ const StewardsUtilityBelt = () => {
 
   return (
     <>
-      {/* Fixed bottom utility bar */}
+      {/* Fixed bottom utility bar - Scrollable on mobile */}
       <motion.div
-        className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-4 pointer-events-none"
+        className="fixed bottom-0 left-0 right-0 z-40 px-2 sm:px-4 pb-2 sm:pb-4 pointer-events-none"
         initial={{ y: 100 }}
         animate={{ y: 0 }}
         transition={{ delay: 1, type: 'spring', stiffness: 200 }}
       >
         <div 
-          className="max-w-lg mx-auto pointer-events-auto rounded-2xl overflow-hidden"
+          className="max-w-lg mx-auto pointer-events-auto rounded-2xl overflow-x-auto"
           style={{
             // Wood & Leather texture styling
             background: `
@@ -303,6 +303,9 @@ const StewardsUtilityBelt = () => {
               inset 0 1px 0 hsl(40 40% 35% / 0.3),
               inset 0 -1px 0 hsl(20 50% 8% / 0.5)
             `,
+            // Hide scrollbar but allow scrolling
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
           }}
         >
           {/* Leather stitching effect - top */}
@@ -314,8 +317,8 @@ const StewardsUtilityBelt = () => {
             }}
           />
           
-          {/* Tool buttons */}
-          <div className="flex items-center justify-around py-3 px-4">
+          {/* Tool buttons - nowrap ensures horizontal scroll on mobile */}
+          <div className="flex items-center justify-around py-2 sm:py-3 px-2 sm:px-4 min-w-max sm:min-w-0">
             {utilityTools.map((tool, index) => (
               <Tooltip key={tool.id}>
                 <TooltipTrigger asChild>

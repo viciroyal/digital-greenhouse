@@ -1,6 +1,31 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Footprints, Droplets, Wind, Utensils, Sparkles } from 'lucide-react';
+
+// Storage key for body check persistence
+const STORAGE_KEY = 'pharmer-body-check-completed';
+
+// Load completed body checks from localStorage
+const loadCompletedChecks = (): Record<number, boolean> => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (error) {
+    console.error('Failed to load body checks:', error);
+  }
+  return {};
+};
+
+// Save completed body checks to localStorage
+const saveCompletedChecks = (checks: Record<number, boolean>) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(checks));
+  } catch (error) {
+    console.error('Failed to save body checks:', error);
+  }
+};
 
 interface BodyCheckInProps {
   level: number;
@@ -157,6 +182,15 @@ const BreathingVisual = ({ color }: { color: string }) => (
  */
 const BodyCheckIn = ({ level, color, onTuned, isTuned }: BodyCheckInProps) => {
   const checkData = bodyCheckData[level];
+  
+  // Persist tuned state to localStorage
+  useEffect(() => {
+    if (isTuned) {
+      const currentChecks = loadCompletedChecks();
+      currentChecks[level] = true;
+      saveCompletedChecks(currentChecks);
+    }
+  }, [isTuned, level]);
   
   if (!checkData) return null;
   
