@@ -75,9 +75,9 @@ export const chapterData: ChapterContent[] = [
     subtitle: 'Structure & Foundation',
     color: 'hsl(0 70% 45%)',
     wisdom: {
-      title: 'The Muscogee Mounds',
-      culture: 'Muscogee & Maroons — Stewardship & Survival',
-      narrative: 'The Muscogee built mounds not to dominate the earth, but to work with it. These structures followed the natural contours of the land, creating microclimates and water management systems that sustained communities for millennia. The first lesson: the soil has memory. Every action you take echoes through generations.',
+      title: 'The 12-Tribe Root',
+      culture: 'Muscogee, Maroon & Xingu',
+      narrative: 'Grounded in Muscogee Mounds, Maroon Resistance, and Xingu Dark Earth. We build the soil eternal. The Muscogee built mounds not to dominate the earth, but to work with it. These structures followed the natural contours of the land, creating microclimates and water management systems that sustained communities for millennia.',
     },
     science: {
       principle: 'Soil Physics & Aeration',
@@ -106,9 +106,9 @@ export const chapterData: ChapterContent[] = [
     subtitle: 'Hydration & Mineralization',
     color: 'hsl(30 50% 40%)',
     wisdom: {
-      title: 'Olmec Hydraulics',
-      culture: 'Olmec (Xi) — The Mother Culture',
-      narrative: 'The Olmec understood that water carries memory and minerals. Their sophisticated hydraulic systems moved water through volcanic stone channels, picking up paramagnetism along the way. The colossal heads they carved were not monuments of ego — they were markers of sacred water sources.',
+      title: 'The 12-Tribe Sacral',
+      culture: 'Olmec, Toltec & Inca',
+      narrative: 'Structured by Olmec Magnetism, Toltec Vision, and Inca Hydrology. We shape the stone and water. The Olmec understood that water carries memory and minerals. Their sophisticated hydraulic systems moved water through volcanic stone channels, picking up paramagnetism along the way.',
     },
     science: {
       principle: 'Paramagnetism & Trace Minerals',
@@ -137,9 +137,9 @@ export const chapterData: ChapterContent[] = [
     subtitle: 'Atmosphere & Signal',
     color: 'hsl(15 100% 50%)',
     wisdom: {
-      title: 'Dogon Cosmology & The Antenna',
-      culture: 'Dogon, Aboriginal, Chinese & Vedic',
-      narrative: 'The Dogon knew about the Sirius binary star system thousands of years before Western telescopes. They understood that the Earth receives signals from the cosmos — and that copper spirals act as antennas. This is not mysticism. This is physics dressed in ceremony.',
+      title: 'The 12-Tribe Signal',
+      culture: 'Dogon, Maya & Aboriginal',
+      narrative: 'Aligned by Dogon Stars, Maya Time, and Aboriginal Song. We tune the farm to the frequency of the sky. The Dogon knew about the Sirius binary star system thousands of years before Western telescopes. They understood that the Earth receives signals from the cosmos — and that copper spirals act as antennas.',
     },
     science: {
       principle: 'Electroculture & Atmospheric Nitrogen',
@@ -168,9 +168,9 @@ export const chapterData: ChapterContent[] = [
     subtitle: 'Nutrition & Transformation',
     color: 'hsl(51 100% 50%)',
     wisdom: {
-      title: 'Kemetic Chemistry & Joseon Fermentation',
-      culture: 'Ancient Kemit & Joseon (The Morning Calm)',
-      narrative: 'The word "Chemistry" comes from "Kemit" — the Black Land of the Nile. The Kemites understood that transformation happens through fermentation and fire. We honor the Joseon lineage for teaching us to culture the Indigenous Microorganisms (IMO) of the soil, just as we honor Kemit for teaching us the Gold Standard of nutrient density. The turning of indigo from green to blue is the same redox chemistry that turns base metals into gold. As above, so below.',
+      title: 'The 12-Tribe Crown',
+      culture: 'Kemit, Joseon & Vedic',
+      narrative: 'Refined by Kemetic Gold, Joseon Fermentation, and Vedic Fire. We transmute the harvest into medicine. The word "Chemistry" comes from "Kemit" — the Black Land of the Nile. We honor the Joseon lineage for teaching us to culture the Indigenous Microorganisms (IMO) of the soil.',
     },
     science: {
       principle: 'Redox Potential & Brix',
