@@ -20,6 +20,9 @@ import SignalCircuitBoard from './SignalCircuitBoard';
 import AvatarProtocol from './AvatarProtocol';
 import FiberProtocolCanvas from './FiberProtocolCanvas';
 import FiberProtocolRobe from './FiberProtocolRobe';
+import BambooStructuralProtocol from './BambooStructuralProtocol';
+import BastFiberProtocol from './BastFiberProtocol';
+import RedoxIndigoProtocol from './RedoxIndigoProtocol';
 import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 interface LessonDrawerProps {
@@ -436,7 +439,12 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
                                   <BrixDiagnostics color={module.color} />
                                 )}
 
-                                {/* Level 3: Signal Circuit Board (4-Step) */}
+                                {/* Level 1: Bamboo Structural Protocol (Shelter) */}
+                                {module.level === 1 && (
+                                  <BambooStructuralProtocol color={module.color} />
+                                )}
+
+                                {/* Level 3: Signal Circuit Board (4-Step) + Bast Fiber Physics */}
                                 {module.level === 3 && (
                                   <>
                                     <SignalCircuitBoard 
@@ -445,14 +453,14 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
                                         console.log(`Circuit switch ${switchId} completed`);
                                       }}
                                     />
-                                    {/* Fiber Protocol: The Canvas (Hemp) */}
-                                    <FiberProtocolCanvas color={module.color} />
+                                    {/* Bast Fiber Physics Protocol (Hemp) - Science First */}
+                                    <BastFiberProtocol color={module.color} />
                                   </>
                                 )}
 
-                                {/* Level 4: Fiber Protocol - The Robe (Cotton & Indigo) */}
+                                {/* Level 4: Redox Chemistry Protocol (Indigo) - Science First */}
                                 {module.level === 4 && (
-                                  <FiberProtocolRobe color={module.color} />
+                                  <RedoxIndigoProtocol color={module.color} />
                                 )}
                               </motion.div>
                             )}
