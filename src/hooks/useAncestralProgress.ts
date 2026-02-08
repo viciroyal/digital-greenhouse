@@ -129,13 +129,17 @@ export function useAncestralProgress() {
 
   // Check if module is unlocked
   const isModuleUnlocked = useCallback((moduleId: string): boolean => {
-    // First module is always unlocked for viewing (even if not logged in)
+    // DEMO MODE: All modules unlocked for testing when not logged in
+    // This allows previewing all content without requiring authentication
+    if (!user) return true;
+    
+    // First module is always unlocked for viewing
     const module = modules.find(m => m.id === moduleId);
     if (module?.order_index === 1) return true;
     
     // Check if user has progress for this module
     return moduleProgress.some(p => p.module_id === moduleId);
-  }, [modules, moduleProgress]);
+  }, [modules, moduleProgress, user]);
 
   // Check if module is completed
   const isModuleCompleted = useCallback((moduleId: string): boolean => {
