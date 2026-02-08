@@ -12,6 +12,9 @@ import EthericAntennaModule from './EthericAntennaModule';
 import EarthAcupunctureModule from './EarthAcupunctureModule';
 import VedicFireModule from './VedicFireModule';
 import FrequencyVisualizer from './FrequencyVisualizer';
+import MasterRecipeCard from './MasterRecipeCard';
+import SeasonalPriorityTag, { getSeasonalPhase } from './SeasonalPriorityTag';
+import BrixDiagnostics from './BrixDiagnostics';
 import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 interface LessonDrawerProps {
@@ -118,6 +121,16 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
 
   // Get protocol steps for this level
   const protocolSteps = levelProtocols[module.level] || [];
+
+  // Check for seasonal priority
+  const seasonalData = getSeasonalPhase();
+  const hasSeasonalPriority = seasonalData.levels.includes(module.level);
+
+  // Check if this level needs Recipe Card (Level 2)
+  const needsRecipeCard = module.level === 2;
+
+  // Check if this level needs Brix Diagnostics (Level 4)
+  const needsBrixDiagnostics = module.level === 4;
 
   const handleFileUpload = async (file: File) => {
     if (!currentLesson || !honorCodeChecked) return;
@@ -362,6 +375,14 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
                         />
                       ) : (
                         <>
+                          {/* Seasonal Priority Tag */}
+                          {hasSeasonalPriority && seasonalData.phase && (
+                            <SeasonalPriorityTag 
+                              phase={seasonalData.phase}
+                              color={module.color}
+                            />
+                          )}
+
                           {/* 9:16 Video Placeholder */}
                           <VideoPlaceholder 
                             color={module.color}
@@ -374,6 +395,16 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
                               color={module.color}
                               steps={protocolSteps}
                             />
+                          )}
+
+                          {/* Master Recipe Card - Level 2 Only */}
+                          {needsRecipeCard && (
+                            <MasterRecipeCard color={module.color} />
+                          )}
+
+                          {/* Brix Diagnostics - Level 4 Only */}
+                          {needsBrixDiagnostics && (
+                            <BrixDiagnostics color={module.color} />
                           )}
 
                           {/* Mission reminder */}

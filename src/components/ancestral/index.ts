@@ -17,6 +17,9 @@ export { default as ProtocolSteps } from './ProtocolSteps';
 export { default as SkyWatcherHeader } from './SkyWatcherHeader';
 export { default as SovereignIcon } from './SovereignIcon';
 export { default as FrequencyVisualizer } from './FrequencyVisualizer';
+export { default as MasterRecipeCard } from './MasterRecipeCard';
+export { default as SeasonalPriorityTag, getSeasonalPhase } from './SeasonalPriorityTag';
+export { default as BrixDiagnostics } from './BrixDiagnostics';
 export { 
   SpiralMoundIcon, 
   KanagaMaskIcon, 
