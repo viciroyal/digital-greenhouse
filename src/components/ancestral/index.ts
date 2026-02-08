@@ -49,3 +49,4 @@ export { default as SovereigntyMap } from './SovereigntyMap';
 export { default as JuniorGuardians } from './JuniorGuardians';
 export { default as GuardianCharacters, guardianCharacters, getGuardianByZone } from './GuardianCharacters';
 export { default as MissionCard } from './MissionCard';
+export { default as StewardsUtilityBelt } from './StewardsUtilityBelt';
