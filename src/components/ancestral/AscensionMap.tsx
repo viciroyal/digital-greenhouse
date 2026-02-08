@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, Pickaxe, Mountain, Zap, Sun, Droplets, KeyRound } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import InitiationModal from './InitiationModal';
 import AscensionLessonDrawer from './AscensionLessonDrawer';
 import ChainBreakingCelebration from './ChainBreakingCelebration';
@@ -409,6 +410,8 @@ const CentralCord = () => {
  */
 
 const AscensionMap = () => {
+  const { toast } = useToast();
+  
   // State: Current level tracks user progress (from database)
   const [currentLevel, setCurrentLevel] = useState(1);
   const [user, setUser] = useState<{ id: string } | null>(null);
@@ -494,11 +497,19 @@ const AscensionMap = () => {
         if (moduleProgress && moduleProgress.length > 0) {
           const newLevel = (moduleProgress[0].modules as { order_index: number }).order_index;
           
-          // If level increased, trigger celebration!
+          // If level increased, trigger celebration and toast!
           if (newLevel > prevLevel) {
             const unlockedLevelData = levelData.find(l => l.level === newLevel);
             setCelebrationLevel(newLevel);
             setShowCelebration(true);
+            
+            // Show toast notification
+            toast({
+              title: "🔓 Level Unlocked!",
+              description: unlockedLevelData 
+                ? `${unlockedLevelData.orisha}: ${unlockedLevelData.title} is now available.`
+                : "A new level has been unlocked!",
+            });
           }
           
           setCurrentLevel(newLevel);
