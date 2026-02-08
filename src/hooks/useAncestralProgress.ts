@@ -217,6 +217,45 @@ export function useAncestralProgress() {
     }
   }, [user, fetchData, toast]);
 
+  // Validate and sanitize file before upload
+  const validateFile = useCallback((file: File): { valid: boolean; error?: string } => {
+    // Max file size: 10MB
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      return { 
+        valid: false, 
+        error: `File must be under 10MB. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`
+      };
+    }
+
+    // Allowed file types
+    const ALLOWED_TYPES = [
+      'image/jpeg', 
+      'image/png', 
+      'image/gif', 
+      'image/webp',
+      'application/pdf'
+    ];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return { 
+        valid: false, 
+        error: 'Only images (JPEG, PNG, GIF, WebP) and PDFs are allowed.'
+      };
+    }
+
+    return { valid: true };
+  }, []);
+
+  // Sanitize filename to prevent path traversal and special characters
+  const sanitizeFilename = useCallback((name: string): string => {
+    const ext = name.split('.').pop()?.toLowerCase() || '';
+    const baseName = name.substring(0, name.lastIndexOf('.')) || name;
+    const cleanName = baseName
+      .replace(/[^a-zA-Z0-9_-]/g, '_')  // Replace special chars with underscore
+      .substring(0, 100);  // Limit length
+    return `${cleanName}.${ext}`;
+  }, []);
+
   // Upload file to field journal
   const uploadToJournal = useCallback(async (
     lessonId: string, 
@@ -231,12 +270,23 @@ export function useAncestralProgress() {
       return false;
     }
 
+    // Validate file
+    const validation = validateFile(file);
+    if (!validation.valid) {
+      toast({
+        title: "Invalid File",
+        description: validation.error,
+        variant: "destructive",
+      });
+      return false;
+    }
+
     try {
-      // Upload file to storage
-      // Path format: {user_id}/{lesson_id}/{timestamp}-{filename}
-      const filePath = `${user.id}/${lessonId}/${Date.now()}-${file.name}`;
+      // Sanitize filename and create path
+      const sanitizedFilename = sanitizeFilename(file.name);
+      const filePath = `${user.id}/${lessonId}/${Date.now()}-${sanitizedFilename}`;
       
-      console.log('Uploading file:', { filePath, fileName: file.name, fileSize: file.size, fileType: file.type });
+      console.log('Uploading file:', { filePath, fileName: sanitizedFilename, fileSize: file.size, fileType: file.type });
       
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('field-journal')
@@ -254,14 +304,14 @@ export function useAncestralProgress() {
 
       console.log('Upload successful:', uploadData);
 
-      // Record in field_journal table
+      // Record in field_journal table with sanitized filename
       const { error: dbError } = await supabase
         .from('field_journal')
         .insert({
           user_id: user.id,
           lesson_id: lessonId,
           file_path: filePath,
-          file_name: file.name,
+          file_name: sanitizedFilename,
           file_type: file.type,
           file_size: file.size,
           status: 'pending',
