@@ -1,10 +1,69 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Lock } from 'lucide-react';
+import { Lock, Pickaxe, Mountain, Zap, Sun, Droplets } from 'lucide-react';
+
+// Level content data with cultural/scientific themes
+interface LevelData {
+  level: number;
+  orisha: string;
+  title: string;
+  subtitle: string;
+  statusColor: string;
+  glowColor: string;
+  bgColor: string;
+  Icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+}
+
+const levelData: LevelData[] = [
+  {
+    level: 4,
+    orisha: 'OSHUN',
+    title: 'THE SWEET ALCHEMY',
+    subtitle: 'Kemetic Chemistry & High Brix',
+    statusColor: '#ffd700', // Gold
+    glowColor: 'hsl(51 100% 50%)',
+    bgColor: 'hsl(51 80% 35%)',
+    Icon: ({ className, style }) => (
+      <div className={className} style={style}>
+        <Sun className="w-full h-full" />
+        <Droplets className="w-3 h-3 absolute -bottom-0.5 -right-0.5" style={{ color: 'hsl(200 80% 60%)' }} />
+      </div>
+    ),
+  },
+  {
+    level: 3,
+    orisha: 'SHANGO',
+    title: 'THE THUNDER SIGNAL',
+    subtitle: 'Dogon Physics & Electroculture',
+    statusColor: '#00bfff', // Cyan
+    glowColor: 'hsl(195 100% 50%)',
+    bgColor: 'hsl(195 70% 35%)',
+    Icon: Zap,
+  },
+  {
+    level: 2,
+    orisha: 'BABALU AYE',
+    title: 'THE MAGNETIC EARTH',
+    subtitle: 'Olmec Geology & Paramagnetism',
+    statusColor: '#ffbf00', // Amber
+    glowColor: 'hsl(45 100% 50%)',
+    bgColor: 'hsl(45 70% 35%)',
+    Icon: Mountain,
+  },
+  {
+    level: 1,
+    orisha: 'OGUN',
+    title: 'THE IRON ROOT',
+    subtitle: 'Muscogee Biology & No-Till',
+    statusColor: '#ff0000', // Red
+    glowColor: 'hsl(0 100% 50%)',
+    bgColor: 'hsl(0 70% 35%)',
+    Icon: Pickaxe,
+  },
+];
 
 interface LevelCardProps {
-  level: number;
-  title: string;
+  data: LevelData;
   isUnlocked: boolean;
   onSelect: () => void;
 }
@@ -12,8 +71,9 @@ interface LevelCardProps {
 /**
  * Level Card - Glassmorphic card for each level in the Ascension Map
  */
-const LevelCard = ({ level, title, isUnlocked, onSelect }: LevelCardProps) => {
+const LevelCard = ({ data, isUnlocked, onSelect }: LevelCardProps) => {
   const [isShaking, setIsShaking] = useState(false);
+  const { level, orisha, title, subtitle, statusColor, glowColor, bgColor, Icon } = data;
 
   const handleClick = () => {
     if (isUnlocked) {
@@ -25,16 +85,6 @@ const LevelCard = ({ level, title, isUnlocked, onSelect }: LevelCardProps) => {
     }
   };
 
-  // Level-specific colors
-  const levelColors: Record<number, { border: string; glow: string; bg: string }> = {
-    1: { border: 'hsl(0 70% 50%)', glow: 'hsl(0 70% 40%)', bg: 'hsl(0 60% 35%)' },
-    2: { border: 'hsl(30 60% 50%)', glow: 'hsl(30 60% 40%)', bg: 'hsl(30 50% 35%)' },
-    3: { border: 'hsl(25 80% 55%)', glow: 'hsl(25 80% 45%)', bg: 'hsl(25 70% 40%)' },
-    4: { border: 'hsl(45 90% 55%)', glow: 'hsl(45 90% 45%)', bg: 'hsl(45 80% 40%)' },
-  };
-
-  const colors = levelColors[level] || levelColors[1];
-
   return (
     <motion.button
       className="relative flex items-center gap-6 p-6 rounded-2xl w-full max-w-md cursor-pointer"
@@ -43,12 +93,9 @@ const LevelCard = ({ level, title, isUnlocked, onSelect }: LevelCardProps) => {
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
         border: isUnlocked 
-          ? `2px solid ${colors.border}` 
+          ? `2px solid ${statusColor}` 
           : '1px solid rgba(255, 255, 255, 0.2)',
         opacity: isUnlocked ? 1 : 0.5,
-        boxShadow: isUnlocked 
-          ? `0 0 30px ${colors.glow}80, 0 0 60px ${colors.glow}4D, inset 0 0 20px ${colors.glow}1A` 
-          : 'none',
       }}
       onClick={handleClick}
       initial={{ opacity: 0, x: -30 }}
@@ -61,22 +108,23 @@ const LevelCard = ({ level, title, isUnlocked, onSelect }: LevelCardProps) => {
         transition: { duration: 0.5 }
       } : {}}
     >
-      {/* Icon Placeholder / Lock Icon */}
+      {/* Icon Container */}
       <div 
-        className="flex-shrink-0 w-16 h-16 rounded-xl flex items-center justify-center"
+        className="relative flex-shrink-0 w-16 h-16 rounded-xl flex items-center justify-center"
         style={{
           background: isUnlocked 
-            ? `linear-gradient(135deg, ${colors.bg}, ${colors.bg}99)`
+            ? `linear-gradient(135deg, ${bgColor}, ${bgColor}99)`
             : 'hsl(0 0% 20%)',
-          border: isUnlocked ? `1px solid ${colors.border}80` : '1px solid hsl(0 0% 30%)',
+          border: isUnlocked ? `1px solid ${statusColor}80` : '1px solid hsl(0 0% 30%)',
+          boxShadow: isUnlocked ? `0 0 20px ${statusColor}40` : 'none',
         }}
       >
         {isUnlocked ? (
-          <div 
-            className="w-8 h-8 rounded-full"
-            style={{
-              background: colors.border,
-              boxShadow: `0 0 15px ${colors.glow}80`,
+          <Icon 
+            className="w-8 h-8" 
+            style={{ 
+              color: statusColor,
+              filter: `drop-shadow(0 0 8px ${statusColor})`,
             }}
           />
         ) : (
@@ -87,39 +135,53 @@ const LevelCard = ({ level, title, isUnlocked, onSelect }: LevelCardProps) => {
         )}
       </div>
 
-      {/* Title Text */}
+      {/* Text Content */}
       <div className="flex-1 text-left">
+        {/* Orisha Name */}
         <p 
-          className="text-xs font-mono tracking-widest mb-1"
+          className="text-xs tracking-[0.2em] mb-1"
           style={{ 
-            color: isUnlocked ? `${colors.border}` : 'hsl(0 0% 50%)',
+            fontFamily: "'Space Mono', monospace",
+            color: isUnlocked ? statusColor : 'hsl(0 0% 50%)',
           }}
         >
-          LEVEL {level}
+          {orisha}
         </p>
+        {/* Title */}
         <h3 
-          className="text-lg tracking-wide"
+          className="text-lg md:text-xl tracking-wide uppercase mb-1"
           style={{ 
             fontFamily: "'Staatliches', sans-serif",
             color: isUnlocked ? 'hsl(0 0% 95%)' : 'hsl(0 0% 50%)',
+            textShadow: isUnlocked ? `0 0 10px ${statusColor}40` : 'none',
           }}
         >
           {title}
         </h3>
+        {/* Subtitle */}
+        <p 
+          className="text-xs tracking-wide"
+          style={{ 
+            fontFamily: "'Space Mono', monospace",
+            color: isUnlocked ? 'hsl(0 0% 70%)' : 'hsl(0 0% 40%)',
+          }}
+        >
+          {subtitle}
+        </p>
       </div>
 
-      {/* Glowing border effect for unlocked cards */}
+      {/* Pulsating Glow Effect for Unlocked Cards */}
       {isUnlocked && (
         <motion.div
           className="absolute inset-0 rounded-2xl pointer-events-none"
           style={{
-            border: `2px solid ${colors.border}`,
+            border: `2px solid ${statusColor}`,
           }}
           animate={{
             boxShadow: [
-              `0 0 20px ${colors.glow}66`,
-              `0 0 35px ${colors.glow}99`,
-              `0 0 20px ${colors.glow}66`,
+              `0 0 15px ${statusColor}66, 0 0 30px ${statusColor}33`,
+              `0 0 25px ${statusColor}99, 0 0 50px ${statusColor}66`,
+              `0 0 15px ${statusColor}66, 0 0 30px ${statusColor}33`,
             ],
           }}
           transition={{
@@ -130,7 +192,7 @@ const LevelCard = ({ level, title, isUnlocked, onSelect }: LevelCardProps) => {
         />
       )}
 
-      {/* Locked overlay with centered padlock */}
+      {/* Locked Overlay with Centered Padlock */}
       {!isUnlocked && (
         <div 
           className="absolute inset-0 rounded-2xl flex items-center justify-center pointer-events-none"
@@ -337,18 +399,11 @@ const CentralCord = () => {
   );
 };
 
-// Level data
-const levels = [
-  { level: 4, title: 'THE SWEET ALCHEMY' },
-  { level: 3, title: 'THE THUNDER SIGNAL' },
-  { level: 2, title: 'THE MAGNETIC EARTH' },
-  { level: 1, title: 'THE IRON ROOT' },
-];
-
 /**
- * Ascension Map - Phase 2 with State Management
+ * Ascension Map - Phase 3 with Cultural Content
  * Vertical timeline with 4 levels, bottom-to-top scroll
  */
+
 const AscensionMap = () => {
   // State: Current level tracks user progress
   const [currentLevel, setCurrentLevel] = useState(1);
@@ -387,13 +442,12 @@ const AscensionMap = () => {
       {/* Level Cards Container */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center py-20 px-6">
         <div className="flex flex-col items-center gap-16">
-          {levels.map((levelData) => (
+          {levelData.map((data) => (
             <LevelCard
-              key={levelData.level}
-              level={levelData.level}
-              title={levelData.title}
-              isUnlocked={currentLevel >= levelData.level}
-              onSelect={() => handleCardSelect(levelData.level)}
+              key={data.level}
+              data={data}
+              isUnlocked={currentLevel >= data.level}
+              onSelect={() => handleCardSelect(data.level)}
             />
           ))}
         </div>
