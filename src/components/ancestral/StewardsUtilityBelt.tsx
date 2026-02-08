@@ -269,7 +269,7 @@ const toolContent: Record<string, { title: string; description: string; comingSo
   },
   seedvault: {
     title: 'The Kiva (Seed Vault)',
-    description: 'We store the life for the next cycle. The Hopi have kept the sacred seeds for 10,000 years. This is the way of the Seed Keepers.',
+    description: 'We do not own the seed; we borrow it from our grandchildren. The Hopi have kept the sacred seeds for 10,000 years.',
     comingSoon: false,
   },
 };
@@ -472,7 +472,7 @@ const StewardsUtilityBelt = () => {
                     className="text-sm font-body leading-relaxed italic"
                     style={{ color: 'hsl(45 60% 75%)' }}
                   >
-                    "We store the life for the next cycle."
+                    "We do not own the seed; we borrow it from our grandchildren."
                   </p>
                   <p 
                     className="text-[10px] mt-2 tracking-wider"
