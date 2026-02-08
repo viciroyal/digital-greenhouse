@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, Pickaxe, Mountain, Zap, Sun, Droplets, KeyRound } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import InitiationModal from './InitiationModal';
 import AscensionLessonDrawer from './AscensionLessonDrawer';
 
@@ -407,13 +408,57 @@ const CentralCord = () => {
  */
 
 const AscensionMap = () => {
-  // State: Current level tracks user progress
+  // State: Current level tracks user progress (from database)
   const [currentLevel, setCurrentLevel] = useState(1);
+  const [user, setUser] = useState<{ id: string } | null>(null);
   
   // Modal and Drawer states
   const [isInitiationOpen, setIsInitiationOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
+
+  // Fetch user progress from database
+  const fetchProgress = useCallback(async (userId: string) => {
+    // Get highest unlocked module
+    const { data: moduleProgress } = await supabase
+      .from('user_module_progress')
+      .select(`
+        module_id,
+        completed_at,
+        modules!inner(order_index)
+      `)
+      .eq('user_id', userId)
+      .order('modules(order_index)', { ascending: false })
+      .limit(1);
+
+    if (moduleProgress && moduleProgress.length > 0) {
+      const highestUnlocked = (moduleProgress[0].modules as { order_index: number }).order_index;
+      setCurrentLevel(highestUnlocked);
+    }
+  }, []);
+
+  // Initialize: check auth and fetch progress
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setUser({ id: data.user.id });
+        fetchProgress(data.user.id);
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setUser({ id: session.user.id });
+        fetchProgress(session.user.id);
+      } else {
+        setUser(null);
+        setCurrentLevel(1);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [fetchProgress]);
 
   // Handle card selection - opens Lesson Drawer
   const handleCardSelect = (level: number) => {
@@ -421,6 +466,16 @@ const AscensionMap = () => {
     setSelectedLevel(level);
     setIsDrawerOpen(true);
   };
+
+  // Handle level completion - refresh progress
+  const handleLevelComplete = useCallback(() => {
+    if (user) {
+      // Delay to allow database triggers to complete
+      setTimeout(() => {
+        fetchProgress(user.id);
+      }, 1000);
+    }
+  }, [user, fetchProgress]);
 
   // Simulate level up for debugging
   const handleSimulateLevelUp = () => {
@@ -530,6 +585,7 @@ const AscensionMap = () => {
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         level={selectedLevel}
+        onLevelComplete={handleLevelComplete}
       />
     </section>
   );
