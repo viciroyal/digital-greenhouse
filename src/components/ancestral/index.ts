@@ -14,6 +14,8 @@ export { default as SoilScanningAnimation } from './SoilScanningAnimation';
 export { default as HazardWarning } from './HazardWarning';
 export { default as VideoPlaceholder } from './VideoPlaceholder';
 export { default as ProtocolSteps } from './ProtocolSteps';
+export { default as SkyWatcherHeader } from './SkyWatcherHeader';
+export { default as SovereignIcon } from './SovereignIcon';
 export { 
   SpiralMoundIcon, 
   KanagaMaskIcon, 
