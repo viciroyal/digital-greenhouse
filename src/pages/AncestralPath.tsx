@@ -285,9 +285,9 @@ const AncestralPath = () => {
     id: 'level-5-sovereign',
     level: 5,
     title: 'LEVEL 5: THE MAROON BRAID',
-    mission: 'The Grandmothers braided the rice into their hair.',
+    mission: 'The Songline does not end; it loops. The Grandmothers braided the seed. You are now the Ancestor.',
     lineage: 'Sovereignty — The Seed Keepers',
-    color: 'hsl(0 0% 85%)',
+    color: 'hsl(0 0% 85%)', // Iridescent Pearl
     iconName: 'sovereign',
     isUnlocked: isLevel4Complete,
     isCompleted: false,

@@ -5,18 +5,19 @@ interface SkyWatcherHeaderProps {
   currentOpenLevel: number | null;
 }
 
-// Level to Lunar Day mapping
-const levelToLunarDay: Record<number, string> = {
-  1: 'ROOT DAYS',
-  2: 'EARTH DAYS',
-  3: 'SIGNAL DAYS',
-  4: 'ALCHEMY DAYS',
-  5: 'SEED DAYS',
+// Level to Focus Name mapping
+const levelToFocusName: Record<number, string> = {
+  1: 'THE IRON ROOT',
+  2: 'THE MAGNETIC EARTH',
+  3: 'THE THUNDER SIGNAL',
+  4: 'THE SWEET ALCHEMY',
+  5: 'THE MAROON BRAID',
 };
 
 /**
  * Sky Watcher Header - Fixed lunar rhythm display
- * Shows current moon phase and dynamic level indicator
+ * "Reading the Dreamtime Sky" - Aboriginal astronomy reference
+ * The Emu in the Sky: reading the dark spaces between stars
  */
 const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
   return (
@@ -27,13 +28,13 @@ const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
       transition={{ delay: 0.3, duration: 0.5 }}
       style={{
         background: `linear-gradient(90deg,
-          hsl(250 50% 8%) 0%,
-          hsl(240 45% 12%) 30%,
-          hsl(260 40% 10%) 70%,
-          hsl(250 50% 8%) 100%
+          hsl(250 50% 6%) 0%,
+          hsl(240 45% 10%) 30%,
+          hsl(260 40% 8%) 70%,
+          hsl(250 50% 6%) 100%
         )`,
-        borderBottom: '1px solid hsl(260 40% 25% / 0.5)',
-        boxShadow: '0 4px 20px hsl(250 50% 5% / 0.8)',
+        borderBottom: '1px solid hsl(260 40% 20% / 0.5)',
+        boxShadow: '0 4px 30px hsl(250 50% 5% / 0.9)',
       }}
     >
       <div className="h-full max-w-7xl mx-auto px-4 flex items-center justify-between">
@@ -58,11 +59,11 @@ const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
                 filter: 'drop-shadow(0 0 6px hsl(45 70% 50% / 0.6))',
               }} 
             />
-            {/* Waxing shadow overlay */}
+            {/* Waxing shadow overlay - represents the dark spaces */}
             <div 
               className="absolute inset-0 rounded-full"
               style={{
-                background: 'linear-gradient(90deg, hsl(250 50% 8%) 0%, transparent 35%)',
+                background: 'linear-gradient(90deg, hsl(250 50% 6%) 0%, transparent 40%)',
               }}
             />
           </div>
@@ -74,9 +75,9 @@ const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
           </span>
         </motion.div>
 
-        {/* Center: Current Rhythm Text */}
+        {/* Center: Current Rhythm - Dreamtime Reference */}
         <motion.div
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 flex-wrap justify-center"
           animate={{
             textShadow: [
               '0 0 10px hsl(280 60% 50% / 0.3)',
@@ -91,7 +92,7 @@ const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
           }}
         >
           <span 
-            className="text-xs sm:text-sm tracking-[0.15em] uppercase"
+            className="text-xs sm:text-sm tracking-[0.12em] uppercase"
             style={{ 
               fontFamily: "'Staatliches', sans-serif",
               color: 'hsl(280 50% 75%)',
@@ -100,18 +101,18 @@ const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
             CURRENT RHYTHM:
           </span>
           <span 
-            className="text-xs sm:text-sm tracking-[0.1em]"
+            className="text-xs sm:text-sm tracking-[0.08em]"
             style={{ 
               fontFamily: "'Staatliches', sans-serif",
-              color: 'hsl(45 80% 65%)',
-              textShadow: '0 0 10px hsl(45 80% 50% / 0.5)',
+              color: 'hsl(185 80% 65%)', // Cyan for Aboriginal reference
+              textShadow: '0 0 10px hsl(185 80% 50% / 0.5)',
             }}
           >
-            SOW THE INTENTION
+            READING THE DREAMTIME SKY
           </span>
         </motion.div>
 
-        {/* Right: Dynamic Level Indicator */}
+        {/* Right: Dynamic Level Focus */}
         <motion.div
           className="flex items-center gap-2"
           key={currentOpenLevel}
@@ -120,15 +121,25 @@ const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
           transition={{ duration: 0.3 }}
         >
           <span 
+            className="text-[10px] font-mono tracking-wide hidden sm:inline"
+            style={{ color: 'hsl(0 0% 50%)' }}
+          >
+            FOCUS:
+          </span>
+          <span 
             className="text-xs font-mono tracking-wide"
             style={{ 
+              fontFamily: "'Staatliches', sans-serif",
               color: currentOpenLevel 
-                ? 'hsl(140 50% 60%)' 
-                : 'hsl(0 0% 50%)',
+                ? 'hsl(45 80% 65%)' 
+                : 'hsl(0 0% 45%)',
+              textShadow: currentOpenLevel 
+                ? '0 0 8px hsl(45 80% 50% / 0.5)'
+                : 'none',
             }}
           >
             {currentOpenLevel 
-              ? levelToLunarDay[currentOpenLevel] || 'COSMIC DAYS'
+              ? levelToFocusName[currentOpenLevel] || 'THE PATH'
               : '— — —'
             }
           </span>
@@ -137,8 +148,8 @@ const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
             <motion.div
               className="w-2 h-2 rounded-full"
               style={{ 
-                background: 'hsl(140 60% 50%)',
-                boxShadow: '0 0 8px hsl(140 60% 50%)',
+                background: 'hsl(45 80% 60%)',
+                boxShadow: '0 0 8px hsl(45 80% 60%)',
               }}
               animate={{
                 scale: [1, 1.3, 1],
@@ -153,21 +164,21 @@ const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
         </motion.div>
       </div>
 
-      {/* Star sparkles in header */}
+      {/* Star sparkles and dark spaces - Emu in the Sky */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(12)].map((_, i) => (
+        {[...Array(15)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute rounded-full"
             style={{
-              left: `${8 + Math.random() * 84}%`,
-              top: `${20 + Math.random() * 60}%`,
-              width: '1px',
-              height: '1px',
-              background: 'hsl(0 0% 80%)',
+              left: `${5 + Math.random() * 90}%`,
+              top: `${15 + Math.random() * 70}%`,
+              width: i % 3 === 0 ? '2px' : '1px',
+              height: i % 3 === 0 ? '2px' : '1px',
+              background: i % 4 === 0 ? 'hsl(185 100% 70%)' : 'hsl(0 0% 80%)',
             }}
             animate={{
-              opacity: [0, 0.8, 0],
+              opacity: [0, 0.9, 0],
               scale: [0.5, 1.2, 0.5],
             }}
             transition={{
