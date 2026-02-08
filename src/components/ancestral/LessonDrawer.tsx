@@ -5,7 +5,6 @@ import FileDropZone from './FileDropZone';
 import HogonSeal from './HogonSeal';
 import HazardWarning from './HazardWarning';
 import VideoPlaceholder from './VideoPlaceholder';
-import ProtocolSteps from './ProtocolSteps';
 import SoilScanningAnimation from './SoilScanningAnimation';
 import GoldenTicketCelebration from './GoldenTicketCelebration';
 import EthericAntennaModule from './EthericAntennaModule';
@@ -23,6 +22,10 @@ import FiberProtocolRobe from './FiberProtocolRobe';
 import BambooStructuralProtocol from './BambooStructuralProtocol';
 import BastFiberProtocol from './BastFiberProtocol';
 import RedoxIndigoProtocol from './RedoxIndigoProtocol';
+import ScaleToggle, { AccessScale } from './ScaleToggle';
+import ScaledProtocolSteps from './ScaledProtocolSteps';
+import ScavengerBadge from './ScavengerBadge';
+import { getProtocolByLevel } from './scaleProtocolData';
 import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 interface LessonDrawerProps {
@@ -39,39 +42,7 @@ interface LessonDrawerProps {
   onModuleComplete?: (level: number) => void;
 }
 
-// Protocol steps for each level
-const levelProtocols: Record<number, { step: number; title: string; description?: string }[]> = {
-  1: [
-    { step: 1, title: 'Assess soil compaction with penetrometer', description: 'Test at 3 depths' },
-    { step: 2, title: 'Broadfork the compacted zone', description: 'No inversion, just fracturing' },
-    { step: 3, title: 'Plant Daikon radishes as bio-drills' },
-    { step: 4, title: 'Apply kelp meal at root zone' },
-  ],
-  2: [
-    { step: 1, title: 'Measure baseline paramagnetism', description: 'Use PCSM meter' },
-    { step: 2, title: 'Apply basalt rock dust at 200 lbs/acre' },
-    { step: 3, title: 'Integrate with existing biology', description: 'Water in immediately' },
-    { step: 4, title: 'Retest at 30-day interval' },
-  ],
-  3: [
-    { step: 1, title: 'Construct copper Fibonacci spiral', description: '8 wraps, 1:1.618 ratio' },
-    { step: 2, title: 'Orient antenna to magnetic north' },
-    { step: 3, title: 'Ground with copper rod (3ft depth)' },
-    { step: 4, title: 'Perform Agnihotra at sunrise/sunset', description: 'Cow dung + ghee + rice' },
-  ],
-  4: [
-    { step: 1, title: 'Collect plant samples for Brix test', description: 'Early morning, same plant' },
-    { step: 2, title: 'Prepare JADAM Liquid Fertilizer (JLF)' },
-    { step: 3, title: 'Ferment for 7 days with leaf mold' },
-    { step: 4, title: 'Foliar apply and retest Brix', description: 'Target: 12+ Brix' },
-  ],
-  5: [
-    { step: 1, title: 'Select mother plants for seed saving', description: 'Healthiest specimens only' },
-    { step: 2, title: 'Allow full maturation on stalk', description: 'Do not harvest early' },
-    { step: 3, title: 'Dry seeds in shade (14 days)', description: 'Low humidity environment' },
-    { step: 4, title: 'Store in glass jars with desiccant', description: 'Label with date and lineage' },
-  ],
-};
+// Access Scale is now managed per-user for adaptive protocols
 
 /**
  * Lesson Drawer - Enhanced with Phase 5 Features
@@ -85,6 +56,7 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
   const [uploadApproved, setUploadApproved] = useState(false);
   const [showGoldenTicket, setShowGoldenTicket] = useState(false);
   const [isBodyTuned, setIsBodyTuned] = useState(false);
+  const [accessScale, setAccessScale] = useState<AccessScale>('sprout');
   
   const {
     getLessonsForModule,
@@ -129,8 +101,9 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
   // Check if this level needs hazard warning
   const needsHazardWarning = module.level === 3 || module.level === 4;
 
-  // Get protocol steps for this level
-  const protocolSteps = levelProtocols[module.level] || [];
+  // Get scaled protocol config for this level
+  const scaledProtocolConfig = getProtocolByLevel(module.level);
+  const scaledSteps = scaledProtocolConfig?.steps[accessScale] || [];
 
   // Check for seasonal priority
   const seasonalData = getSeasonalPhase();
@@ -407,6 +380,13 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
                                 transition={{ duration: 0.4 }}
                                 className="space-y-6"
                               >
+                                {/* ACCESS KEY - Scale Toggle */}
+                                <ScaleToggle
+                                  value={accessScale}
+                                  onChange={setAccessScale}
+                                  color={module.color}
+                                />
+
                                 {/* Seasonal Priority Tag */}
                                 {hasSeasonalPriority && seasonalData.phase && (
                                   <SeasonalPriorityTag 
@@ -421,13 +401,21 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
                                   title={lessonContent.videoTitle}
                                 />
 
-                                {/* Protocol Steps */}
-                                {protocolSteps.length > 0 && (
-                                  <ProtocolSteps
+                                {/* Scale-Adaptive Protocol Steps */}
+                                {scaledProtocolConfig && scaledSteps.length > 0 && (
+                                  <ScaledProtocolSteps
                                     color={module.color}
-                                    steps={protocolSteps}
+                                    steps={scaledSteps}
+                                    scale={accessScale}
+                                    science={scaledProtocolConfig.science}
                                   />
                                 )}
+
+                                {/* Scavenger Badge - SEED mode completions */}
+                                <ScavengerBadge 
+                                  color={module.color} 
+                                  isVisible={accessScale === 'seed' && uploadApproved} 
+                                />
 
                                 {/* Master Recipe Card - Level 2 Only */}
                                 {needsRecipeCard && (
