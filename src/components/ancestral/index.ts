@@ -36,3 +36,7 @@ export { default as FiberProtocolRobe } from './FiberProtocolRobe';
 export { default as BambooStructuralProtocol } from './BambooStructuralProtocol';
 export { default as BastFiberProtocol } from './BastFiberProtocol';
 export { default as RedoxIndigoProtocol } from './RedoxIndigoProtocol';
+export { default as ScaleToggle, type AccessScale } from './ScaleToggle';
+export { default as ScaledProtocolSteps } from './ScaledProtocolSteps';
+export { default as ScavengerBadge } from './ScavengerBadge';
+export * from './scaleProtocolData';
