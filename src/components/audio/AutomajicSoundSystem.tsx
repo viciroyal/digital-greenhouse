@@ -4,17 +4,19 @@ import { trackData, type TrackData } from '@/data/trackData';
 import { Play, Pause, Radio } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import pharmbotArtwork from '@/assets/pharmboi-artwork.png';
+import { getCrateTexture, SpeakerMeshPattern, SankofaBirdSvg } from './CulturalTextures';
 
 /**
  * THE AUTOMAJIC SOUND SYSTEM
  * 
  * Organizes the PHARMBOI album into 4 frequency crates:
- * - THE ROOT (396Hz) - Tracks 1-3
- * - THE FLOW (528Hz) - Tracks 4-6
- * - THE SIGNAL (741Hz) - Tracks 7-9
- * - THE CROWN (963Hz) - Tracks 10-12
+ * - THE ROOT (396Hz) - Tracks 1-3 - Bogolan/Mud Cloth texture
+ * - THE FLOW (528Hz) - Tracks 4-6 - Inca Stone Wall texture
+ * - THE SIGNAL (741Hz) - Tracks 7-9 - Star Chart/Dogon texture
+ * - THE CROWN (963Hz) - Tracks 10-12 - Flower of Life texture
  * 
  * PRESERVATION MODE: All track titles and colors remain unchanged.
+ * CULTURAL WATERMARKS: Ancestral textures overlaid at subliminal opacity.
  */
 
 interface CrateConfig {
@@ -30,28 +32,28 @@ const CRATES: CrateConfig[] = [
     id: 'root',
     name: 'THE ROOT',
     frequency: '396Hz',
-    colorHsl: '0 60% 35%', // From Track 1: chakra-root
+    colorHsl: '0 60% 35%', // From Track 1: chakra-root - PRESERVED
     tracks: [1, 2, 3],
   },
   {
     id: 'flow',
     name: 'THE FLOW',
     frequency: '528Hz',
-    colorHsl: '45 90% 55%', // From Track 3: chakra-solar (528Hz)
+    colorHsl: '45 90% 55%', // From Track 3: chakra-solar (528Hz) - PRESERVED
     tracks: [4, 5, 6],
   },
   {
     id: 'signal',
     name: 'THE SIGNAL',
     frequency: '741Hz',
-    colorHsl: '210 70% 55%', // From Track 7: chakra-throat
+    colorHsl: '210 70% 55%', // From Track 7: chakra-throat - PRESERVED
     tracks: [7, 8, 9],
   },
   {
     id: 'crown',
     name: 'THE CROWN',
     frequency: '963Hz',
-    colorHsl: '280 60% 55%', // From Track 9/10: chakra-vision (Gold-Violet blend)
+    colorHsl: '280 60% 55%', // From Track 9/10: chakra-vision - PRESERVED
     tracks: [10, 11, 12],
   },
 ];
@@ -158,6 +160,8 @@ interface CrateProps {
 }
 
 const Crate = ({ config, tracks, currentTrack, onPlayTrack }: CrateProps) => {
+  const texture = getCrateTexture(config.id);
+  
   return (
     <motion.div
       className="relative rounded-2xl p-4 overflow-hidden"
@@ -170,8 +174,28 @@ const Crate = ({ config, tracks, currentTrack, onPlayTrack }: CrateProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+      {/* Cultural Texture Overlay - THE VISUAL CONSTITUTION */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: texture.pattern,
+          backgroundRepeat: 'repeat',
+          opacity: texture.opacity,
+          mixBlendMode: 'overlay',
+        }}
+      />
+      
+      {/* Darkroom Overlay for legibility */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'hsl(0 0% 0% / 0.15)',
+          mixBlendMode: 'multiply',
+        }}
+      />
+
       {/* Crate Header */}
-      <div className="flex items-center justify-between mb-4 pb-3 border-b" style={{ borderColor: `hsl(${config.colorHsl} / 0.2)` }}>
+      <div className="relative flex items-center justify-between mb-4 pb-3 border-b" style={{ borderColor: `hsl(${config.colorHsl} / 0.2)` }}>
         <div>
           <h3 
             className="font-display text-lg"
@@ -184,6 +208,10 @@ const Crate = ({ config, tracks, currentTrack, onPlayTrack }: CrateProps) => {
           </h3>
           <p className="font-mono text-xs text-cream-muted/50">
             {config.frequency} · TRACKS {config.tracks[0]}-{config.tracks[config.tracks.length - 1]}
+          </p>
+          {/* Cultural concept tooltip on hover */}
+          <p className="font-mono text-[9px] text-cream-muted/30 italic mt-1">
+            "{texture.concept}"
           </p>
         </div>
 
@@ -203,7 +231,7 @@ const Crate = ({ config, tracks, currentTrack, onPlayTrack }: CrateProps) => {
       </div>
 
       {/* Track List */}
-      <div className="space-y-2">
+      <div className="relative space-y-2">
         {tracks.map((track) => (
           <TrackItem
             key={track.row}
@@ -252,6 +280,27 @@ const NowPlaying = ({ track, isPlaying, onTogglePlay }: NowPlayingProps) => {
               borderTop: `1px solid hsl(${track.colorHsl} / 0.3)`,
             }}
           />
+          
+          {/* Speaker Mesh Overlay - Sound System aesthetic */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage: SpeakerMeshPattern,
+              backgroundRepeat: 'repeat',
+              opacity: 0.04,
+              mixBlendMode: 'overlay',
+            }}
+          />
+          
+          {/* Sankofa Bird Watermark - "Go back and fetch it" */}
+          <div 
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-24 h-24 pointer-events-none"
+            style={{ 
+              color: `hsl(${track.colorHsl} / 0.15)`,
+            }}
+          >
+            <SankofaBirdSvg />
+          </div>
 
           <div className={`relative px-4 py-3 max-w-6xl mx-auto ${isMobile ? 'flex-col' : 'flex items-center justify-between'} flex gap-4`}>
             {/* Album Art + Track Info */}
@@ -375,7 +424,21 @@ const AutomajicSoundSystem = () => {
         <p className="font-mono text-sm text-cream-muted/60">
           PHARMBOI · 12 TRACKS · 4 FREQUENCY CRATES
         </p>
+        <p className="font-mono text-[10px] text-cream-muted/40 mt-1 italic">
+          "The Sound System of the Ancestors: Go back and fetch it."
+        </p>
       </motion.div>
+
+      {/* Speaker Mesh Background Overlay */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: SpeakerMeshPattern,
+          backgroundRepeat: 'repeat',
+          opacity: 0.02,
+          mixBlendMode: 'overlay',
+        }}
+      />
 
       {/* Crates Grid */}
       <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2'} pb-24`}>
