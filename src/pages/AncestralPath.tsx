@@ -17,6 +17,7 @@ import {
   SkyWatcherHeader,
   SovereignIcon,
   GoldenTicketCelebration,
+  EmergencySOSButton,
 } from '@/components/ancestral';
 import { OgunIcon, BabaluAyeIcon, ShangoIcon, OshunIcon, OrishaBadge } from '@/components/ancestral/OrishaIcons';
 import { useAncestralProgress, Module } from '@/hooks/useAncestralProgress';
@@ -756,6 +757,9 @@ const AncestralPath = () => {
         isVisible={showGoldenTicket}
         onClose={() => setShowGoldenTicket(false)}
       />
+
+      {/* Emergency SOS Button - Always Visible Safety Feature */}
+      <EmergencySOSButton />
     </main>
   );
 };
