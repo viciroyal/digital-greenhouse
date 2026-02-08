@@ -200,7 +200,7 @@ const BannekerAlmanac = () => {
             THE BANNEKER ALMANAC
           </p>
           <p className="text-[10px] opacity-70 mb-2">
-            "Consult the sky before you plant." — Benjamin Banneker
+            "The Sky tells the truth. Watch the signs." — Benjamin Banneker
           </p>
           <div className="flex items-center gap-3 text-[10px]">
             <span>🌡️ {weatherData.temp}°F</span>

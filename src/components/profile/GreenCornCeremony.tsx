@@ -244,8 +244,8 @@ const GreenCornCeremony = ({ userId, hasMasterStewardBadge, onReset }: GreenCorn
             color: 'hsl(40 40% 65%)',
           }}
         >
-          "Honoring the Muscogee tradition of Renewal. When the cycle ends, 
-          we extinguish the old fire and light the new."
+          "When the corn is ripe, we extinguish the old fire and light the new. 
+          All debts are forgiven."
         </p>
 
         {/* Master Steward Badge Notice */}
