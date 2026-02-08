@@ -83,6 +83,31 @@ const KoraIcon = ({ className = "" }: { className?: string }) => (
   </svg>
 );
 
+// Mortar & Pestle Icon - Cherokee (Tsalagi)
+const MortarPestleIcon = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 48 48" className={className} fill="none">
+    {/* Mortar bowl */}
+    <path 
+      d="M8 24 Q8 40, 24 42 Q40 40, 40 24 L40 28 Q40 44, 24 46 Q8 44, 8 28 Z" 
+      fill="hsl(25 30% 25%)" 
+      stroke="currentColor" 
+      strokeWidth="1.5" 
+    />
+    {/* Mortar opening */}
+    <ellipse cx="24" cy="24" rx="16" ry="6" fill="hsl(20 25% 18%)" stroke="currentColor" strokeWidth="1.5" />
+    {/* Inner shadow */}
+    <ellipse cx="24" cy="26" rx="12" ry="4" fill="hsl(20 20% 12%)" opacity="0.6" />
+    {/* Pestle */}
+    <rect x="30" y="4" width="6" height="24" rx="3" fill="hsl(30 35% 35%)" stroke="currentColor" strokeWidth="1" transform="rotate(25 33 16)" />
+    {/* Pestle tip */}
+    <ellipse cx="36" cy="22" rx="4" ry="5" fill="hsl(30 30% 40%)" stroke="currentColor" strokeWidth="0.75" transform="rotate(25 36 22)" />
+    {/* Herbs inside */}
+    <circle cx="20" cy="25" r="2" fill="hsl(140 50% 35%)" opacity="0.7" />
+    <circle cx="26" cy="24" r="1.5" fill="hsl(120 40% 40%)" opacity="0.6" />
+    <circle cx="23" cy="27" r="1" fill="hsl(100 45% 45%)" opacity="0.5" />
+  </svg>
+);
+
 interface UtilityTool {
   id: string;
   name: string;
@@ -117,6 +142,14 @@ const utilityTools: UtilityTool[] = [
     icon: <KoraIcon className="w-7 h-10" />,
     color: 'hsl(30 60% 45%)',
   },
+  {
+    id: 'mortar',
+    name: 'THE MORTAR',
+    culture: 'Cherokee (Tsalagi)',
+    tooltip: 'Brew the Medicine',
+    icon: <MortarPestleIcon className="w-8 h-8" />,
+    color: 'hsl(140 45% 40%)',
+  },
 ];
 
 // Placeholder content for each tool's modal
@@ -136,6 +169,11 @@ const toolContent: Record<string, { title: string; description: string; comingSo
     description: 'Tell your farm\'s story with the art of the Griot. Access templates, content calendars, and visual assets to sing your harvest\'s song.',
     comingSoon: true,
   },
+  mortar: {
+    title: 'The Herbal Apothecary',
+    description: 'Honor the Green Pharmacy of the Cherokee (Tsalagi) tradition. Access herbal protocols, preparation methods, and the medicine wheel of the local Georgia flora.',
+    comingSoon: true,
+  },
 };
 
 const StewardsUtilityBelt = () => {
@@ -151,7 +189,7 @@ const StewardsUtilityBelt = () => {
         transition={{ delay: 1, type: 'spring', stiffness: 200 }}
       >
         <div 
-          className="max-w-md mx-auto pointer-events-auto rounded-2xl overflow-hidden"
+          className="max-w-lg mx-auto pointer-events-auto rounded-2xl overflow-hidden"
           style={{
             // Wood & Leather texture styling
             background: `
