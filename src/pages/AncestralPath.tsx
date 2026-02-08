@@ -9,6 +9,7 @@ import {
   MycelialCord,
   LessonDrawer,
   ChainBreakingCelebration,
+  BlessingCeremony,
   SpiralMoundIcon,
   KanagaMaskIcon,
   DreamtimeCircleIcon,
@@ -113,10 +114,18 @@ const AncestralPath = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { isAdmin } = useAdminRole();
 
-  // Celebration state
+  // Chain Breaking Celebration state (for unlocking)
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationData, setCelebrationData] = useState<{ name: string; color: string } | null>(null);
   const previousUnlockedRef = useRef<Set<string>>(new Set());
+
+  // Blessing Ceremony state (for completion)
+  const [showBlessing, setShowBlessing] = useState(false);
+  const [blessingData, setBlessingData] = useState<{ 
+    orisha: 'ogun' | 'babalu-aye' | 'shango' | 'oshun';
+    moduleName: string;
+  } | null>(null);
+  const previousCompletedRef = useRef<Set<string>>(new Set());
 
   const {
     modules,
@@ -159,6 +168,46 @@ const AncestralPath = () => {
   const handleCelebrationComplete = useCallback(() => {
     setShowCelebration(false);
     setCelebrationData(null);
+  }, []);
+
+  // Module name to Orisha mapping
+  const moduleNameToOrisha: Record<string, 'ogun' | 'babalu-aye' | 'shango' | 'oshun'> = {
+    'root-protocol': 'ogun',
+    'magnetic-earth': 'babalu-aye',
+    'thunder-signal': 'shango',
+    'sweet-alchemy': 'oshun',
+  };
+
+  // Detect newly completed modules and trigger blessing ceremony
+  useEffect(() => {
+    if (isLoading || !user || modules.length === 0) return;
+
+    const currentCompleted = new Set(
+      modules.filter(m => isModuleCompleted(m.id)).map(m => m.id)
+    );
+
+    // Check for newly completed modules
+    currentCompleted.forEach(moduleId => {
+      if (!previousCompletedRef.current.has(moduleId) && previousCompletedRef.current.size >= 0) {
+        // A module was just completed!
+        const completedModule = modules.find(m => m.id === moduleId);
+        if (completedModule) {
+          const orisha = moduleNameToOrisha[completedModule.name] || 'ogun';
+          setBlessingData({
+            orisha,
+            moduleName: completedModule.display_name,
+          });
+          setShowBlessing(true);
+        }
+      }
+    });
+
+    previousCompletedRef.current = currentCompleted;
+  }, [modules, moduleProgress, isLoading, user, isModuleCompleted]);
+
+  const handleBlessingComplete = useCallback(() => {
+    setShowBlessing(false);
+    setBlessingData(null);
   }, []);
 
   // Scroll to bottom on mount (start at roots)
@@ -617,13 +666,23 @@ const AncestralPath = () => {
         module={selectedModule}
       />
 
-      {/* Chain Breaking Celebration */}
+      {/* Chain Breaking Celebration (for unlocking) */}
       <ChainBreakingCelebration
         isVisible={showCelebration}
         onComplete={handleCelebrationComplete}
         levelName={celebrationData?.name || 'NEW LEVEL'}
         color={celebrationData?.color || 'hsl(45 90% 55%)'}
       />
+
+      {/* Blessing Ceremony (for completion) */}
+      {blessingData && (
+        <BlessingCeremony
+          isActive={showBlessing}
+          orisha={blessingData.orisha}
+          moduleName={blessingData.moduleName}
+          onComplete={handleBlessingComplete}
+        />
+      )}
     </main>
   );
 };
