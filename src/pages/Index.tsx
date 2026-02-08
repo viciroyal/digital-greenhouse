@@ -11,10 +11,10 @@ import RespiratorySystem from '@/components/bio-digital/RespiratorySystem';
 import BioluminescentVeins from '@/components/bio-digital/BioluminescentVeins';
 import CircadianOverlay from '@/components/bio-digital/CircadianOverlay';
 import MycelialMenu from '@/components/bio-digital/MycelialMenu';
-import { AudioBiomeManager, ConchShellControl } from '@/components/audio';
+import { AudioBiomeManager, ConchShellControl, ResonanceDeck } from '@/components/audio';
 import GriotOracle from '@/components/GriotOracle';
 import { SedimentRuler, GhostArtifacts } from '@/components/scrollytelling';
-import { MycelialCursor } from '@/components/cursor';
+import { MycelialCursor, TouchRipple } from '@/components/cursor';
 import { ChakraSpine } from '@/components/navigation';
 import { ResonantChamber } from '@/components/community';
 import { PharmersPledgeModal } from '@/components/portal';
@@ -42,8 +42,11 @@ const Index = () => {
       {/* Dark Mode Womb Overlay - Color Harmonization */}
       <div className="darkroom-overlay" />
       
-      {/* Mycelial Cursor - The Wood Wide Web Thread */}
+      {/* Mycelial Cursor - Desktop Only (disabled on mobile) */}
       <MycelialCursor />
+      
+      {/* Touch Ripple - Mobile Only (cyan concentric rings) */}
+      <TouchRipple />
       
       {/* Grand Unified Cosmogram - The Living Tapestry */}
       <RespiratorySystem>
@@ -71,6 +74,7 @@ const Index = () => {
       {/* Audio Biome System */}
       <AudioBiomeManager />
       <ConchShellControl />
+      <ResonanceDeck />
       
       {/* Ancestral Oracle */}
       <GriotOracle />

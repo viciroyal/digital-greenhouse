@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TrailPoint {
   id: number;
@@ -9,6 +10,7 @@ interface TrailPoint {
 }
 
 const MycelialCursor = () => {
+  const isMobile = useIsMobile();
   const [mousePos, setMousePos] = useState({ x: -100, y: -100 });
   const [trail, setTrail] = useState<TrailPoint[]>([]);
   const [isVisible, setIsVisible] = useState(false);
@@ -60,7 +62,8 @@ const MycelialCursor = () => {
     return () => clearInterval(cleanup);
   }, []);
 
-  if (!isVisible) return null;
+  // Disable on mobile/touch devices
+  if (!isVisible || isMobile) return null;
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[9999]">

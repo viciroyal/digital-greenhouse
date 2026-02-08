@@ -216,10 +216,22 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Copyright */}
+        {/* The Covenant - Legal Disclaimer */}
         <div className="text-center pt-8 border-t border-border/20">
-          <p className="text-cream-muted/30 font-body text-xs">
+          <p className="text-cream-muted/40 font-body text-xs mb-4">
             © 2025 PHARMBOI. All rights reserved. Roots run deep. Gems shine bright.
+          </p>
+          <p 
+            className="font-mono text-[10px] leading-relaxed max-w-2xl mx-auto"
+            style={{ 
+              color: 'hsl(45 20% 70% / 0.4)',
+              letterSpacing: '0.02em',
+            }}
+          >
+            THE COVENANT: Terms "Pharmacy," "Medicine," "Prescription," and "Dosage" 
+            refer exclusively to Vibrational Stewardship and frequency-based wellness practices. 
+            This content is not intended to diagnose, treat, cure, or prevent any disease. 
+            Always consult a licensed physician for medical needs.
           </p>
         </div>
       </div>
