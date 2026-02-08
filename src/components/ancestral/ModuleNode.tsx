@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Lock } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { getSeasonalResonance } from './SkyWatcherHeader';
 
 interface ModuleNodeProps {
   level: number;
@@ -31,6 +32,11 @@ const ModuleNode = ({
   onSelect 
 }: ModuleNodeProps) => {
   const [showTooltip, setShowTooltip] = useState(false);
+  
+  // Seasonal dimming logic
+  const seasonalResonance = useMemo(() => getSeasonalResonance(), []);
+  const isSeasonallyDimmed = seasonalResonance.dimLevels.includes(level);
+  const isSeasonallySpotlit = seasonalResonance.spotlightLevels.includes(level);
 
   const handleClick = () => {
     if (isUnlocked) {
@@ -49,7 +55,30 @@ const ModuleNode = ({
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.8, delay: level * 0.1 }}
+      style={{
+        // Seasonal dimming: reduce opacity for out-of-season levels
+        opacity: isSeasonallyDimmed && isUnlocked ? 0.6 : 1,
+        filter: isSeasonallyDimmed && isUnlocked ? 'saturate(0.7)' : 'none',
+      }}
     >
+      {/* Seasonal Spotlight Indicator */}
+      {isSeasonallySpotlit && isUnlocked && (
+        <motion.div
+          className="absolute -left-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full"
+          style={{
+            background: seasonalResonance.color,
+            boxShadow: `0 0 12px ${seasonalResonance.color}`,
+          }}
+          animate={{
+            scale: [1, 1.5, 1],
+            opacity: [0.7, 1, 0.7],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+          }}
+        />
+      )}
       {/* Node Circle */}
       <motion.button
         className="relative flex-shrink-0 w-20 h-20 md:w-28 md:h-28 rounded-full flex items-center justify-center"

@@ -14,15 +14,75 @@ const levelToFocusName: Record<number, string> = {
   5: 'THE MAROON BRAID',
 };
 
+// Seasonal Octave Logic
+// The year is divided into octaves based on agricultural rhythms
+const getSeasonalResonance = () => {
+  const month = new Date().getMonth(); // 0-11
+  
+  // Cool Octave (Roots) - Nov, Dec, Jan, Feb, Mar
+  // This is preparation/root season - 396 Hz (Root)
+  if (month >= 10 || month <= 2) {
+    return {
+      frequency: 396,
+      name: 'ROOT PULSE',
+      octave: 'COOL OCTAVE',
+      spotlightLevels: [1, 2], // Spotlight Levels 1 & 2
+      dimLevels: [3, 4], // Dim Levels 3 & 4
+      color: 'hsl(0 70% 50%)', // Red
+    };
+  }
+  
+  // Warm Octave (Growth) - Apr, May, Jun
+  // This is signal/growth season - 528 Hz (Solar)
+  if (month >= 3 && month <= 5) {
+    return {
+      frequency: 528,
+      name: 'GROWTH WAVE',
+      octave: 'WARM OCTAVE',
+      spotlightLevels: [2, 3],
+      dimLevels: [1],
+      color: 'hsl(45 90% 55%)', // Yellow
+    };
+  }
+  
+  // Hot Octave (Alchemy) - Jul, Aug
+  // This is alchemy/fruiting season - 639 Hz (Heart)
+  if (month >= 6 && month <= 7) {
+    return {
+      frequency: 639,
+      name: 'ALCHEMY TONE',
+      octave: 'HOT OCTAVE',
+      spotlightLevels: [3, 4],
+      dimLevels: [1, 2],
+      color: 'hsl(140 50% 50%)', // Green
+    };
+  }
+  
+  // Harvest Octave (Return) - Sep, Oct
+  // This is harvest/seed saving season - 852 Hz (Third Eye)
+  return {
+    frequency: 852,
+    name: 'HARVEST SIGNAL',
+    octave: 'HARVEST OCTAVE',
+    spotlightLevels: [4, 5],
+    dimLevels: [1, 2, 3],
+    color: 'hsl(280 60% 55%)', // Indigo
+  };
+};
+
 /**
  * Sky Watcher Header - Fixed lunar rhythm display
  * "Reading the Dreamtime Sky" - Aboriginal astronomy reference
  * The Emu in the Sky: reading the dark spaces between stars
+ * 
+ * Now includes seasonal resonance frequency badge
  */
 const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
+  const resonance = getSeasonalResonance();
+  
   return (
     <motion.header
-      className="fixed top-0 left-0 right-0 z-50 h-12"
+      className="fixed top-0 left-0 right-0 z-50 h-14"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3, duration: 0.5 }}
@@ -59,7 +119,7 @@ const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
                 filter: 'drop-shadow(0 0 6px hsl(45 70% 50% / 0.6))',
               }} 
             />
-            {/* Waxing shadow overlay - represents the dark spaces */}
+            {/* Waxing shadow overlay */}
             <div 
               className="absolute inset-0 rounded-full"
               style={{
@@ -75,40 +135,75 @@ const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
           </span>
         </motion.div>
 
-        {/* Center: Current Rhythm - Dreamtime Reference */}
+        {/* Center: Seasonal Resonance Frequency Badge */}
         <motion.div
-          className="flex items-center gap-2 flex-wrap justify-center"
-          animate={{
-            textShadow: [
-              '0 0 10px hsl(280 60% 50% / 0.3)',
-              '0 0 20px hsl(280 60% 50% / 0.5)',
-              '0 0 10px hsl(280 60% 50% / 0.3)',
-            ],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
+          className="flex flex-col items-center"
         >
-          <span 
-            className="text-xs sm:text-sm tracking-[0.12em] uppercase"
-            style={{ 
-              fontFamily: "'Staatliches', sans-serif",
-              color: 'hsl(280 50% 75%)',
+          {/* Pulsing Frequency Badge */}
+          <motion.div
+            className="flex items-center gap-2 px-3 py-1 rounded-full"
+            style={{
+              background: `${resonance.color}20`,
+              border: `1px solid ${resonance.color}60`,
+              boxShadow: `0 0 15px ${resonance.color}30`,
+            }}
+            animate={{
+              boxShadow: [
+                `0 0 15px ${resonance.color}30`,
+                `0 0 25px ${resonance.color}50`,
+                `0 0 15px ${resonance.color}30`,
+              ],
+              scale: [1, 1.02, 1],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: 'easeInOut',
             }}
           >
-            CURRENT RHYTHM:
-          </span>
+            {/* Frequency dot */}
+            <motion.div
+              className="w-2 h-2 rounded-full"
+              style={{
+                background: resonance.color,
+                boxShadow: `0 0 8px ${resonance.color}`,
+              }}
+              animate={{
+                opacity: [0.6, 1, 0.6],
+                scale: [0.9, 1.1, 0.9],
+              }}
+              transition={{
+                duration: 1,
+                repeat: Infinity,
+              }}
+            />
+            <span 
+              className="text-xs sm:text-sm font-mono tracking-wide"
+              style={{ 
+                fontFamily: "'Space Mono', monospace",
+                color: resonance.color,
+              }}
+            >
+              {resonance.frequency} Hz
+            </span>
+            <span 
+              className="text-[10px] font-mono tracking-wide hidden sm:inline"
+              style={{ 
+                color: 'hsl(0 0% 55%)',
+              }}
+            >
+              {resonance.name}
+            </span>
+          </motion.div>
+          
+          {/* Octave Label */}
           <span 
-            className="text-xs sm:text-sm tracking-[0.08em]"
+            className="text-[9px] font-mono tracking-[0.1em] mt-0.5"
             style={{ 
-              fontFamily: "'Staatliches', sans-serif",
-              color: 'hsl(185 80% 65%)', // Cyan for Aboriginal reference
-              textShadow: '0 0 10px hsl(185 80% 50% / 0.5)',
+              color: 'hsl(0 0% 45%)',
             }}
           >
-            READING THE DREAMTIME SKY
+            {resonance.octave}
           </span>
         </motion.div>
 
@@ -164,7 +259,7 @@ const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
         </motion.div>
       </div>
 
-      {/* Star sparkles and dark spaces - Emu in the Sky */}
+      {/* Star sparkles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {[...Array(15)].map((_, i) => (
           <motion.div
@@ -193,4 +288,6 @@ const SkyWatcherHeader = ({ currentOpenLevel }: SkyWatcherHeaderProps) => {
   );
 };
 
+// Export the resonance getter for use in other components
+export { getSeasonalResonance };
 export default SkyWatcherHeader;

@@ -16,6 +16,7 @@ import MasterRecipeCard from './MasterRecipeCard';
 import SeasonalPriorityTag, { getSeasonalPhase } from './SeasonalPriorityTag';
 import BrixDiagnostics from './BrixDiagnostics';
 import CulturalProtocols from './CulturalProtocols';
+import SignalCircuitBoard from './SignalCircuitBoard';
 import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 interface LessonDrawerProps {
@@ -408,11 +409,21 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
                             <BrixDiagnostics color={module.color} />
                           )}
 
-                          {/* Cultural Protocols - Chakra Aligned Lore */}
-                          <CulturalProtocols 
-                            level={module.level} 
-                            color={module.color} 
-                          />
+                          {/* Level 3: Signal Circuit Board (4-Step) */}
+                          {module.level === 3 ? (
+                            <SignalCircuitBoard 
+                              color={module.color}
+                              onSwitchComplete={(switchId) => {
+                                console.log(`Circuit switch ${switchId} completed`);
+                              }}
+                            />
+                          ) : (
+                            /* Cultural Protocols - Chakra Aligned Lore (Other Levels) */
+                            <CulturalProtocols 
+                              level={module.level} 
+                              color={module.color} 
+                            />
+                          )}
 
                           {/* Mission reminder */}
                           <div 
