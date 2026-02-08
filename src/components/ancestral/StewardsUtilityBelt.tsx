@@ -1,10 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import WhisperTooltip from '@/components/ui/WhisperTooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -207,7 +203,7 @@ const utilityTools: UtilityTool[] = [
     id: 'compass',
     name: 'THE COMPASS',
     culture: 'Polynesia (Wayfinders)',
-    tooltip: 'Navigate the Season',
+    tooltip: 'Polynesian Wayfinding (Strategy)',
     icon: <StarCompassIcon className="w-8 h-8" />,
     color: 'hsl(200 70% 50%)',
   },
@@ -215,7 +211,7 @@ const utilityTools: UtilityTool[] = [
     id: 'shield',
     name: 'THE SHIELD',
     culture: 'Maasai (Guardians)',
-    tooltip: 'Protect the Herd',
+    tooltip: 'Maasai Shield (Pest Defense)',
     icon: <MaasaiShieldIcon className="w-7 h-10" />,
     color: 'hsl(0 70% 45%)',
   },
@@ -223,7 +219,7 @@ const utilityTools: UtilityTool[] = [
     id: 'kora',
     name: 'THE KORA',
     culture: 'The Griot (West Africa)',
-    tooltip: 'Sing the Story',
+    tooltip: "Griot's Instrument (Storytelling)",
     icon: <KoraIcon className="w-7 h-10" />,
     color: 'hsl(30 60% 45%)',
   },
@@ -231,7 +227,7 @@ const utilityTools: UtilityTool[] = [
     id: 'mortar',
     name: 'THE MORTAR',
     culture: 'Cherokee (Tsalagi)',
-    tooltip: 'The Land is the Medicine',
+    tooltip: 'Cherokee Apothecary (Medicine)',
     icon: <MortarPestleIcon className="w-8 h-8" />,
     color: 'hsl(140 55% 35%)',
   },
@@ -239,7 +235,7 @@ const utilityTools: UtilityTool[] = [
     id: 'seedvault',
     name: 'THE KIVA',
     culture: 'Hopi (Seed Keepers)',
-    tooltip: 'Store the Life',
+    tooltip: 'Hopi Vault (Sovereignty)',
     icon: <SeedKernelIcon className="w-7 h-10" />,
     color: 'hsl(45 70% 50%)',
   },
@@ -320,57 +316,40 @@ const StewardsUtilityBelt = () => {
           {/* Tool buttons - nowrap ensures horizontal scroll on mobile */}
           <div className="flex items-center justify-around py-2 sm:py-3 px-2 sm:px-4 min-w-max sm:min-w-0">
             {utilityTools.map((tool, index) => (
-              <Tooltip key={tool.id}>
-                <TooltipTrigger asChild>
-                  <motion.button
-                    className="relative flex flex-col items-center gap-1 p-2 rounded-xl transition-colors"
-                    style={{
-                      color: 'hsl(40 50% 75%)',
-                    }}
-                    whileHover={{ 
-                      scale: 1.1,
-                      color: tool.color,
-                    }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setActiveTool(tool.id)}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.2 + index * 0.1 }}
-                  >
-                    {/* Icon container with subtle glow on hover */}
-                    <motion.div
-                      className="relative"
-                      whileHover={{
-                        filter: `drop-shadow(0 0 8px ${tool.color})`,
-                      }}
-                    >
-                      {tool.icon}
-                    </motion.div>
-                    
-                    {/* Tool name */}
-                    <span 
-                      className="text-[10px] tracking-wider opacity-70"
-                      style={{ fontFamily: 'Staatliches, sans-serif' }}
-                    >
-                      {tool.name.split(' ')[1]}
-                    </span>
-                  </motion.button>
-                </TooltipTrigger>
-                <TooltipContent 
-                  side="top" 
-                  className="font-body text-xs"
+              <WhisperTooltip key={tool.id} whisper={tool.tooltip} position="top">
+                <motion.button
+                  className="relative flex flex-col items-center gap-1 p-2 rounded-xl transition-colors"
                   style={{
-                    background: 'hsl(20 30% 15%)',
-                    border: '1px solid hsl(30 40% 35%)',
-                    color: 'hsl(40 50% 80%)',
+                    color: 'hsl(40 50% 75%)',
                   }}
+                  whileHover={{ 
+                    scale: 1.1,
+                    color: tool.color,
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setActiveTool(tool.id)}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.2 + index * 0.1 }}
                 >
-                  <p className="font-bold">{tool.tooltip}</p>
-                  <p className="text-[10px] opacity-60" style={{ fontFamily: 'Staatliches, sans-serif' }}>
-                    {tool.culture}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
+                  {/* Icon container with subtle glow on hover */}
+                  <motion.div
+                    className="relative"
+                    whileHover={{
+                      filter: `drop-shadow(0 0 8px ${tool.color})`,
+                    }}
+                  >
+                    {tool.icon}
+                  </motion.div>
+                  
+                  {/* Tool name */}
+                  <span 
+                    className="text-[10px] tracking-wider opacity-70 font-staatliches"
+                  >
+                    {tool.name.split(' ')[1]}
+                  </span>
+                </motion.button>
+              </WhisperTooltip>
             ))}
           </div>
           

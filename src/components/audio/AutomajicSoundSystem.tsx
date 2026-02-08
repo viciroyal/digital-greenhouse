@@ -5,6 +5,7 @@ import { Play, Pause, Radio } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import pharmbotArtwork from '@/assets/pharmboi-artwork.png';
 import { getCrateTexture, SpeakerMeshPattern, SankofaBirdSvg } from './CulturalTextures';
+import WhisperTooltip from '@/components/ui/WhisperTooltip';
 
 /**
  * THE AUTOMAJIC SOUND SYSTEM
@@ -25,6 +26,7 @@ interface CrateConfig {
   frequency: string;
   colorHsl: string;
   tracks: number[];
+  whisper: string;
 }
 
 const CRATES: CrateConfig[] = [
@@ -34,6 +36,7 @@ const CRATES: CrateConfig[] = [
     frequency: '396Hz',
     colorHsl: '0 60% 35%', // From Track 1: chakra-root - PRESERVED
     tracks: [1, 2, 3],
+    whisper: 'The Root (396Hz) - Survival',
   },
   {
     id: 'flow',
@@ -41,6 +44,7 @@ const CRATES: CrateConfig[] = [
     frequency: '528Hz',
     colorHsl: '45 90% 55%', // From Track 3: chakra-solar (528Hz) - PRESERVED
     tracks: [4, 5, 6],
+    whisper: 'The Flow (528Hz) - Healing',
   },
   {
     id: 'signal',
@@ -48,6 +52,7 @@ const CRATES: CrateConfig[] = [
     frequency: '741Hz',
     colorHsl: '210 70% 55%', // From Track 7: chakra-throat - PRESERVED
     tracks: [7, 8, 9],
+    whisper: 'The Signal (741Hz) - Logic',
   },
   {
     id: 'crown',
@@ -55,6 +60,7 @@ const CRATES: CrateConfig[] = [
     frequency: '963Hz',
     colorHsl: '280 60% 55%', // From Track 9/10: chakra-vision - PRESERVED
     tracks: [10, 11, 12],
+    whisper: 'The Crown (963Hz) - Alchemy',
   },
 ];
 
@@ -163,17 +169,19 @@ const Crate = ({ config, tracks, currentTrack, onPlayTrack }: CrateProps) => {
   const texture = getCrateTexture(config.id);
   
   return (
-    <motion.div
-      className="relative rounded-2xl p-4 overflow-hidden"
-      style={{
-        background: `linear-gradient(145deg, hsl(${config.colorHsl} / 0.15), hsl(${config.colorHsl} / 0.05))`,
-        border: `2px solid hsl(${config.colorHsl} / 0.3)`,
-        boxShadow: `0 4px 20px hsl(${config.colorHsl} / 0.1), inset 0 1px 0 hsl(${config.colorHsl} / 0.1)`,
-      }}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <WhisperTooltip whisper={config.whisper} position="top">
+      <motion.div
+        className="relative rounded-2xl p-4 overflow-hidden"
+        style={{
+          background: `linear-gradient(145deg, hsl(${config.colorHsl} / 0.15), hsl(${config.colorHsl} / 0.05))`,
+          border: `2px solid hsl(${config.colorHsl} / 0.3)`,
+          boxShadow: `0 4px 20px hsl(${config.colorHsl} / 0.1), inset 0 1px 0 hsl(${config.colorHsl} / 0.1)`,
+        }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        whileHover={{ scale: 1.01 }}
+      >
       {/* Cultural Texture Overlay - THE VISUAL CONSTITUTION */}
       <div 
         className="absolute inset-0 pointer-events-none"
@@ -249,6 +257,7 @@ const Crate = ({ config, tracks, currentTrack, onPlayTrack }: CrateProps) => {
         style={{ background: `hsl(${config.colorHsl} / 0.15)` }}
       />
     </motion.div>
+    </WhisperTooltip>
   );
 };
 

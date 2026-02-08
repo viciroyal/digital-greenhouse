@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { KeyholeButton } from '@/components/portal';
+import WhisperTooltip from '@/components/ui/WhisperTooltip';
 
 interface MenuNode {
   id: string;
@@ -76,21 +77,22 @@ const MycelialMenu = ({ onInitiationClick }: MycelialMenuProps) => {
       {/* The Initiation Keyhole */}
       <KeyholeButton onClick={onInitiationClick || (() => {})} />
       {/* Spore/Seed Button */}
-      <motion.button
-        className="relative w-14 h-14 rounded-full flex items-center justify-center"
-        style={{
-          background: 'radial-gradient(circle at 30% 30%, hsl(40 60% 50%), hsl(20 50% 25%))',
-          boxShadow: isOpen 
-            ? '0 0 30px hsl(140 60% 40% / 0.6), 0 0 60px hsl(200 80% 50% / 0.3)'
-            : '0 4px 20px rgba(0,0,0,0.4)',
-          border: '2px solid hsl(40 50% 40%)',
-        }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label="Open navigation menu"
-        aria-expanded={isOpen}
-      >
+      <WhisperTooltip whisper="Return to the Mounds" position="left">
+        <motion.button
+          className="relative w-14 h-14 rounded-full flex items-center justify-center"
+          style={{
+            background: 'radial-gradient(circle at 30% 30%, hsl(40 60% 50%), hsl(20 50% 25%))',
+            boxShadow: isOpen 
+              ? '0 0 30px hsl(140 60% 40% / 0.6), 0 0 60px hsl(200 80% 50% / 0.3)'
+              : '0 4px 20px rgba(0,0,0,0.4)',
+            border: '2px solid hsl(40 50% 40%)',
+          }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Open navigation menu"
+          aria-expanded={isOpen}
+        >
         {/* Spore texture dots */}
         <div className="absolute inset-2 opacity-60">
           {[...Array(7)].map((_, i) => (
@@ -120,7 +122,8 @@ const MycelialMenu = ({ onInitiationClick }: MycelialMenuProps) => {
           }}
           transition={{ duration: 0.5 }}
         />
-      </motion.button>
+        </motion.button>
+      </WhisperTooltip>
 
       {/* Mycelium Network Container */}
       <AnimatePresence>

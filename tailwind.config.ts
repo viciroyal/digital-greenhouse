@@ -17,6 +17,7 @@ export default {
         display: ['"Chewy"', 'cursive'],
         body: ['"Space Mono"', 'monospace'],
         bubble: ['"Chewy"', 'cursive'],
+        staatliches: ['"Staatliches"', 'sans-serif'],
       },
       borderRadius: {
         organic: '2rem',
