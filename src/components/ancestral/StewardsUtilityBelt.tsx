@@ -149,6 +149,50 @@ const MortarPestleIcon = ({ className = "" }: { className?: string }) => (
   </svg>
 );
 
+// Corn/Seed Kernel Icon - Hopi Seed Keepers
+const SeedKernelIcon = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 48 56" className={className} fill="none">
+    {/* Central corn cob */}
+    <ellipse cx="24" cy="28" rx="12" ry="22" fill="hsl(45 70% 45%)" stroke="currentColor" strokeWidth="1.5" />
+    {/* Kernel rows */}
+    <g fill="hsl(45 80% 55%)" stroke="hsl(40 60% 35%)" strokeWidth="0.5">
+      {/* Row 1 */}
+      <ellipse cx="18" cy="16" rx="4" ry="5" />
+      <ellipse cx="30" cy="16" rx="4" ry="5" />
+      {/* Row 2 */}
+      <ellipse cx="14" cy="24" rx="4" ry="5" />
+      <ellipse cx="24" cy="22" rx="4" ry="5" />
+      <ellipse cx="34" cy="24" rx="4" ry="5" />
+      {/* Row 3 */}
+      <ellipse cx="16" cy="32" rx="4" ry="5" />
+      <ellipse cx="26" cy="30" rx="4" ry="5" />
+      <ellipse cx="32" cy="34" rx="4" ry="5" />
+      {/* Row 4 */}
+      <ellipse cx="20" cy="40" rx="4" ry="5" />
+      <ellipse cx="28" cy="42" rx="4" ry="5" />
+    </g>
+    {/* Husk leaves */}
+    <path 
+      d="M10 50 Q12 35, 10 20 Q8 15, 12 12" 
+      stroke="hsl(100 40% 35%)" 
+      strokeWidth="3" 
+      fill="none" 
+      strokeLinecap="round"
+    />
+    <path 
+      d="M38 50 Q36 35, 38 20 Q40 15, 36 12" 
+      stroke="hsl(100 40% 35%)" 
+      strokeWidth="3" 
+      fill="none" 
+      strokeLinecap="round"
+    />
+    {/* Top silk */}
+    <path d="M22 6 Q20 2, 18 0" stroke="hsl(45 50% 60%)" strokeWidth="1" fill="none" opacity="0.7" />
+    <path d="M24 5 Q24 1, 24 -2" stroke="hsl(45 50% 60%)" strokeWidth="1" fill="none" opacity="0.7" />
+    <path d="M26 6 Q28 2, 30 0" stroke="hsl(45 50% 60%)" strokeWidth="1" fill="none" opacity="0.7" />
+  </svg>
+);
+
 interface UtilityTool {
   id: string;
   name: string;
@@ -189,7 +233,15 @@ const utilityTools: UtilityTool[] = [
     culture: 'Cherokee (Tsalagi)',
     tooltip: 'The Land is the Medicine',
     icon: <MortarPestleIcon className="w-8 h-8" />,
-    color: 'hsl(140 55% 35%)', // Deep Green glow for the Green Pharmacy
+    color: 'hsl(140 55% 35%)',
+  },
+  {
+    id: 'seedvault',
+    name: 'THE KIVA',
+    culture: 'Hopi (Seed Keepers)',
+    tooltip: 'Store the Life',
+    icon: <SeedKernelIcon className="w-7 h-10" />,
+    color: 'hsl(45 70% 50%)',
   },
 ];
 
@@ -214,6 +266,11 @@ const toolContent: Record<string, { title: string; description: string; comingSo
     title: 'The Herbal Apothecary',
     description: 'Honor the Green Pharmacy of the Cherokee (Tsalagi) tradition. Access herbal protocols, preparation methods, and the medicine wheel of the local Georgia flora.',
     comingSoon: true,
+  },
+  seedvault: {
+    title: 'The Kiva (Seed Vault)',
+    description: 'We store the life for the next cycle. The Hopi have kept the sacred seeds for 10,000 years. This is the way of the Seed Keepers.',
+    comingSoon: false,
   },
 };
 
@@ -327,7 +384,7 @@ const StewardsUtilityBelt = () => {
 
       {/* Tool Modal - Standard for most tools */}
       <AnimatePresence>
-        {activeTool && activeTool !== 'mortar' && (
+        {activeTool && activeTool !== 'mortar' && activeTool !== 'seedvault' && (
           <Dialog open={!!activeTool} onOpenChange={() => setActiveTool(null)}>
             <DialogContent
               className="max-w-lg"
@@ -372,6 +429,153 @@ const StewardsUtilityBelt = () => {
                     </p>
                   </motion.div>
                 )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+      </AnimatePresence>
+
+      {/* THE KIVA (SEED VAULT) - Hopi Seed Keepers */}
+      <AnimatePresence>
+        {activeTool === 'seedvault' && (
+          <Dialog open={activeTool === 'seedvault'} onOpenChange={() => setActiveTool(null)}>
+            <DialogContent
+              className="max-w-lg"
+              style={{
+                background: 'linear-gradient(180deg, hsl(45 30% 15%) 0%, hsl(30 35% 10%) 100%)',
+                border: '2px solid hsl(45 50% 40%)',
+                color: 'hsl(40 50% 85%)',
+              }}
+            >
+              <DialogHeader>
+                <DialogTitle 
+                  className="text-xl tracking-wider flex items-center gap-3"
+                  style={{ fontFamily: 'Staatliches, sans-serif', color: 'hsl(45 80% 65%)' }}
+                >
+                  <SeedKernelIcon className="w-8 h-10" />
+                  THE KIVA (SEED VAULT)
+                </DialogTitle>
+              </DialogHeader>
+              
+              <div className="py-4">
+                {/* Lore Section */}
+                <motion.div
+                  className="mb-6 p-4 rounded-xl"
+                  style={{
+                    background: 'hsl(45 30% 12% / 0.6)',
+                    border: '1px solid hsl(45 40% 30%)',
+                  }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <p 
+                    className="text-sm font-body leading-relaxed italic"
+                    style={{ color: 'hsl(45 60% 75%)' }}
+                  >
+                    "We store the life for the next cycle."
+                  </p>
+                  <p 
+                    className="text-[10px] mt-2 tracking-wider"
+                    style={{ fontFamily: 'Staatliches, sans-serif', color: 'hsl(45 40% 50%)' }}
+                  >
+                    LINEAGE: HOPI (THE SEED KEEPERS)
+                  </p>
+                </motion.div>
+
+                <p className="font-body text-sm leading-relaxed opacity-80 mb-6">
+                  {toolContent.seedvault?.description}
+                </p>
+
+                {/* Seed Inventory Placeholder */}
+                <div 
+                  className="rounded-xl overflow-hidden"
+                  style={{
+                    border: '1px solid hsl(45 35% 30%)',
+                  }}
+                >
+                  <div 
+                    className="px-4 py-2"
+                    style={{
+                      background: 'hsl(45 30% 20%)',
+                      borderBottom: '1px solid hsl(45 35% 30%)',
+                    }}
+                  >
+                    <p 
+                      className="text-sm tracking-wider"
+                      style={{ fontFamily: 'Staatliches, sans-serif', color: 'hsl(45 70% 70%)' }}
+                    >
+                      YOUR SEED INVENTORY
+                    </p>
+                  </div>
+                  <div 
+                    className="p-4 space-y-3"
+                    style={{ background: 'hsl(30 25% 12%)' }}
+                  >
+                    {/* Placeholder seeds */}
+                    {[
+                      { name: 'Cherokee Purple Tomato', quantity: 24, saved: '2025' },
+                      { name: 'Sea Island Red Pea', quantity: 50, saved: '2024' },
+                      { name: 'Jimmy Red Corn', quantity: 36, saved: '2025' },
+                    ].map((seed, i) => (
+                      <motion.div
+                        key={seed.name}
+                        className="flex items-center justify-between p-3 rounded-lg"
+                        style={{
+                          background: 'hsl(45 25% 15% / 0.5)',
+                          border: '1px solid hsl(45 30% 25%)',
+                        }}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 * i }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">🌱</span>
+                          <div>
+                            <p 
+                              className="text-sm font-medium"
+                              style={{ color: 'hsl(45 60% 75%)' }}
+                            >
+                              {seed.name}
+                            </p>
+                            <p 
+                              className="text-[10px] opacity-60"
+                              style={{ fontFamily: 'Space Mono, monospace' }}
+                            >
+                              Saved: {seed.saved}
+                            </p>
+                          </div>
+                        </div>
+                        <div 
+                          className="px-2 py-1 rounded-full text-xs font-mono"
+                          style={{
+                            background: 'hsl(45 40% 25%)',
+                            color: 'hsl(45 70% 70%)',
+                          }}
+                        >
+                          {seed.quantity} seeds
+                        </div>
+                      </motion.div>
+                    ))}
+                    
+                    {/* Add Seed Button Placeholder */}
+                    <motion.button
+                      className="w-full py-3 rounded-lg text-sm tracking-wider flex items-center justify-center gap-2"
+                      style={{
+                        background: 'hsl(45 30% 18%)',
+                        border: '1px dashed hsl(45 40% 35%)',
+                        color: 'hsl(45 50% 60%)',
+                        fontFamily: 'Staatliches, sans-serif',
+                      }}
+                      whileHover={{ 
+                        scale: 1.02,
+                        background: 'hsl(45 35% 22%)',
+                      }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <span>+ ADD SEED TO VAULT</span>
+                    </motion.button>
+                  </div>
+                </div>
               </div>
             </DialogContent>
           </Dialog>
