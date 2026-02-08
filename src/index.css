@@ -512,4 +512,34 @@
   .matrix-cell {
     @apply matrix-cell-organic;
   }
+
+  /* Glassmorphism Text Backdrop - High Contrast Readability */
+  .text-backdrop {
+    background: hsl(0 0% 0% / 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    padding: 1rem;
+  }
+
+  .text-backdrop-light {
+    background: hsl(255 255% 100% / 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    padding: 1rem;
+  }
+
+  /* Ensure minimum text contrast on textured backgrounds */
+  .high-contrast-text {
+    color: hsl(40 50% 95%);
+    text-shadow: 0 1px 3px hsl(0 0% 0% / 0.8);
+  }
+
+  /* WCAG AA compliant body text */
+  .readable-body {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: hsl(40 40% 80%);
+  }
 }
