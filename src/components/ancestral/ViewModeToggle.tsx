@@ -12,8 +12,8 @@ interface ViewModeToggleProps {
  * VIEW MODE TOGGLE
  * 
  * Switches between:
+ * - THE ALMANAC: Living reference book (Study Mode)
  * - THE PATH: Gamified totem with locked levels
- * - THE BOOK: Linear textbook layout (The Grimoire)
  */
 const ViewModeToggle = ({ value, onChange }: ViewModeToggleProps) => {
   return (
@@ -28,18 +28,18 @@ const ViewModeToggle = ({ value, onChange }: ViewModeToggleProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
     >
-      {/* THE LIBRARY Option (First - Default) */}
+      {/* THE ALMANAC Option (First - Default) */}
       <motion.button
         className="flex items-center gap-2 px-4 py-2 rounded-full font-mono text-xs tracking-wider transition-all"
         style={{
           background: value === 'book' 
-            ? 'linear-gradient(135deg, hsl(280 40% 25%), hsl(260 35% 20%))'
+            ? 'linear-gradient(135deg, hsl(40 45% 22%), hsl(35 40% 18%))'
             : 'transparent',
           color: value === 'book' 
-            ? 'hsl(280 70% 75%)' 
+            ? 'hsl(40 70% 70%)' 
             : 'hsl(40 30% 50%)',
           boxShadow: value === 'book' 
-            ? '0 0 20px hsl(280 60% 40% / 0.3)' 
+            ? '0 0 20px hsl(40 60% 35% / 0.3)' 
             : 'none',
         }}
         onClick={() => onChange('book')}
@@ -47,7 +47,7 @@ const ViewModeToggle = ({ value, onChange }: ViewModeToggleProps) => {
         whileTap={{ scale: 0.98 }}
       >
         <BookOpen className="w-4 h-4" />
-        THE LIBRARY
+        THE ALMANAC
       </motion.button>
 
       {/* THE PATH Option */}
