@@ -421,7 +421,7 @@ const StewardsUtilityBelt = () => {
                     style={{ fontFamily: 'Staatliches, sans-serif' }}
                   >
                     <IronPotIcon className="w-5 h-4" />
-                    THE KITCHEN
+                    THE GULLAH POT
                   </TabsTrigger>
                 </TabsList>
                 
@@ -478,15 +478,14 @@ const StewardsUtilityBelt = () => {
                       </div>
                       <div>
                         <p className="text-sm font-bold" style={{ color: 'hsl(45 70% 65%)' }}>
-                          Gullah Geechee Heritage
+                          Grandma's Protocols (Gullah Geechee)
                         </p>
-                        <p className="text-xs opacity-60">The Medicine is in the Pot</p>
+                        <p className="text-xs opacity-60">The Pot is the Pharmacy</p>
                       </div>
                     </div>
                     
-                    <p className="font-body text-sm leading-relaxed opacity-80">
-                      Honoring the Gullah Geechee heritage — the keepers of West African culinary medicine 
-                      on the Sea Islands. Food as frequency. Cooking as ceremony.
+                    <p className="font-body text-sm leading-relaxed opacity-80 italic">
+                      "We do not just grow the medicine; we eat it. The Rice, the Okra, the Benne."
                     </p>
                     
                     <motion.div
@@ -502,12 +501,23 @@ const StewardsUtilityBelt = () => {
                         className="text-sm tracking-wider mb-3"
                         style={{ fontFamily: 'Staatliches, sans-serif', color: 'hsl(45 60% 60%)' }}
                       >
-                        GRANDMA'S PROTOCOLS
+                        THE RECIPES
                       </p>
-                      <div className="space-y-2 font-body text-xs opacity-70">
-                        <p>• <span className="text-[hsl(45_60%_65%)]">Carolina Gold Rice</span> — The grain that built a nation</p>
-                        <p>• <span className="text-[hsl(140_50%_55%)]">Okra</span> — The binder of the pot, the healer of the gut</p>
-                        <p>• <span className="text-[hsl(30_60%_60%)]">Benne (Sesame)</span> — The seed of good fortune</p>
+                      <div className="space-y-3 font-body text-sm">
+                        <div className="flex items-center gap-3 p-2 rounded-lg" style={{ background: 'hsl(0 50% 20% / 0.3)' }}>
+                          <span className="text-lg">🍚</span>
+                          <div>
+                            <p className="text-[hsl(0_60%_65%)] font-bold">Recipe 1: Red Rice</p>
+                            <p className="text-xs opacity-60">Tomato, onion, and the ancestors' blessing</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 p-2 rounded-lg" style={{ background: 'hsl(140 40% 20% / 0.3)' }}>
+                          <span className="text-lg">🥬</span>
+                          <div>
+                            <p className="text-[hsl(140_50%_55%)] font-bold">Recipe 2: Pot Likker</p>
+                            <p className="text-xs opacity-60">The broth of collards — liquid medicine</p>
+                          </div>
+                        </div>
                       </div>
                     </motion.div>
                     
@@ -524,10 +534,10 @@ const StewardsUtilityBelt = () => {
                         className="text-sm tracking-widest mb-1"
                         style={{ fontFamily: 'Staatliches, sans-serif', color: 'hsl(45 60% 60%)' }}
                       >
-                        RECIPE ARCHIVE COMING
+                        MORE RECIPES LOADING
                       </p>
                       <p className="font-body text-[10px] opacity-50">
-                        Preserving the wisdom of the Low Country...
+                        Preserving the wisdom of the Low Country Sea Islands...
                       </p>
                     </motion.div>
                   </div>
