@@ -1,33 +1,32 @@
-import { motion } from 'framer-motion';
 import type { TrackData } from '@/data/trackData';
+import DataQuadrant from './DataQuadrant';
 
 interface LogicQuadrantProps {
   track: TrackData;
 }
 
+const LogicIcon = ({ color }: { color: string }) => (
+  <svg viewBox="0 0 24 24" width={18} height={18}>
+    <circle cx="12" cy="12" r="8" fill="none" stroke={`hsl(${color})`} strokeWidth="1.5" />
+    <path d="M8 8 L16 16 M16 8 L8 16" stroke={`hsl(${color})`} strokeWidth="1.5" />
+    <circle cx="12" cy="12" r="2" fill={`hsl(${color})`} />
+  </svg>
+);
+
 const LogicQuadrant = ({ track }: LogicQuadrantProps) => {
   return (
-    <motion.div
-      className="root-card p-6 h-full"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4 }}
+    <DataQuadrant
+      title="The Logic"
+      label="PHARMER'S NOTE"
+      icon={<LogicIcon color={track.colorHsl} />}
+      trackColor={track.colorHsl}
+      delay={0.4}
     >
-      <div className="flex items-center gap-3 mb-4">
-        <svg viewBox="0 0 24 24" width={28} height={28} className="drop-shadow">
-          <circle cx="12" cy="12" r="10" fill="hsl(20 40% 18%)" stroke="hsl(140 50% 40%)" strokeWidth="1" />
-          <path d="M8 8 L16 16 M16 8 L8 16" stroke="hsl(45 90% 55%)" strokeWidth="1.5" strokeLinecap="round" />
-          <circle cx="12" cy="12" r="3" fill="hsl(45 90% 55%)" />
-        </svg>
-        <h3 className="font-bubble text-xl text-foreground">The Logic</h3>
-        <span className="text-muted-foreground/60 font-body text-xs ml-auto tracking-wider">PHARMER'S NOTE</span>
-      </div>
-
       {/* Quote box */}
       <div 
-        className="relative p-6 rounded-xl border"
+        className="relative p-6 rounded-xl"
         style={{ 
-          borderColor: `hsl(${track.colorHsl} / 0.3)`,
+          border: `1px solid hsl(${track.colorHsl} / 0.2)`,
           background: `linear-gradient(135deg, hsl(${track.colorHsl} / 0.05) 0%, transparent 100%)`
         }}
       >
@@ -39,7 +38,10 @@ const LogicQuadrant = ({ track }: LogicQuadrantProps) => {
           "
         </span>
         
-        <p className="font-body text-base text-foreground leading-relaxed italic pl-4">
+        <p 
+          className="font-body text-base leading-relaxed italic pl-4"
+          style={{ color: 'hsl(40 50% 88%)' }}
+        >
           {track.pharmerNote}
         </p>
 
@@ -55,17 +57,17 @@ const LogicQuadrant = ({ track }: LogicQuadrantProps) => {
       <div className="mt-6 flex items-center gap-3">
         <div 
           className="h-px flex-1"
-          style={{ background: `linear-gradient(90deg, hsl(${track.colorHsl} / 0.5), transparent)` }}
+          style={{ background: `linear-gradient(90deg, hsl(${track.colorHsl} / 0.4), transparent)` }}
         />
-        <p className="text-muted-foreground/60 font-body text-xs">
+        <p className="font-mono text-[10px]" style={{ color: 'hsl(40 30% 55%)' }}>
           {track.mineral} → {track.chakra} → {track.frequency}
         </p>
         <div 
           className="h-px flex-1"
-          style={{ background: `linear-gradient(90deg, transparent, hsl(${track.colorHsl} / 0.5)` }}
+          style={{ background: `linear-gradient(90deg, transparent, hsl(${track.colorHsl} / 0.4))` }}
         />
       </div>
-    </motion.div>
+    </DataQuadrant>
   );
 };
 

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { forwardRef } from 'react';
 import type { TrackData } from '@/data/trackData';
-
+import DataQuadrant from './DataQuadrant';
 interface ActivationQuadrantProps {
   track: TrackData;
 }
@@ -286,107 +286,112 @@ const YogaPoseSvg = ({ pose, color }: { pose: string; color: string }) => {
   );
 };
 
+const ActivationIcon = ({ color }: { color: string }) => (
+  <svg viewBox="0 0 24 24" width={18} height={18}>
+    <circle cx="12" cy="5" r="3" fill="none" stroke={`hsl(${color})`} strokeWidth="1.5" />
+    <path d="M12 8 L12 14" stroke={`hsl(${color})`} strokeWidth="1.5" />
+    <path d="M12 11 L9 9" stroke={`hsl(${color})`} strokeWidth="1" />
+    <path d="M12 11 L15 9" stroke={`hsl(${color})`} strokeWidth="1" />
+    <path d="M10 14 L12 14 L14 14" stroke={`hsl(${color})`} strokeWidth="1.5" />
+    <path d="M10 14 L8 20" stroke={`hsl(${color})`} strokeWidth="1.5" />
+    <path d="M14 14 L16 20" stroke={`hsl(${color})`} strokeWidth="1.5" />
+  </svg>
+);
+
 const ActivationQuadrant = forwardRef<HTMLDivElement, ActivationQuadrantProps>(
   ({ track }, ref) => {
   return (
-    <motion.div
-      ref={ref}
-      className="root-card p-6 md:col-span-2"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5 }}
-    >
-      <div className="flex items-center gap-3 mb-4">
-        <svg viewBox="0 0 28 28" width={28} height={28} className="drop-shadow">
-          <circle cx="14" cy="14" r="12" fill="hsl(280 50% 20%)" stroke="hsl(280 60% 55%)" strokeWidth="1" />
-          <circle cx="14" cy="8" r="3" fill="hsl(40 50% 90%)" />
-          <path d="M14 11 L14 18" stroke="hsl(40 50% 90%)" strokeWidth="1.5" />
-          <path d="M14 14 L10 12" stroke="hsl(40 50% 90%)" strokeWidth="1" />
-          <path d="M14 14 L18 12" stroke="hsl(40 50% 90%)" strokeWidth="1" />
-          <path d="M11 18 L14 18 L17 18" stroke="hsl(40 50% 90%)" strokeWidth="1.5" />
-          <path d="M11 18 L10 24" stroke="hsl(40 50% 90%)" strokeWidth="1" />
-          <path d="M17 18 L18 24" stroke="hsl(40 50% 90%)" strokeWidth="1" />
-        </svg>
-        <h3 className="font-bubble text-xl text-foreground">The Activation</h3>
-        <span className="text-muted-foreground/60 font-body text-xs ml-auto tracking-wider">THE RITUAL</span>
-      </div>
+    <div ref={ref} className="md:col-span-2">
+      <DataQuadrant
+        title="The Activation"
+        label="THE RITUAL"
+        icon={<ActivationIcon color={track.colorHsl} />}
+        trackColor={track.colorHsl}
+        delay={0.5}
+      >
+        {/* Instruction header */}
+        <p className="font-body text-xs italic mb-6 text-center" style={{ color: 'hsl(40 30% 60%)' }}>
+          "To maximize absorption of this frequency, assume this posture."
+        </p>
 
-      {/* Instruction header */}
-      <p className="text-muted-foreground/80 font-body text-xs italic mb-6 text-center">
-        "To maximize absorption of this frequency, assume this posture."
-      </p>
-
-      <div className="grid md:grid-cols-3 gap-6">
-        {/* Yoga Pose SVG */}
-        <div className="flex flex-col items-center">
-          <div 
-            className="w-32 h-32 rounded-2xl p-4 flex items-center justify-center mb-3"
-            style={{ 
-              background: `linear-gradient(135deg, hsl(${track.colorHsl} / 0.1) 0%, transparent 100%)`,
-              border: `1px solid hsl(${track.colorHsl} / 0.2)`
-            }}
-          >
-            <YogaPoseSvg pose={track.yogaPoseSanskrit} color={track.colorHsl} />
-          </div>
-          <p 
-            className="font-bubble text-lg font-bold text-center"
-            style={{ color: `hsl(${track.colorHsl})` }}
-          >
-            {track.yogaPose}
-          </p>
-          <p className="font-body text-xs text-muted-foreground italic text-center">
-            ({track.yogaPoseSanskrit})
-          </p>
-        </div>
-
-        {/* Why and Action */}
-        <div className="md:col-span-2 space-y-4">
-          {/* Why this pose */}
-          <div>
-            <p className="text-muted-foreground/60 font-body text-xs uppercase tracking-wider mb-2">
-              Why This Pose
-            </p>
-            <p className="font-body text-sm text-foreground leading-relaxed">
-              {track.yogaWhy}
-            </p>
-          </div>
-
-          {/* The Action */}
-          <div 
-            className="p-4 rounded-xl border"
-            style={{ 
-              borderColor: `hsl(${track.colorHsl} / 0.3)`,
-              background: `linear-gradient(135deg, hsl(${track.colorHsl} / 0.08) 0%, transparent 100%)`
-            }}
-          >
-            <p className="text-muted-foreground/60 font-body text-xs uppercase tracking-wider mb-2">
-              The Action
-            </p>
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Yoga Pose SVG */}
+          <div className="flex flex-col items-center">
+            <div 
+              className="w-32 h-32 rounded-2xl p-4 flex items-center justify-center mb-3"
+              style={{ 
+                background: `linear-gradient(135deg, hsl(${track.colorHsl} / 0.1) 0%, transparent 100%)`,
+                border: `1px solid hsl(${track.colorHsl} / 0.2)`
+              }}
+            >
+              <YogaPoseSvg pose={track.yogaPoseSanskrit} color={track.colorHsl} />
+            </div>
             <p 
-              className="font-body text-base font-medium leading-relaxed"
+              className="font-display text-lg text-center"
               style={{ color: `hsl(${track.colorHsl})` }}
             >
-              "{track.ritualAction}"
+              {track.yogaPose}
+            </p>
+            <p className="font-body text-xs italic text-center" style={{ color: 'hsl(40 30% 55%)' }}>
+              ({track.yogaPoseSanskrit})
             </p>
           </div>
 
-          {/* Connection to frequency */}
-          <div className="flex items-center gap-2 pt-2">
+          {/* Why and Action */}
+          <div className="md:col-span-2 space-y-4">
+            {/* Why this pose */}
+            <div>
+              <p 
+                className="font-mono text-[10px] uppercase tracking-wider mb-2"
+                style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
+              >
+                Why This Pose
+              </p>
+              <p className="font-body text-sm leading-relaxed" style={{ color: 'hsl(40 50% 88%)' }}>
+                {track.yogaWhy}
+              </p>
+            </div>
+
+            {/* The Action */}
             <div 
-              className="h-px flex-1"
-              style={{ background: `linear-gradient(90deg, hsl(${track.colorHsl} / 0.4), transparent)` }}
-            />
-            <p className="font-mono text-xs text-muted-foreground/60">
-              {track.yogaPose} × {track.frequency} × {track.chakra}
-            </p>
-            <div 
-              className="h-px flex-1"
-              style={{ background: `linear-gradient(90deg, transparent, hsl(${track.colorHsl} / 0.4))` }}
-            />
+              className="p-4 rounded-xl"
+              style={{ 
+                border: `1px solid hsl(${track.colorHsl} / 0.2)`,
+                background: `linear-gradient(135deg, hsl(${track.colorHsl} / 0.08) 0%, transparent 100%)`
+              }}
+            >
+              <p 
+                className="font-mono text-[10px] uppercase tracking-wider mb-2"
+                style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
+              >
+                The Action
+              </p>
+              <p 
+                className="font-body text-base font-medium leading-relaxed"
+                style={{ color: `hsl(${track.colorHsl})` }}
+              >
+                "{track.ritualAction}"
+              </p>
+            </div>
+
+            {/* Connection to frequency */}
+            <div className="flex items-center gap-2 pt-2">
+              <div 
+                className="h-px flex-1"
+                style={{ background: `linear-gradient(90deg, hsl(${track.colorHsl} / 0.3), transparent)` }}
+              />
+              <p className="font-mono text-[10px]" style={{ color: 'hsl(40 30% 55%)' }}>
+                {track.yogaPose} × {track.frequency} × {track.chakra}
+              </p>
+              <div 
+                className="h-px flex-1"
+                style={{ background: `linear-gradient(90deg, transparent, hsl(${track.colorHsl} / 0.3))` }}
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </motion.div>
+      </DataQuadrant>
+    </div>
   );
 });
 
