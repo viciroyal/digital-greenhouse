@@ -7,7 +7,7 @@
    All colors in HSL
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Chewy&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chewy&family=Space+Mono:wght@400;700&family=Staatliches&display=swap');
 
 @layer base {
   :root {
@@ -515,19 +515,36 @@
 
   /* Glassmorphism Text Backdrop - High Contrast Readability */
   .text-backdrop {
-    background: hsl(0 0% 0% / 0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 1rem;
     padding: 1rem;
   }
 
   .text-backdrop-light {
-    background: hsl(255 255% 100% / 0.08);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 1rem;
     padding: 1rem;
+  }
+
+  /* The Whisper Glass - Standard Tooltip Container */
+  .whisper-glass {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Staatliches Headers - Ancestral Typography */
+  .font-staatliches {
+    font-family: 'Staatliches', sans-serif;
+    letter-spacing: 0.05em;
   }
 
   /* Ensure minimum text contrast on textured backgrounds */
