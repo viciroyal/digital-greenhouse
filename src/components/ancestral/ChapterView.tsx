@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Beaker, Wrench, Heart, FlaskConical, ArrowRight, ChevronUp } from 'lucide-react';
-import ScaleToggle, { AccessScale } from './ScaleToggle';
+import { AccessScale } from './ScaleToggle';
 import ScaledProtocolSteps from './ScaledProtocolSteps';
 import { getProtocolByLevel } from './scaleProtocolData';
 import BodyCheckIn from './BodyCheckIn';
@@ -198,15 +198,16 @@ interface ChapterViewProps {
   onClose: () => void;
   onEnterFieldLab: (chapterNumber: number) => void;
   searchQuery?: string;
+  accessScale: AccessScale;
 }
 
 /**
  * CHAPTER VIEW - The Reading Mode
  * 
- * Structured content: Wisdom → Science → Protocol → Somatic → Field Lab
+ * Structured content: Wisdom → Science → Protocol → Somatic → Field Notes
+ * The accessScale is passed from the Almanac for dynamic content.
  */
-const ChapterView = ({ chapterId, onClose, onEnterFieldLab, searchQuery = '' }: ChapterViewProps) => {
-  const [accessScale, setAccessScale] = useState<AccessScale>('sprout');
+const ChapterView = ({ chapterId, onClose, onEnterFieldLab, searchQuery = '', accessScale }: ChapterViewProps) => {
   const [isBodyTuned, setIsBodyTuned] = useState(false);
 
   const chapter = chapterData.find(c => c.id === chapterId);
@@ -418,13 +419,6 @@ const ChapterView = ({ chapterId, onClose, onEnterFieldLab, searchQuery = '' }: 
           </h2>
         </div>
 
-        {/* Scale Toggle */}
-        <ScaleToggle
-          value={accessScale}
-          onChange={setAccessScale}
-          color={chapter.color}
-        />
-
         {/* Scaled Protocol Steps */}
         {scaledProtocolConfig && scaledSteps.length > 0 && (
           <ScaledProtocolSteps
@@ -514,7 +508,7 @@ const ChapterView = ({ chapterId, onClose, onEnterFieldLab, searchQuery = '' }: 
         </div>
       </motion.section>
 
-      {/* SECTION 5: ENTER FIELD LAB (Game Layer) */}
+      {/* SECTION 5: OPEN FIELD NOTES (Game Layer) */}
       <motion.section
         className="p-6 rounded-xl text-center"
         style={{
@@ -533,7 +527,7 @@ const ChapterView = ({ chapterId, onClose, onEnterFieldLab, searchQuery = '' }: 
             color: 'hsl(0 0% 60%)',
           }}
         >
-          THE FIELD LAB
+          FIELD NOTES
         </div>
 
         <h3
@@ -543,14 +537,14 @@ const ChapterView = ({ chapterId, onClose, onEnterFieldLab, searchQuery = '' }: 
             color: chapter.color,
           }}
         >
-          Ready to Prove It in the Soil?
+          Ready to Record Your Observation?
         </h3>
 
         <p
           className="text-sm font-mono mb-6"
           style={{ color: 'hsl(40 40% 60%)' }}
         >
-          You have studied the theory. Now log your work and earn your credentials.
+          You have read the Almanac. Now log your work and earn your credentials.
         </p>
 
         <Button
@@ -563,7 +557,7 @@ const ChapterView = ({ chapterId, onClose, onEnterFieldLab, searchQuery = '' }: 
           }}
           onClick={() => onEnterFieldLab(chapter.number)}
         >
-          ENTER FIELD LAB
+          OPEN FIELD NOTES
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
 

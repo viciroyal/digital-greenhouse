@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ChevronRight, BookOpen, Leaf, Mountain, Zap, Droplet, Crown, X, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import ChapterView, { chapterData } from './ChapterView';
+import ScaleToggle, { AccessScale } from './ScaleToggle';
 
 interface SyllabusChapter {
   id: string;
-  number: number;
+  number: string;
   title: string;
   subtitle: string;
   culture: string;
@@ -16,13 +17,13 @@ interface SyllabusChapter {
   icon: typeof Leaf;
 }
 
-// The Syllabus - Table of Contents
+// The Living Almanac - Table of Contents (Roman Numerals)
 const syllabusData: SyllabusChapter[] = [
   {
     id: 'intro',
-    number: 0,
-    title: 'INTRODUCTION',
-    subtitle: 'The Philosophy',
+    number: '◆',
+    title: 'THE PHILOSOPHY',
+    subtitle: 'Listen When The Soil Whispers',
     culture: 'The Soil Has a Memory',
     crop: '',
     cropGoal: '',
@@ -31,10 +32,10 @@ const syllabusData: SyllabusChapter[] = [
   },
   {
     id: 'chapter-1',
-    number: 1,
-    title: 'MODULE 1: THE ROOT',
-    subtitle: 'Structure',
-    culture: 'Muscogee & Maroons',
+    number: 'I',
+    title: 'THE FOUNDATION',
+    subtitle: 'Shelter / Root',
+    culture: 'Muscogee Science',
     crop: 'Bamboo',
     cropGoal: 'Shelter',
     color: 'hsl(0 70% 45%)',
@@ -42,10 +43,10 @@ const syllabusData: SyllabusChapter[] = [
   },
   {
     id: 'chapter-2',
-    number: 2,
-    title: 'MODULE 2: THE FLOW',
-    subtitle: 'Hydration',
-    culture: 'Olmec (Xi)',
+    number: 'II',
+    title: 'THE FLOW',
+    subtitle: 'Food / Water',
+    culture: 'Olmec Science',
     crop: 'Sweet Potato',
     cropGoal: 'Food',
     color: 'hsl(30 50% 40%)',
@@ -53,10 +54,10 @@ const syllabusData: SyllabusChapter[] = [
   },
   {
     id: 'chapter-3',
-    number: 3,
-    title: 'MODULE 3: THE ENERGY',
-    subtitle: 'Atmosphere',
-    culture: 'Dogon, Vedic, Aboriginal, Chinese',
+    number: 'III',
+    title: 'THE SIGNAL',
+    subtitle: 'Clothing / Atmosphere',
+    culture: 'Dogon Science',
     crop: 'Hemp',
     cropGoal: 'Clothing',
     color: 'hsl(15 100% 50%)',
@@ -64,10 +65,10 @@ const syllabusData: SyllabusChapter[] = [
   },
   {
     id: 'chapter-4',
-    number: 4,
-    title: 'MODULE 4: THE ALCHEMY',
-    subtitle: 'Nutrition',
-    culture: 'Ancient Kemit',
+    number: 'IV',
+    title: 'THE ALCHEMY',
+    subtitle: 'Nutrition / Gold',
+    culture: 'Kemetic Science',
     crop: 'Indigo',
     cropGoal: 'Adornment',
     color: 'hsl(51 100% 50%)',
@@ -75,10 +76,10 @@ const syllabusData: SyllabusChapter[] = [
   },
   {
     id: 'chapter-5',
-    number: 5,
-    title: 'MODULE 5: THE RETURN',
-    subtitle: 'Sovereignty',
-    culture: 'Maroon Grandmothers',
+    number: 'V',
+    title: 'THE RETURN',
+    subtitle: 'Sovereignty / Seed',
+    culture: 'Maroon Science',
     crop: 'Rice (Carolina Gold)',
     cropGoal: 'Legacy',
     color: 'hsl(0 0% 85%)',
@@ -91,13 +92,14 @@ interface GrimoireViewProps {
 }
 
 /**
- * THE GRIMOIRE - The Living Library
+ * THE LIVING ALMANAC (2026 Edition)
  * 
- * A searchable, linear view of all curriculum content.
- * Study Mode is the Lead — this is a Digital Codex.
+ * A dynamic, interactive reference book for Sovereign Living.
+ * The Almanac "reads" the user via the Scale Toggle.
  */
 const GrimoireView = ({ onEnterFieldLab }: GrimoireViewProps) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [accessScale, setAccessScale] = useState<AccessScale>('sprout');
   const [selectedChapter, setSelectedChapter] = useState<string | null>(null);
 
   // Filter syllabus based on search
@@ -155,6 +157,7 @@ const GrimoireView = ({ onEnterFieldLab }: GrimoireViewProps) => {
               onClose={() => setSelectedChapter(null)}
               onEnterFieldLab={handleEnterFieldLab}
               searchQuery={searchQuery}
+              accessScale={accessScale}
             />
           </motion.div>
         ) : (
@@ -167,23 +170,23 @@ const GrimoireView = ({ onEnterFieldLab }: GrimoireViewProps) => {
           >
             {/* Header */}
             <motion.div
-              className="text-center mb-8"
+              className="text-center mb-6"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <div
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4"
                 style={{
-                  background: 'hsl(280 30% 15%)',
-                  border: '1px solid hsl(280 40% 35%)',
+                  background: 'hsl(40 30% 12%)',
+                  border: '1px solid hsl(40 50% 35%)',
                 }}
               >
-                <BookOpen className="w-4 h-4" style={{ color: 'hsl(280 60% 65%)' }} />
+                <BookOpen className="w-4 h-4" style={{ color: 'hsl(40 60% 60%)' }} />
                 <span
                   className="text-xs font-mono tracking-widest"
-                  style={{ color: 'hsl(280 50% 70%)' }}
+                  style={{ color: 'hsl(40 50% 65%)' }}
                 >
-                  STUDY MODE ACTIVE
+                  2026 EDITION
                 </span>
               </div>
 
@@ -191,26 +194,40 @@ const GrimoireView = ({ onEnterFieldLab }: GrimoireViewProps) => {
                 className="text-3xl md:text-4xl mb-2 tracking-[0.15em]"
                 style={{
                   fontFamily: "'Staatliches', sans-serif",
-                  color: 'hsl(280 60% 70%)',
-                  textShadow: '0 0 30px hsl(280 60% 50% / 0.4)',
+                  color: 'hsl(40 70% 65%)',
+                  textShadow: '0 0 30px hsl(40 60% 40% / 0.4)',
                 }}
               >
-                THE LIVING LIBRARY
+                THE LIVING ALMANAC
               </h1>
               <p
-                className="font-mono text-sm"
-                style={{ color: 'hsl(40 40% 60%)' }}
+                className="font-mono text-sm italic"
+                style={{ color: 'hsl(40 40% 55%)' }}
               >
-                The Complete Pharmacological Manuscript
+                "Listen when the soil whispers. Act when the stars signal."
               </p>
+            </motion.div>
+
+            {/* Global Scale Toggle (The "Living" Dynamic) */}
+            <motion.div
+              className="mb-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.15 }}
+            >
+              <ScaleToggle
+                value={accessScale}
+                onChange={setAccessScale}
+                color="hsl(40 60% 55%)"
+              />
             </motion.div>
 
             {/* Study Mode Notice */}
             <motion.div
               className="mb-6 p-4 rounded-xl text-center"
               style={{
-                background: 'linear-gradient(135deg, hsl(280 30% 12%), hsl(260 25% 10%))',
-                border: '1px dashed hsl(280 40% 30%)',
+                background: 'linear-gradient(135deg, hsl(40 25% 10%), hsl(35 20% 8%))',
+                border: '1px dashed hsl(40 40% 25%)',
               }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -218,43 +235,50 @@ const GrimoireView = ({ onEnterFieldLab }: GrimoireViewProps) => {
             >
               <p
                 className="text-sm font-mono"
-                style={{ color: 'hsl(280 40% 65%)' }}
+                style={{ color: 'hsl(40 40% 60%)' }}
               >
-                All content is unlocked for study. Switch to <strong>The Path</strong> to log your fieldwork.
+                All content is unlocked for study. Switch to <strong>The Path</strong> to record your fieldwork.
               </p>
             </motion.div>
 
-            {/* Search Bar */}
+            {/* ASK THE ALMANAC - Search Bar */}
             <motion.div
               className="relative mb-8"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5"
-                style={{ color: 'hsl(40 40% 50%)' }}
-              />
-              <Input
-                type="text"
-                placeholder="Search: Nitrogen, Bamboo, Oshun, Brix, Paramagnetism..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-10 py-6 font-mono text-sm rounded-xl"
-                style={{
-                  background: 'hsl(0 0% 8%)',
-                  border: '1px solid hsl(40 30% 25%)',
-                  color: 'hsl(40 60% 80%)',
-                }}
-              />
-              {searchQuery && (
-                <button
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/10"
-                  onClick={() => setSearchQuery('')}
+              <div className="flex items-center gap-2 mb-2">
+                <Search className="w-4 h-4" style={{ color: 'hsl(40 50% 50%)' }} />
+                <span 
+                  className="text-xs font-mono tracking-[0.15em] uppercase"
+                  style={{ color: 'hsl(40 50% 50%)' }}
                 >
-                  <X className="w-4 h-4" style={{ color: 'hsl(0 50% 60%)' }} />
-                </button>
-              )}
+                  Ask the Almanac
+                </span>
+              </div>
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Brix, Indigo, Nitrogen, Panic Attack, Bamboo..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-4 pr-10 py-5 font-mono text-sm rounded-xl w-full"
+                  style={{
+                    background: 'hsl(0 0% 8%)',
+                    border: '1px solid hsl(40 30% 25%)',
+                    color: 'hsl(40 60% 80%)',
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/10"
+                    onClick={() => setSearchQuery('')}
+                  >
+                    <X className="w-4 h-4" style={{ color: 'hsl(0 50% 60%)' }} />
+                  </button>
+                )}
+              </div>
             </motion.div>
 
             {/* Search Results Count */}
@@ -426,16 +450,16 @@ const GrimoireView = ({ onEnterFieldLab }: GrimoireViewProps) => {
             {/* Footer */}
             <motion.div
               className="mt-12 text-center py-8 border-t"
-              style={{ borderColor: 'hsl(0 0% 20%)' }}
+              style={{ borderColor: 'hsl(40 30% 20%)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
               <p
                 className="text-xs font-mono"
-                style={{ color: 'hsl(40 30% 40%)' }}
+                style={{ color: 'hsl(40 30% 45%)' }}
               >
-                THE LIVING LIBRARY • A Digital Codex of Ancestral Agriculture
+                THE LIVING ALMANAC • 2026 Edition • A Reference Guide for Sovereign Living
               </p>
             </motion.div>
           </motion.div>
