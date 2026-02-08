@@ -23,6 +23,7 @@ import {
   StewardsLog,
   JuniorGuardians,
   StewardsUtilityBelt,
+  AgroSonicRadio,
 } from '@/components/ancestral';
 import { ViewMode } from '@/components/ancestral/ViewModeToggle';
 import { OgunIcon, BabaluAyeIcon, ShangoIcon, OshunIcon, OrishaBadge } from '@/components/ancestral/OrishaIcons';
@@ -441,11 +442,14 @@ const AncestralPath = () => {
       {/* Auth Status Indicator */}
       {!user && !isLoading && (
         <motion.div
-          className="fixed top-6 right-6 z-50"
+          className="fixed top-6 right-6 z-50 flex items-center gap-3"
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.7 }}
         >
+          {/* Agro-Sonic Radio - 432Hz Toggle (available to all) */}
+          <AgroSonicRadio />
+          
           <Button
             variant="outline"
             size="sm"
@@ -471,6 +475,8 @@ const AncestralPath = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.7 }}
         >
+          {/* Agro-Sonic Radio - 432Hz Toggle */}
+          <AgroSonicRadio />
           {/* Admin Link */}
           {isAdmin && (
             <Button
