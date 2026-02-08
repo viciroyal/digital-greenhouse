@@ -17,7 +17,7 @@ import SeasonalPriorityTag, { getSeasonalPhase } from './SeasonalPriorityTag';
 import BrixDiagnostics from './BrixDiagnostics';
 import CulturalProtocols from './CulturalProtocols';
 import SignalCircuitBoard from './SignalCircuitBoard';
-import BodyCheckIn from './BodyCheckIn';
+import AvatarProtocol from './AvatarProtocol';
 import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 interface LessonDrawerProps {
@@ -380,15 +380,19 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
                         />
                       ) : (
                         <>
-                          {/* Body Check-In - Somatic Gate */}
-                          <BodyCheckIn
+                          {/* Avatar Protocol - Player-First System */}
+                          <AvatarProtocol
                             level={module.level}
                             color={module.color}
-                            isTuned={isBodyTuned}
-                            onTuned={() => setIsBodyTuned(true)}
+                            onPhaseComplete={(phase) => {
+                              if (phase === 'internal') {
+                                setIsBodyTuned(true);
+                              }
+                              console.log(`Avatar phase ${phase} completed`);
+                            }}
                           />
 
-                          {/* Agricultural Content - Only visible after body is tuned */}
+                          {/* Additional Content - Only visible after internal phase */}
                           <AnimatePresence>
                             {isBodyTuned && (
                               <motion.div
@@ -412,64 +416,33 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
                                   title={lessonContent.videoTitle}
                                 />
 
-                          {/* Protocol Steps */}
-                          {protocolSteps.length > 0 && (
-                            <ProtocolSteps
-                              color={module.color}
-                              steps={protocolSteps}
-                            />
-                          )}
+                                {/* Protocol Steps */}
+                                {protocolSteps.length > 0 && (
+                                  <ProtocolSteps
+                                    color={module.color}
+                                    steps={protocolSteps}
+                                  />
+                                )}
 
-                          {/* Master Recipe Card - Level 2 Only */}
-                          {needsRecipeCard && (
-                            <MasterRecipeCard color={module.color} />
-                          )}
+                                {/* Master Recipe Card - Level 2 Only */}
+                                {needsRecipeCard && (
+                                  <MasterRecipeCard color={module.color} />
+                                )}
 
-                          {/* Brix Diagnostics - Level 4 Only */}
-                          {needsBrixDiagnostics && (
-                            <BrixDiagnostics color={module.color} />
-                          )}
+                                {/* Brix Diagnostics - Level 4 Only */}
+                                {needsBrixDiagnostics && (
+                                  <BrixDiagnostics color={module.color} />
+                                )}
 
-                          {/* Level 3: Signal Circuit Board (4-Step) */}
-                          {module.level === 3 ? (
-                            <SignalCircuitBoard 
-                              color={module.color}
-                              onSwitchComplete={(switchId) => {
-                                console.log(`Circuit switch ${switchId} completed`);
-                              }}
-                            />
-                          ) : (
-                            /* Cultural Protocols - Chakra Aligned Lore (Other Levels) */
-                            <CulturalProtocols 
-                              level={module.level} 
-                              color={module.color} 
-                            />
-                          )}
-
-                          {/* Mission reminder */}
-                          <div 
-                            className="p-4 rounded-lg text-center"
-                            style={{
-                              background: `${module.color}10`,
-                              border: `1px dashed ${module.color}50`,
-                            }}
-                          >
-                            <p 
-                              className="text-xs font-mono mb-1"
-                              style={{ color: 'hsl(40 40% 50%)' }}
-                            >
-                              YOUR MISSION
-                            </p>
-                            <p 
-                              className="text-lg tracking-wide"
-                              style={{ 
-                                fontFamily: "'Staatliches', sans-serif",
-                                color: module.color,
-                              }}
-                            >
-                              "{module.mission}"
-                            </p>
-                          </div>
+                                {/* Level 3: Signal Circuit Board (4-Step) */}
+                                {module.level === 3 && (
+                                  <SignalCircuitBoard 
+                                    color={module.color}
+                                    onSwitchComplete={(switchId) => {
+                                      console.log(`Circuit switch ${switchId} completed`);
+                                    }}
+                                  />
+                                )}
                               </motion.div>
                             )}
                           </AnimatePresence>
