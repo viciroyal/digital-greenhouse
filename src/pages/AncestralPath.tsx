@@ -22,6 +22,7 @@ import {
   GrimoireView,
   StewardsLog,
   JuniorGuardians,
+  StewardsUtilityBelt,
 } from '@/components/ancestral';
 import { ViewMode } from '@/components/ancestral/ViewModeToggle';
 import { OgunIcon, BabaluAyeIcon, ShangoIcon, OshunIcon, OrishaBadge } from '@/components/ancestral/OrishaIcons';
@@ -878,6 +879,9 @@ const AncestralPath = () => {
 
       {/* Emergency SOS Button - Always Visible Safety Feature */}
       <EmergencySOSButton />
+
+      {/* Steward's Utility Belt - Fixed Bottom Navigation */}
+      <StewardsUtilityBelt />
     </main>
   );
 };
