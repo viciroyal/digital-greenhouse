@@ -146,10 +146,13 @@ Deno.serve(async (req) => {
       }
     );
   } catch (error) {
+    // Log full error details server-side for debugging
     console.error("Error in griot-oracle:", error);
+    
+    // Return generic error to client - never expose internal error details
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: "INTERNAL_ERROR",
         message: "The connection to the ancestors has been disrupted. The soil needs rest. Try again later."
       }),
       { 
