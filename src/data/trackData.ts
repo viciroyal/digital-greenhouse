@@ -246,6 +246,7 @@ export const trackData: TrackData[] = [
     crystal: 'Lapis Lazuli',
     colorKey: 'chakra-throat',
     colorHsl: '210 70% 55%',
+    audioUrl: 'https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/7.%20Vici%20Royal%20-%20Quantum%20Love%20.wav',
     organs: ['Throat', 'Thyroid', 'Jaw'],
     bodyArea: 'throat',
     moonPhase: 'Full Moon',
