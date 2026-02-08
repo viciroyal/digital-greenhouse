@@ -8,19 +8,59 @@ interface PharmersPledgeModalProps {
   onClose: () => void;
 }
 
-// Chakra-aligned ancestral lineages - The Grand Pledge
+// The Civilization Contract - Full 12-Tribe Harmonic Pledge
 const pledgeLines = [
-  { text: "We Pharm because the soil holds the memory...", color: "hsl(0 0% 95%)", glow: false },
   { text: "", color: "transparent", glow: false },
-  { text: "(ROOT)", color: "hsl(0 70% 50%)", glow: true, subtext: "Of the MUSCOGEE & MAROONS (The Land)." },
+  { 
+    text: "We stand on the ROOTS of the Xingu & Muscogee.", 
+    color: "hsl(0 70% 55%)", 
+    glow: true,
+    glowColor: "hsl(0 70% 55%)"
+  },
   { text: "", color: "transparent", glow: false },
-  { text: "(STRUCTURE)", color: "hsl(35 80% 50%)", glow: true, subtext: "Of the OLMEC (The Stone)." },
+  { 
+    text: "We build on the STONE of the Olmec & Inca.", 
+    color: "hsl(35 85% 55%)", 
+    glow: true,
+    glowColor: "hsl(35 85% 55%)"
+  },
   { text: "", color: "transparent", glow: false },
-  { text: "(SIGNAL)", color: "hsl(210 90% 55%)", glow: true, subtext: "Of the DOGON, ABORIGINAL, CHINESE, & VEDIC (The Energy)." },
+  { 
+    text: "We align with the STARS of the Dogon & Maya.", 
+    color: "hsl(190 90% 55%)", 
+    glow: true,
+    glowColor: "hsl(190 90% 55%)"
+  },
   { text: "", color: "transparent", glow: false },
-  { text: "(ALCHEMY)", color: "hsl(51 100% 50%)", glow: true, subtext: "Of the KEMETIC PRIESTS (The Gold)." },
+  { 
+    text: "We refine the GOLD of Kemit & Joseon.", 
+    color: "hsl(51 100% 55%)", 
+    glow: true,
+    glowColor: "hsl(51 100% 55%)"
+  },
   { text: "", color: "transparent", glow: false },
-  { text: "To enter this school is to remember them.", color: "hsl(0 0% 95%)", glow: false },
+  { 
+    text: "We are bound by the LAW of the Haudenosaunee.", 
+    color: "hsl(140 70% 50%)", 
+    glow: true,
+    glowColor: "hsl(140 70% 50%)",
+    subtext: "(The 7th Generation)"
+  },
+  { text: "", color: "transparent", glow: false },
+  { 
+    text: "We live by the BOND of Ubuntu.", 
+    color: "hsl(0 0% 95%)", 
+    glow: true,
+    glowColor: "hsl(0 0% 95%)",
+    subtext: "(I Am Because We Are)"
+  },
+  { text: "", color: "transparent", glow: false },
+  { text: "", color: "transparent", glow: false },
+  { 
+    text: "To enter this gate is to sign the contract with the Ancestors.", 
+    color: "hsl(45 60% 70%)", 
+    glow: false 
+  },
 ];
 
 /**
@@ -294,10 +334,10 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
             
             {/* The Title - Staatliches Carved Wood Style */}
             <motion.h1
-              className="text-3xl md:text-5xl lg:text-6xl text-center mb-8 tracking-[0.15em] z-10"
+              className="text-2xl md:text-4xl lg:text-5xl text-center mb-4 tracking-[0.1em] z-10 px-4"
               style={{
                 fontFamily: "'Staatliches', 'Chewy', sans-serif",
-                color: 'hsl(51 100% 50%)',
+                color: 'hsl(51 100% 55%)',
                 textShadow: `
                   2px 2px 0 hsl(20 50% 10%),
                   4px 4px 8px rgba(0,0,0,0.8),
@@ -308,8 +348,25 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.5 }}
             >
-              THE PHARMER'S PLEDGE
+              WE DO NOT JUST GROW FOOD.
             </motion.h1>
+            <motion.h2
+              className="text-2xl md:text-4xl lg:text-5xl text-center mb-8 tracking-[0.1em] z-10 px-4"
+              style={{
+                fontFamily: "'Staatliches', 'Chewy', sans-serif",
+                color: 'hsl(140 60% 55%)',
+                textShadow: `
+                  2px 2px 0 hsl(20 50% 10%),
+                  4px 4px 8px rgba(0,0,0,0.8),
+                  0 0 40px hsl(140 60% 40% / 0.5)
+                `,
+              }}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.8 }}
+            >
+              WE GROW CIVILIZATION.
+            </motion.h2>
 
             {/* Star Wars style scrolling text container */}
             <div 
@@ -349,17 +406,17 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
                 }}
               >
                 {pledgeLines.map((line, index) => (
-                  <div key={index} className="mb-5">
+                  <div key={index} className="mb-4">
                     <p
-                      className="text-lg md:text-xl lg:text-2xl leading-relaxed"
+                      className="text-base md:text-lg lg:text-xl leading-relaxed"
                       style={{
                         fontFamily: "'Staatliches', sans-serif",
-                        letterSpacing: '0.08em',
+                        letterSpacing: '0.06em',
                         color: line.text ? line.color : 'transparent',
                         textShadow: line.text && line.glow 
-                          ? `0 0 20px ${line.color}, 0 0 40px ${line.color}, 0 0 60px ${line.color}` 
+                          ? `0 0 15px ${line.glowColor || line.color}, 0 0 30px ${line.glowColor || line.color}, 0 0 50px ${line.glowColor || line.color}` 
                           : line.text 
-                            ? '0 0 10px hsl(0 0% 70% / 0.3)' 
+                            ? '0 0 8px hsl(0 0% 70% / 0.3)' 
                             : 'none',
                       }}
                     >
@@ -367,13 +424,13 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
                     </p>
                     {line.subtext && (
                       <p
-                        className="text-base md:text-lg lg:text-xl mt-1"
+                        className="text-sm md:text-base lg:text-lg mt-1 italic"
                         style={{
                           fontFamily: "'Space Mono', monospace",
                           letterSpacing: '0.02em',
                           color: line.color,
-                          opacity: 0.85,
-                          textShadow: `0 0 15px ${line.color}`,
+                          opacity: 0.75,
+                          textShadow: `0 0 12px ${line.glowColor || line.color}`,
                         }}
                       >
                         {line.subtext}
@@ -444,7 +501,7 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
                 </AnimatePresence>
                 
                 <span className="relative z-10" style={{ opacity: isUnlocking ? 0 : 1 }}>
-                  I REMEMBER
+                  I SIGN FOR THE 7TH GENERATION
                 </span>
               </motion.button>
               
