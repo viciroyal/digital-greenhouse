@@ -74,19 +74,21 @@ interface TrackItemProps {
 
 const TrackItem = ({ track, crateColor, isPlaying, onPlay, onOpenDetail }: TrackItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  // Use each track's individual color from trackData for the "garden" aesthetic
+  const trackColor = track.colorHsl;
 
   return (
     <motion.div
       className="relative px-4 py-3 rounded-xl cursor-pointer transition-all duration-300"
       style={{
         background: isHovered 
-          ? `linear-gradient(135deg, hsl(${crateColor} / 0.3), hsl(${crateColor} / 0.15))`
+          ? `linear-gradient(135deg, hsl(${trackColor} / 0.3), hsl(${trackColor} / 0.15))`
           : 'hsl(20 30% 12% / 0.5)',
         border: isHovered 
-          ? `1px solid hsl(${crateColor} / 0.5)`
+          ? `1px solid hsl(${trackColor} / 0.5)`
           : '1px solid hsl(20 30% 25% / 0.3)',
         boxShadow: isHovered 
-          ? `0 0 20px hsl(${crateColor} / 0.3), inset 0 0 15px hsl(${crateColor} / 0.1)`
+          ? `0 0 20px hsl(${trackColor} / 0.3), inset 0 0 15px hsl(${trackColor} / 0.1)`
           : 'none',
       }}
       onMouseEnter={() => setIsHovered(true)}
@@ -97,10 +99,10 @@ const TrackItem = ({ track, crateColor, isPlaying, onPlay, onOpenDetail }: Track
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          {/* Track Number */}
+          {/* Track Number - Uses individual track color */}
           <span 
             className="font-mono text-sm w-6 text-center"
-            style={{ color: `hsl(${crateColor})` }}
+            style={{ color: `hsl(${trackColor})` }}
           >
             {String(track.row).padStart(2, '0')}
           </span>
@@ -110,8 +112,8 @@ const TrackItem = ({ track, crateColor, isPlaying, onPlay, onOpenDetail }: Track
             <p 
               className="font-display text-base truncate"
               style={{ 
-                color: isHovered ? `hsl(${crateColor})` : 'hsl(40 50% 90%)',
-                textShadow: isHovered ? `0 0 10px hsl(${crateColor} / 0.5)` : 'none',
+                color: isHovered ? `hsl(${trackColor})` : 'hsl(40 50% 90%)',
+                textShadow: isHovered ? `0 0 10px hsl(${trackColor} / 0.5)` : 'none',
               }}
             >
               {track.track}
@@ -124,12 +126,12 @@ const TrackItem = ({ track, crateColor, isPlaying, onPlay, onOpenDetail }: Track
           </div>
         </div>
 
-        {/* Play Button */}
+        {/* Play Button - Uses individual track color */}
         <motion.button
           className="w-8 h-8 rounded-full flex items-center justify-center"
           style={{
             background: isPlaying 
-              ? `linear-gradient(135deg, hsl(${crateColor}), hsl(${crateColor} / 0.7))`
+              ? `linear-gradient(135deg, hsl(${trackColor}), hsl(${trackColor} / 0.7))`
               : 'hsl(20 30% 18%)',
           }}
           animate={isPlaying ? { scale: [1, 1.1, 1] } : {}}
@@ -146,26 +148,26 @@ const TrackItem = ({ track, crateColor, isPlaying, onPlay, onOpenDetail }: Track
           )}
         </motion.button>
 
-        {/* Detail Arrow */}
+        {/* Detail Arrow - Uses individual track color */}
         <motion.div
           className="w-6 h-6 rounded-full flex items-center justify-center"
           style={{ 
-            background: `hsl(${crateColor} / 0.2)`,
+            background: `hsl(${trackColor} / 0.2)`,
             opacity: isHovered ? 1 : 0,
           }}
           initial={false}
           animate={{ opacity: isHovered ? 1 : 0 }}
         >
-          <ChevronRight className="w-4 h-4" style={{ color: `hsl(${crateColor})` }} />
+          <ChevronRight className="w-4 h-4" style={{ color: `hsl(${trackColor})` }} />
         </motion.div>
       </div>
 
-      {/* Frequency Badge */}
+      {/* Frequency Badge - Uses individual track color */}
       <div 
         className="absolute -top-1 -right-1 px-2 py-0.5 rounded-full font-mono text-[10px]"
         style={{
-          background: `hsl(${crateColor} / 0.2)`,
-          color: `hsl(${crateColor})`,
+          background: `hsl(${trackColor} / 0.2)`,
+          color: `hsl(${trackColor})`,
           opacity: isHovered ? 1 : 0,
           transition: 'opacity 0.3s',
         }}
