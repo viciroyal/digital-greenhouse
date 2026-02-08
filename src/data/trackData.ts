@@ -10,6 +10,7 @@ export interface TrackData {
   crystal: string;
   colorKey: string;
   colorHsl: string;
+  audioUrl?: string; // Supabase storage URL for audio file
   // Body quadrant
   organs: string[];
   bodyArea: 'feet' | 'sacral' | 'stomach' | 'heart' | 'throat' | 'eyes' | 'crown';
@@ -49,6 +50,7 @@ export const trackData: TrackData[] = [
     crystal: 'Hematite',
     colorKey: 'chakra-root',
     colorHsl: '0 60% 35%',
+    audioUrl: 'https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/1.%20Vici%20Royal%20-%20Pulling%20Weeds%20.wav',
     organs: ['Skeleton', 'Adrenals', 'Feet'],
     bodyArea: 'feet',
     moonPhase: 'New Moon',
@@ -81,6 +83,7 @@ export const trackData: TrackData[] = [
     crystal: 'Carnelian',
     colorKey: 'chakra-sacral',
     colorHsl: '25 80% 50%',
+    audioUrl: 'https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/2.%20Vici%20Royal%20-%20Drugs%20(ft.%20Sistah%20Moon%20&%20Yamau).wav',
     organs: ['Reproductive System', 'Bladder', 'Kidneys'],
     bodyArea: 'sacral',
     moonPhase: 'Waxing Crescent',
@@ -112,6 +115,7 @@ export const trackData: TrackData[] = [
     crystal: 'Citrine',
     colorKey: 'chakra-solar',
     colorHsl: '45 90% 55%',
+    audioUrl: 'https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/3.%20Vici%20Royal%20-%20No%20Nouns%20.wav',
     organs: ['Stomach', 'Liver', 'Digestive System'],
     bodyArea: 'stomach',
     moonPhase: 'First Quarter',
