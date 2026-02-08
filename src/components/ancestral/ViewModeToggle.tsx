@@ -1,21 +1,25 @@
 import { motion } from 'framer-motion';
-import { Map, BookOpen } from 'lucide-react';
+import { BookOpen, PenTool, Map } from 'lucide-react';
 
-export type ViewMode = 'path' | 'book';
+export type ViewMode = 'book' | 'log' | 'path';
 
 interface ViewModeToggleProps {
   value: ViewMode;
   onChange: (mode: ViewMode) => void;
+  showPath?: boolean;
 }
 
 /**
  * VIEW MODE TOGGLE
  * 
- * Switches between:
- * - THE ALMANAC: Living reference book (Study Mode)
+ * Primary duality:
+ * - THE ALMANAC: Living reference book (Read / Study / Reference)
+ * - THE LOG: Personal journal (Write / Record / Reflect)
+ * 
+ * Secondary option (hidden by default):
  * - THE PATH: Gamified totem with locked levels
  */
-const ViewModeToggle = ({ value, onChange }: ViewModeToggleProps) => {
+const ViewModeToggle = ({ value, onChange, showPath = false }: ViewModeToggleProps) => {
   return (
     <motion.div
       className="flex items-center gap-1 p-1 rounded-full"
@@ -28,7 +32,7 @@ const ViewModeToggle = ({ value, onChange }: ViewModeToggleProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
     >
-      {/* THE ALMANAC Option (First - Default) */}
+      {/* THE ALMANAC Option (Read) */}
       <motion.button
         className="flex items-center gap-2 px-4 py-2 rounded-full font-mono text-xs tracking-wider transition-all"
         style={{
@@ -50,27 +54,51 @@ const ViewModeToggle = ({ value, onChange }: ViewModeToggleProps) => {
         THE ALMANAC
       </motion.button>
 
-      {/* THE PATH Option */}
+      {/* THE LOG Option (Write) */}
       <motion.button
         className="flex items-center gap-2 px-4 py-2 rounded-full font-mono text-xs tracking-wider transition-all"
         style={{
-          background: value === 'path' 
-            ? 'linear-gradient(135deg, hsl(51 60% 25%), hsl(40 50% 20%))'
+          background: value === 'log' 
+            ? 'linear-gradient(135deg, hsl(140 40% 22%), hsl(140 35% 18%))'
             : 'transparent',
-          color: value === 'path' 
-            ? 'hsl(51 100% 70%)' 
+          color: value === 'log' 
+            ? 'hsl(140 60% 65%)' 
             : 'hsl(40 30% 50%)',
-          boxShadow: value === 'path' 
-            ? '0 0 20px hsl(51 80% 40% / 0.3)' 
+          boxShadow: value === 'log' 
+            ? '0 0 20px hsl(140 50% 35% / 0.3)' 
             : 'none',
         }}
-        onClick={() => onChange('path')}
+        onClick={() => onChange('log')}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
-        <Map className="w-4 h-4" />
-        THE PATH
+        <PenTool className="w-4 h-4" />
+        THE LOG
       </motion.button>
+
+      {/* THE PATH Option (Game - Hidden by default) */}
+      {showPath && (
+        <motion.button
+          className="flex items-center gap-2 px-4 py-2 rounded-full font-mono text-xs tracking-wider transition-all"
+          style={{
+            background: value === 'path' 
+              ? 'linear-gradient(135deg, hsl(51 60% 25%), hsl(40 50% 20%))'
+              : 'transparent',
+            color: value === 'path' 
+              ? 'hsl(51 100% 70%)' 
+              : 'hsl(40 30% 50%)',
+            boxShadow: value === 'path' 
+              ? '0 0 20px hsl(51 80% 40% / 0.3)' 
+              : 'none',
+          }}
+          onClick={() => onChange('path')}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <Map className="w-4 h-4" />
+          THE PATH
+        </motion.button>
+      )}
     </motion.div>
   );
 };
