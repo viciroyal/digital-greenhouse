@@ -56,6 +56,11 @@ interface Lesson {
   order_index: number;
 }
 
+interface LessonProgress {
+  lesson_id: string;
+  hasJournalEntry: boolean;
+}
+
 /**
  * Lesson Drawer - Side panel for lesson content
  * Two tabs: THE TRANSMISSION and THE FIELD JOURNAL
@@ -67,6 +72,7 @@ const LessonDrawer = ({ isOpen, onClose, level, onLevelComplete }: LessonDrawerP
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [lessonProgress, setLessonProgress] = useState<LessonProgress[]>([]);
   const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
   const [user, setUser] = useState<{ id: string } | null>(null);
   const { toast } = useToast();
@@ -81,18 +87,19 @@ const LessonDrawer = ({ isOpen, onClose, level, onLevelComplete }: LessonDrawerP
       setUploadSuccess(false);
       setError(null);
       setActiveTab('transmission');
+      setLessonProgress([]);
       
-      // Get current user
+      // Get current user and fetch lessons
       supabase.auth.getUser().then(({ data }) => {
-        setUser(data.user ? { id: data.user.id } : null);
+        const currentUser = data.user ? { id: data.user.id } : null;
+        setUser(currentUser);
+        // Fetch lessons with user ID for progress tracking
+        fetchLessonsForLevel(level, currentUser?.id);
       });
-
-      // Fetch lessons for this level (module)
-      fetchLessonsForLevel(level);
     }
   }, [isOpen, level]);
 
-  const fetchLessonsForLevel = async (moduleOrder: number) => {
+  const fetchLessonsForLevel = async (moduleOrder: number, userId?: string) => {
     const { data, error } = await supabase
       .from('lessons')
       .select(`
@@ -113,7 +120,32 @@ const LessonDrawer = ({ isOpen, onClose, level, onLevelComplete }: LessonDrawerP
     if (data && data.length > 0) {
       setLessons(data);
       setSelectedLessonId(data[0].id); // Default to first lesson
+      
+      // Fetch progress for these lessons if user is logged in
+      if (userId) {
+        const lessonIds = data.map(l => l.id);
+        
+        // Get field journal entries for these lessons
+        const { data: journalData } = await supabase
+          .from('field_journal')
+          .select('lesson_id')
+          .eq('user_id', userId)
+          .in('lesson_id', lessonIds);
+        
+        // Map to progress
+        const progress: LessonProgress[] = data.map(lesson => ({
+          lesson_id: lesson.id,
+          hasJournalEntry: journalData?.some(j => j.lesson_id === lesson.id) || false,
+        }));
+        
+        setLessonProgress(progress);
+      }
     }
+  };
+  
+  // Check if a lesson has been completed
+  const isLessonCompleted = (lessonId: string): boolean => {
+    return lessonProgress.some(p => p.lesson_id === lessonId && p.hasJournalEntry);
   };
 
   const handleFileSelect = (file: File) => {
@@ -374,26 +406,37 @@ const LessonDrawer = ({ isOpen, onClose, level, onLevelComplete }: LessonDrawerP
                         LESSONS
                       </h3>
                       <div className="space-y-2">
-                        {lessons.map((lesson, index) => (
-                          <div
-                            key={lesson.id}
-                            className="p-3 rounded-lg"
-                            style={{
-                              background: 'rgba(0, 0, 0, 0.2)',
-                              border: `1px solid ${content.color}20`,
-                            }}
-                          >
-                            <p 
-                              className="text-sm"
-                              style={{ 
-                                fontFamily: "'Space Mono', monospace",
-                                color: 'hsl(0 0% 75%)',
+                        {lessons.map((lesson, index) => {
+                          const completed = isLessonCompleted(lesson.id);
+                          return (
+                            <div
+                              key={lesson.id}
+                              className="p-3 rounded-lg flex items-center justify-between gap-3"
+                              style={{
+                                background: completed ? `${content.color}15` : 'rgba(0, 0, 0, 0.2)',
+                                border: `1px solid ${completed ? content.color + '60' : content.color + '20'}`,
                               }}
                             >
-                              {index + 1}. {lesson.display_name}
-                            </p>
-                          </div>
-                        ))}
+                              <p 
+                                className="text-sm"
+                                style={{ 
+                                  fontFamily: "'Space Mono', monospace",
+                                  color: completed ? content.color : 'hsl(0 0% 75%)',
+                                }}
+                              >
+                                {index + 1}. {lesson.display_name}
+                              </p>
+                              {completed && (
+                                <div 
+                                  className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center"
+                                  style={{ background: content.color }}
+                                >
+                                  <Check className="w-3 h-3 text-black" />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
