@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import StarMapping from "./pages/StarMapping";
 import ResonanceReport from "./pages/ResonanceReport";
 import AncestralPath from "./pages/AncestralPath";
+import AscensionMapDemo from "./pages/AscensionMapDemo";
 import HogonReview from "./pages/HogonReview";
 import PharmerProfile from "./pages/PharmerProfile";
 import Auth from "./pages/Auth";
@@ -31,6 +32,7 @@ const App = () => (
                 <Route path="/star-mapping" element={<StarMapping />} />
                 <Route path="/resonance-report" element={<ResonanceReport />} />
                 <Route path="/ancestral-path" element={<AncestralPath />} />
+                <Route path="/ascension-map" element={<AscensionMapDemo />} />
                 <Route path="/hogon-review" element={<HogonReview />} />
                 <Route path="/pharmer-profile" element={<PharmerProfile />} />
                 <Route path="/auth" element={<Auth />} />
