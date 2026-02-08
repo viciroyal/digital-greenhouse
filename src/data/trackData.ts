@@ -337,6 +337,7 @@ export const trackData: TrackData[] = [
     crystal: 'Fluorite',
     colorKey: 'chakra-vision',
     colorHsl: '280 60% 55%',
+    audioUrl: 'https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/10.%20Vici%20Royal%20-%20M.O.E..wav',
     organs: ['Forehead', 'Nervous System'],
     bodyArea: 'eyes',
     moonPhase: 'Waning Gibbous',
