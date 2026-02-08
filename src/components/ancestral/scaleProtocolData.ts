@@ -21,6 +21,31 @@ export interface ScaleProtocolConfig {
   steps: Record<AccessScale, ScaledProtocolStep[]>;
 }
 
+// Level 0: VORTEX/EARTH STAR - "The Battery of the Soil"
+export const level0Protocol: ScaleProtocolConfig = {
+  science: "Biochar is the coral reef of the soil. It provides the housing for the microbes. Without the house, the biology cannot stay. CEC (Cation Exchange Capacity) measures the soil's nutrient-holding power.",
+  steps: {
+    canopy: [
+      { step: 1, title: 'Build the Carbon Kiln', tool: 'TLUD Kiln or Cone Pit', action: 'Stack bamboo scraps in pyramid. Light from top. Pyrolyze at 400-500°C for 3 hours.' },
+      { step: 2, title: 'Quench the charcoal', tool: 'Water + Hose', action: 'Spray until steam stops. Crush to 1-inch chunks max. Never use dry — it steals nutrients.' },
+      { step: 3, title: 'Inoculate with biology', tool: 'Compost Tea + JADAM JLF', action: 'Soak biochar in compost tea for 24-48 hours. The char is now "charged" with microbes.' },
+      { step: 4, title: 'Apply to soil', tool: 'Wheelbarrow + Shovel', action: 'Top-dress at 5-10% by volume. Do not bury deep — keep in root zone.' },
+    ],
+    sprout: [
+      { step: 1, title: 'Build the Hot Pile', tool: 'Pitchfork + Thermometer', source: 'Garden center', action: 'Layer Green (Nitrogen) and Brown (Carbon) 1:3. Add water until it drips when squeezed.' },
+      { step: 2, title: 'Turn when hot', tool: 'Compost Thermometer', action: 'Turn the pile when it reaches 140°F (60°C). This kills pathogens and weed seeds.' },
+      { step: 3, title: 'Add charcoal scraps', tool: 'BBQ Charcoal (lump, no additives)', source: 'Hardware store', action: 'Crush and mix in. The charcoal charges as the pile cooks.' },
+      { step: 4, title: 'Apply finished compost', tool: 'Wheelbarrow', action: 'After 4-8 weeks, apply 2-inch layer to beds. The biochar-compost is your Terra Preta.' },
+    ],
+    seed: [
+      { step: 1, title: 'Build the Worm Hotel', tool: 'Plastic Bin + Newspaper', source: 'Kitchen scavenger', action: 'Drill holes in bin. Layer damp newspaper. Add Red Wiggler worms (1 lb per sq ft).' },
+      { step: 2, title: 'Feed the guests', tool: 'Kitchen Scraps', source: 'Kitchen', action: 'Add fruit/veggie scraps. No citrus, onion, or meat. Bury food under bedding.' },
+      { step: 3, title: 'Harvest the castings', tool: 'Light + Patience', action: 'Shine light on bin. Worms dive down. Scoop castings from top. This is Amazonian Gold.' },
+      { step: 4, title: 'Top-dress your pots', tool: 'Your Hands', action: 'Sprinkle castings on soil surface. Water in. The CEC of your pot just tripled.' },
+    ],
+  },
+};
+
 // Level 1: ROOT/STRUCTURE - "Don't invert the soil layers"
 export const level1Protocol: ScaleProtocolConfig = {
   science: "Don't invert the soil layers. Aerobic life lives on top, anaerobic below. Mixing kills both.",
@@ -149,6 +174,7 @@ export const level5Protocol: ScaleProtocolConfig = {
 // Get protocol config by level
 export const getProtocolByLevel = (level: number): ScaleProtocolConfig | null => {
   switch (level) {
+    case 0: return level0Protocol;
     case 1: return level1Protocol;
     case 2: return level2Protocol;
     case 3: return level3Protocol;

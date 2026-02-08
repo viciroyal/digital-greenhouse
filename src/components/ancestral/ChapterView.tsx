@@ -34,8 +34,40 @@ interface ChapterContent {
   };
 }
 
-// The 5 Chapters aligned with the curriculum
-const chapterData: ChapterContent[] = [
+// The 6 Chapters aligned with the curriculum (0-5)
+export const chapterData: ChapterContent[] = [
+  {
+    id: 'chapter-0',
+    number: 0,
+    title: 'THE VORTEX',
+    subtitle: 'The Earth Star',
+    color: 'hsl(320 70% 25%)',
+    wisdom: {
+      title: 'The Amazonian Black Earth',
+      culture: 'Amazonian — The Soil Builders',
+      narrative: 'Before the Muscogee built the mounds, the Amazonians built the soil itself. They taught us that Fire does not destroy; it preserves. They created Terra Preta (Black Earth) to hold the spirit of the forest forever. For 10,000 years, this soil has remained fertile — while surrounding jungle soil depletes in 3 years. We do not waste. We feed the Vortex.',
+    },
+    science: {
+      principle: 'Biochar & Cation Exchange Capacity',
+      data: [
+        'Biochar is the coral reef of the soil — it provides housing for microbes.',
+        'CEC (Cation Exchange Capacity) measures the soil\'s ability to hold nutrients.',
+        'Terra Preta has 3x the CEC of surrounding soils — it\'s a nutrient battery.',
+        'Biochar lasts 1,000+ years. Regular compost decomposes in 1-3 years.',
+        'Charcoal without inoculation is sterile. Biochar must be "charged" with biology.',
+      ],
+    },
+    crop: {
+      name: 'Worm Castings',
+      goal: 'Foundation',
+      keyFact: 'Worm castings have 5x more nitrogen, 7x more phosphorus, and 11x more potassium than regular soil. They are the Amazonian Gold.',
+    },
+    somatic: {
+      instruction: 'Place hands on your belly. The soil has a stomach, and so do you. If you cannot digest, you cannot grow.',
+      breath: 'Breathe into the gut. Feel the warmth of your digestive fire.',
+      posture: 'Belly soft. Let the breath move your hands. This is fermentation — slow transformation.',
+    },
+  },
   {
     id: 'chapter-1',
     number: 1,
@@ -572,5 +604,4 @@ const ChapterView = ({ chapterId, onClose, onEnterFieldLab, searchQuery = '', ac
   );
 };
 
-export { chapterData };
 export default ChapterView;
