@@ -168,16 +168,16 @@ export const chapterData: ChapterContent[] = [
     subtitle: 'Nutrition & Transformation',
     color: 'hsl(51 100% 50%)',
     wisdom: {
-      title: 'Kemetic Chemistry',
-      culture: 'Ancient Kemit — The Gold Masters',
-      narrative: 'The word "Chemistry" comes from "Kemit" — the Black Land of the Nile. The Kemites understood that transformation happens through fermentation and fire. The turning of indigo from green to blue is the same redox chemistry that turns base metals into gold. As above, so below.',
+      title: 'Kemetic Chemistry & Joseon Fermentation',
+      culture: 'Ancient Kemit & Joseon (The Morning Calm)',
+      narrative: 'The word "Chemistry" comes from "Kemit" — the Black Land of the Nile. The Kemites understood that transformation happens through fermentation and fire. We honor the Joseon lineage for teaching us to culture the Indigenous Microorganisms (IMO) of the soil, just as we honor Kemit for teaching us the Gold Standard of nutrient density. The turning of indigo from green to blue is the same redox chemistry that turns base metals into gold. As above, so below.',
     },
     science: {
       principle: 'Redox Potential & Brix',
       data: [
         'Brix measures sugar content in plant sap (degrees Brix).',
         'Above 12 Brix = natural pest resistance. Insects can\'t digest high-sugar plants.',
-        'JADAM fermentation creates living microbe cultures for soil inoculation.',
+        'Joseon (The Morning Calm) fermentation creates living microbe cultures for soil inoculation.',
         'Indigo dyeing is a redox reaction: reduction (green) → oxidation (blue).',
       ],
     },
