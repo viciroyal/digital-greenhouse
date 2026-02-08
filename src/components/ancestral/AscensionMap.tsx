@@ -70,6 +70,7 @@ const levelData: LevelData[] = [
 interface LevelCardProps {
   data: LevelData;
   isUnlocked: boolean;
+  isNextLevel: boolean;
   onSelect: () => void;
   completedCount: number;
   totalCount: number;
@@ -78,7 +79,7 @@ interface LevelCardProps {
 /**
  * Level Card - Glassmorphic card for each level in the Ascension Map
  */
-const LevelCard = ({ data, isUnlocked, onSelect, completedCount, totalCount }: LevelCardProps) => {
+const LevelCard = ({ data, isUnlocked, isNextLevel, onSelect, completedCount, totalCount }: LevelCardProps) => {
   const [isShaking, setIsShaking] = useState(false);
   const { level, orisha, title, subtitle, statusColor, glowColor, bgColor, Icon } = data;
   const isComplete = totalCount > 0 && completedCount >= totalCount;
@@ -101,8 +102,10 @@ const LevelCard = ({ data, isUnlocked, onSelect, completedCount, totalCount }: L
         WebkitBackdropFilter: 'blur(10px)',
         border: isUnlocked 
           ? `2px solid ${statusColor}` 
-          : '1px solid rgba(255, 255, 255, 0.2)',
-        opacity: isUnlocked ? 1 : 0.5,
+          : isNextLevel 
+            ? `2px dashed ${statusColor}60`
+            : '1px solid rgba(255, 255, 255, 0.2)',
+        opacity: isUnlocked ? 1 : isNextLevel ? 0.75 : 0.5,
       }}
       onClick={handleClick}
       initial={{ opacity: 0, x: -30 }}
@@ -221,19 +224,44 @@ const LevelCard = ({ data, isUnlocked, onSelect, completedCount, totalCount }: L
         />
       )}
 
+      {/* Pulsing Glow for Next Unlockable Level */}
+      {!isUnlocked && isNextLevel && (
+        <motion.div
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          style={{
+            border: `2px dashed ${statusColor}`,
+          }}
+          animate={{
+            boxShadow: [
+              `0 0 10px ${statusColor}20, 0 0 20px ${statusColor}10, inset 0 0 15px ${statusColor}10`,
+              `0 0 25px ${statusColor}40, 0 0 50px ${statusColor}20, inset 0 0 25px ${statusColor}20`,
+              `0 0 10px ${statusColor}20, 0 0 20px ${statusColor}10, inset 0 0 15px ${statusColor}10`,
+            ],
+            opacity: [0.6, 1, 0.6],
+          }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      )}
+
       {/* Locked Overlay with Centered Padlock */}
       {!isUnlocked && (
         <div 
           className="absolute inset-0 rounded-2xl flex items-center justify-center pointer-events-none"
           style={{
-            background: 'rgba(0, 0, 0, 0.3)',
+            background: isNextLevel ? 'rgba(0, 0, 0, 0.15)' : 'rgba(0, 0, 0, 0.3)',
           }}
         >
           <Lock 
             className="w-10 h-10" 
             style={{ 
-              color: 'hsl(0 0% 40%)',
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))',
+              color: isNextLevel ? `${statusColor}80` : 'hsl(0 0% 40%)',
+              filter: isNextLevel 
+                ? `drop-shadow(0 0 8px ${statusColor}40)` 
+                : 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))',
             }}
           />
         </div>
@@ -682,6 +710,7 @@ const AscensionMap = () => {
               key={data.level}
               data={data}
               isUnlocked={currentLevel >= data.level}
+              isNextLevel={data.level === currentLevel + 1 && currentLevel < 4}
               onSelect={() => handleCardSelect(data.level)}
               completedCount={lessonCounts[data.level]?.completed || 0}
               totalCount={lessonCounts[data.level]?.total || 0}
