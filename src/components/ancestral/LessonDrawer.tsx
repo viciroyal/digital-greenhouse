@@ -4,6 +4,7 @@ import { X, BookOpen, Leaf, Play, Scroll, CheckCircle } from 'lucide-react';
 import FileDropZone from './FileDropZone';
 import HogonSeal from './HogonSeal';
 import EthericAntennaModule from './EthericAntennaModule';
+import EarthAcupunctureModule from './EarthAcupunctureModule';
 import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 interface LessonDrawerProps {
@@ -84,8 +85,9 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
     task: "UPLOAD YOUR EVIDENCE",
   };
 
-  // Check if this is the Etheric Antenna lesson (electroculture module)
+  // Check if this is a specialized module lesson
   const isEthericAntennaLesson = currentLesson?.name === 'etheric-antenna';
+  const isEarthAcupunctureLesson = currentLesson?.name === 'earth-acupuncture';
 
   const lessonContent = currentLesson ? {
     videoTitle: currentLesson.display_name,
@@ -259,9 +261,14 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {/* Specialized Etheric Antenna Module */}
+                    {/* Specialized Modules */}
                     {isEthericAntennaLesson ? (
                       <EthericAntennaModule 
+                        color={module.color}
+                        onUploadClick={() => setActiveTab('journal')}
+                      />
+                    ) : isEarthAcupunctureLesson ? (
+                      <EarthAcupunctureModule 
                         color={module.color}
                         onUploadClick={() => setActiveTab('journal')}
                       />
@@ -309,8 +316,8 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                       </>
                     )}
 
-                    {/* Only show completion status and mission for non-Etheric lessons */}
-                    {!isEthericAntennaLesson && (
+                    {/* Only show completion status and mission for non-specialized lessons */}
+                    {!isEthericAntennaLesson && !isEarthAcupunctureLesson && (
                       <>
                         {/* Completion status */}
                         {isCurrentLessonCompleted && (
