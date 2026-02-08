@@ -51,3 +51,4 @@ export { default as GuardianCharacters, guardianCharacters, getGuardianByZone } 
 export { default as MissionCard } from './MissionCard';
 export { default as StewardsUtilityBelt } from './StewardsUtilityBelt';
 export { default as AgroSonicRadio } from './AgroSonicRadio';
+export { default as BannekerAlmanac } from './BannekerAlmanac';

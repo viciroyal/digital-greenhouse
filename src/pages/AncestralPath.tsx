@@ -24,6 +24,7 @@ import {
   JuniorGuardians,
   StewardsUtilityBelt,
   AgroSonicRadio,
+  BannekerAlmanac,
 } from '@/components/ancestral';
 import { ViewMode } from '@/components/ancestral/ViewModeToggle';
 import { OgunIcon, BabaluAyeIcon, ShangoIcon, OshunIcon, OrishaBadge } from '@/components/ancestral/OrishaIcons';
@@ -415,29 +416,36 @@ const AncestralPath = () => {
       {/* Darkroom overlay */}
       <div className="fixed inset-0 bg-black/30 pointer-events-none" />
 
-      {/* Back button */}
-      <motion.button
-        className="fixed top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 rounded-full"
-        style={{
-          background: 'hsl(20 30% 12% / 0.9)',
-          border: '1px solid hsl(40 40% 30%)',
-          backdropFilter: 'blur(10px)',
-        }}
-        whileHover={{ scale: 1.05, x: -5 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={() => navigate('/')}
+      {/* Back button + Banneker Almanac (Left Side) */}
+      <motion.div
+        className="fixed top-6 left-6 z-50 flex items-center gap-3"
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <ArrowLeft className="w-4 h-4" style={{ color: 'hsl(40 50% 70%)' }} />
-        <span 
-          className="text-sm font-mono"
-          style={{ color: 'hsl(40 50% 70%)' }}
+        <motion.button
+          className="flex items-center gap-2 px-4 py-2 rounded-full"
+          style={{
+            background: 'hsl(20 30% 12% / 0.9)',
+            border: '1px solid hsl(40 40% 30%)',
+            backdropFilter: 'blur(10px)',
+          }}
+          whileHover={{ scale: 1.05, x: -5 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => navigate('/')}
         >
-          Return to Garden
-        </span>
-      </motion.button>
+          <ArrowLeft className="w-4 h-4" style={{ color: 'hsl(40 50% 70%)' }} />
+          <span 
+            className="text-sm font-mono hidden sm:inline"
+            style={{ color: 'hsl(40 50% 70%)' }}
+          >
+            Return
+          </span>
+        </motion.button>
+        
+        {/* Banneker Almanac - Weather Display */}
+        <BannekerAlmanac />
+      </motion.div>
 
       {/* Auth Status Indicator */}
       {!user && !isLoading && (
