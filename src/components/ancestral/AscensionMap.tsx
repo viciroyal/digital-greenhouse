@@ -1,60 +1,98 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Lock } from 'lucide-react';
 
 interface LevelCardProps {
   level: number;
   title: string;
-  isActive: boolean;
+  isUnlocked: boolean;
+  onSelect: () => void;
 }
 
 /**
  * Level Card - Glassmorphic card for each level in the Ascension Map
  */
-const LevelCard = ({ level, title, isActive }: LevelCardProps) => {
+const LevelCard = ({ level, title, isUnlocked, onSelect }: LevelCardProps) => {
+  const [isShaking, setIsShaking] = useState(false);
+
+  const handleClick = () => {
+    if (isUnlocked) {
+      onSelect();
+    } else {
+      // Trigger shake animation for locked cards
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+    }
+  };
+
+  // Level-specific colors
+  const levelColors: Record<number, { border: string; glow: string; bg: string }> = {
+    1: { border: 'hsl(0 70% 50%)', glow: 'hsl(0 70% 40%)', bg: 'hsl(0 60% 35%)' },
+    2: { border: 'hsl(30 60% 50%)', glow: 'hsl(30 60% 40%)', bg: 'hsl(30 50% 35%)' },
+    3: { border: 'hsl(25 80% 55%)', glow: 'hsl(25 80% 45%)', bg: 'hsl(25 70% 40%)' },
+    4: { border: 'hsl(45 90% 55%)', glow: 'hsl(45 90% 45%)', bg: 'hsl(45 80% 40%)' },
+  };
+
+  const colors = levelColors[level] || levelColors[1];
+
   return (
-    <motion.div
-      className="relative flex items-center gap-6 p-6 rounded-2xl w-full max-w-md"
+    <motion.button
+      className="relative flex items-center gap-6 p-6 rounded-2xl w-full max-w-md cursor-pointer"
       style={{
         background: 'rgba(255, 255, 255, 0.05)',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
-        border: isActive 
-          ? '2px solid hsl(0 70% 50%)' 
+        border: isUnlocked 
+          ? `2px solid ${colors.border}` 
           : '1px solid rgba(255, 255, 255, 0.2)',
-        opacity: isActive ? 1 : 0.5,
-        boxShadow: isActive 
-          ? '0 0 30px hsl(0 70% 40% / 0.5), 0 0 60px hsl(0 70% 30% / 0.3), inset 0 0 20px hsl(0 70% 50% / 0.1)' 
+        opacity: isUnlocked ? 1 : 0.5,
+        boxShadow: isUnlocked 
+          ? `0 0 30px ${colors.glow}80, 0 0 60px ${colors.glow}4D, inset 0 0 20px ${colors.glow}1A` 
           : 'none',
       }}
+      onClick={handleClick}
       initial={{ opacity: 0, x: -30 }}
-      whileInView={{ opacity: isActive ? 1 : 0.5, x: 0 }}
+      whileInView={{ opacity: isUnlocked ? 1 : 0.5, x: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, delay: (4 - level) * 0.15 }}
-      whileHover={isActive ? { scale: 1.02 } : {}}
+      whileHover={isUnlocked ? { scale: 1.02 } : {}}
+      animate={isShaking ? {
+        x: [0, -10, 10, -10, 10, -5, 5, 0],
+        transition: { duration: 0.5 }
+      } : {}}
     >
-      {/* Icon Placeholder */}
+      {/* Icon Placeholder / Lock Icon */}
       <div 
         className="flex-shrink-0 w-16 h-16 rounded-xl flex items-center justify-center"
         style={{
-          background: isActive 
-            ? 'linear-gradient(135deg, hsl(0 60% 35%), hsl(0 50% 25%))'
+          background: isUnlocked 
+            ? `linear-gradient(135deg, ${colors.bg}, ${colors.bg}99)`
             : 'hsl(0 0% 20%)',
-          border: isActive ? '1px solid hsl(0 50% 45%)' : '1px solid hsl(0 0% 30%)',
+          border: isUnlocked ? `1px solid ${colors.border}80` : '1px solid hsl(0 0% 30%)',
         }}
       >
-        <div 
-          className="w-8 h-8 rounded-full"
-          style={{
-            background: isActive ? 'hsl(0 60% 50%)' : 'hsl(0 0% 35%)',
-          }}
-        />
+        {isUnlocked ? (
+          <div 
+            className="w-8 h-8 rounded-full"
+            style={{
+              background: colors.border,
+              boxShadow: `0 0 15px ${colors.glow}80`,
+            }}
+          />
+        ) : (
+          <Lock 
+            className="w-8 h-8" 
+            style={{ color: 'hsl(0 0% 45%)' }}
+          />
+        )}
       </div>
 
       {/* Title Text */}
-      <div className="flex-1">
+      <div className="flex-1 text-left">
         <p 
           className="text-xs font-mono tracking-widest mb-1"
           style={{ 
-            color: isActive ? 'hsl(0 60% 65%)' : 'hsl(0 0% 50%)',
+            color: isUnlocked ? `${colors.border}` : 'hsl(0 0% 50%)',
           }}
         >
           LEVEL {level}
@@ -63,26 +101,25 @@ const LevelCard = ({ level, title, isActive }: LevelCardProps) => {
           className="text-lg tracking-wide"
           style={{ 
             fontFamily: "'Staatliches', sans-serif",
-            color: isActive ? 'hsl(0 0% 95%)' : 'hsl(0 0% 50%)',
+            color: isUnlocked ? 'hsl(0 0% 95%)' : 'hsl(0 0% 50%)',
           }}
         >
           {title}
         </h3>
       </div>
 
-      {/* Active glow effect */}
-      {isActive && (
+      {/* Glowing border effect for unlocked cards */}
+      {isUnlocked && (
         <motion.div
           className="absolute inset-0 rounded-2xl pointer-events-none"
           style={{
-            border: '2px solid hsl(0 70% 50%)',
-            boxShadow: '0 0 20px hsl(0 70% 50% / 0.4)',
+            border: `2px solid ${colors.border}`,
           }}
           animate={{
             boxShadow: [
-              '0 0 20px hsl(0 70% 50% / 0.4)',
-              '0 0 35px hsl(0 70% 50% / 0.6)',
-              '0 0 20px hsl(0 70% 50% / 0.4)',
+              `0 0 20px ${colors.glow}66`,
+              `0 0 35px ${colors.glow}99`,
+              `0 0 20px ${colors.glow}66`,
             ],
           }}
           transition={{
@@ -92,15 +129,38 @@ const LevelCard = ({ level, title, isActive }: LevelCardProps) => {
           }}
         />
       )}
-    </motion.div>
+
+      {/* Locked overlay with centered padlock */}
+      {!isUnlocked && (
+        <div 
+          className="absolute inset-0 rounded-2xl flex items-center justify-center pointer-events-none"
+          style={{
+            background: 'rgba(0, 0, 0, 0.3)',
+          }}
+        >
+          <Lock 
+            className="w-10 h-10" 
+            style={{ 
+              color: 'hsl(0 0% 40%)',
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))',
+            }}
+          />
+        </div>
+      )}
+    </motion.button>
   );
 };
 
 /**
  * Sap Rise Thermometer - Fixed progress bar on the right edge
  */
-const SapRiseThermometer = () => {
-  const fillPercent = 25; // 25% to represent Level 1 at bottom
+interface SapRiseThermometerProps {
+  currentLevel: number;
+}
+
+const SapRiseThermometer = ({ currentLevel }: SapRiseThermometerProps) => {
+  // Calculate fill percentage based on current level
+  const fillPercent = currentLevel * 25;
 
   return (
     <motion.div
@@ -147,19 +207,23 @@ const SapRiseThermometer = () => {
         <motion.div
           className="absolute bottom-0 left-0 right-0 rounded-b-full"
           style={{
-            background: `linear-gradient(0deg,
-              hsl(140 65% 25%) 0%,
-              hsl(120 55% 35%) 50%,
-              hsl(100 65% 45%) 100%
-            )`,
-            boxShadow: `
-              inset 0 5px 10px hsl(140 70% 50% / 0.25),
-              0 0 8px hsl(140 55% 40% / 0.4)
-            `,
+            background: currentLevel >= 4 
+              ? `linear-gradient(0deg,
+                  hsl(120 70% 30%) 0%,
+                  hsl(100 65% 40%) 50%,
+                  hsl(80 70% 50%) 100%
+                )`
+              : `linear-gradient(0deg,
+                  hsl(140 65% 25%) 0%,
+                  hsl(120 55% 35%) 50%,
+                  hsl(100 65% 45%) 100%
+                )`,
+            boxShadow: currentLevel >= 4
+              ? `inset 0 5px 10px hsl(100 80% 55% / 0.3), 0 0 15px hsl(100 65% 45% / 0.5)`
+              : `inset 0 5px 10px hsl(140 70% 50% / 0.25), 0 0 8px hsl(140 55% 40% / 0.4)`,
           }}
-          initial={{ height: 0 }}
           animate={{ height: `${fillPercent}%` }}
-          transition={{ duration: 1.2, delay: 1, ease: 'easeOut' }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
         >
           {/* Bubbles */}
           <div className="absolute inset-0 overflow-hidden">
@@ -206,9 +270,13 @@ const SapRiseThermometer = () => {
       <div 
         className="w-8 h-8 md:w-10 md:h-10 rounded-full -mt-3"
         style={{
-          background: `radial-gradient(circle at 30% 30%, hsl(140 60% 35%), hsl(140 50% 20%))`,
+          background: currentLevel >= 4
+            ? `radial-gradient(circle at 30% 30%, hsl(100 70% 40%), hsl(100 60% 25%))`
+            : `radial-gradient(circle at 30% 30%, hsl(140 60% 35%), hsl(140 50% 20%))`,
           border: '2px solid hsl(40 35% 25%)',
-          boxShadow: '0 0 15px hsl(140 55% 30% / 0.4)',
+          boxShadow: currentLevel >= 4
+            ? '0 0 20px hsl(100 65% 40% / 0.5)'
+            : '0 0 15px hsl(140 55% 30% / 0.4)',
         }}
       />
 
@@ -278,10 +346,23 @@ const levels = [
 ];
 
 /**
- * Ascension Map - Phase 1 Skeleton
+ * Ascension Map - Phase 2 with State Management
  * Vertical timeline with 4 levels, bottom-to-top scroll
  */
 const AscensionMap = () => {
+  // State: Current level tracks user progress
+  const [currentLevel, setCurrentLevel] = useState(1);
+
+  // Handle card selection
+  const handleCardSelect = (level: number) => {
+    console.log(`OPEN LESSON DRAWER - Level ${level}`);
+  };
+
+  // Simulate level up for debugging
+  const handleSimulateLevelUp = () => {
+    setCurrentLevel(prev => Math.min(prev + 1, 4));
+  };
+
   return (
     <section 
       className="relative min-h-screen w-full overflow-hidden"
@@ -301,17 +382,18 @@ const AscensionMap = () => {
       <CentralCord />
 
       {/* Sap Rise Thermometer */}
-      <SapRiseThermometer />
+      <SapRiseThermometer currentLevel={currentLevel} />
 
       {/* Level Cards Container */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center py-20 px-6">
         <div className="flex flex-col items-center gap-16">
-          {levels.map((level) => (
+          {levels.map((levelData) => (
             <LevelCard
-              key={level.level}
-              level={level.level}
-              title={level.title}
-              isActive={level.level === 1}
+              key={levelData.level}
+              level={levelData.level}
+              title={levelData.title}
+              isUnlocked={currentLevel >= levelData.level}
+              onSelect={() => handleCardSelect(levelData.level)}
             />
           ))}
         </div>
@@ -327,6 +409,25 @@ const AscensionMap = () => {
           ↑ SCROLL UP TO ASCEND ↑
         </motion.p>
       </div>
+
+      {/* Debug Button - Simulate Level Up */}
+      <motion.button
+        className="fixed bottom-6 right-6 z-50 px-4 py-2 rounded-lg font-mono text-xs"
+        style={{
+          background: 'hsl(280 50% 25%)',
+          border: '1px solid hsl(280 60% 50%)',
+          color: 'hsl(280 60% 75%)',
+          boxShadow: '0 0 15px hsl(280 50% 30% / 0.5)',
+        }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={handleSimulateLevelUp}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1 }}
+      >
+        🧪 SIMULATE LEVEL UP (Current: {currentLevel})
+      </motion.button>
     </section>
   );
 };
