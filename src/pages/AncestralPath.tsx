@@ -13,11 +13,12 @@ import {
   DreamtimeCircleIcon,
   DjedPillarIcon,
 } from '@/components/ancestral';
+import { OgunIcon, BabaluAyeIcon, ShangoIcon, OshunIcon, OrishaBadge } from '@/components/ancestral/OrishaIcons';
 import { useAncestralProgress, Module } from '@/hooks/useAncestralProgress';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { Button } from '@/components/ui/button';
 
-// Icon mapping
+// Icon mapping for module icons
 const iconMap: Record<string, React.ComponentType<{ color: string }>> = {
   'spiral-mound': SpiralMoundIcon,
   'kanaga-mask': KanagaMaskIcon,
@@ -25,12 +26,60 @@ const iconMap: Record<string, React.ComponentType<{ color: string }>> = {
   'sun-disc': DjedPillarIcon,
 };
 
+// Orisha data for each level
+const orishaMap: Record<number, {
+  name: string;
+  title: string;
+  orisha: 'ogun' | 'babalu-aye' | 'shango' | 'oshun';
+  Icon: React.ComponentType<{ className?: string; animated?: boolean }>;
+  science: string;
+  task: string;
+  texture: string;
+}> = {
+  1: {
+    name: 'OGUN',
+    title: 'Lord of Iron & Labor',
+    orisha: 'ogun',
+    Icon: OgunIcon,
+    science: 'No-Till & Cover Cropping',
+    task: 'Upload: Broadforking or Drill Radishes',
+    texture: 'Red Clay + Iron Chain',
+  },
+  2: {
+    name: 'BABALU AYE',
+    title: 'Lord of Earth & Compost',
+    orisha: 'babalu-aye',
+    Icon: BabaluAyeIcon,
+    science: 'Paramagnetism (Rock Dust) & Soil Biology',
+    task: 'Upload: Rock Dust Application or Compost',
+    texture: 'Porous Stone + Grain Skep',
+  },
+  3: {
+    name: 'SHANGO',
+    title: 'Lord of Lightning & Fire',
+    orisha: 'shango',
+    Icon: ShangoIcon,
+    science: 'Electroculture, Sonic Bloom & Agnihotra',
+    task: 'Upload: Copper Antenna or Agnihotra Ritual',
+    texture: 'Copper + Star Map',
+  },
+  4: {
+    name: 'OSHUN',
+    title: 'Lady of Sweet Waters',
+    orisha: 'oshun',
+    Icon: OshunIcon,
+    science: 'High Brix & JADAM Ferments',
+    task: 'Upload: Refractometer (12+ Brix) or Ferment',
+    texture: 'Gold Leaf + Brass Mirror',
+  },
+};
+
 // Fallback modules for display when loading
 const fallbackModules = [
-  { level: 1, title: "LEVEL 1: SOIL & SURVIVAL", mission: "Heal the Clay. Save the Seed.", lineage: "Muscogee & Maroons — The Foundation", color: "hsl(0 100% 50%)", iconName: 'spiral-mound' },
-  { level: 2, title: "LEVEL 2: COSMIC ALIGNMENT", mission: "Map the Garden to the Sky.", lineage: "Dogon — The Architecture", color: "hsl(195 100% 50%)", iconName: 'kanaga-mask' },
-  { level: 3, title: "LEVEL 3: SONGLINES & FREQUENCY", mission: "Sing the Plant into Being.", lineage: "Aboriginal — The Song", color: "hsl(275 100% 25%)", iconName: 'dot-circle' },
-  { level: 4, title: "LEVEL 4: HIGH BRIX ALCHEMY", mission: "Transmute Sunlight into Nutrient Density.", lineage: "Ancient Kemit — The Mastery", color: "hsl(51 100% 50%)", iconName: 'sun-disc' },
+  { level: 1, title: "LEVEL 1: THE IRON ROOT", mission: "Ogun clears the path.", lineage: "Muscogee & Maroons — Stewardship & Survival", color: "hsl(0 70% 40%)", iconName: 'spiral-mound' },
+  { level: 2, title: "LEVEL 2: THE MAGNETIC EARTH", mission: "Babalu heals the soil.", lineage: "Olmec (Xi) — The Mother Culture", color: "hsl(30 40% 35%)", iconName: 'kanaga-mask' },
+  { level: 3, title: "LEVEL 3: THE THUNDER SIGNAL", mission: "Shango strikes the copper.", lineage: "Dogon, Aboriginal, Chinese & Vedic", color: "hsl(15 100% 50%)", iconName: 'dot-circle' },
+  { level: 4, title: "LEVEL 4: THE SWEET ALCHEMY", mission: "Oshun brings the honey.", lineage: "Ancient Kemit — The Gold Masters", color: "hsl(51 100% 50%)", iconName: 'sun-disc' },
 ];
 
 /**
@@ -325,9 +374,11 @@ const AncestralPath = () => {
         {/* Skill Tree Container */}
         <div className="max-w-3xl mx-auto px-6 md:px-12">
           
-          {/* Module Nodes with Mycelial Cords */}
+          {/* Module Nodes with Mycelial Cords and Orisha Guardians */}
           {displayModules.map((module, index) => {
             const IconComponent = iconMap[module.iconName] || SpiralMoundIcon;
+            const orishaData = orishaMap[module.level];
+            const OrishaIcon = orishaData?.Icon;
             
             return (
               <div key={module.id} className="relative">
@@ -341,20 +392,91 @@ const AncestralPath = () => {
                   </div>
                 )}
 
-                {/* Module Node */}
+                {/* Module Node with Orisha */}
                 <div className="relative z-10 py-8">
-                  <ModuleNode
-                    level={module.level}
-                    title={module.title}
-                    mission={module.mission}
-                    lineage={module.lineage}
-                    color={module.color}
-                    icon={<IconComponent color={module.color} />}
-                    isUnlocked={module.isUnlocked}
-                    isCompleted={module.isCompleted}
-                    completionPercent={module.completionPercent}
-                    onSelect={() => handleModuleSelect(module)}
-                  />
+                  <div className="flex items-start gap-4">
+                    {/* Orisha Guardian Icon (left side on desktop) */}
+                    {orishaData && (
+                      <motion.div
+                        className="hidden md:flex flex-col items-center gap-2 min-w-[80px]"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: module.isUnlocked ? 1 : 0.4, x: 0 }}
+                        transition={{ delay: 0.3 + index * 0.1 }}
+                      >
+                        <div 
+                          className="w-16 h-16 rounded-full flex items-center justify-center"
+                          style={{
+                            background: module.isCompleted 
+                              ? `radial-gradient(circle at 30% 30%, ${module.color}40, ${module.color}20)`
+                              : 'hsl(0 0% 12%)',
+                            border: `2px solid ${module.isCompleted ? module.color : 'hsl(0 0% 25%)'}`,
+                            boxShadow: module.isCompleted ? `0 0 20px ${module.color}40` : 'none',
+                            filter: module.isUnlocked ? 'none' : 'grayscale(100%)',
+                          }}
+                        >
+                          <OrishaIcon className="w-10 h-10" animated={module.isUnlocked} />
+                        </div>
+                        <p 
+                          className="text-xs text-center tracking-wider"
+                          style={{ 
+                            fontFamily: "'Staatliches', sans-serif",
+                            color: module.isCompleted ? module.color : 'hsl(0 0% 40%)',
+                          }}
+                        >
+                          {orishaData.name}
+                        </p>
+                        {module.isCompleted && (
+                          <motion.p
+                            className="text-[10px] font-mono text-center"
+                            style={{ color: module.color }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                          >
+                            ✦ BLESSED ✦
+                          </motion.p>
+                        )}
+                      </motion.div>
+                    )}
+                    
+                    {/* Main Module Node */}
+                    <div className="flex-1">
+                      <ModuleNode
+                        level={module.level}
+                        title={module.title}
+                        mission={module.mission}
+                        lineage={module.lineage}
+                        color={module.color}
+                        icon={<IconComponent color={module.color} />}
+                        isUnlocked={module.isUnlocked}
+                        isCompleted={module.isCompleted}
+                        completionPercent={module.completionPercent}
+                        onSelect={() => handleModuleSelect(module)}
+                      />
+                      
+                      {/* Science & Task info (shown when unlocked) */}
+                      {module.isUnlocked && orishaData && (
+                        <motion.div
+                          className="mt-3 ml-20 md:ml-24 space-y-2"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.5 }}
+                        >
+                          <p 
+                            className="text-xs font-mono"
+                            style={{ color: 'hsl(195 60% 60%)' }}
+                          >
+                            ⚗ {orishaData.science}
+                          </p>
+                          <p 
+                            className="text-xs font-mono"
+                            style={{ color: 'hsl(40 50% 50%)' }}
+                          >
+                            📷 {orishaData.task}
+                          </p>
+                        </motion.div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             );
