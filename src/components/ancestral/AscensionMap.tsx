@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, Pickaxe, Mountain, Zap, Sun, Droplets, KeyRound } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import InitiationModal from './InitiationModal';
 import AscensionLessonDrawer from './AscensionLessonDrawer';
+import ChainBreakingCelebration from './ChainBreakingCelebration';
 
 // Level content data with cultural/scientific themes
 interface LevelData {
@@ -411,11 +412,14 @@ const AscensionMap = () => {
   // State: Current level tracks user progress (from database)
   const [currentLevel, setCurrentLevel] = useState(1);
   const [user, setUser] = useState<{ id: string } | null>(null);
+  const previousLevelRef = useRef(1);
   
-  // Modal and Drawer states
+  // Modal, Drawer, and Celebration states
   const [isInitiationOpen, setIsInitiationOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationLevel, setCelebrationLevel] = useState<number | null>(null);
 
   // Fetch user progress from database
   const fetchProgress = useCallback(async (userId: string) => {
@@ -467,19 +471,67 @@ const AscensionMap = () => {
     setIsDrawerOpen(true);
   };
 
-  // Handle level completion - refresh progress
+  // Handle level completion - refresh progress and check for level up
   const handleLevelComplete = useCallback(() => {
     if (user) {
       // Delay to allow database triggers to complete
-      setTimeout(() => {
-        fetchProgress(user.id);
+      setTimeout(async () => {
+        // Store previous level before fetching
+        const prevLevel = currentLevel;
+        
+        // Fetch updated progress
+        const { data: moduleProgress } = await supabase
+          .from('user_module_progress')
+          .select(`
+            module_id,
+            completed_at,
+            modules!inner(order_index)
+          `)
+          .eq('user_id', user.id)
+          .order('modules(order_index)', { ascending: false })
+          .limit(1);
+
+        if (moduleProgress && moduleProgress.length > 0) {
+          const newLevel = (moduleProgress[0].modules as { order_index: number }).order_index;
+          
+          // If level increased, trigger celebration!
+          if (newLevel > prevLevel) {
+            const unlockedLevelData = levelData.find(l => l.level === newLevel);
+            setCelebrationLevel(newLevel);
+            setShowCelebration(true);
+          }
+          
+          setCurrentLevel(newLevel);
+          previousLevelRef.current = newLevel;
+        }
       }, 1000);
     }
-  }, [user, fetchProgress]);
+  }, [user, currentLevel]);
 
-  // Simulate level up for debugging
+  // Simulate level up for debugging (also triggers celebration)
   const handleSimulateLevelUp = () => {
-    setCurrentLevel(prev => Math.min(prev + 1, 4));
+    const newLevel = Math.min(currentLevel + 1, 4);
+    if (newLevel > currentLevel) {
+      setCelebrationLevel(newLevel);
+      setShowCelebration(true);
+      setCurrentLevel(newLevel);
+    }
+  };
+
+  // Handle celebration complete
+  const handleCelebrationComplete = () => {
+    setShowCelebration(false);
+    setCelebrationLevel(null);
+  };
+
+  // Get level data for celebration
+  const getCelebrationLevelData = () => {
+    if (!celebrationLevel) return { name: 'NEW LEVEL', color: 'hsl(45 90% 55%)' };
+    const level = levelData.find(l => l.level === celebrationLevel);
+    return {
+      name: level?.title || 'NEW LEVEL',
+      color: level?.glowColor || 'hsl(45 90% 55%)',
+    };
   };
 
   return (
@@ -586,6 +638,14 @@ const AscensionMap = () => {
         onClose={() => setIsDrawerOpen(false)}
         level={selectedLevel}
         onLevelComplete={handleLevelComplete}
+      />
+
+      {/* Chain Breaking Celebration */}
+      <ChainBreakingCelebration
+        isVisible={showCelebration}
+        onComplete={handleCelebrationComplete}
+        levelName={getCelebrationLevelData().name}
+        color={getCelebrationLevelData().color}
       />
     </section>
   );
