@@ -71,15 +71,17 @@ interface LevelCardProps {
   data: LevelData;
   isUnlocked: boolean;
   onSelect: () => void;
+  completedCount: number;
+  totalCount: number;
 }
 
 /**
  * Level Card - Glassmorphic card for each level in the Ascension Map
  */
-const LevelCard = ({ data, isUnlocked, onSelect }: LevelCardProps) => {
+const LevelCard = ({ data, isUnlocked, onSelect, completedCount, totalCount }: LevelCardProps) => {
   const [isShaking, setIsShaking] = useState(false);
   const { level, orisha, title, subtitle, statusColor, glowColor, bgColor, Icon } = data;
-
+  const isComplete = totalCount > 0 && completedCount >= totalCount;
   const handleClick = () => {
     if (isUnlocked) {
       onSelect();
@@ -173,6 +175,28 @@ const LevelCard = ({ data, isUnlocked, onSelect }: LevelCardProps) => {
         >
           {subtitle}
         </p>
+        
+        {/* Lesson Progress Count */}
+        {isUnlocked && totalCount > 0 && (
+          <div 
+            className="flex items-center gap-2 mt-2"
+            style={{ fontFamily: "'Space Mono', monospace" }}
+          >
+            <div 
+              className="text-xs px-2 py-0.5 rounded-full"
+              style={{
+                background: isComplete ? `${statusColor}30` : 'rgba(255, 255, 255, 0.1)',
+                border: `1px solid ${isComplete ? statusColor : 'rgba(255, 255, 255, 0.2)'}`,
+                color: isComplete ? statusColor : 'hsl(0 0% 60%)',
+              }}
+            >
+              {completedCount}/{totalCount} lessons
+            </div>
+            {isComplete && (
+              <span style={{ color: statusColor }}>✓</span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Pulsating Glow Effect for Unlocked Cards */}
@@ -423,6 +447,53 @@ const AscensionMap = () => {
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationLevel, setCelebrationLevel] = useState<number | null>(null);
+  
+  // Lesson counts per level: { [level]: { completed: number, total: number } }
+  const [lessonCounts, setLessonCounts] = useState<Record<number, { completed: number; total: number }>>({});
+
+  // Fetch lesson counts for all levels
+  const fetchLessonCounts = useCallback(async (userId?: string) => {
+    // Get all modules with their lessons
+    const { data: modules } = await supabase
+      .from('modules')
+      .select('id, order_index')
+      .order('order_index');
+    
+    if (!modules) return;
+    
+    // Get all lessons grouped by module
+    const { data: lessons } = await supabase
+      .from('lessons')
+      .select('id, module_id');
+    
+    if (!lessons) return;
+    
+    // Get user's completed lessons (field journal entries)
+    let completedLessonIds: string[] = [];
+    if (userId) {
+      const { data: journalEntries } = await supabase
+        .from('field_journal')
+        .select('lesson_id')
+        .eq('user_id', userId);
+      
+      completedLessonIds = journalEntries?.map(e => e.lesson_id) || [];
+    }
+    
+    // Build counts per level
+    const counts: Record<number, { completed: number; total: number }> = {};
+    
+    modules.forEach(module => {
+      const moduleLessons = lessons.filter(l => l.module_id === module.id);
+      const completedCount = moduleLessons.filter(l => completedLessonIds.includes(l.id)).length;
+      
+      counts[module.order_index] = {
+        completed: completedCount,
+        total: moduleLessons.length,
+      };
+    });
+    
+    setLessonCounts(counts);
+  }, []);
 
   // Fetch user progress from database
   const fetchProgress = useCallback(async (userId: string) => {
@@ -442,10 +513,16 @@ const AscensionMap = () => {
       const highestUnlocked = (moduleProgress[0].modules as { order_index: number }).order_index;
       setCurrentLevel(highestUnlocked);
     }
-  }, []);
+    
+    // Fetch lesson counts with user context
+    fetchLessonCounts(userId);
+  }, [fetchLessonCounts]);
 
   // Initialize: check auth and fetch progress
   useEffect(() => {
+    // Always fetch lesson counts (even for non-logged-in users, shows totals)
+    fetchLessonCounts();
+    
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
         setUser({ id: data.user.id });
@@ -461,11 +538,12 @@ const AscensionMap = () => {
       } else {
         setUser(null);
         setCurrentLevel(1);
+        fetchLessonCounts(); // Refresh without user context
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [fetchProgress]);
+  }, [fetchProgress, fetchLessonCounts]);
 
   // Handle card selection - opens Lesson Drawer
   const handleCardSelect = (level: number) => {
@@ -515,9 +593,12 @@ const AscensionMap = () => {
           setCurrentLevel(newLevel);
           previousLevelRef.current = newLevel;
         }
+        
+        // Refresh lesson counts
+        fetchLessonCounts(user.id);
       }, 1000);
     }
-  }, [user, currentLevel]);
+  }, [user, currentLevel, fetchLessonCounts, toast]);
 
   // Simulate level up for debugging (also triggers celebration)
   const handleSimulateLevelUp = () => {
@@ -602,6 +683,8 @@ const AscensionMap = () => {
               data={data}
               isUnlocked={currentLevel >= data.level}
               onSelect={() => handleCardSelect(data.level)}
+              completedCount={lessonCounts[data.level]?.completed || 0}
+              totalCount={lessonCounts[data.level]?.total || 0}
             />
           ))}
         </div>
