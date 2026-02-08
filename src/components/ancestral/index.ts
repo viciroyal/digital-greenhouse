@@ -14,7 +14,7 @@ export { default as SoilScanningAnimation } from './SoilScanningAnimation';
 export { default as HazardWarning } from './HazardWarning';
 export { default as VideoPlaceholder } from './VideoPlaceholder';
 export { default as ProtocolSteps } from './ProtocolSteps';
-export { default as SkyWatcherHeader } from './SkyWatcherHeader';
+export { default as SkyWatcherHeader, getSeasonalResonance } from './SkyWatcherHeader';
 export { default as SovereignIcon } from './SovereignIcon';
 export { default as FrequencyVisualizer } from './FrequencyVisualizer';
 export { default as MasterRecipeCard } from './MasterRecipeCard';
@@ -27,3 +27,4 @@ export {
   DjedPillarIcon 
 } from './ModuleIcons';
 export { default as CulturalProtocols } from './CulturalProtocols';
+export { default as SignalCircuitBoard } from './SignalCircuitBoard';
