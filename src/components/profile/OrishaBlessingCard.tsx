@@ -84,7 +84,7 @@ export const OrishaBlessingCard = ({
     >
       {/* Card Container */}
       <motion.div
-        className="relative overflow-hidden rounded-3xl p-6"
+        className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-6"
         style={{
           background: isEarned ? data.bgGradient : 'linear-gradient(135deg, hsl(0 0% 15%), hsl(0 0% 10%))',
           border: `2px solid ${isEarned ? data.color : 'hsl(0 0% 25%)'}`,
@@ -110,9 +110,9 @@ export const OrishaBlessingCard = ({
         )}
 
         {/* Level Badge */}
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
           <div
-            className="px-3 py-1 rounded-full text-xs font-mono"
+            className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-mono"
             style={{
               background: isEarned ? data.color : 'hsl(0 0% 30%)',
               color: isEarned ? 'hsl(0 0% 10%)' : 'hsl(0 0% 60%)',
@@ -125,7 +125,7 @@ export const OrishaBlessingCard = ({
         </div>
 
         {/* Main Content */}
-        <div className="flex items-start gap-5">
+        <div className="flex items-start gap-3 sm:gap-5">
           {/* Icon Container */}
           <motion.div
             className="relative flex-shrink-0"
@@ -135,7 +135,7 @@ export const OrishaBlessingCard = ({
             transition={{ duration: 4, repeat: Infinity }}
           >
             <div
-              className="w-24 h-24 rounded-2xl flex items-center justify-center relative overflow-hidden"
+              className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl sm:rounded-2xl flex items-center justify-center relative overflow-hidden"
               style={{
                 background: isEarned 
                   ? `linear-gradient(145deg, ${data.color}30, ${data.color}10)`
@@ -143,12 +143,12 @@ export const OrishaBlessingCard = ({
                 border: `2px solid ${isEarned ? data.color : 'hsl(0 0% 25%)'}`,
               }}
             >
-              <Icon className="w-16 h-16" animated={isEarned} />
+              <Icon className="w-10 h-10 sm:w-16 sm:h-16" animated={isEarned} />
               
               {/* Lock Overlay */}
               {!isEarned && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-2xl">
-                  <Lock className="w-8 h-8 text-muted-foreground" />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-xl sm:rounded-2xl">
+                  <Lock className="w-5 h-5 sm:w-8 sm:h-8 text-muted-foreground" />
                 </div>
               )}
             </div>
@@ -156,21 +156,21 @@ export const OrishaBlessingCard = ({
             {/* Completion Check */}
             {isEarned && (
               <motion.div
-                className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center"
+                className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center"
                 style={{ background: data.color }}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3 + index * 0.15, type: 'spring' }}
               >
-                <CheckCircle className="w-5 h-5 text-black" />
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
               </motion.div>
             )}
           </motion.div>
 
           {/* Text Content */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 pt-1">
             <h3
-              className="text-xl mb-1"
+              className="text-base sm:text-xl mb-0.5 sm:mb-1 truncate pr-16 sm:pr-20"
               style={{
                 fontFamily: "'Staatliches', sans-serif",
                 color: isEarned ? data.color : 'hsl(0 0% 50%)',
@@ -179,13 +179,13 @@ export const OrishaBlessingCard = ({
             >
               {data.name}
             </h3>
-            <p className="text-sm text-muted-foreground mb-2" style={{ fontFamily: "'Space Mono', monospace" }}>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-1.5 sm:mb-2 truncate" style={{ fontFamily: "'Space Mono', monospace" }}>
               {data.title}
             </p>
             
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
               <span
-                className="px-2 py-0.5 rounded text-xs"
+                className="px-1.5 py-0.5 sm:px-2 rounded text-[10px] sm:text-xs"
                 style={{
                   background: isEarned ? `${data.color}20` : 'hsl(0 0% 20%)',
                   color: isEarned ? data.color : 'hsl(0 0% 50%)',
@@ -194,13 +194,13 @@ export const OrishaBlessingCard = ({
               >
                 ◆ {data.category}
               </span>
-              <span className="text-xs text-muted-foreground" style={{ fontFamily: "'Space Mono', monospace" }}>
+              <span className="text-[10px] sm:text-xs text-muted-foreground truncate hidden sm:inline" style={{ fontFamily: "'Space Mono', monospace" }}>
                 {data.lineage}
               </span>
             </div>
 
             {/* Progress Bar */}
-            <div className="relative h-2 rounded-full overflow-hidden bg-black/30 mb-2">
+            <div className="relative h-1.5 sm:h-2 rounded-full overflow-hidden bg-black/30 mb-1.5 sm:mb-2">
               <motion.div
                 className="absolute inset-y-0 left-0 rounded-full"
                 style={{ background: data.color }}
@@ -210,7 +210,7 @@ export const OrishaBlessingCard = ({
               />
             </div>
             
-            <div className="flex justify-between text-xs" style={{ fontFamily: "'Space Mono', monospace" }}>
+            <div className="flex justify-between text-[10px] sm:text-xs" style={{ fontFamily: "'Space Mono', monospace" }}>
               <span className="text-muted-foreground">
                 {lessonsCompleted}/{totalLessons} lessons
               </span>
@@ -224,14 +224,14 @@ export const OrishaBlessingCard = ({
         {/* Blessing Banner (if earned) */}
         {isEarned && (
           <motion.div
-            className="mt-4 pt-4 border-t"
+            className="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t"
             style={{ borderColor: `${data.color}30` }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 + index * 0.15 }}
           >
             <p
-              className="text-center text-sm"
+              className="text-center text-xs sm:text-sm"
               style={{
                 fontFamily: "'Staatliches', sans-serif",
                 color: data.color,

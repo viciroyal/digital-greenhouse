@@ -63,17 +63,17 @@ export const ProfileStats = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="rounded-3xl overflow-hidden"
+      className="rounded-2xl sm:rounded-3xl overflow-hidden"
       style={{
         background: 'linear-gradient(145deg, hsl(20 40% 12%), hsl(20 30% 8%))',
         border: '2px solid hsl(20 40% 25%)',
       }}
     >
       {/* Header with Rank */}
-      <div className="p-6 pb-4">
-        <div className="flex items-center gap-4 mb-4">
+      <div className="p-4 sm:p-6 pb-3 sm:pb-4">
+        <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
           <motion.div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center"
+            className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0"
             style={{
               background: `linear-gradient(145deg, ${rank.color}30, ${rank.color}10)`,
               border: `2px solid ${rank.color}`,
@@ -81,14 +81,14 @@ export const ProfileStats = ({
             animate={{ boxShadow: [`0 0 20px ${rank.color}40`, `0 0 40px ${rank.color}60`, `0 0 20px ${rank.color}40`] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            <Sprout className="w-8 h-8" style={{ color: rank.color }} />
+            <Sprout className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: rank.color }} />
           </motion.div>
-          <div>
-            <p className="text-xs text-muted-foreground mb-1" style={{ fontFamily: "'Space Mono', monospace" }}>
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-xs text-muted-foreground mb-0.5 sm:mb-1" style={{ fontFamily: "'Space Mono', monospace" }}>
               PHARMER RANK
             </p>
             <motion.h2
-              className="text-2xl"
+              className="text-lg sm:text-2xl truncate"
               style={{
                 fontFamily: "'Staatliches', sans-serif",
                 color: rank.color,
@@ -104,9 +104,9 @@ export const ProfileStats = ({
         </div>
 
         {/* Overall Progress Ring */}
-        <div className="flex items-center gap-4 mb-4">
-          <div className="relative w-20 h-20">
-            <svg className="w-full h-full transform -rotate-90">
+        <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
+            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 80 80">
               {/* Background circle */}
               <circle
                 cx="40"
@@ -133,18 +133,18 @@ export const ProfileStats = ({
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
               <span
-                className="text-lg font-bold"
+                className="text-sm sm:text-lg font-bold"
                 style={{ fontFamily: "'Staatliches', sans-serif", color: rank.color }}
               >
                 {overallProgress}%
               </span>
             </div>
           </div>
-          <div className="flex-1">
-            <p className="text-sm text-muted-foreground mb-2" style={{ fontFamily: "'Space Mono', monospace" }}>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-1.5 sm:mb-2" style={{ fontFamily: "'Space Mono', monospace" }}>
               Journey Progress
             </p>
-            <div className="h-3 rounded-full overflow-hidden bg-black/40">
+            <div className="h-2 sm:h-3 rounded-full overflow-hidden bg-black/40">
               <motion.div
                 className="h-full rounded-full"
                 style={{
@@ -167,14 +167,14 @@ export const ProfileStats = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 + index * 0.1 }}
-            className="p-4"
+            className="p-3 sm:p-4"
             style={{
               background: 'hsl(20 30% 10%)',
             }}
           >
-            <stat.icon className="w-5 h-5 mb-2" style={{ color: stat.color }} />
+            <stat.icon className="w-4 h-4 sm:w-5 sm:h-5 mb-1.5 sm:mb-2" style={{ color: stat.color }} />
             <p
-              className="text-xl mb-1"
+              className="text-lg sm:text-xl mb-0.5 sm:mb-1"
               style={{
                 fontFamily: "'Staatliches', sans-serif",
                 color: stat.color,
@@ -182,7 +182,7 @@ export const ProfileStats = ({
             >
               {stat.value}
             </p>
-            <p className="text-xs text-muted-foreground" style={{ fontFamily: "'Space Mono', monospace" }}>
+            <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight" style={{ fontFamily: "'Space Mono', monospace" }}>
               {stat.label}
             </p>
           </motion.div>
