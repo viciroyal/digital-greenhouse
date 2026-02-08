@@ -5,6 +5,8 @@ interface WhisperTooltipProps {
   children: ReactNode;
   whisper: string;
   position?: 'top' | 'bottom' | 'left' | 'right';
+  /** Use 'block' for full-width containers like cards/crates */
+  display?: 'inline' | 'block';
 }
 
 /**
@@ -15,7 +17,12 @@ interface WhisperTooltipProps {
  * 
  * Style: Glass effect, white 12px text, 0.2s ease-out animation
  */
-const WhisperTooltip = ({ children, whisper, position = 'top' }: WhisperTooltipProps) => {
+const WhisperTooltip = ({ 
+  children, 
+  whisper, 
+  position = 'top',
+  display = 'inline'
+}: WhisperTooltipProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const positionClasses = {
@@ -32,9 +39,11 @@ const WhisperTooltip = ({ children, whisper, position = 'top' }: WhisperTooltipP
     right: { initial: { opacity: 0, x: -8, scale: 0.95 }, animate: { opacity: 1, x: 0, scale: 1 } },
   };
 
+  const displayClass = display === 'block' ? 'relative block w-full' : 'relative inline-flex';
+
   return (
     <div 
-      className="relative inline-flex"
+      className={displayClass}
       onMouseEnter={() => setIsVisible(true)}
       onMouseLeave={() => setIsVisible(false)}
     >

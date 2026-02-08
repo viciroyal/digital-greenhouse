@@ -169,7 +169,7 @@ const Crate = ({ config, tracks, currentTrack, onPlayTrack }: CrateProps) => {
   const texture = getCrateTexture(config.id);
   
   return (
-    <WhisperTooltip whisper={config.whisper} position="top">
+    <WhisperTooltip whisper={config.whisper} position="top" display="block">
       <motion.div
         className="relative rounded-2xl p-4 overflow-hidden"
         style={{

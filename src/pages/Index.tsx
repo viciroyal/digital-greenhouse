@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import HeroSection from '@/components/HeroSection';
-import MasterMatrix from '@/components/MasterMatrix';
+import AutomajicSoundSystem from '@/components/audio/AutomajicSoundSystem';
 import GrowingRoots from '@/components/GrowingRoots';
 import CosmicResonanceButton from '@/components/CosmicResonanceButton';
 import ShopSection from '@/components/ShopSection';
@@ -98,7 +98,9 @@ const Index = () => {
       <div className="relative z-10">
         <GrowingRoots />
         <HeroSection onLogoClick={handleLogoClick} />
-        <MasterMatrix />
+        <section className="py-16 px-4 md:px-8 max-w-7xl mx-auto">
+          <AutomajicSoundSystem />
+        </section>
         <CosmicResonanceButton onClick={() => setIsStarMappingOpen(true)} />
         <ShopSection />
         
