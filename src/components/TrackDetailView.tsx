@@ -1,5 +1,4 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
 import { useState } from 'react';
 import type { TrackData } from '@/data/trackData';
 import FunctionSeal from './track-detail/FunctionSeal';
@@ -18,7 +17,8 @@ import {
   BogolanPattern, 
   IncaStonePattern, 
   StarChartPattern, 
-  FlowerOfLifePattern 
+  FlowerOfLifePattern,
+  SankofaBirdSvg 
 } from './audio/CulturalTextures';
 
 interface TrackDetailViewProps {
@@ -159,20 +159,27 @@ const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="max-w-6xl mx-auto">
-              {/* Close button */}
+              {/* Sankofa Return Button - "Go back and fetch it" */}
               <motion.button
-                className="fixed top-4 right-4 md:top-8 md:right-8 z-50 w-12 h-12 rounded-full flex items-center justify-center transition-colors"
+                className="fixed top-4 right-4 md:top-8 md:right-8 z-50 w-14 h-14 rounded-full flex items-center justify-center transition-colors group"
                 style={{
                   background: `hsl(${theme.baseColor} / 0.9)`,
                   border: `2px solid hsl(${theme.accentColor} / 0.5)`,
-                  color: 'hsl(40 50% 95%)',
+                  color: `hsl(${theme.accentColor})`,
                   backdropFilter: 'blur(10px)',
                 }}
-                whileHover={{ scale: 1.1, boxShadow: `0 0 20px hsl(${theme.accentColor} / 0.4)` }}
+                whileHover={{ 
+                  scale: 1.1, 
+                  boxShadow: `0 0 25px hsl(${theme.accentColor} / 0.5)`,
+                  rotate: -15 
+                }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onClose}
+                title="Return to the Sound System"
               >
-                <X size={24} />
+                <div className="w-8 h-8 transition-transform group-hover:scale-110">
+                  <SankofaBirdSvg />
+                </div>
               </motion.button>
 
               {/* Civilization Header Badge */}
@@ -291,19 +298,27 @@ const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
                 <ActivationQuadrant track={track} />
               </div>
 
-              {/* Footer with Producer Credits */}
+              {/* Footer with Sankofa Return Prompt */}
               <motion.div
                 className="mt-12 text-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
               >
-                <p 
-                  className="font-mono text-xs"
-                  style={{ color: 'hsl(40 30% 50%)' }}
-                >
-                  Press ESC or click outside to close
-                </p>
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-6 h-6 opacity-40">
+                    <SankofaBirdSvg />
+                  </div>
+                  <p 
+                    className="font-body text-xs tracking-wide"
+                    style={{ color: 'hsl(40 30% 55%)' }}
+                  >
+                    Click the Sankofa to return • ESC to close
+                  </p>
+                  <div className="w-6 h-6 opacity-40 transform scale-x-[-1]">
+                    <SankofaBirdSvg />
+                  </div>
+                </div>
               </motion.div>
 
               {/* Spectral Vault Drawer */}
