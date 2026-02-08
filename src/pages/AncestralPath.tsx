@@ -20,6 +20,7 @@ import {
   EmergencySOSButton,
   ViewModeToggle,
   GrimoireView,
+  StewardsLog,
 } from '@/components/ancestral';
 import { ViewMode } from '@/components/ancestral/ViewModeToggle';
 import { OgunIcon, BabaluAyeIcon, ShangoIcon, OshunIcon, OrishaBadge } from '@/components/ancestral/OrishaIcons';
@@ -528,24 +529,38 @@ const AncestralPath = () => {
             className="text-3xl md:text-5xl lg:text-6xl mb-4 tracking-[0.1em]"
             style={{
               fontFamily: "'Staatliches', sans-serif",
-              color: viewMode === 'book' ? 'hsl(280 60% 70%)' : 'hsl(51 100% 50%)',
+              color: viewMode === 'book' 
+                ? 'hsl(40 70% 65%)' 
+                : viewMode === 'log'
+                ? 'hsl(140 50% 60%)'
+                : 'hsl(51 100% 50%)',
               textShadow: viewMode === 'book'
-                ? '0 0 40px hsl(280 60% 50% / 0.4)'
+                ? '0 0 40px hsl(40 60% 40% / 0.4)'
+                : viewMode === 'log'
+                ? '0 0 40px hsl(140 60% 35% / 0.4)'
                 : `2px 2px 0 hsl(20 50% 10%), 0 0 40px hsl(51 80% 40% / 0.4)`,
             }}
           >
-            {viewMode === 'book' ? 'THE LIVING LIBRARY' : 'THE ANCESTRAL PATH'}
+            {viewMode === 'book' 
+              ? 'THE LIVING ALMANAC' 
+              : viewMode === 'log'
+              ? "THE STEWARD'S LOG"
+              : 'THE ANCESTRAL PATH'}
           </h1>
           <p 
             className="text-lg md:text-xl font-mono mb-6"
             style={{ color: 'hsl(40 50% 65%)' }}
           >
-            {viewMode === 'book' ? 'A Digital Codex of Ancestral Agriculture' : 'Ascend from Root to Crown'}
+            {viewMode === 'book' 
+              ? 'Listen when the soil whispers. Act when the stars signal.'
+              : viewMode === 'log'
+              ? 'Record. Reflect. Remember.'
+              : 'Ascend from Root to Crown'}
           </p>
           
           {/* View Mode Toggle */}
           <div className="flex justify-center mb-4">
-            <ViewModeToggle value={viewMode} onChange={setViewMode} />
+            <ViewModeToggle value={viewMode} onChange={setViewMode} showPath={true} />
           </div>
 
           {user && viewMode === 'path' && (
@@ -561,7 +576,7 @@ const AncestralPath = () => {
           )}
         </motion.div>
 
-        {/* Conditional Content: Path View or Grimoire View */}
+        {/* Conditional Content: Almanac, Log, or Path View */}
         <AnimatePresence mode="wait">
           {viewMode === 'book' ? (
             <motion.div
@@ -580,6 +595,16 @@ const AncestralPath = () => {
                   }
                 }}
               />
+            </motion.div>
+          ) : viewMode === 'log' ? (
+            <motion.div
+              key="stewards-log"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <StewardsLog userId={user?.id} />
             </motion.div>
           ) : (
             <motion.div
