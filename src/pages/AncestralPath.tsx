@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, LogIn, LogOut, User, Shield } from 'lucide-react';
@@ -8,6 +8,7 @@ import {
   SapRiseProgress,
   MycelialCord,
   LessonDrawer,
+  ChainBreakingCelebration,
   SpiralMoundIcon,
   KanagaMaskIcon,
   DreamtimeCircleIcon,
@@ -102,8 +103,14 @@ const AncestralPath = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { isAdmin } = useAdminRole();
 
+  // Celebration state
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationData, setCelebrationData] = useState<{ name: string; color: string } | null>(null);
+  const previousUnlockedRef = useRef<Set<string>>(new Set());
+
   const {
     modules,
+    moduleProgress,
     isLoading,
     user,
     isModuleUnlocked,
@@ -111,6 +118,38 @@ const AncestralPath = () => {
     getModuleCompletionPercent,
     getOverallProgress,
   } = useAncestralProgress();
+
+  // Detect newly unlocked modules and trigger celebration
+  useEffect(() => {
+    if (isLoading || !user || modules.length === 0) return;
+
+    const currentUnlocked = new Set(
+      modules.filter(m => isModuleUnlocked(m.id)).map(m => m.id)
+    );
+
+    // Check for newly unlocked modules (not in previous set)
+    currentUnlocked.forEach(moduleId => {
+      if (!previousUnlockedRef.current.has(moduleId) && previousUnlockedRef.current.size > 0) {
+        // A new module was unlocked!
+        const unlockedModule = modules.find(m => m.id === moduleId);
+        if (unlockedModule && unlockedModule.order_index > 1) {
+          // Trigger celebration for non-first modules
+          setCelebrationData({
+            name: unlockedModule.display_name,
+            color: unlockedModule.chakra_color,
+          });
+          setShowCelebration(true);
+        }
+      }
+    });
+
+    previousUnlockedRef.current = currentUnlocked;
+  }, [modules, moduleProgress, isLoading, user, isModuleUnlocked]);
+
+  const handleCelebrationComplete = useCallback(() => {
+    setShowCelebration(false);
+    setCelebrationData(null);
+  }, []);
 
   // Scroll to bottom on mount (start at roots)
   useEffect(() => {
@@ -529,6 +568,14 @@ const AncestralPath = () => {
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         module={selectedModule}
+      />
+
+      {/* Chain Breaking Celebration */}
+      <ChainBreakingCelebration
+        isVisible={showCelebration}
+        onComplete={handleCelebrationComplete}
+        levelName={celebrationData?.name || 'NEW LEVEL'}
+        color={celebrationData?.color || 'hsl(45 90% 55%)'}
       />
     </main>
   );

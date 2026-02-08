@@ -6,6 +6,7 @@ export { default as LessonDrawer } from './LessonDrawer';
 export { default as FileDropZone } from './FileDropZone';
 export { default as HogonSeal } from './HogonSeal';
 export { default as EthericAntennaModule } from './EthericAntennaModule';
+export { default as ChainBreakingCelebration } from './ChainBreakingCelebration';
 export { 
   SpiralMoundIcon, 
   KanagaMaskIcon, 
