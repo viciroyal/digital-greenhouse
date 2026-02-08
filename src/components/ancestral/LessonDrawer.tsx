@@ -18,6 +18,8 @@ import BrixDiagnostics from './BrixDiagnostics';
 import CulturalProtocols from './CulturalProtocols';
 import SignalCircuitBoard from './SignalCircuitBoard';
 import AvatarProtocol from './AvatarProtocol';
+import FiberProtocolCanvas from './FiberProtocolCanvas';
+import FiberProtocolRobe from './FiberProtocolRobe';
 import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 interface LessonDrawerProps {
@@ -436,12 +438,21 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
 
                                 {/* Level 3: Signal Circuit Board (4-Step) */}
                                 {module.level === 3 && (
-                                  <SignalCircuitBoard 
-                                    color={module.color}
-                                    onSwitchComplete={(switchId) => {
-                                      console.log(`Circuit switch ${switchId} completed`);
-                                    }}
-                                  />
+                                  <>
+                                    <SignalCircuitBoard 
+                                      color={module.color}
+                                      onSwitchComplete={(switchId) => {
+                                        console.log(`Circuit switch ${switchId} completed`);
+                                      }}
+                                    />
+                                    {/* Fiber Protocol: The Canvas (Hemp) */}
+                                    <FiberProtocolCanvas color={module.color} />
+                                  </>
+                                )}
+
+                                {/* Level 4: Fiber Protocol - The Robe (Cotton & Indigo) */}
+                                {module.level === 4 && (
+                                  <FiberProtocolRobe color={module.color} />
                                 )}
                               </motion.div>
                             )}

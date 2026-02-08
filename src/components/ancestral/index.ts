@@ -31,3 +31,5 @@ export { default as SignalCircuitBoard } from './SignalCircuitBoard';
 export { default as BodyCheckIn } from './BodyCheckIn';
 export { default as AvatarProtocol } from './AvatarProtocol';
 export { default as EmergencySOSButton } from './EmergencySOSButton';
+export { default as FiberProtocolCanvas } from './FiberProtocolCanvas';
+export { default as FiberProtocolRobe } from './FiberProtocolRobe';
