@@ -43,9 +43,9 @@ export const chapterData: ChapterContent[] = [
     subtitle: 'The Earth Star',
     color: 'hsl(320 70% 25%)',
     wisdom: {
-      title: 'The Amazonian Black Earth',
-      culture: 'Amazonian — The Soil Builders',
-      narrative: 'Before the Muscogee built the mounds, the Amazonians built the soil itself. They taught us that Fire does not destroy; it preserves. They created Terra Preta (Black Earth) to hold the spirit of the forest forever. For 10,000 years, this soil has remained fertile — while surrounding jungle soil depletes in 3 years. We do not waste. We feed the Vortex.',
+      title: 'The Xingu Black Earth',
+      culture: 'Xingu — The Dark Earth Architects',
+      narrative: 'We honor the Xingu lineage for teaching us the secret of Terra Preta (Biochar)—how to burn the carbon to make the soil eternal. They taught us that Fire does not destroy; it preserves. For 10,000 years, this soil has remained fertile — while surrounding jungle soil depletes in 3 years. We do not waste. We feed the Vortex.',
     },
     science: {
       principle: 'Biochar & Cation Exchange Capacity',
@@ -60,7 +60,7 @@ export const chapterData: ChapterContent[] = [
     crop: {
       name: 'Worm Castings',
       goal: 'Foundation',
-      keyFact: 'Worm castings have 5x more nitrogen, 7x more phosphorus, and 11x more potassium than regular soil. They are the Amazonian Gold.',
+      keyFact: 'Worm castings have 5x more nitrogen, 7x more phosphorus, and 11x more potassium than regular soil. They are the Xingu Gold.',
     },
     somatic: {
       instruction: 'Place hands on your belly. The soil has a stomach, and so do you. If you cannot digest, you cannot grow.',

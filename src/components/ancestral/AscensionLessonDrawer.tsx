@@ -22,7 +22,7 @@ const levelContent: Record<number, {
   1: {
     orisha: 'OGUN',
     title: 'THE IRON ROOT',
-    transmission: 'We stand on the shoulders of the Muscogee (The Mounds), the Maroons (The Seed), and the Amazonians (Terra Preta). We do not till; we build the black earth.',
+    transmission: 'We stand on the shoulders of the Muscogee (The Mounds), the Maroons (The Seed), and the Xingu (Terra Preta). We do not till; we build the black earth.',
     journalTask: 'Upload photo of Broadforking or Drill Radishes.',
     color: '#ff0000',
   },
