@@ -6,6 +6,47 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+// Iron Pot Icon - Gullah Geechee Kitchen
+const IronPotIcon = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 40 36" className={className} fill="none">
+    {/* Pot body */}
+    <path 
+      d="M6 14 Q4 14, 4 18 L6 30 Q6 34, 10 34 L30 34 Q34 34, 34 30 L36 18 Q36 14, 34 14 Z" 
+      fill="hsl(20 20% 15%)" 
+      stroke="currentColor" 
+      strokeWidth="1.5" 
+    />
+    {/* Pot rim */}
+    <ellipse cx="20" cy="14" rx="16" ry="4" fill="hsl(20 15% 20%)" stroke="currentColor" strokeWidth="1.5" />
+    {/* Handles */}
+    <path d="M4 16 Q0 16, 0 20 Q0 24, 4 24" stroke="currentColor" strokeWidth="2" fill="none" />
+    <path d="M36 16 Q40 16, 40 20 Q40 24, 36 24" stroke="currentColor" strokeWidth="2" fill="none" />
+    {/* Legs */}
+    <circle cx="12" cy="36" r="2" fill="hsl(20 15% 18%)" />
+    <circle cx="28" cy="36" r="2" fill="hsl(20 15% 18%)" />
+    {/* Steam wisps */}
+    <path d="M14 8 Q14 4, 16 2" stroke="hsl(0 0% 70%)" strokeWidth="1" fill="none" opacity="0.5" />
+    <path d="M20 6 Q20 2, 22 0" stroke="hsl(0 0% 70%)" strokeWidth="1" fill="none" opacity="0.5" />
+    <path d="M26 8 Q26 4, 24 2" stroke="hsl(0 0% 70%)" strokeWidth="1" fill="none" opacity="0.5" />
+  </svg>
+);
+
+// Herbal Leaves Icon - Cherokee Apothecary
+const HerbalLeavesIcon = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 40 40" className={className} fill="none">
+    {/* Central stem */}
+    <path d="M20 38 Q20 20, 20 10" stroke="hsl(140 40% 35%)" strokeWidth="2" fill="none" />
+    {/* Left leaf */}
+    <path d="M20 25 Q10 20, 8 12 Q6 8, 12 8 Q18 8, 20 18" fill="hsl(140 50% 40%)" stroke="hsl(140 40% 30%)" strokeWidth="1" />
+    {/* Right leaf */}
+    <path d="M20 20 Q30 15, 32 8 Q34 4, 28 4 Q22 4, 20 14" fill="hsl(140 45% 45%)" stroke="hsl(140 40% 30%)" strokeWidth="1" />
+    {/* Small accent leaves */}
+    <path d="M20 30 Q14 28, 12 24 Q14 22, 20 26" fill="hsl(120 40% 35%)" />
+    <path d="M20 32 Q26 30, 28 26 Q26 24, 20 28" fill="hsl(120 40% 35%)" />
+  </svg>
+);
 
 // Star Compass Icon - Polynesian Wayfinders
 const StarCompassIcon = ({ className = "" }: { className?: string }) => (
@@ -284,9 +325,9 @@ const StewardsUtilityBelt = () => {
         </div>
       </motion.div>
 
-      {/* Tool Modal */}
+      {/* Tool Modal - Standard for most tools */}
       <AnimatePresence>
-        {activeTool && (
+        {activeTool && activeTool !== 'mortar' && (
           <Dialog open={!!activeTool} onOpenChange={() => setActiveTool(null)}>
             <DialogContent
               className="max-w-lg"
@@ -332,6 +373,166 @@ const StewardsUtilityBelt = () => {
                   </motion.div>
                 )}
               </div>
+            </DialogContent>
+          </Dialog>
+        )}
+      </AnimatePresence>
+
+      {/* THE MORTAR - Special Tabbed Modal with Kitchen */}
+      <AnimatePresence>
+        {activeTool === 'mortar' && (
+          <Dialog open={activeTool === 'mortar'} onOpenChange={() => setActiveTool(null)}>
+            <DialogContent
+              className="max-w-lg"
+              style={{
+                background: 'linear-gradient(180deg, hsl(140 25% 15%) 0%, hsl(20 40% 12%) 100%)',
+                border: '2px solid hsl(140 40% 30%)',
+                color: 'hsl(40 50% 85%)',
+              }}
+            >
+              <DialogHeader>
+                <DialogTitle 
+                  className="text-xl tracking-wider"
+                  style={{ fontFamily: 'Staatliches, sans-serif', color: 'hsl(140 60% 60%)' }}
+                >
+                  THE GREEN PHARMACY
+                </DialogTitle>
+              </DialogHeader>
+              
+              <Tabs defaultValue="apothecary" className="mt-4">
+                <TabsList 
+                  className="grid w-full grid-cols-2 mb-4"
+                  style={{
+                    background: 'hsl(20 30% 12%)',
+                    border: '1px solid hsl(30 40% 25%)',
+                  }}
+                >
+                  <TabsTrigger 
+                    value="apothecary"
+                    className="flex items-center gap-2 data-[state=active]:bg-[hsl(140_40%_25%)] data-[state=active]:text-[hsl(140_70%_70%)]"
+                    style={{ fontFamily: 'Staatliches, sans-serif' }}
+                  >
+                    <HerbalLeavesIcon className="w-4 h-4" />
+                    APOTHECARY
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="kitchen"
+                    className="flex items-center gap-2 data-[state=active]:bg-[hsl(30_40%_25%)] data-[state=active]:text-[hsl(45_70%_70%)]"
+                    style={{ fontFamily: 'Staatliches, sans-serif' }}
+                  >
+                    <IronPotIcon className="w-5 h-4" />
+                    THE KITCHEN
+                  </TabsTrigger>
+                </TabsList>
+                
+                {/* Cherokee Apothecary Tab */}
+                <TabsContent value="apothecary" className="mt-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ background: 'hsl(140 40% 20%)' }}>
+                        <HerbalLeavesIcon className="w-6 h-6 text-[hsl(140_60%_55%)]" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold" style={{ color: 'hsl(140 60% 60%)' }}>
+                          Cherokee (Tsalagi) Tradition
+                        </p>
+                        <p className="text-xs opacity-60">The Land is the Medicine</p>
+                      </div>
+                    </div>
+                    
+                    <p className="font-body text-sm leading-relaxed opacity-80">
+                      Honor the Green Pharmacy of the Cherokee (Tsalagi) tradition. 
+                      Access herbal protocols, preparation methods, and the medicine wheel of the local Georgia flora.
+                    </p>
+                    
+                    <motion.div
+                      className="text-center py-6 rounded-xl"
+                      style={{
+                        background: 'hsl(140 30% 15% / 0.5)',
+                        border: '1px dashed hsl(140 40% 35%)',
+                      }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                    >
+                      <p 
+                        className="text-lg tracking-widest mb-2"
+                        style={{ fontFamily: 'Staatliches, sans-serif', color: 'hsl(140 50% 55%)' }}
+                      >
+                        HERBAL DATABASE LOADING
+                      </p>
+                      <p className="font-body text-xs opacity-60">
+                        Cataloging the plants of the Southern Piedmont...
+                      </p>
+                    </motion.div>
+                  </div>
+                </TabsContent>
+                
+                {/* Gullah Geechee Kitchen Tab */}
+                <TabsContent value="kitchen" className="mt-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ background: 'hsl(30 40% 20%)' }}>
+                        <IronPotIcon className="w-6 h-5 text-[hsl(45_70%_60%)]" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold" style={{ color: 'hsl(45 70% 65%)' }}>
+                          Gullah Geechee Heritage
+                        </p>
+                        <p className="text-xs opacity-60">The Medicine is in the Pot</p>
+                      </div>
+                    </div>
+                    
+                    <p className="font-body text-sm leading-relaxed opacity-80">
+                      Honoring the Gullah Geechee heritage — the keepers of West African culinary medicine 
+                      on the Sea Islands. Food as frequency. Cooking as ceremony.
+                    </p>
+                    
+                    <motion.div
+                      className="rounded-xl p-4"
+                      style={{
+                        background: 'hsl(30 30% 15% / 0.6)',
+                        border: '1px solid hsl(30 40% 30%)',
+                      }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <p 
+                        className="text-sm tracking-wider mb-3"
+                        style={{ fontFamily: 'Staatliches, sans-serif', color: 'hsl(45 60% 60%)' }}
+                      >
+                        GRANDMA'S PROTOCOLS
+                      </p>
+                      <div className="space-y-2 font-body text-xs opacity-70">
+                        <p>• <span className="text-[hsl(45_60%_65%)]">Carolina Gold Rice</span> — The grain that built a nation</p>
+                        <p>• <span className="text-[hsl(140_50%_55%)]">Okra</span> — The binder of the pot, the healer of the gut</p>
+                        <p>• <span className="text-[hsl(30_60%_60%)]">Benne (Sesame)</span> — The seed of good fortune</p>
+                      </div>
+                    </motion.div>
+                    
+                    <motion.div
+                      className="text-center py-4 rounded-xl"
+                      style={{
+                        background: 'hsl(30 30% 15% / 0.5)',
+                        border: '1px dashed hsl(40 40% 35%)',
+                      }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1, transition: { delay: 0.2 } }}
+                    >
+                      <p 
+                        className="text-sm tracking-widest mb-1"
+                        style={{ fontFamily: 'Staatliches, sans-serif', color: 'hsl(45 60% 60%)' }}
+                      >
+                        RECIPE ARCHIVE COMING
+                      </p>
+                      <p className="font-body text-[10px] opacity-50">
+                        Preserving the wisdom of the Low Country...
+                      </p>
+                    </motion.div>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </DialogContent>
           </Dialog>
         )}
