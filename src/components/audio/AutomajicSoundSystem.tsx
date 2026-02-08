@@ -721,6 +721,12 @@ const AutomajicSoundSystem = () => {
         track={selectedTrack}
         isOpen={isDetailOpen}
         onClose={handleCloseDetail}
+        isPlaying={isPlaying && currentTrack?.row === selectedTrack?.row}
+        onTogglePlay={handleTogglePlay}
+        currentTime={currentTime}
+        duration={duration}
+        onSeek={handleSeek}
+        onPlayTrack={handlePlayTrack}
       />
     </div>
   );

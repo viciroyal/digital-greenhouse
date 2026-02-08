@@ -25,6 +25,13 @@ interface TrackDetailViewProps {
   track: TrackData | null;
   isOpen: boolean;
   onClose: () => void;
+  // Audio player props
+  isPlaying?: boolean;
+  onTogglePlay?: () => void;
+  currentTime?: number;
+  duration?: number;
+  onSeek?: (value: number[]) => void;
+  onPlayTrack?: (track: TrackData) => void;
 }
 
 /**
@@ -82,7 +89,17 @@ const getCivilizationTheme = (trackNumber: number) => {
   }
 };
 
-const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
+const TrackDetailView = ({ 
+  track, 
+  isOpen, 
+  onClose,
+  isPlaying = false,
+  onTogglePlay,
+  currentTime = 0,
+  duration = 0,
+  onSeek,
+  onPlayTrack,
+}: TrackDetailViewProps) => {
   const [isRxActivated, setIsRxActivated] = useState(false);
   const [isSpectralVaultOpen, setIsSpectralVaultOpen] = useState(false);
   
@@ -265,7 +282,15 @@ const TrackDetailView = ({ track, isOpen, onClose }: TrackDetailViewProps) => {
               {/* Audio Player, Rx Prescription, Lunar Protocol, and Spectral Vault */}
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {/* Audio Player */}
-                <WaveformPlayer track={track} />
+                <WaveformPlayer 
+                  track={track} 
+                  isPlaying={isPlaying}
+                  onTogglePlay={onTogglePlay}
+                  currentTime={currentTime}
+                  duration={duration}
+                  onSeek={onSeek}
+                  onPlayTrack={onPlayTrack}
+                />
                 
                 {/* Rx Prescription Pad */}
                 <RxPrescription track={track} onActivate={() => setIsRxActivated(true)} />
