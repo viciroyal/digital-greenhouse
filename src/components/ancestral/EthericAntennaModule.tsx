@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { Zap, Compass, Leaf, Star, Shell, Upload, Award, ArrowUp } from 'lucide-react';
-
+import { Zap, Compass, Leaf, Star, Shell, Upload, ArrowUp } from 'lucide-react';
+import FibonacciWrapAnimation from './FibonacciWrapAnimation';
 /**
  * THE ETHERIC ANTENNA MODULE
  * 
@@ -390,6 +390,20 @@ const EthericAntennaModule = ({ color, onUploadClick }: EthericAntennaModuleProp
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Interactive Fibonacci Animation */}
+        <div className="mt-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Shell className="w-4 h-4" style={{ color: '#4A9B7F' }} />
+            <p 
+              className="text-xs font-mono uppercase tracking-wider"
+              style={{ color: '#4A9B7F' }}
+            >
+              INTERACTIVE: THE FIBONACCI WRAP
+            </p>
+          </div>
+          <FibonacciWrapAnimation />
         </div>
 
         {/* Fibonacci emphasis */}
