@@ -1,25 +1,31 @@
-import { motion } from 'framer-motion';
 import type { TrackData } from '@/data/trackData';
-import { GemstoneBodySvg, GemstoneChakraIcon } from './GemstoneIcons';
+import { GemstoneBodySvg } from './GemstoneIcons';
+import DataQuadrant from './DataQuadrant';
 
 interface BodyQuadrantProps {
   track: TrackData;
 }
 
+const BodyIcon = ({ color }: { color: string }) => (
+  <svg viewBox="0 0 24 24" width={18} height={18}>
+    <circle cx="12" cy="5" r="3" fill="none" stroke={`hsl(${color})`} strokeWidth="1.5" />
+    <path d="M12 8 L12 16" stroke={`hsl(${color})`} strokeWidth="1.5" />
+    <path d="M12 10 L8 14" stroke={`hsl(${color})`} strokeWidth="1.5" />
+    <path d="M12 10 L16 14" stroke={`hsl(${color})`} strokeWidth="1.5" />
+    <path d="M12 16 L9 22" stroke={`hsl(${color})`} strokeWidth="1.5" />
+    <path d="M12 16 L15 22" stroke={`hsl(${color})`} strokeWidth="1.5" />
+  </svg>
+);
+
 const BodyQuadrant = ({ track }: BodyQuadrantProps) => {
   return (
-    <motion.div
-      className="root-card p-6 h-full"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 }}
+    <DataQuadrant
+      title="The Body"
+      label="ANATOMY"
+      icon={<BodyIcon color={track.colorHsl} />}
+      trackColor={track.colorHsl}
+      delay={0.1}
     >
-      <div className="flex items-center gap-3 mb-4">
-        <GemstoneChakraIcon color={track.colorHsl} size={28} />
-        <h3 className="font-bubble text-xl text-foreground">The Body</h3>
-        <span className="text-muted-foreground/60 font-body text-xs ml-auto tracking-wider">ANATOMY</span>
-      </div>
-
       <div className="grid grid-cols-2 gap-4">
         {/* Body visualization - Gemstone chakra style */}
         <div className="flex items-center justify-center">
@@ -29,7 +35,10 @@ const BodyQuadrant = ({ track }: BodyQuadrantProps) => {
         {/* Data points */}
         <div className="space-y-4">
           <div>
-            <p className="text-muted-foreground/60 font-body text-xs uppercase tracking-wider mb-1">
+            <p 
+              className="font-mono text-[10px] uppercase tracking-wider mb-1"
+              style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
+            >
               Organ Systems
             </p>
             <div className="space-y-1">
@@ -37,7 +46,7 @@ const BodyQuadrant = ({ track }: BodyQuadrantProps) => {
                 <p 
                   key={i} 
                   className="font-body text-sm"
-                  style={{ color: `hsl(${track.colorHsl})` }}
+                  style={{ color: 'hsl(40 50% 85%)' }}
                 >
                   ◇ {organ}
                 </p>
@@ -46,11 +55,14 @@ const BodyQuadrant = ({ track }: BodyQuadrantProps) => {
           </div>
 
           <div>
-            <p className="text-muted-foreground/60 font-body text-xs uppercase tracking-wider mb-1">
+            <p 
+              className="font-mono text-[10px] uppercase tracking-wider mb-1"
+              style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
+            >
               Chakra
             </p>
             <p 
-              className="font-body text-sm font-bold"
+              className="font-body text-sm font-medium"
               style={{ color: `hsl(${track.colorHsl})` }}
             >
               {track.chakra}
@@ -58,16 +70,22 @@ const BodyQuadrant = ({ track }: BodyQuadrantProps) => {
           </div>
 
           <div>
-            <p className="text-muted-foreground/60 font-body text-xs uppercase tracking-wider mb-1">
+            <p 
+              className="font-mono text-[10px] uppercase tracking-wider mb-1"
+              style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
+            >
               Frequency
             </p>
-            <p className="font-body text-lg text-gem-topaz">
+            <p 
+              className="font-mono text-lg"
+              style={{ color: 'hsl(45 90% 60%)' }}
+            >
               {track.frequency}
             </p>
           </div>
         </div>
       </div>
-    </motion.div>
+    </DataQuadrant>
   );
 };
 

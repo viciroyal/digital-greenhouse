@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import type { TrackData } from '@/data/trackData';
-import { CrystalGemIcon } from './GemstoneIcons';
+import DataQuadrant from './DataQuadrant';
 
 interface CrystalQuadrantProps {
   track: TrackData;
@@ -39,33 +39,35 @@ const crystalProperties: Record<string, string> = {
   'Selenite': 'Divine light, spiritual connection, and cleansing. The liquid light.',
 };
 
+const CrystalIcon = ({ color }: { color: string }) => (
+  <svg viewBox="0 0 24 24" width={18} height={18}>
+    <path d="M12 2 L18 8 L18 16 L12 22 L6 16 L6 8 Z" fill="none" stroke={`hsl(${color})`} strokeWidth="1.5" />
+    <path d="M12 2 L12 22" stroke={`hsl(${color})`} strokeWidth="1" opacity="0.5" />
+    <path d="M6 8 L18 16" stroke={`hsl(${color})`} strokeWidth="1" opacity="0.5" />
+    <path d="M18 8 L6 16" stroke={`hsl(${color})`} strokeWidth="1" opacity="0.5" />
+  </svg>
+);
+
 const CrystalQuadrant = ({ track }: CrystalQuadrantProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const crystalImage = crystalImages[track.crystal] || crystalImages['Clear Quartz'];
   const crystalProperty = crystalProperties[track.crystal] || 'A powerful healing crystal.';
 
   return (
-    <motion.div
-      className="gem-card p-6 h-full"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.35 }}
+    <DataQuadrant
+      title="The Crystal"
+      label="AMPLIFIER"
+      icon={<CrystalIcon color={track.colorHsl} />}
+      trackColor={track.colorHsl}
+      delay={0.35}
     >
-      <div className="flex items-center gap-3 mb-4">
-        <CrystalGemIcon color={track.colorHsl} size={28} />
-        <h3 className="font-bubble text-xl text-foreground">The Crystal</h3>
-        <span className="text-muted-foreground/60 font-body text-xs ml-auto tracking-wider">AMPLIFIER</span>
-      </div>
-
       <div className="flex flex-col items-center">
         {/* Crystal Image with Hover Glow */}
         <motion.div
           className="relative cursor-pointer mb-4"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          animate={{
-            y: [0, -4, 0],
-          }}
+          animate={{ y: [0, -4, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         >
           {/* Ambient glow */}
@@ -75,10 +77,7 @@ const CrystalQuadrant = ({ track }: CrystalQuadrantProps) => {
               background: `radial-gradient(circle, hsl(${track.colorHsl} / ${isHovered ? 0.5 : 0.2}) 0%, transparent 70%)`,
               transform: 'scale(1.6)',
             }}
-            animate={{
-              opacity: isHovered ? 1 : 0.6,
-              scale: isHovered ? 2 : 1.6,
-            }}
+            animate={{ opacity: isHovered ? 1 : 0.6, scale: isHovered ? 2 : 1.6 }}
             transition={{ duration: 0.3 }}
           />
 
@@ -88,9 +87,7 @@ const CrystalQuadrant = ({ track }: CrystalQuadrantProps) => {
             style={{
               boxShadow: `0 0 30px hsl(${track.colorHsl} / 0.4), 0 0 60px hsl(${track.colorHsl} / 0.2)`,
             }}
-            animate={{
-              opacity: isHovered ? 1 : 0,
-            }}
+            animate={{ opacity: isHovered ? 1 : 0 }}
             transition={{ duration: 0.3 }}
           />
 
@@ -100,21 +97,17 @@ const CrystalQuadrant = ({ track }: CrystalQuadrantProps) => {
             style={{
               boxShadow: isHovered 
                 ? `0 0 25px hsl(${track.colorHsl} / 0.6), 0 8px 24px hsl(${track.colorHsl} / 0.3)`
-                : `0 6px 24px hsl(${track.colorHsl} / 0.2)`,
-              border: `2px solid hsl(${track.colorHsl} / 0.3)`,
+                : `0 6px 24px hsl(0 0% 0% / 0.4)`,
+              border: `1px solid hsl(${track.colorHsl} / 0.3)`,
             }}
-            animate={{
-              scale: isHovered ? 1.05 : 1,
-            }}
+            animate={{ scale: isHovered ? 1.05 : 1 }}
             transition={{ duration: 0.3 }}
           >
             <img
               src={crystalImage}
               alt={`${track.crystal} crystal`}
               className="w-full h-full object-cover transition-all duration-300"
-              style={{
-                filter: isHovered ? 'brightness(1.2) saturate(1.1)' : 'brightness(1)',
-              }}
+              style={{ filter: isHovered ? 'brightness(1.2) saturate(1.1)' : 'brightness(1)' }}
             />
             
             {/* Shimmer effect */}
@@ -123,33 +116,26 @@ const CrystalQuadrant = ({ track }: CrystalQuadrantProps) => {
               style={{
                 background: 'linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)',
               }}
-              animate={{
-                x: isHovered ? ['100%', '-100%'] : '100%',
-              }}
-              transition={{
-                duration: 0.6,
-                ease: 'easeInOut',
-                repeat: isHovered ? Infinity : 0,
-                repeatDelay: 1.5,
-              }}
+              animate={{ x: isHovered ? ['100%', '-100%'] : '100%' }}
+              transition={{ duration: 0.6, ease: 'easeInOut', repeat: isHovered ? Infinity : 0, repeatDelay: 1.5 }}
             />
           </motion.div>
         </motion.div>
 
         {/* Crystal Name */}
         <p 
-          className="font-body text-lg font-bold tracking-wide text-center"
+          className="font-display text-lg tracking-wide text-center"
           style={{ color: `hsl(${track.colorHsl})` }}
         >
           {track.crystal}
         </p>
 
         {/* Crystal Properties */}
-        <p className="font-body text-xs text-muted-foreground/70 text-center mt-2 leading-relaxed max-w-xs">
+        <p className="font-body text-xs text-center mt-2 leading-relaxed max-w-xs" style={{ color: 'hsl(40 30% 60%)' }}>
           {crystalProperty}
         </p>
       </div>
-    </motion.div>
+    </DataQuadrant>
   );
 };
 

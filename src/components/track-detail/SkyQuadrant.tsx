@@ -1,58 +1,39 @@
 import { motion } from 'framer-motion';
 import type { TrackData } from '@/data/trackData';
 import { WovenZodiacGlyph } from './GemstoneIcons';
+import DataQuadrant from './DataQuadrant';
 
 interface SkyQuadrantProps {
   track: TrackData;
 }
 
-// Cosmic Garden colors
-const COSMIC = {
-  cream: 'hsl(40 50% 95%)',
-  creamMuted: 'hsl(40 50% 85%)',
-  gemRuby: 'hsl(350 75% 50%)',
-  gemSapphire: 'hsl(220 75% 55%)',
-  gemTopaz: 'hsl(45 90% 60%)',
-  gemAmethyst: 'hsl(280 60% 55%)',
-  forestGreen: 'hsl(140 50% 35%)',
-};
+const SkyIcon = ({ color }: { color: string }) => (
+  <svg viewBox="0 0 24 24" width={18} height={18}>
+    <circle cx="12" cy="12" r="8" fill="none" stroke={`hsl(${color})`} strokeWidth="1.5" />
+    <circle cx="12" cy="12" r="2" fill={`hsl(${color})`} />
+    <circle cx="12" cy="5" r="1.5" fill={`hsl(${color})`} opacity="0.6" />
+    <circle cx="19" cy="12" r="1" fill={`hsl(${color})`} opacity="0.6" />
+    <circle cx="5" cy="12" r="1" fill={`hsl(${color})`} opacity="0.6" />
+  </svg>
+);
 
 const SkyQuadrant = ({ track }: SkyQuadrantProps) => {
   return (
-    <motion.div
-      className="gem-card p-6 h-full"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 }}
+    <DataQuadrant
+      title="The Sky"
+      label="CELESTIAL"
+      icon={<SkyIcon color={track.colorHsl} />}
+      trackColor={track.colorHsl}
+      delay={0.2}
     >
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <svg viewBox="0 0 24 24" width={28} height={28} className="drop-shadow">
-          <circle cx="12" cy="12" r="10" fill="hsl(250 50% 20%)" stroke={COSMIC.gemAmethyst} strokeWidth="1" />
-          <circle cx="12" cy="12" r="2" fill={COSMIC.gemTopaz} />
-          <circle cx="12" cy="5" r="1.5" fill="white" opacity="0.8" />
-          <circle cx="19" cy="12" r="1" fill="white" opacity="0.6" />
-          <circle cx="12" cy="19" r="1" fill="white" opacity="0.6" />
-          <circle cx="5" cy="12" r="1" fill="white" opacity="0.6" />
-        </svg>
-        <h3 className="font-bubble text-xl text-foreground">The Sky</h3>
-        <span className="text-muted-foreground/60 font-body text-xs ml-auto tracking-wider">CELESTIAL</span>
-      </div>
-
       <div className="flex flex-col items-center justify-center py-4">
         {/* Woven Vine Zodiac Glyph */}
         <motion.div
           className="relative"
-          animate={{
-            y: [0, -4, 0],
-          }}
-          transition={{ 
-            duration: 6, 
-            repeat: Infinity, 
-            ease: "easeInOut" 
-          }}
+          animate={{ y: [0, -4, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         >
-          <WovenZodiacGlyph glyph={track.zodiacGlyph} color={track.colorHsl} size={140} />
+          <WovenZodiacGlyph glyph={track.zodiacGlyph} color={track.colorHsl} size={120} />
         </motion.div>
 
         {/* Zodiac Details */}
@@ -65,16 +46,16 @@ const SkyQuadrant = ({ track }: SkyQuadrantProps) => {
           {/* Sign Name */}
           <div>
             <p 
-              className="font-bubble text-2xl tracking-wider"
+              className="font-display text-xl tracking-wider"
               style={{ 
-                color: COSMIC.cream,
+                color: 'hsl(40 50% 92%)',
                 textShadow: `0 0 20px hsl(${track.colorHsl} / 0.5)`,
               }}
             >
               {track.zodiacSign}
             </p>
             <p 
-              className="font-body text-xs tracking-[0.2em] uppercase mt-1"
+              className="font-mono text-[10px] tracking-[0.2em] uppercase mt-1"
               style={{ color: `hsl(${track.colorHsl})` }}
             >
               {track.zodiacName}
@@ -84,18 +65,15 @@ const SkyQuadrant = ({ track }: SkyQuadrantProps) => {
           {/* Planetary Ruler */}
           <div 
             className="pt-3 border-t"
-            style={{ borderColor: `hsl(${track.colorHsl} / 0.3)` }}
+            style={{ borderColor: `hsl(${track.colorHsl} / 0.2)` }}
           >
             <p 
-              className="font-body text-[10px] uppercase tracking-[0.2em] mb-1"
-              style={{ color: COSMIC.gemTopaz }}
+              className="font-mono text-[10px] uppercase tracking-[0.15em] mb-1"
+              style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
             >
               ◇ Celestial Ruler
             </p>
-            <p 
-              className="font-body text-sm"
-              style={{ color: COSMIC.creamMuted }}
-            >
+            <p className="font-body text-sm" style={{ color: 'hsl(40 50% 85%)' }}>
               {track.planetaryRuler}
             </p>
           </div>
@@ -103,20 +81,15 @@ const SkyQuadrant = ({ track }: SkyQuadrantProps) => {
           {/* Moon Phase */}
           <div>
             <p 
-              className="font-body text-[10px] uppercase tracking-[0.2em] mb-1"
-              style={{ color: COSMIC.gemSapphire }}
+              className="font-mono text-[10px] uppercase tracking-[0.15em] mb-1"
+              style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
             >
               ◇ Moon Cycle
             </p>
-            <p 
-              className="font-body text-sm"
-              style={{ color: COSMIC.creamMuted }}
-            >
+            <p className="font-body text-sm" style={{ color: 'hsl(40 50% 85%)' }}>
               {track.moonPhase}
             </p>
-            <p 
-              className="font-body text-xs italic mt-1 text-muted-foreground/70"
-            >
+            <p className="font-body text-xs italic mt-1" style={{ color: 'hsl(40 30% 60%)' }}>
               "{track.moonDescription}"
             </p>
           </div>
@@ -124,15 +97,15 @@ const SkyQuadrant = ({ track }: SkyQuadrantProps) => {
           {/* Zodiac Logic */}
           <div 
             className="pt-3 max-w-xs mx-auto"
-            style={{ borderTop: `1px dashed hsl(${track.colorHsl} / 0.2)` }}
+            style={{ borderTop: `1px dashed hsl(${track.colorHsl} / 0.15)` }}
           >
-            <p className="font-body text-xs leading-relaxed italic text-muted-foreground/60">
+            <p className="font-body text-xs leading-relaxed italic" style={{ color: 'hsl(40 30% 55%)' }}>
               {track.zodiacLogic}
             </p>
           </div>
         </motion.div>
       </div>
-    </motion.div>
+    </DataQuadrant>
   );
 };
 
