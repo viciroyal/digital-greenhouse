@@ -1,85 +1,136 @@
 import { motion } from 'framer-motion';
 
-// Eshu Crossroads Silhouette - The Divine Trickster (Loading variant)
-const EshuSilhouetteSmall = ({ className = "" }: { className?: string }) => (
-  <svg viewBox="0 0 80 100" className={className} fill="currentColor">
-    {/* Crossroads */}
-    <path 
-      d="M0 60 L80 60 M40 20 L40 100" 
+// Crossroads Symbol - Eshu's sacred intersection
+const CrossroadsSymbol = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 64 64" className={className} fill="none">
+    {/* Horizontal road */}
+    <motion.path 
+      d="M4 32 L60 32" 
       stroke="currentColor" 
-      strokeWidth="2" 
-      fill="none"
-      opacity="0.2"
+      strokeWidth="4" 
+      strokeLinecap="round"
+      initial={{ pathLength: 0 }}
+      animate={{ pathLength: 1 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
     />
+    {/* Vertical road */}
+    <motion.path 
+      d="M32 4 L32 60" 
+      stroke="currentColor" 
+      strokeWidth="4" 
+      strokeLinecap="round"
+      initial={{ pathLength: 0 }}
+      animate={{ pathLength: 1 }}
+      transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+    />
+    {/* Center point - the decision node */}
+    <motion.circle 
+      cx="32" 
+      cy="32" 
+      r="6" 
+      fill="hsl(350 60% 50%)"
+      initial={{ scale: 0 }}
+      animate={{ scale: [0, 1.2, 1] }}
+      transition={{ duration: 0.5, delay: 0.6 }}
+    />
+    {/* Cardinal markers */}
+    <motion.circle cx="12" cy="32" r="2" fill="hsl(45 70% 55%)" 
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} />
+    <motion.circle cx="52" cy="32" r="2" fill="hsl(45 70% 55%)" 
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }} />
+    <motion.circle cx="32" cy="12" r="2" fill="hsl(45 70% 55%)" 
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }} />
+    <motion.circle cx="32" cy="52" r="2" fill="hsl(45 70% 55%)" 
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.3 }} />
+  </svg>
+);
+
+// Eshu Silhouette - The Trickster leaning on staff
+const EshuSilhouette = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 80 120" className={className} fill="currentColor">
+    {/* Head with distinctive hat/crown */}
+    <ellipse cx="40" cy="22" rx="10" ry="12" />
+    <path d="M30 16 Q40 5, 50 16" /> {/* Hat point */}
     
-    {/* Figure silhouette */}
-    <ellipse cx="40" cy="22" rx="8" ry="10" fill="currentColor" />
-    <path d="M32 17 Q40 8, 48 17" fill="currentColor" />
+    {/* Body - leaning pose */}
+    <path d="M34 32 L28 75 L34 75 L38 45 L42 75 L48 75 L42 32 Z" />
     
-    {/* Body */}
-    <path d="M34 30 L32 58 L36 58 L38 38 L40 58 L44 58 L42 38 L46 58 L48 58 L46 30 Z" fill="currentColor" />
+    {/* Arms - one resting on staff */}
+    <path d="M34 40 L20 55 L23 58 L34 48" />
+    <path d="M46 40 L55 35 L56 40 L47 48" />
     
-    {/* Arms */}
-    <path d="M34 35 L24 45 L26 48 L34 40" fill="currentColor" />
-    <path d="M46 35 L56 32 L57 36 L47 40" fill="currentColor" />
+    {/* Legs - relaxed stance */}
+    <path d="M28 75 L22 110 L28 110 L32 80" />
+    <path d="M42 75 L48 110 L54 110 L46 80" />
     
-    {/* Pipe */}
-    <rect x="54" y="28" width="12" height="3" rx="1" fill="currentColor" />
-    <ellipse cx="65" cy="26" rx="3" ry="4" fill="currentColor" />
+    {/* Staff/walking stick */}
+    <line x1="20" y1="55" x2="15" y2="115" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    
+    {/* Staff ornament */}
+    <circle cx="15" cy="50" r="4" fill="hsl(350 60% 50%)" />
   </svg>
 );
 
 interface EshuLoaderProps {
   message?: string;
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
+/**
+ * EshuLoader - The Trickster Loading State
+ * 
+ * Instead of a generic spinner, we show Eshu's Crossroads symbol
+ * pulsing with the message "Eshu is opening the gate..."
+ */
 const EshuLoader = ({ 
   message = "Eshu is opening the gate...", 
+  size = 'md',
   className = "" 
 }: EshuLoaderProps) => {
+  const sizeClasses = {
+    sm: 'w-12 h-12',
+    md: 'w-20 h-20',
+    lg: 'w-32 h-32',
+  };
+
   return (
-    <div 
-      className={`flex flex-col items-center justify-center ${className}`}
-    >
-      {/* Animated Eshu silhouette */}
+    <div className={`flex flex-col items-center justify-center ${className}`}>
+      {/* Animated Crossroads Symbol */}
       <motion.div
+        className="relative"
         animate={{
-          opacity: [0.4, 0.8, 0.4],
-          scale: [0.98, 1.02, 0.98],
+          opacity: [0.6, 1, 0.6],
         }}
         transition={{
           duration: 2,
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="mb-6"
       >
-        <EshuSilhouetteSmall className="w-16 h-20 text-amber-600/70" />
-      </motion.div>
-
-      {/* Gate opening animation */}
-      <div className="relative w-48 h-1 mb-4 overflow-hidden rounded-full bg-amber-900/30">
+        {/* Outer glow ring */}
         <motion.div
-          className="absolute inset-y-0 left-0 rounded-full"
+          className={`absolute inset-0 rounded-full ${sizeClasses[size]}`}
           style={{
-            background: 'linear-gradient(90deg, hsl(350 60% 45%), hsl(45 70% 55%), hsl(350 60% 45%))',
+            background: 'radial-gradient(circle, hsl(350 50% 40% / 0.3) 0%, transparent 70%)',
           }}
           animate={{
-            width: ['0%', '100%', '0%'],
-            left: ['0%', '0%', '100%'],
+            scale: [1, 1.3, 1],
+            opacity: [0.5, 0.2, 0.5],
           }}
           transition={{
-            duration: 2.5,
+            duration: 2,
             repeat: Infinity,
             ease: "easeInOut",
           }}
         />
-      </div>
+        
+        <CrossroadsSymbol className={`${sizeClasses[size]} text-amber-500/80`} />
+      </motion.div>
 
       {/* Loading text */}
       <motion.p
-        className="text-sm tracking-wider italic"
+        className="mt-6 text-sm tracking-wider italic text-center"
         style={{
           fontFamily: 'Space Mono, monospace',
           color: 'hsl(45 50% 65%)',
@@ -95,32 +146,23 @@ const EshuLoader = ({
         {message}
       </motion.p>
 
-      {/* Smoke wisps */}
-      <div className="absolute pointer-events-none">
-        {[...Array(3)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 rounded-full bg-amber-500/30"
-            style={{
-              left: `${45 + i * 5}%`,
-              top: '20%',
-            }}
-            animate={{
-              y: [-10, -40, -70],
-              x: [0, (i - 1) * 10, (i - 1) * 20],
-              opacity: [0, 0.6, 0],
-              scale: [0.5, 1, 1.5],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              delay: i * 0.3,
-            }}
-          />
-        ))}
-      </div>
+      {/* Eshu attribution */}
+      <motion.p
+        className="mt-2 text-[10px] tracking-widest"
+        style={{
+          fontFamily: 'Staatliches, sans-serif',
+          color: 'hsl(280 40% 50% / 0.5)',
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+      >
+        ESHU-ELEGBA • YORUBA
+      </motion.p>
     </div>
   );
 };
 
+// Export both components
+export { EshuSilhouette, CrossroadsSymbol };
 export default EshuLoader;
