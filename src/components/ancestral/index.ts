@@ -46,3 +46,6 @@ export { default as ChapterView, chapterData } from './ChapterView';
 export { default as StewardsLog } from './StewardsLog';
 export { default as NewLogEntry } from './NewLogEntry';
 export { default as SovereigntyMap } from './SovereigntyMap';
+export { default as JuniorGuardians } from './JuniorGuardians';
+export { default as GuardianCharacters, guardianCharacters, getGuardianByZone } from './GuardianCharacters';
+export { default as MissionCard } from './MissionCard';

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogIn, LogOut, User, Shield } from 'lucide-react';
+import { ArrowLeft, LogIn, LogOut, User, Shield, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   ModuleNode,
@@ -21,6 +21,7 @@ import {
   ViewModeToggle,
   GrimoireView,
   StewardsLog,
+  JuniorGuardians,
 } from '@/components/ancestral';
 import { ViewMode } from '@/components/ancestral/ViewModeToggle';
 import { OgunIcon, BabaluAyeIcon, ShangoIcon, OshunIcon, OrishaBadge } from '@/components/ancestral/OrishaIcons';
@@ -141,6 +142,9 @@ const AncestralPath = () => {
   // View Mode: 'path' (gamified) or 'book' (textbook/grimoire)
   // Default to 'book' mode - Library First Architecture
   const [viewMode, setViewMode] = useState<ViewMode>('book');
+
+  // Kids Mode (Junior Guardians)
+  const [isKidsMode, setIsKidsMode] = useState(false);
 
   // Golden Ticket Celebration state (for completing Level 4 / all levels)
   const [showGoldenTicket, setShowGoldenTicket] = useState(false);
@@ -319,6 +323,27 @@ const AncestralPath = () => {
       return () => clearTimeout(timer);
     }
   }, [isLevel4Complete, user]);
+
+  // Handle opening Almanac from Kids Mode
+  const handleOpenAlmanacFromKidsMode = (zoneNumber: number) => {
+    setIsKidsMode(false);
+    setViewMode('book');
+    // Find the module for this zone and open the drawer
+    const targetModule = displayModules.find(m => m.level === zoneNumber);
+    if (targetModule) {
+      handleModuleSelect(targetModule);
+    }
+  };
+
+  // If Kids Mode is active, render the Junior Guardians interface
+  if (isKidsMode) {
+    return (
+      <JuniorGuardians
+        onExitKidsMode={() => setIsKidsMode(false)}
+        onOpenAlmanac={handleOpenAlmanacFromKidsMode}
+      />
+    );
+  }
 
   return (
     <main 
@@ -562,6 +587,30 @@ const AncestralPath = () => {
           <div className="flex justify-center mb-4">
             <ViewModeToggle value={viewMode} onChange={setViewMode} showPath={true} />
           </div>
+
+          {/* Junior Guardians (Kids Mode) Button */}
+          <motion.div
+            className="flex justify-center mb-4"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            <Button
+              className="rounded-full px-6 py-3 text-lg font-bold gap-2"
+              style={{
+                fontFamily: "'Chewy', cursive",
+                background: 'linear-gradient(135deg, hsl(120 60% 50%), hsl(195 70% 50%), hsl(45 90% 55%))',
+                color: 'white',
+                border: '3px solid white',
+                boxShadow: '0 4px 20px hsl(120 60% 50% / 0.4)',
+              }}
+              onClick={() => setIsKidsMode(true)}
+            >
+              <Sparkles className="w-5 h-5" />
+              JUNIOR GUARDIANS
+              <span className="text-xl">🌱</span>
+            </Button>
+          </motion.div>
 
           {user && viewMode === 'path' && (
             <motion.p
