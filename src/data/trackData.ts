@@ -370,6 +370,7 @@ export const trackData: TrackData[] = [
     crystal: 'Clear Quartz',
     colorKey: 'chakra-source',
     colorHsl: '112 64% 96%',
+    audioUrl: 'https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/11.%20Vici%20Royal%20-%20Awakwen%20(ft.%20Victoria,%20Dara%20Carter,%20Briar%20Blakey).wav',
     organs: ['Pineal Gland', 'Cerebral Cortex'],
     bodyArea: 'crown',
     moonPhase: 'Balsamic',
