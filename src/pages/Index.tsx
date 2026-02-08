@@ -5,7 +5,6 @@ import GrowingRoots from '@/components/GrowingRoots';
 import CosmicResonanceButton from '@/components/CosmicResonanceButton';
 import ShopSection from '@/components/ShopSection';
 import Footer from '@/components/Footer';
-import ManifestoSection from '@/components/ManifestoSection';
 import StarMappingModal from '@/components/StarMappingModal';
 import GrandCosmogram from '@/components/cosmogram/GrandCosmogram';
 import RespiratorySystem from '@/components/bio-digital/RespiratorySystem';
@@ -106,9 +105,6 @@ const Index = () => {
         
         {/* The Resonant Chamber - Mycelial Network (Community Map) */}
         <ResonantChamber />
-        
-        {/* THE MANIFESTO - Social Operating System */}
-        <ManifestoSection />
         
         <Footer />
         <StarMappingModal
