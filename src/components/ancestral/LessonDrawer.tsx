@@ -17,6 +17,7 @@ import SeasonalPriorityTag, { getSeasonalPhase } from './SeasonalPriorityTag';
 import BrixDiagnostics from './BrixDiagnostics';
 import CulturalProtocols from './CulturalProtocols';
 import SignalCircuitBoard from './SignalCircuitBoard';
+import BodyCheckIn from './BodyCheckIn';
 import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 interface LessonDrawerProps {
@@ -78,6 +79,7 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
   const [isScanning, setIsScanning] = useState(false);
   const [uploadApproved, setUploadApproved] = useState(false);
   const [showGoldenTicket, setShowGoldenTicket] = useState(false);
+  const [isBodyTuned, setIsBodyTuned] = useState(false);
   
   const {
     getLessonsForModule,
@@ -97,6 +99,7 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
         setHonorCodeChecked(false);
         setIsScanning(false);
         setUploadApproved(false);
+        setIsBodyTuned(false); // Reset body check-in
       }, 300);
     }
   }, [isOpen]);
@@ -377,19 +380,37 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
                         />
                       ) : (
                         <>
-                          {/* Seasonal Priority Tag */}
-                          {hasSeasonalPriority && seasonalData.phase && (
-                            <SeasonalPriorityTag 
-                              phase={seasonalData.phase}
-                              color={module.color}
-                            />
-                          )}
-
-                          {/* 9:16 Video Placeholder */}
-                          <VideoPlaceholder 
+                          {/* Body Check-In - Somatic Gate */}
+                          <BodyCheckIn
+                            level={module.level}
                             color={module.color}
-                            title={lessonContent.videoTitle}
+                            isTuned={isBodyTuned}
+                            onTuned={() => setIsBodyTuned(true)}
                           />
+
+                          {/* Agricultural Content - Only visible after body is tuned */}
+                          <AnimatePresence>
+                            {isBodyTuned && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.4 }}
+                                className="space-y-6"
+                              >
+                                {/* Seasonal Priority Tag */}
+                                {hasSeasonalPriority && seasonalData.phase && (
+                                  <SeasonalPriorityTag 
+                                    phase={seasonalData.phase}
+                                    color={module.color}
+                                  />
+                                )}
+
+                                {/* 9:16 Video Placeholder */}
+                                <VideoPlaceholder 
+                                  color={module.color}
+                                  title={lessonContent.videoTitle}
+                                />
 
                           {/* Protocol Steps */}
                           {protocolSteps.length > 0 && (
@@ -449,6 +470,9 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
                               "{module.mission}"
                             </p>
                           </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </>
                       )}
 
