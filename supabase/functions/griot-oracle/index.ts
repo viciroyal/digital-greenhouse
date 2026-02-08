@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -41,12 +42,70 @@ RESPONSE STYLE:
 
 IMPORTANT: You do not have access to actual song lyrics. Instead, reference the themes and functions of tracks conceptually.`;
 
+// Simple in-memory rate limiting (resets on function restart)
+const requestCounts = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(userId: string, maxRequests = 20, windowMs = 60000): boolean {
+  const now = Date.now();
+  const userLimit = requestCounts.get(userId);
+  
+  if (!userLimit || now > userLimit.resetAt) {
+    requestCounts.set(userId, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  
+  if (userLimit.count >= maxRequests) {
+    return false;
+  }
+  
+  userLimit.count++;
+  return true;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Validate authentication
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Missing authorization header" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    
+    if (claimsError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized - invalid token" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const userId = claimsData.claims.sub as string;
+
+    // Check rate limit
+    if (!checkRateLimit(userId)) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Rate limit exceeded",
+          message: "The ancestors require rest between consultations. Wait a moment before speaking again."
+        }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { messages } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
