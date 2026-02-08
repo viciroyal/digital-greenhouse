@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, BookOpen, Leaf, Play, Scroll, CheckCircle } from 'lucide-react';
 import FileDropZone from './FileDropZone';
 import HogonSeal from './HogonSeal';
+import EthericAntennaModule from './EthericAntennaModule';
 import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 interface LessonDrawerProps {
@@ -82,6 +83,9 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
     lore: "The ancestors are preparing your transmission. This lesson contains the sacred knowledge of the lineage.",
     task: "UPLOAD YOUR EVIDENCE",
   };
+
+  // Check if this is the Etheric Antenna lesson (electroculture module)
+  const isEthericAntennaLesson = currentLesson?.name === 'etheric-antenna';
 
   const lessonContent = currentLesson ? {
     videoTitle: currentLesson.display_name,
@@ -255,113 +259,128 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {/* Video Player Placeholder */}
-                    <div 
-                      className="relative aspect-video rounded-xl overflow-hidden mb-6"
-                      style={{
-                        background: 'hsl(0 0% 5%)',
-                        border: `1px solid ${module.color}30`,
-                      }}
-                    >
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <motion.div
-                          className="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer"
-                          style={{
-                            background: `${module.color}30`,
-                            border: `2px solid ${module.color}`,
-                          }}
-                          whileHover={{ 
-                            scale: 1.1,
-                            boxShadow: `0 0 30px ${module.color}60`,
-                          }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <Play className="w-8 h-8 ml-1" style={{ color: module.color }} />
-                        </motion.div>
-                        <p 
-                          className="mt-4 text-sm font-mono text-center px-4"
-                          style={{ color: 'hsl(40 50% 60%)' }}
-                        >
-                          {lessonContent.videoTitle}
-                        </p>
-                      </div>
-                      
-                      {/* Film grain overlay */}
-                      <div 
-                        className="absolute inset-0 opacity-30 pointer-events-none"
-                        style={{
-                          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-                        }}
+                    {/* Specialized Etheric Antenna Module */}
+                    {isEthericAntennaLesson ? (
+                      <EthericAntennaModule 
+                        color={module.color}
+                        onUploadClick={() => setActiveTab('journal')}
                       />
-                    </div>
-
-                    {/* Completion status */}
-                    {isCurrentLessonCompleted && (
-                      <motion.div
-                        className="mb-4 p-3 rounded-lg flex items-center gap-2"
-                        style={{
-                          background: 'hsl(140 40% 15%)',
-                          border: '1px solid hsl(140 50% 30%)',
-                        }}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                      >
-                        <CheckCircle className="w-5 h-5" style={{ color: 'hsl(140 60% 50%)' }} />
-                        <span className="text-sm font-mono" style={{ color: 'hsl(140 60% 60%)' }}>
-                          LESSON COMPLETED
-                        </span>
-                      </motion.div>
+                    ) : (
+                      <>
+                        {/* Video Player Placeholder */}
+                        <div 
+                          className="relative aspect-video rounded-xl overflow-hidden mb-6"
+                          style={{
+                            background: 'hsl(0 0% 5%)',
+                            border: `1px solid ${module.color}30`,
+                          }}
+                        >
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <motion.div
+                              className="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer"
+                              style={{
+                                background: `${module.color}30`,
+                                border: `2px solid ${module.color}`,
+                              }}
+                              whileHover={{ 
+                                scale: 1.1,
+                                boxShadow: `0 0 30px ${module.color}60`,
+                              }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <Play className="w-8 h-8 ml-1" style={{ color: module.color }} />
+                            </motion.div>
+                            <p 
+                              className="mt-4 text-sm font-mono text-center px-4"
+                              style={{ color: 'hsl(40 50% 60%)' }}
+                            >
+                              {lessonContent.videoTitle}
+                            </p>
+                          </div>
+                          
+                          {/* Film grain overlay */}
+                          <div 
+                            className="absolute inset-0 opacity-30 pointer-events-none"
+                            style={{
+                              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+                            }}
+                          />
+                        </div>
+                      </>
                     )}
 
-                    {/* The Scroll - Lore & Science */}
-                    <div 
-                      className="p-5 rounded-xl"
-                      style={{
-                        background: 'hsl(20 30% 10%)',
-                        border: '1px solid hsl(40 40% 25%)',
-                      }}
-                    >
-                      <div className="flex items-center gap-2 mb-3">
-                        <Scroll className="w-5 h-5" style={{ color: 'hsl(40 60% 50%)' }} />
-                        <h3 
-                          className="text-sm font-mono tracking-wider"
-                          style={{ color: 'hsl(40 60% 60%)' }}
-                        >
-                          THE SCROLL
-                        </h3>
-                      </div>
-                      <p 
-                        className="text-sm leading-relaxed font-mono"
-                        style={{ color: 'hsl(40 40% 75%)' }}
-                      >
-                        {lessonContent.lore}
-                      </p>
-                    </div>
+                    {/* Only show completion status and mission for non-Etheric lessons */}
+                    {!isEthericAntennaLesson && (
+                      <>
+                        {/* Completion status */}
+                        {isCurrentLessonCompleted && (
+                          <motion.div
+                            className="mb-4 p-3 rounded-lg flex items-center gap-2"
+                            style={{
+                              background: 'hsl(140 40% 15%)',
+                              border: '1px solid hsl(140 50% 30%)',
+                            }}
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                          >
+                            <CheckCircle className="w-5 h-5" style={{ color: 'hsl(140 60% 50%)' }} />
+                            <span className="text-sm font-mono" style={{ color: 'hsl(140 60% 60%)' }}>
+                              LESSON COMPLETED
+                            </span>
+                          </motion.div>
+                        )}
 
-                    {/* Mission reminder */}
-                    <div 
-                      className="mt-6 p-4 rounded-lg text-center"
-                      style={{
-                        background: `${module.color}10`,
-                        border: `1px dashed ${module.color}50`,
-                      }}
-                    >
-                      <p 
-                        className="text-xs font-mono mb-1"
-                        style={{ color: 'hsl(40 40% 50%)' }}
-                      >
-                        YOUR MISSION
-                      </p>
-                      <p 
-                        className="text-lg tracking-wide"
-                        style={{ 
-                          fontFamily: "'Staatliches', sans-serif",
-                          color: module.color,
-                        }}
-                      >
-                        "{module.mission}"
-                      </p>
-                    </div>
+                        {/* The Scroll - Lore & Science */}
+                        <div 
+                          className="p-5 rounded-xl"
+                          style={{
+                            background: 'hsl(20 30% 10%)',
+                            border: '1px solid hsl(40 40% 25%)',
+                          }}
+                        >
+                          <div className="flex items-center gap-2 mb-3">
+                            <Scroll className="w-5 h-5" style={{ color: 'hsl(40 60% 50%)' }} />
+                            <h3 
+                              className="text-sm font-mono tracking-wider"
+                              style={{ color: 'hsl(40 60% 60%)' }}
+                            >
+                              THE SCROLL
+                            </h3>
+                          </div>
+                          <p 
+                            className="text-sm leading-relaxed font-mono"
+                            style={{ color: 'hsl(40 40% 75%)' }}
+                          >
+                            {lessonContent.lore}
+                          </p>
+                        </div>
+
+                        {/* Mission reminder */}
+                        <div 
+                          className="mt-6 p-4 rounded-lg text-center"
+                          style={{
+                            background: `${module.color}10`,
+                            border: `1px dashed ${module.color}50`,
+                          }}
+                        >
+                          <p 
+                            className="text-xs font-mono mb-1"
+                            style={{ color: 'hsl(40 40% 50%)' }}
+                          >
+                            YOUR MISSION
+                          </p>
+                          <p 
+                            className="text-lg tracking-wide"
+                            style={{ 
+                              fontFamily: "'Staatliches', sans-serif",
+                              color: module.color,
+                            }}
+                          >
+                            "{module.mission}"
+                          </p>
+                        </div>
+                      </>
+                    )}
                   </motion.div>
                 ) : (
                   <motion.div
