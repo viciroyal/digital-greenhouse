@@ -11,7 +11,7 @@ import RespiratorySystem from '@/components/bio-digital/RespiratorySystem';
 import BioluminescentVeins from '@/components/bio-digital/BioluminescentVeins';
 import CircadianOverlay from '@/components/bio-digital/CircadianOverlay';
 import MycelialMenu from '@/components/bio-digital/MycelialMenu';
-import { AudioBiomeManager, ConchShellControl, ResonanceDeck, VibrationalAudioPlayer } from '@/components/audio';
+import { AudioBiomeManager, ConchShellControl, ResonanceDeck } from '@/components/audio';
 import GriotOracle from '@/components/GriotOracle';
 import { SedimentRuler, GhostArtifacts } from '@/components/scrollytelling';
 import { MycelialCursor, TouchRipple } from '@/components/cursor';
@@ -98,30 +98,6 @@ const Index = () => {
         <GrowingRoots />
         <HeroSection onLogoClick={handleLogoClick} />
         <section className="py-16 px-4 md:px-8 max-w-7xl mx-auto">
-          {/* Vibrational Audio Player Test */}
-          <div className="space-y-8 mb-12">
-            <VibrationalAudioPlayer 
-              src="https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/1.%20Vici%20Royal%20-%20Pulling%20Weeds%20.wav"
-              title="Pulling Weeds"
-              artist="Vici Royàl"
-              frequency="396Hz"
-              colorHsl="0 70% 50%"
-            />
-            <VibrationalAudioPlayer 
-              src="https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/2.%20Vici%20Royal%20-%20Drugs%20(ft.%20Sistah%20Moon%20&%20Yamau).wav"
-              title="Drugs"
-              artist="Vici Royàl"
-              frequency="417Hz"
-              colorHsl="25 80% 55%"
-            />
-            <VibrationalAudioPlayer 
-              src="https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/3.%20Vici%20Royal%20-%20No%20Nouns%20.wav"
-              title="No Nouns"
-              artist="Vici Royàl"
-              frequency="528Hz"
-              colorHsl="45 90% 55%"
-            />
-          </div>
           <AutomajicSoundSystem />
         </section>
         <CosmicResonanceButton onClick={() => setIsStarMappingOpen(true)} />

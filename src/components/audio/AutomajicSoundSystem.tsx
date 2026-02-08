@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trackData, type TrackData } from '@/data/trackData';
-import { Play, Pause, Radio, ChevronRight } from 'lucide-react';
+import { Play, Pause, Radio, ChevronRight, Volume2, VolumeX, SkipBack, SkipForward } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import pharmbotArtwork from '@/assets/pharmboi-artwork.png';
 import { getCrateTexture, SpeakerMeshPattern, SankofaBirdSvg } from './CulturalTextures';
 import WhisperTooltip from '@/components/ui/WhisperTooltip';
 import TrackDetailView from '@/components/TrackDetailView';
+import { Slider } from '@/components/ui/slider';
 /**
  * THE AUTOMAJIC SOUND SYSTEM
  * 
@@ -287,9 +288,40 @@ interface NowPlayingProps {
   track: TrackData | null;
   isPlaying: boolean;
   onTogglePlay: () => void;
+  audioRef: React.RefObject<HTMLAudioElement>;
+  currentTime: number;
+  duration: number;
+  onSeek: (value: number[]) => void;
+  volume: number;
+  isMuted: boolean;
+  onVolumeChange: (value: number[]) => void;
+  onToggleMute: () => void;
+  onPrevTrack: () => void;
+  onNextTrack: () => void;
 }
 
-const NowPlaying = ({ track, isPlaying, onTogglePlay }: NowPlayingProps) => {
+const formatTime = (time: number) => {
+  if (!time || isNaN(time)) return '0:00';
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60);
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+};
+
+const NowPlaying = ({ 
+  track, 
+  isPlaying, 
+  onTogglePlay, 
+  audioRef,
+  currentTime,
+  duration,
+  onSeek,
+  volume,
+  isMuted,
+  onVolumeChange,
+  onToggleMute,
+  onPrevTrack,
+  onNextTrack,
+}: NowPlayingProps) => {
   const isMobile = useIsMobile();
 
   return (
@@ -335,7 +367,7 @@ const NowPlaying = ({ track, isPlaying, onTogglePlay }: NowPlayingProps) => {
 
           <div className={`relative px-4 py-3 max-w-6xl mx-auto ${isMobile ? 'flex-col' : 'flex items-center justify-between'} flex gap-4`}>
             {/* Album Art + Track Info */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-shrink-0">
               <motion.div 
                 className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0"
                 style={{
@@ -363,52 +395,113 @@ const NowPlaying = ({ track, isPlaying, onTogglePlay }: NowPlayingProps) => {
                   {track.featuring ? `ft. ${track.featuring}` : 'Vici Royàl'}
                 </p>
                 <p className="font-mono text-[10px] text-cream-muted/40">
-                  {track.frequency} · {track.chakra}
+                  {formatTime(currentTime)} / {formatTime(duration)}
                 </p>
               </div>
             </div>
 
-            {/* Waveform Visualizer */}
+            {/* Progress Bar + Waveform (Desktop) */}
             {!isMobile && (
-              <div className="flex items-center gap-0.5 h-8">
-                {Array.from({ length: 16 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="w-1 rounded-full"
-                    style={{ background: `hsl(${track.colorHsl})` }}
-                    animate={isPlaying ? {
-                      height: [4, Math.random() * 28 + 4, 4],
-                    } : { height: 4 }}
-                    transition={{
-                      duration: 0.3 + Math.random() * 0.3,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                      delay: i * 0.03,
-                    }}
+              <div className="flex-1 flex items-center gap-3 max-w-md">
+                {/* Waveform Visualizer */}
+                <div className="flex items-center gap-0.5 h-8 flex-shrink-0">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="w-1 rounded-full"
+                      style={{ background: `hsl(${track.colorHsl})` }}
+                      animate={isPlaying ? {
+                        height: [4, Math.random() * 24 + 4, 4],
+                      } : { height: 4 }}
+                      transition={{
+                        duration: 0.3 + Math.random() * 0.3,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: i * 0.03,
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Progress Slider */}
+                <div className="flex-1">
+                  <Slider
+                    value={[duration ? (currentTime / duration) * 100 : 0]}
+                    onValueChange={onSeek}
+                    max={100}
+                    step={0.1}
+                    className="cursor-pointer"
                   />
-                ))}
+                </div>
               </div>
             )}
 
-            {/* Play/Pause Button */}
-            <motion.button
-              className="p-3 rounded-full"
-              style={{
-                background: isPlaying 
-                  ? `linear-gradient(135deg, hsl(${track.colorHsl}), hsl(${track.colorHsl} / 0.7))`
-                  : 'hsl(20 30% 18%)',
-                boxShadow: `0 0 20px hsl(${track.colorHsl} / 0.3)`,
-              }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onTogglePlay}
-            >
-              {isPlaying ? (
-                <Pause className="w-6 h-6 text-background" />
-              ) : (
-                <Play className="w-6 h-6 text-cream ml-0.5" />
+            {/* Transport Controls */}
+            <div className="flex items-center gap-2">
+              {/* Volume (Desktop only) */}
+              {!isMobile && (
+                <div className="flex items-center gap-2 mr-2">
+                  <motion.button
+                    className="p-1.5 rounded-full"
+                    style={{ color: isMuted ? 'hsl(40 30% 45%)' : `hsl(${track.colorHsl})` }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={onToggleMute}
+                  >
+                    {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                  </motion.button>
+                  <Slider
+                    value={[isMuted ? 0 : volume * 100]}
+                    onValueChange={onVolumeChange}
+                    max={100}
+                    step={1}
+                    className="w-16"
+                  />
+                </div>
               )}
-            </motion.button>
+
+              {/* Skip Back */}
+              <motion.button
+                className="p-2 rounded-full"
+                style={{ background: 'hsl(20 30% 18%)', color: 'hsl(40 50% 70%)' }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onPrevTrack}
+              >
+                <SkipBack className="w-4 h-4" />
+              </motion.button>
+
+              {/* Play/Pause */}
+              <motion.button
+                className="p-3 rounded-full"
+                style={{
+                  background: isPlaying 
+                    ? `linear-gradient(135deg, hsl(${track.colorHsl}), hsl(${track.colorHsl} / 0.7))`
+                    : 'hsl(20 30% 18%)',
+                  boxShadow: `0 0 20px hsl(${track.colorHsl} / 0.3)`,
+                }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onTogglePlay}
+              >
+                {isPlaying ? (
+                  <Pause className="w-6 h-6 text-background" />
+                ) : (
+                  <Play className="w-6 h-6 text-cream ml-0.5" />
+                )}
+              </motion.button>
+
+              {/* Skip Forward */}
+              <motion.button
+                className="p-2 rounded-full"
+                style={{ background: 'hsl(20 30% 18%)', color: 'hsl(40 50% 70%)' }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onNextTrack}
+              >
+                <SkipForward className="w-4 h-4" />
+              </motion.button>
+            </div>
           </div>
         </motion.div>
       )}
@@ -421,7 +514,74 @@ const AutomajicSoundSystem = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<TrackData | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(0.7);
+  const [isMuted, setIsMuted] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const isMobile = useIsMobile();
+
+  // Audio event handlers
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleLoadedMetadata = () => setDuration(audio.duration);
+    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const handleEnded = () => {
+      // Auto-play next track
+      if (currentTrack) {
+        const nextTrackNum = currentTrack.row < 12 ? currentTrack.row + 1 : 1;
+        const nextTrack = trackData.find(t => t.row === nextTrackNum);
+        if (nextTrack) {
+          setCurrentTrack(nextTrack);
+        } else {
+          setIsPlaying(false);
+        }
+      }
+    };
+
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [currentTrack]);
+
+  // Play/pause when isPlaying or track changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlaying && currentTrack?.audioUrl) {
+      audio.play().catch(console.error);
+    } else {
+      audio.pause();
+    }
+  }, [isPlaying, currentTrack]);
+
+  // Update audio source when track changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !currentTrack?.audioUrl) return;
+    
+    audio.src = currentTrack.audioUrl;
+    audio.load();
+    if (isPlaying) {
+      audio.play().catch(console.error);
+    }
+  }, [currentTrack?.audioUrl]);
+
+  // Volume control
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
+    }
+  }, [volume, isMuted]);
 
   const handleOpenDetail = (track: TrackData) => {
     setSelectedTrack(track);
@@ -442,7 +602,41 @@ const AutomajicSoundSystem = () => {
   };
 
   const handleTogglePlay = () => {
+    if (!currentTrack?.audioUrl) return;
     setIsPlaying(!isPlaying);
+  };
+
+  const handleSeek = (value: number[]) => {
+    if (audioRef.current && duration) {
+      const newTime = (value[0] / 100) * duration;
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  };
+
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0] / 100);
+    if (value[0] > 0) setIsMuted(false);
+  };
+
+  const handlePrevTrack = () => {
+    if (!currentTrack) return;
+    const prevTrackNum = currentTrack.row > 1 ? currentTrack.row - 1 : 12;
+    const prevTrack = trackData.find(t => t.row === prevTrackNum);
+    if (prevTrack) {
+      setCurrentTrack(prevTrack);
+      setIsPlaying(true);
+    }
+  };
+
+  const handleNextTrack = () => {
+    if (!currentTrack) return;
+    const nextTrackNum = currentTrack.row < 12 ? currentTrack.row + 1 : 1;
+    const nextTrack = trackData.find(t => t.row === nextTrackNum);
+    if (nextTrack) {
+      setCurrentTrack(nextTrack);
+      setIsPlaying(true);
+    }
   };
 
   // Get tracks for each crate
@@ -502,11 +696,24 @@ const AutomajicSoundSystem = () => {
         ))}
       </div>
 
+      {/* Hidden Audio Element */}
+      <audio ref={audioRef} preload="metadata" />
+
       {/* Now Playing Footer */}
       <NowPlaying
         track={currentTrack}
         isPlaying={isPlaying}
         onTogglePlay={handleTogglePlay}
+        audioRef={audioRef}
+        currentTime={currentTime}
+        duration={duration}
+        onSeek={handleSeek}
+        volume={volume}
+        isMuted={isMuted}
+        onVolumeChange={handleVolumeChange}
+        onToggleMute={() => setIsMuted(!isMuted)}
+        onPrevTrack={handlePrevTrack}
+        onNextTrack={handleNextTrack}
       />
 
       {/* Track Detail View Modal */}
