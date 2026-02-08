@@ -1,10 +1,11 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { OgunIcon, BabaluAyeIcon, ShangoIcon, OshunIcon } from './OrishaIcons';
+import SovereignIcon from './SovereignIcon';
 
 interface BlessingCeremonyProps {
   isActive: boolean;
-  orisha: 'ogun' | 'babalu-aye' | 'shango' | 'oshun';
+  orisha: 'ogun' | 'babalu-aye' | 'shango' | 'oshun' | 'sovereign';
   moduleName: string;
   onComplete: () => void;
 }
@@ -49,6 +50,16 @@ const orishaConfig = {
     bgGradient: 'radial-gradient(circle at 50% 50%, hsl(45 50% 15%), hsl(35 40% 5%))',
     Icon: OshunIcon,
     particleColors: ['#FFD700', '#FFF8DC', '#DAA520', '#B8860B', '#FFFACD'],
+  },
+  'sovereign': {
+    name: 'THE SOVEREIGN',
+    title: 'Keeper of the Eternal Seed',
+    blessing: 'THE SEED REMEMBERS YOUR STEWARDSHIP',
+    color: 'hsl(0 0% 90%)',
+    glowColor: '#E8E8E8',
+    bgGradient: 'radial-gradient(circle at 50% 50%, hsl(280 20% 15%), hsl(250 15% 5%))',
+    Icon: ({ className, animated }: { className?: string; animated?: boolean }) => <SovereignIcon className={className} animated={animated} />,
+    particleColors: ['#E8E8E8', '#C0C0C0', '#FFD700', '#87CEEB', '#DDA0DD'],
   },
 };
 

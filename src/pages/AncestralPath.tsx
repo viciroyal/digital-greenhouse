@@ -14,6 +14,9 @@ import {
   KanagaMaskIcon,
   DreamtimeCircleIcon,
   DjedPillarIcon,
+  SkyWatcherHeader,
+  SovereignIcon,
+  GoldenTicketCelebration,
 } from '@/components/ancestral';
 import { OgunIcon, BabaluAyeIcon, ShangoIcon, OshunIcon, OrishaBadge } from '@/components/ancestral/OrishaIcons';
 import { useAncestralProgress, Module } from '@/hooks/useAncestralProgress';
@@ -21,18 +24,19 @@ import { useAdminRole } from '@/hooks/useAdminRole';
 import { Button } from '@/components/ui/button';
 
 // Icon mapping for module icons
-const iconMap: Record<string, React.ComponentType<{ color: string }>> = {
+const iconMap: Record<string, React.ComponentType<{ color?: string; className?: string; animated?: boolean }>> = {
   'spiral-mound': SpiralMoundIcon,
   'kanaga-mask': KanagaMaskIcon,
   'dot-circle': DreamtimeCircleIcon,
   'sun-disc': DjedPillarIcon,
+  'sovereign': SovereignIcon,
 };
 
 // Orisha data for each level - matching the Grand Temple specifications
 const orishaMap: Record<number, {
   name: string;
   title: string;
-  orisha: 'ogun' | 'babalu-aye' | 'shango' | 'oshun';
+  orisha: 'ogun' | 'babalu-aye' | 'shango' | 'oshun' | 'sovereign';
   Icon: React.ComponentType<{ className?: string; animated?: boolean }>;
   lore: string;
   science: string;
@@ -84,6 +88,17 @@ const orishaMap: Record<number, {
     texture: 'Gold Leaf + Brass Mirror',
     category: 'CHEMISTRY',
   },
+  5: {
+    name: 'THE SOVEREIGN',
+    title: 'Keeper of the Eternal Seed',
+    orisha: 'sovereign',
+    Icon: ({ className, animated }) => <SovereignIcon className={className} animated={animated} />,
+    lore: 'The loop is not closed until the seed is saved. The Grandmothers braided the rice into their hair so we could eat today. You do not own the harvest until you own the seed.',
+    science: 'Epigenetics & Landrace Breeding',
+    task: 'Upload photo of Saved Seeds (Dried & Jars)',
+    texture: 'Iridescent Pearl + Spirit Light',
+    category: 'SOVEREIGNTY',
+  },
 };
 
 // Fallback modules for display when loading
@@ -92,6 +107,7 @@ const fallbackModules = [
   { level: 2, title: "LEVEL 2: THE MAGNETIC EARTH", mission: "Babalu heals the soil.", lineage: "Olmec (Xi) — The Mother Culture", color: "hsl(30 40% 35%)", iconName: 'kanaga-mask' },
   { level: 3, title: "LEVEL 3: THE THUNDER SIGNAL", mission: "Shango strikes the copper.", lineage: "Dogon, Aboriginal, Chinese & Vedic", color: "hsl(15 100% 50%)", iconName: 'dot-circle' },
   { level: 4, title: "LEVEL 4: THE SWEET ALCHEMY", mission: "Oshun brings the honey.", lineage: "Ancient Kemit — The Gold Masters", color: "hsl(51 100% 50%)", iconName: 'sun-disc' },
+  { level: 5, title: "LEVEL 5: THE MAROON BRAID", mission: "The Grandmothers braided the rice.", lineage: "The Sovereign Return — Seed Keepers", color: "hsl(0 0% 90%)", iconName: 'sovereign' },
 ];
 
 /**
@@ -114,6 +130,13 @@ const AncestralPath = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { isAdmin } = useAdminRole();
 
+  // Track currently open level for Sky Watcher Header
+  const [currentOpenLevel, setCurrentOpenLevel] = useState<number | null>(null);
+
+  // Golden Ticket Celebration state (for completing Level 4 / all levels)
+  const [showGoldenTicket, setShowGoldenTicket] = useState(false);
+  const hasShownGoldenTicketRef = useRef(false);
+
   // Chain Breaking Celebration state (for unlocking)
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationData, setCelebrationData] = useState<{ name: string; color: string } | null>(null);
@@ -122,7 +145,7 @@ const AncestralPath = () => {
   // Blessing Ceremony state (for completion)
   const [showBlessing, setShowBlessing] = useState(false);
   const [blessingData, setBlessingData] = useState<{ 
-    orisha: 'ogun' | 'babalu-aye' | 'shango' | 'oshun';
+    orisha: 'ogun' | 'babalu-aye' | 'shango' | 'oshun' | 'sovereign';
     moduleName: string;
   } | null>(null);
   const previousCompletedRef = useRef<Set<string>>(new Set());
@@ -171,11 +194,12 @@ const AncestralPath = () => {
   }, []);
 
   // Module name to Orisha mapping
-  const moduleNameToOrisha: Record<string, 'ogun' | 'babalu-aye' | 'shango' | 'oshun'> = {
+  const moduleNameToOrisha: Record<string, 'ogun' | 'babalu-aye' | 'shango' | 'oshun' | 'sovereign'> = {
     'root-protocol': 'ogun',
     'magnetic-earth': 'babalu-aye',
     'thunder-signal': 'shango',
     'sweet-alchemy': 'oshun',
+    'sovereign-return': 'sovereign',
   };
 
   // Detect newly completed modules and trigger blessing ceremony
@@ -241,6 +265,7 @@ const AncestralPath = () => {
       }));
 
   const handleModuleSelect = (module: typeof displayModules[0]) => {
+    setCurrentOpenLevel(module.level);
     setSelectedModule({
       id: module.id,
       level: module.level,
@@ -252,11 +277,48 @@ const AncestralPath = () => {
     setIsDrawerOpen(true);
   };
 
+  // Check if Level 4 is complete to show Level 5
+  const isLevel4Complete = displayModules.find(m => m.level === 4)?.isCompleted || false;
+
+  // Build the final display modules list (add Level 5 if Level 4 is complete)
+  const level5Data = {
+    id: 'level-5-sovereign',
+    level: 5,
+    title: 'LEVEL 5: THE MAROON BRAID',
+    mission: 'The Grandmothers braided the rice into their hair.',
+    lineage: 'Sovereignty — The Seed Keepers',
+    color: 'hsl(0 0% 85%)',
+    iconName: 'sovereign',
+    isUnlocked: isLevel4Complete,
+    isCompleted: false,
+    completionPercent: 0,
+  };
+
+  // Insert Level 5 at the top of the totem if Level 4 is complete
+  const finalDisplayModules = isLevel4Complete 
+    ? [level5Data, ...displayModules]
+    : displayModules;
+
+  // Detect Level 4 completion and trigger Golden Ticket celebration
+  useEffect(() => {
+    if (isLevel4Complete && !hasShownGoldenTicketRef.current && user) {
+      hasShownGoldenTicketRef.current = true;
+      // Small delay to allow blessing ceremony to complete first
+      const timer = setTimeout(() => {
+        setShowGoldenTicket(true);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLevel4Complete, user]);
+
   return (
     <main 
       ref={containerRef}
       className="min-h-[300vh] relative overflow-x-hidden"
     >
+      {/* Sky Watcher Header - Lunar Rhythm Display */}
+      <SkyWatcherHeader currentOpenLevel={currentOpenLevel} />
+
       {/* Background: Starry Sky (top) to Soil (bottom) */}
       <div 
         className="fixed inset-0 pointer-events-none"
@@ -445,7 +507,7 @@ const AncestralPath = () => {
       <SapRiseProgress overallProgress={getOverallProgress()} />
 
       {/* Main Content - The Totem */}
-      <div className="relative z-10 pt-24 pb-32">
+      <div className="relative z-10 pt-36 pb-32">
         
         {/* Header */}
         <motion.div
@@ -490,19 +552,21 @@ const AncestralPath = () => {
         <div className="max-w-3xl mx-auto px-6 md:px-12">
           
           {/* Module Nodes with Mycelial Cords and Orisha Guardians */}
-          {displayModules.map((module, index) => {
-            const IconComponent = iconMap[module.iconName] || SpiralMoundIcon;
+          {finalDisplayModules.map((module, index) => {
+            const IconComponent = module.level === 5 
+              ? SovereignIcon 
+              : (iconMap[module.iconName] || SpiralMoundIcon);
             const orishaData = orishaMap[module.level];
             const OrishaIcon = orishaData?.Icon;
             
             return (
               <div key={module.id} className="relative">
                 {/* Mycelial Cord connector (except for last/top node) */}
-                {index < displayModules.length - 1 && (
+                {index < finalDisplayModules.length - 1 && (
                   <div className="absolute left-10 md:left-14 top-full z-0">
                     <MycelialCord 
                       height="120px" 
-                      isActive={module.isUnlocked || displayModules[index + 1]?.isUnlocked}
+                      isActive={module.isUnlocked || finalDisplayModules[index + 1]?.isUnlocked}
                     />
                   </div>
                 )}
@@ -662,7 +726,10 @@ const AncestralPath = () => {
       {/* Lesson Drawer */}
       <LessonDrawer
         isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
+        onClose={() => {
+          setIsDrawerOpen(false);
+          setCurrentOpenLevel(null);
+        }}
         module={selectedModule}
       />
 
@@ -683,6 +750,12 @@ const AncestralPath = () => {
           onComplete={handleBlessingComplete}
         />
       )}
+
+      {/* Golden Ticket Celebration (for completing Level 4) */}
+      <GoldenTicketCelebration
+        isVisible={showGoldenTicket}
+        onClose={() => setShowGoldenTicket(false)}
+      />
     </main>
   );
 };
