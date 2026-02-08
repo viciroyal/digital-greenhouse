@@ -180,6 +180,7 @@ export const trackData: TrackData[] = [
     crystal: 'Malachite',
     colorKey: 'chakra-heart',
     colorHsl: '140 50% 45%',
+    audioUrl: 'https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/5.%20Vici%20Royal%20-%20Babe%20.wav',
     organs: ['Heart', 'Lungs', 'Circulatory System'],
     bodyArea: 'heart',
     moonPhase: 'Waxing Gibbous',
