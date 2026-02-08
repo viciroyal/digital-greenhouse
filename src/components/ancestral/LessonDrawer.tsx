@@ -15,6 +15,7 @@ import FrequencyVisualizer from './FrequencyVisualizer';
 import MasterRecipeCard from './MasterRecipeCard';
 import SeasonalPriorityTag, { getSeasonalPhase } from './SeasonalPriorityTag';
 import BrixDiagnostics from './BrixDiagnostics';
+import CulturalProtocols from './CulturalProtocols';
 import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 interface LessonDrawerProps {
@@ -406,6 +407,12 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
                           {needsBrixDiagnostics && (
                             <BrixDiagnostics color={module.color} />
                           )}
+
+                          {/* Cultural Protocols - Chakra Aligned Lore */}
+                          <CulturalProtocols 
+                            level={module.level} 
+                            color={module.color} 
+                          />
 
                           {/* Mission reminder */}
                           <div 

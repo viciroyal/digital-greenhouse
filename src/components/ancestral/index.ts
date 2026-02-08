@@ -26,3 +26,4 @@ export {
   DreamtimeCircleIcon, 
   DjedPillarIcon 
 } from './ModuleIcons';
+export { default as CulturalProtocols } from './CulturalProtocols';
