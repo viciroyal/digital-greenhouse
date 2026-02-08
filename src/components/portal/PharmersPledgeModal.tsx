@@ -8,69 +8,98 @@ interface PharmersPledgeModalProps {
   onClose: () => void;
 }
 
-// The Civilization Contract - Full 12-Tribe Harmonic Pledge
-const pledgeLines = [
-  { text: "", color: "transparent", glow: false },
-  { 
-    text: "We stand on the ROOTS of the Xingu & Muscogee.", 
-    color: "hsl(0 70% 55%)", 
-    glow: true,
-    glowColor: "hsl(0 70% 55%)"
-  },
-  { text: "", color: "transparent", glow: false },
-  { 
-    text: "We build on the STONE of the Olmec & Inca.", 
-    color: "hsl(35 85% 55%)", 
-    glow: true,
-    glowColor: "hsl(35 85% 55%)"
-  },
-  { text: "", color: "transparent", glow: false },
-  { 
-    text: "We align with the STARS of the Dogon & Maya.", 
-    color: "hsl(190 90% 55%)", 
-    glow: true,
-    glowColor: "hsl(190 90% 55%)"
-  },
-  { text: "", color: "transparent", glow: false },
-  { 
-    text: "We refine the GOLD of Kemit & Joseon.", 
-    color: "hsl(51 100% 55%)", 
-    glow: true,
-    glowColor: "hsl(51 100% 55%)"
-  },
-  { text: "", color: "transparent", glow: false },
-  { 
-    text: "We are bound by the LAW of the Haudenosaunee.", 
-    color: "hsl(140 70% 50%)", 
-    glow: true,
-    glowColor: "hsl(140 70% 50%)",
-    subtext: "(The 7th Generation)"
-  },
-  { text: "", color: "transparent", glow: false },
-  { 
-    text: "We live by the BOND of Ubuntu.", 
-    color: "hsl(0 0% 95%)", 
-    glow: true,
-    glowColor: "hsl(0 0% 95%)",
-    subtext: "(I Am Because We Are)"
-  },
-  { text: "", color: "transparent", glow: false },
-  { text: "", color: "transparent", glow: false },
-  { 
-    text: "To enter this gate is to sign the contract with the Ancestors.", 
-    color: "hsl(45 60% 70%)", 
-    glow: false 
-  },
-];
+// Wampum Belt Icon - Haudenosaunee
+const WampumBeltIcon = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 64 32" className={className} fill="none">
+    <rect x="2" y="8" width="60" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <circle cx="10" cy="16" r="3" fill="hsl(280 60% 70%)" />
+    <circle cx="20" cy="16" r="3" fill="hsl(45 80% 90%)" />
+    <circle cx="30" cy="16" r="3" fill="hsl(280 60% 70%)" />
+    <circle cx="40" cy="16" r="3" fill="hsl(45 80% 90%)" />
+    <circle cx="50" cy="16" r="3" fill="hsl(280 60% 70%)" />
+    <line x1="10" y1="16" x2="20" y2="16" stroke="currentColor" strokeWidth="0.5" />
+    <line x1="20" y1="16" x2="30" y2="16" stroke="currentColor" strokeWidth="0.5" />
+    <line x1="30" y1="16" x2="40" y2="16" stroke="currentColor" strokeWidth="0.5" />
+    <line x1="40" y1="16" x2="50" y2="16" stroke="currentColor" strokeWidth="0.5" />
+  </svg>
+);
+
+// Cowrie Shell Icon - Mali/Mandinka
+const CowrieShellIcon = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 40 48" className={className} fill="none">
+    <ellipse cx="20" cy="24" rx="14" ry="20" fill="hsl(45 70% 85%)" stroke="currentColor" strokeWidth="1.5" />
+    <path 
+      d="M20 8 Q20 24, 20 40" 
+      stroke="hsl(30 50% 40%)" 
+      strokeWidth="2" 
+      strokeLinecap="round"
+    />
+    <path d="M12 14 Q20 18, 28 14" stroke="currentColor" strokeWidth="0.75" fill="none" />
+    <path d="M10 20 Q20 24, 30 20" stroke="currentColor" strokeWidth="0.75" fill="none" />
+    <path d="M10 28 Q20 24, 30 28" stroke="currentColor" strokeWidth="0.75" fill="none" />
+    <path d="M12 34 Q20 30, 28 34" stroke="currentColor" strokeWidth="0.75" fill="none" />
+  </svg>
+);
+
+// Interlinked Circle Icon - Bantu/Ubuntu
+const UbuntuCircleIcon = ({ className = "" }: { className?: string }) => (
+  <svg viewBox="0 0 48 48" className={className} fill="none">
+    <circle cx="24" cy="14" r="10" stroke="hsl(350 70% 50%)" strokeWidth="2" fill="none" />
+    <circle cx="16" cy="30" r="10" stroke="hsl(140 50% 45%)" strokeWidth="2" fill="none" />
+    <circle cx="32" cy="30" r="10" stroke="hsl(220 70% 55%)" strokeWidth="2" fill="none" />
+    <circle cx="24" cy="24" r="3" fill="hsl(45 80% 60%)" />
+  </svg>
+);
+
+interface PillarProps {
+  icon: React.ReactNode;
+  tribe: string;
+  subtitle: string;
+  text: string;
+  delay: number;
+}
+
+const Pillar = ({ icon, tribe, subtitle, text, delay }: PillarProps) => (
+  <motion.div
+    className="flex flex-col items-center text-center max-w-xs px-4"
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.6, delay }}
+  >
+    <motion.div 
+      className="w-16 h-16 mb-4 text-cream-muted/80"
+      whileHover={{ scale: 1.1, rotate: 5 }}
+      transition={{ type: "spring", stiffness: 300 }}
+    >
+      {icon}
+    </motion.div>
+    <h4 
+      className="text-xl md:text-2xl tracking-wider mb-1"
+      style={{ fontFamily: 'Staatliches, sans-serif', color: 'hsl(45 80% 70%)' }}
+    >
+      {tribe}
+    </h4>
+    <p className="text-gem-amethyst/80 font-bubble text-sm mb-3">
+      {subtitle}
+    </p>
+    <p className="text-cream-muted/70 font-body text-sm leading-relaxed">
+      "{text}"
+    </p>
+  </motion.div>
+);
 
 /**
- * The Pharmer's Pledge Modal - "The Soil Chamber"
+ * The Pharmer's Pledge Modal - "The Manifesto Gateway"
  * 
- * A sacred scroll experience with Chakra-aligned ancestral colors,
- * Shepard Tone audio, and spore dissolution animation.
+ * Displays the three pillars of the Social Operating System:
+ * - THE LAW (Haudenosaunee) - 7th Generation
+ * - THE WEALTH (Mali/Mandinka) - Sacred Value
+ * - THE BOND (Bantu/Ubuntu) - I Am Because We Are
+ * 
+ * Features stone door rumble audio and spore dissolution animation.
  */
 const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
-  const [scrollComplete, setScrollComplete] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [sporeParticles, setSporeParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -79,38 +108,28 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
   // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
-      setScrollComplete(false);
+      setIsReady(false);
       setIsUnlocking(false);
       setSporeParticles([]);
+      // Enable button after pillars animate in
+      const timer = setTimeout(() => setIsReady(true), 2000);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
-  // Auto-scroll completion timer
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const timer = setTimeout(() => {
-      setScrollComplete(true);
-    }, 14000); // 14 seconds for the full scroll
-
-    return () => clearTimeout(timer);
-  }, [isOpen]);
-
-  // Heavy Stone Door Rumble - Deep grinding stone with reverberant echoes
+  // Heavy Stone Door Rumble
   const playStoneDoorRumble = useCallback(() => {
     if (audioContextRef.current) return;
     
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     audioContextRef.current = audioContext;
 
-    // Create noise buffer for stone grinding texture
     const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 3, audioContext.sampleRate);
     const noiseData = noiseBuffer.getChannelData(0);
     for (let i = 0; i < noiseData.length; i++) {
       noiseData[i] = (Math.random() * 2 - 1) * 0.5;
     }
 
-    // Stone grinding noise layer
     const noiseSource = audioContext.createBufferSource();
     noiseSource.buffer = noiseBuffer;
     const noiseFilter = audioContext.createBiquadFilter();
@@ -128,7 +147,6 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
     noiseSource.start(audioContext.currentTime);
     noiseSource.stop(audioContext.currentTime + 3);
 
-    // Deep resonant bass rumble (stone mass)
     const bassOsc = audioContext.createOscillator();
     bassOsc.type = 'sine';
     bassOsc.frequency.setValueAtTime(35, audioContext.currentTime);
@@ -143,28 +161,6 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
     bassOsc.start(audioContext.currentTime);
     bassOsc.stop(audioContext.currentTime + 3);
 
-    // Mid-frequency grinding resonance
-    const grindOsc = audioContext.createOscillator();
-    grindOsc.type = 'sawtooth';
-    grindOsc.frequency.setValueAtTime(55, audioContext.currentTime);
-    grindOsc.frequency.setValueAtTime(48, audioContext.currentTime + 0.5);
-    grindOsc.frequency.setValueAtTime(52, audioContext.currentTime + 1);
-    grindOsc.frequency.linearRampToValueAtTime(40, audioContext.currentTime + 2.5);
-    const grindFilter = audioContext.createBiquadFilter();
-    grindFilter.type = 'lowpass';
-    grindFilter.frequency.value = 150;
-    const grindGain = audioContext.createGain();
-    grindGain.gain.setValueAtTime(0, audioContext.currentTime);
-    grindGain.gain.linearRampToValueAtTime(0.08, audioContext.currentTime + 0.3);
-    grindGain.gain.linearRampToValueAtTime(0.04, audioContext.currentTime + 1.5);
-    grindGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2.5);
-    grindOsc.connect(grindFilter);
-    grindFilter.connect(grindGain);
-    grindGain.connect(audioContext.destination);
-    grindOsc.start(audioContext.currentTime);
-    grindOsc.stop(audioContext.currentTime + 3);
-
-    // Final thud impact when door settles
     setTimeout(() => {
       if (!audioContextRef.current) return;
       const thudOsc = audioContext.createOscillator();
@@ -181,7 +177,6 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
     }, 2200);
   }, []);
 
-  // Generate spore particles for dissolution effect
   const generateSpores = useCallback(() => {
     const newSpores = Array.from({ length: 50 }, (_, i) => ({
       id: i,
@@ -191,12 +186,11 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
     setSporeParticles(newSpores);
   }, []);
 
-  const handleRemember = () => {
+  const handleEnter = () => {
     setIsUnlocking(true);
     playStoneDoorRumble();
     generateSpores();
     
-    // Delay navigation for the full experience
     setTimeout(() => {
       if (audioContextRef.current) {
         audioContextRef.current.close();
@@ -207,7 +201,6 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
     }, 3000);
   };
 
-  // Cleanup audio context on unmount
   useEffect(() => {
     return () => {
       if (audioContextRef.current) {
@@ -221,21 +214,21 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-center justify-center"
+          className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* The Soil Chamber Background - Dark Soil #1a1a00 */}
+          {/* Dark Soil Background */}
           <div 
             className="absolute inset-0"
             style={{
-              background: '#1a1a00',
+              background: 'linear-gradient(180deg, hsl(20 30% 6%) 0%, hsl(25 25% 8%) 50%, hsl(20 30% 6%) 100%)',
             }}
           />
           
-          {/* Animated Mycelial Network Texture */}
+          {/* Animated Mycelial Network */}
           <div className="absolute inset-0 overflow-hidden opacity-30">
             {[...Array(20)].map((_, i) => (
               <motion.div
@@ -263,9 +256,9 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
             ))}
           </div>
 
-          {/* Stars at the top (where text disappears into) */}
-          <div className="absolute top-0 left-0 right-0 h-1/3 pointer-events-none">
-            {[...Array(30)].map((_, i) => (
+          {/* Stars */}
+          <div className="absolute inset-0 pointer-events-none">
+            {[...Array(50)].map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute rounded-full"
@@ -288,7 +281,7 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
             ))}
           </div>
 
-          {/* Gold Leaf Border - Ancient & Chipped */}
+          {/* Gold Leaf Border */}
           <motion.div
             className="absolute inset-4 md:inset-8 pointer-events-none"
             style={{
@@ -307,15 +300,9 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 1 }}
-          >
-            {/* Chipped corner effects */}
-            <div className="absolute -top-1 -left-1 w-6 h-6 bg-[hsl(0_0%_10%)]" style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-[hsl(0_0%_10%)]" style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 0)' }} />
-            <div className="absolute -bottom-1 -left-1 w-5 h-5 bg-[hsl(0_0%_10%)]" style={{ clipPath: 'polygon(0 0, 0 100%, 100% 100%)' }} />
-            <div className="absolute -bottom-1 -right-1 w-8 h-3 bg-[hsl(0_0%_10%)]" style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }} />
-          </motion.div>
+          />
 
-          {/* Close button */}
+          {/* Close Button */}
           <motion.button
             className="absolute top-8 right-8 md:top-12 md:right-12 p-3 rounded-full z-20"
             style={{
@@ -330,215 +317,165 @@ const PharmersPledgeModal = ({ isOpen, onClose }: PharmersPledgeModalProps) => {
           </motion.button>
 
           {/* Content Container */}
-          <div className="relative w-full max-w-4xl mx-auto px-8 h-full flex flex-col items-center justify-center overflow-hidden">
+          <div className="relative w-full max-w-5xl mx-auto px-4 py-16 md:py-20 flex flex-col items-center">
             
-            {/* The Title - Staatliches Carved Wood Style */}
-            <motion.h1
-              className="text-2xl md:text-4xl lg:text-5xl text-center mb-4 tracking-[0.1em] z-10 px-4"
-              style={{
-                fontFamily: "'Staatliches', 'Chewy', sans-serif",
-                color: 'hsl(51 100% 55%)',
-                textShadow: `
-                  2px 2px 0 hsl(20 50% 10%),
-                  4px 4px 8px rgba(0,0,0,0.8),
-                  0 0 40px hsl(51 80% 40% / 0.4)
-                `,
-              }}
+            {/* Title */}
+            <motion.div 
+              className="text-center mb-12 md:mb-16"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.5 }}
+              transition={{ duration: 0.8 }}
             >
-              WE DO NOT JUST GROW FOOD.
-            </motion.h1>
-            <motion.h2
-              className="text-2xl md:text-4xl lg:text-5xl text-center mb-8 tracking-[0.1em] z-10 px-4"
-              style={{
-                fontFamily: "'Staatliches', 'Chewy', sans-serif",
-                color: 'hsl(140 60% 55%)',
-                textShadow: `
-                  2px 2px 0 hsl(20 50% 10%),
-                  4px 4px 8px rgba(0,0,0,0.8),
-                  0 0 40px hsl(140 60% 40% / 0.5)
-                `,
-              }}
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.8 }}
-            >
-              WE GROW CIVILIZATION.
-            </motion.h2>
-
-            {/* Star Wars style scrolling text container */}
-            <div 
-              className="relative w-full h-[45vh] overflow-hidden"
-              style={{
-                perspective: '350px',
-                perspectiveOrigin: 'center top',
-              }}
-            >
-              {/* Top fade into stars */}
-              <div 
-                className="absolute inset-x-0 top-0 h-24 z-10 pointer-events-none"
-                style={{
-                  background: 'linear-gradient(180deg, hsl(0 0% 10%) 0%, transparent 100%)',
-                }}
-              />
-              {/* Bottom fade */}
-              <div 
-                className="absolute inset-x-0 bottom-0 h-24 z-10 pointer-events-none"
-                style={{
-                  background: 'linear-gradient(0deg, hsl(0 0% 10%) 0%, transparent 100%)',
-                }}
-              />
-
-              {/* Scrolling text */}
-              <motion.div
-                className="absolute inset-x-0 text-center px-4"
-                style={{
-                  transformStyle: 'preserve-3d',
-                  transform: 'rotateX(20deg)',
-                }}
-                initial={{ y: '120%' }}
-                animate={{ y: '-120%' }}
-                transition={{
-                  duration: 14,
-                  ease: 'linear',
-                }}
-              >
-                {pledgeLines.map((line, index) => (
-                  <div key={index} className="mb-4">
-                    <p
-                      className="text-base md:text-lg lg:text-xl leading-relaxed"
-                      style={{
-                        fontFamily: "'Staatliches', sans-serif",
-                        letterSpacing: '0.06em',
-                        color: line.text ? line.color : 'transparent',
-                        textShadow: line.text && line.glow 
-                          ? `0 0 15px ${line.glowColor || line.color}, 0 0 30px ${line.glowColor || line.color}, 0 0 50px ${line.glowColor || line.color}` 
-                          : line.text 
-                            ? '0 0 8px hsl(0 0% 70% / 0.3)' 
-                            : 'none',
-                      }}
-                    >
-                      {line.text || '\u00A0'}
-                    </p>
-                    {line.subtext && (
-                      <p
-                        className="text-sm md:text-base lg:text-lg mt-1 italic"
-                        style={{
-                          fontFamily: "'Space Mono', monospace",
-                          letterSpacing: '0.02em',
-                          color: line.color,
-                          opacity: 0.75,
-                          textShadow: `0 0 12px ${line.glowColor || line.color}`,
-                        }}
-                      >
-                        {line.subtext}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </motion.div>
-            </div>
-
-            {/* The Blood Oath Button */}
-            <motion.div
-              className="mt-8 relative z-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 2 }}
-            >
-              <motion.button
-                className="relative px-14 py-5 rounded-lg font-bubble text-lg tracking-wider overflow-hidden"
+              <h1 
+                className="text-3xl md:text-5xl lg:text-6xl tracking-[0.1em] mb-4"
                 style={{
                   fontFamily: "'Staatliches', sans-serif",
-                  background: scrollComplete 
-                    ? 'linear-gradient(135deg, hsl(0 70% 40%), hsl(0 80% 30%))'
-                    : 'hsl(0 0% 25%)',
-                  border: scrollComplete
-                    ? '2px solid hsl(0 60% 50%)'
-                    : '2px solid hsl(0 0% 35%)',
-                  color: scrollComplete ? 'hsl(0 0% 95%)' : 'hsl(0 0% 50%)',
-                  boxShadow: scrollComplete 
-                    ? '0 0 30px hsl(0 70% 40% / 0.5), inset 0 2px 10px hsl(0 80% 60% / 0.2)'
-                    : 'none',
-                  cursor: scrollComplete ? 'pointer' : 'not-allowed',
+                  color: 'hsl(51 100% 55%)',
+                  textShadow: `
+                    2px 2px 0 hsl(20 50% 10%),
+                    4px 4px 8px rgba(0,0,0,0.8),
+                    0 0 40px hsl(51 80% 40% / 0.4)
+                  `,
                 }}
-                disabled={!scrollComplete || isUnlocking}
-                whileHover={scrollComplete && !isUnlocking ? { 
-                  scale: 1.05,
-                  boxShadow: '0 0 50px hsl(0 70% 50% / 0.7), inset 0 2px 15px hsl(0 80% 60% / 0.3)',
-                } : {}}
-                whileTap={scrollComplete && !isUnlocking ? { scale: 0.98 } : {}}
-                onClick={handleRemember}
-                animate={isUnlocking ? { scale: [1, 1.1, 0], opacity: [1, 1, 0] } : {}}
-                transition={isUnlocking ? { duration: 1.5, ease: 'easeOut' } : {}}
               >
-                {/* Spore dissolution particles */}
-                <AnimatePresence>
-                  {isUnlocking && sporeParticles.map((spore) => (
-                    <motion.div
-                      key={spore.id}
-                      className="absolute w-2 h-2 rounded-full"
-                      style={{
-                        background: 'hsl(51 100% 50%)',
-                        left: '50%',
-                        top: '50%',
-                      }}
-                      initial={{ x: 0, y: 0, opacity: 1 }}
-                      animate={{
-                        x: spore.x * 3,
-                        y: spore.y * 3,
-                        opacity: 0,
-                        scale: [1, 0.5, 0],
-                      }}
-                      transition={{
-                        duration: 2,
-                        ease: 'easeOut',
-                      }}
-                    />
-                  ))}
-                </AnimatePresence>
-                
-                <span className="relative z-10" style={{ opacity: isUnlocking ? 0 : 1 }}>
-                  I SIGN FOR THE 7TH GENERATION
-                </span>
-              </motion.button>
-              
-              {!scrollComplete && !isUnlocking && (
-                <motion.p
-                  className="text-center mt-4 text-sm"
-                  style={{ 
-                    fontFamily: "'Space Mono', monospace",
-                    color: 'hsl(40 30% 50%)' 
-                  }}
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  Read the sacred text...
-                </motion.p>
-              )}
+                THE MANIFESTO
+              </h1>
+              <p 
+                className="text-cream-muted/60 font-mono text-sm tracking-wider"
+              >
+                The Social Operating System of AgroMajic
+              </p>
             </motion.div>
-          </div>
 
-          {/* Ascending light effect when unlocking */}
-          <AnimatePresence>
-            {isUnlocking && (
-              <motion.div
-                className="absolute inset-0 pointer-events-none"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.8, 0] }}
-                transition={{ duration: 3 }}
-                style={{
-                  background: `radial-gradient(
-                    ellipse at center bottom,
-                    hsl(51 100% 50% / 0.3) 0%,
-                    transparent 70%
-                  )`,
-                }}
+            {/* Three Pillars - Triangle Layout */}
+            <div className="flex flex-col items-center gap-10 md:gap-12 mb-12 md:mb-16">
+              {/* TOP - THE LAW */}
+              <Pillar
+                icon={<WampumBeltIcon className="w-full h-full" />}
+                tribe="HAUDENOSAUNEE"
+                subtitle="THE LAW"
+                text="We decide for the 7th Generation. Every seed we plant is a promise to the future."
+                delay={0.3}
               />
-            )}
-          </AnimatePresence>
+              
+              {/* BOTTOM ROW */}
+              <div className="flex flex-col md:flex-row items-center md:items-start justify-center gap-10 md:gap-16 lg:gap-24 w-full">
+                {/* THE WEALTH */}
+                <Pillar
+                  icon={<CowrieShellIcon className="w-full h-full" />}
+                  tribe="MALI (MANDINKA)"
+                  subtitle="THE WEALTH"
+                  text="We trade in Sacred Value. We use the Cowrie to measure not just price, but prosperity."
+                  delay={0.5}
+                />
+                
+                {/* THE BOND */}
+                <Pillar
+                  icon={<UbuntuCircleIcon className="w-full h-full" />}
+                  tribe="BANTU (UBUNTU)"
+                  subtitle="THE BOND"
+                  text="We live by Ubuntu: 'I am because we are.' Your harvest is my harvest. We grow together."
+                  delay={0.7}
+                />
+              </div>
+            </div>
+
+            {/* Connecting Triangle Lines */}
+            <svg 
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[60%] pointer-events-none hidden md:block"
+              style={{ zIndex: -1 }}
+            >
+              <defs>
+                <linearGradient id="modalLineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="hsl(45 80% 60% / 0.15)" />
+                  <stop offset="50%" stopColor="hsl(280 60% 50% / 0.2)" />
+                  <stop offset="100%" stopColor="hsl(45 80% 60% / 0.15)" />
+                </linearGradient>
+              </defs>
+              <polygon 
+                points="50%,20% 20%,80% 80%,80%" 
+                stroke="url(#modalLineGradient)" 
+                strokeWidth="1" 
+                fill="none"
+                strokeDasharray="6 6"
+              />
+            </svg>
+
+            {/* Enter Button */}
+            <motion.div
+              className="relative z-10"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2 }}
+            >
+              <motion.button
+                className="relative px-12 py-5 rounded-xl font-bubble text-lg tracking-wider overflow-hidden"
+                style={{
+                  fontFamily: "'Staatliches', sans-serif",
+                  background: isReady 
+                    ? 'linear-gradient(135deg, hsl(140 50% 35%), hsl(140 40% 25%))'
+                    : 'hsl(0 0% 25%)',
+                  border: isReady 
+                    ? '2px solid hsl(140 60% 45%)'
+                    : '2px solid hsl(0 0% 35%)',
+                  color: isReady ? 'hsl(140 100% 95%)' : 'hsl(0 0% 50%)',
+                  boxShadow: isReady 
+                    ? '0 0 30px hsl(140 60% 40% / 0.4), inset 0 1px 0 hsl(140 80% 70% / 0.3)'
+                    : 'none',
+                  cursor: isReady ? 'pointer' : 'not-allowed',
+                }}
+                whileHover={isReady ? { scale: 1.05, boxShadow: '0 0 40px hsl(140 60% 40% / 0.6)' } : {}}
+                whileTap={isReady ? { scale: 0.98 } : {}}
+                onClick={isReady ? handleEnter : undefined}
+                disabled={!isReady || isUnlocking}
+              >
+                {isUnlocking ? (
+                  <span className="flex items-center gap-2">
+                    <motion.span
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    >
+                      ◈
+                    </motion.span>
+                    ENTERING THE PATH...
+                  </span>
+                ) : (
+                  'I ACCEPT THE COVENANT'
+                )}
+              </motion.button>
+
+              {/* Spore Particles */}
+              {isUnlocking && sporeParticles.map((spore) => (
+                <motion.div
+                  key={spore.id}
+                  className="absolute w-2 h-2 rounded-full"
+                  style={{
+                    background: 'hsl(140 60% 50%)',
+                    left: '50%',
+                    top: '50%',
+                  }}
+                  initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                  animate={{
+                    x: spore.x,
+                    y: spore.y,
+                    opacity: 0,
+                    scale: 0,
+                  }}
+                  transition={{ duration: 2, ease: 'easeOut' }}
+                />
+              ))}
+            </motion.div>
+
+            {/* Footer Text */}
+            <motion.p
+              className="text-center text-cream-muted/40 font-mono text-xs mt-8 max-w-md"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.5 }}
+            >
+              To enter this gate is to sign the contract with the Ancestors.
+            </motion.p>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
