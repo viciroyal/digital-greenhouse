@@ -28,6 +28,28 @@ const ViewModeToggle = ({ value, onChange }: ViewModeToggleProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
     >
+      {/* THE LIBRARY Option (First - Default) */}
+      <motion.button
+        className="flex items-center gap-2 px-4 py-2 rounded-full font-mono text-xs tracking-wider transition-all"
+        style={{
+          background: value === 'book' 
+            ? 'linear-gradient(135deg, hsl(280 40% 25%), hsl(260 35% 20%))'
+            : 'transparent',
+          color: value === 'book' 
+            ? 'hsl(280 70% 75%)' 
+            : 'hsl(40 30% 50%)',
+          boxShadow: value === 'book' 
+            ? '0 0 20px hsl(280 60% 40% / 0.3)' 
+            : 'none',
+        }}
+        onClick={() => onChange('book')}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <BookOpen className="w-4 h-4" />
+        THE LIBRARY
+      </motion.button>
+
       {/* THE PATH Option */}
       <motion.button
         className="flex items-center gap-2 px-4 py-2 rounded-full font-mono text-xs tracking-wider transition-all"
@@ -48,28 +70,6 @@ const ViewModeToggle = ({ value, onChange }: ViewModeToggleProps) => {
       >
         <Map className="w-4 h-4" />
         THE PATH
-      </motion.button>
-
-      {/* THE BOOK Option */}
-      <motion.button
-        className="flex items-center gap-2 px-4 py-2 rounded-full font-mono text-xs tracking-wider transition-all"
-        style={{
-          background: value === 'book' 
-            ? 'linear-gradient(135deg, hsl(280 40% 25%), hsl(260 35% 20%))'
-            : 'transparent',
-          color: value === 'book' 
-            ? 'hsl(280 70% 75%)' 
-            : 'hsl(40 30% 50%)',
-          boxShadow: value === 'book' 
-            ? '0 0 20px hsl(280 60% 40% / 0.3)' 
-            : 'none',
-        }}
-        onClick={() => onChange('book')}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <BookOpen className="w-4 h-4" />
-        THE BOOK
       </motion.button>
     </motion.div>
   );

@@ -138,7 +138,8 @@ const AncestralPath = () => {
   const [currentOpenLevel, setCurrentOpenLevel] = useState<number | null>(null);
 
   // View Mode: 'path' (gamified) or 'book' (textbook/grimoire)
-  const [viewMode, setViewMode] = useState<ViewMode>('path');
+  // Default to 'book' mode - Library First Architecture
+  const [viewMode, setViewMode] = useState<ViewMode>('book');
 
   // Golden Ticket Celebration state (for completing Level 4 / all levels)
   const [showGoldenTicket, setShowGoldenTicket] = useState(false);
@@ -533,13 +534,13 @@ const AncestralPath = () => {
                 : `2px 2px 0 hsl(20 50% 10%), 0 0 40px hsl(51 80% 40% / 0.4)`,
             }}
           >
-            {viewMode === 'book' ? 'THE GRIMOIRE' : 'THE ANCESTRAL PATH'}
+            {viewMode === 'book' ? 'THE LIVING LIBRARY' : 'THE ANCESTRAL PATH'}
           </h1>
           <p 
             className="text-lg md:text-xl font-mono mb-6"
             style={{ color: 'hsl(40 50% 65%)' }}
           >
-            {viewMode === 'book' ? 'The Complete Pharmacological Manuscript' : 'Ascend from Root to Crown'}
+            {viewMode === 'book' ? 'A Digital Codex of Ancestral Agriculture' : 'Ascend from Root to Crown'}
           </p>
           
           {/* View Mode Toggle */}
@@ -570,7 +571,15 @@ const AncestralPath = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <GrimoireView />
+              <GrimoireView
+                onEnterFieldLab={(moduleLevel) => {
+                  // Find the module for this level and open the drawer
+                  const targetModule = displayModules.find(m => m.level === moduleLevel);
+                  if (targetModule) {
+                    handleModuleSelect(targetModule);
+                  }
+                }}
+              />
             </motion.div>
           ) : (
             <motion.div
