@@ -146,9 +146,9 @@ const utilityTools: UtilityTool[] = [
     id: 'mortar',
     name: 'THE MORTAR',
     culture: 'Cherokee (Tsalagi)',
-    tooltip: 'Brew the Medicine',
+    tooltip: 'The Land is the Medicine',
     icon: <MortarPestleIcon className="w-8 h-8" />,
-    color: 'hsl(140 45% 40%)',
+    color: 'hsl(140 55% 35%)', // Deep Green glow for the Green Pharmacy
   },
 ];
 
