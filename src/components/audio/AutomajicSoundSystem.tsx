@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trackData, type TrackData } from '@/data/trackData';
-import { Play, Pause, Radio } from 'lucide-react';
+import { Play, Pause, Radio, ChevronRight } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import pharmbotArtwork from '@/assets/pharmboi-artwork.png';
 import { getCrateTexture, SpeakerMeshPattern, SankofaBirdSvg } from './CulturalTextures';
 import WhisperTooltip from '@/components/ui/WhisperTooltip';
-
+import TrackDetailView from '@/components/TrackDetailView';
 /**
  * THE AUTOMAJIC SOUND SYSTEM
  * 
@@ -69,9 +69,10 @@ interface TrackItemProps {
   crateColor: string;
   isPlaying: boolean;
   onPlay: () => void;
+  onOpenDetail: () => void;
 }
 
-const TrackItem = ({ track, crateColor, isPlaying, onPlay }: TrackItemProps) => {
+const TrackItem = ({ track, crateColor, isPlaying, onPlay, onOpenDetail }: TrackItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -90,7 +91,7 @@ const TrackItem = ({ track, crateColor, isPlaying, onPlay }: TrackItemProps) => 
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={onPlay}
+      onClick={onOpenDetail}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
@@ -123,8 +124,8 @@ const TrackItem = ({ track, crateColor, isPlaying, onPlay }: TrackItemProps) => 
           </div>
         </div>
 
-        {/* Play Indicator */}
-        <motion.div
+        {/* Play Button */}
+        <motion.button
           className="w-8 h-8 rounded-full flex items-center justify-center"
           style={{
             background: isPlaying 
@@ -133,12 +134,29 @@ const TrackItem = ({ track, crateColor, isPlaying, onPlay }: TrackItemProps) => 
           }}
           animate={isPlaying ? { scale: [1, 1.1, 1] } : {}}
           transition={{ duration: 0.5, repeat: isPlaying ? Infinity : 0 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onPlay();
+          }}
         >
           {isPlaying ? (
             <Pause className="w-4 h-4 text-background" />
           ) : (
             <Play className="w-4 h-4 text-cream/60 ml-0.5" />
           )}
+        </motion.button>
+
+        {/* Detail Arrow */}
+        <motion.div
+          className="w-6 h-6 rounded-full flex items-center justify-center"
+          style={{ 
+            background: `hsl(${crateColor} / 0.2)`,
+            opacity: isHovered ? 1 : 0,
+          }}
+          initial={false}
+          animate={{ opacity: isHovered ? 1 : 0 }}
+        >
+          <ChevronRight className="w-4 h-4" style={{ color: `hsl(${crateColor})` }} />
         </motion.div>
       </div>
 
@@ -163,9 +181,10 @@ interface CrateProps {
   tracks: TrackData[];
   currentTrack: TrackData | null;
   onPlayTrack: (track: TrackData) => void;
+  onOpenDetail: (track: TrackData) => void;
 }
 
-const Crate = ({ config, tracks, currentTrack, onPlayTrack }: CrateProps) => {
+const Crate = ({ config, tracks, currentTrack, onPlayTrack, onOpenDetail }: CrateProps) => {
   const texture = getCrateTexture(config.id);
   
   return (
@@ -247,6 +266,7 @@ const Crate = ({ config, tracks, currentTrack, onPlayTrack }: CrateProps) => {
             crateColor={config.colorHsl}
             isPlaying={currentTrack?.row === track.row}
             onPlay={() => onPlayTrack(track)}
+            onOpenDetail={() => onOpenDetail(track)}
           />
         ))}
       </div>
@@ -397,7 +417,18 @@ const NowPlaying = ({ track, isPlaying, onTogglePlay }: NowPlayingProps) => {
 const AutomajicSoundSystem = () => {
   const [currentTrack, setCurrentTrack] = useState<TrackData | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedTrack, setSelectedTrack] = useState<TrackData | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const isMobile = useIsMobile();
+
+  const handleOpenDetail = (track: TrackData) => {
+    setSelectedTrack(track);
+    setIsDetailOpen(true);
+  };
+
+  const handleCloseDetail = () => {
+    setIsDetailOpen(false);
+  };
 
   const handlePlayTrack = (track: TrackData) => {
     if (currentTrack?.row === track.row) {
@@ -462,6 +493,7 @@ const AutomajicSoundSystem = () => {
               config={crate}
               tracks={getTracksForCrate(crate)}
               currentTrack={currentTrack}
+              onOpenDetail={handleOpenDetail}
               onPlayTrack={handlePlayTrack}
             />
           </motion.div>
@@ -473,6 +505,13 @@ const AutomajicSoundSystem = () => {
         track={currentTrack}
         isPlaying={isPlaying}
         onTogglePlay={handleTogglePlay}
+      />
+
+      {/* Track Detail View Modal */}
+      <TrackDetailView
+        track={selectedTrack}
+        isOpen={isDetailOpen}
+        onClose={handleCloseDetail}
       />
     </div>
   );
