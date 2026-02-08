@@ -16,6 +16,7 @@ export { default as VideoPlaceholder } from './VideoPlaceholder';
 export { default as ProtocolSteps } from './ProtocolSteps';
 export { default as SkyWatcherHeader } from './SkyWatcherHeader';
 export { default as SovereignIcon } from './SovereignIcon';
+export { default as FrequencyVisualizer } from './FrequencyVisualizer';
 export { 
   SpiralMoundIcon, 
   KanagaMaskIcon, 

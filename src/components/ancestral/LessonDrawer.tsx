@@ -11,6 +11,7 @@ import GoldenTicketCelebration from './GoldenTicketCelebration';
 import EthericAntennaModule from './EthericAntennaModule';
 import EarthAcupunctureModule from './EarthAcupunctureModule';
 import VedicFireModule from './VedicFireModule';
+import FrequencyVisualizer from './FrequencyVisualizer';
 import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 interface LessonDrawerProps {
@@ -52,6 +53,12 @@ const levelProtocols: Record<number, { step: number; title: string; description?
     { step: 2, title: 'Prepare JADAM Liquid Fertilizer (JLF)' },
     { step: 3, title: 'Ferment for 7 days with leaf mold' },
     { step: 4, title: 'Foliar apply and retest Brix', description: 'Target: 12+ Brix' },
+  ],
+  5: [
+    { step: 1, title: 'Select mother plants for seed saving', description: 'Healthiest specimens only' },
+    { step: 2, title: 'Allow full maturation on stalk', description: 'Do not harvest early' },
+    { step: 3, title: 'Dry seeds in shade (14 days)', description: 'Low humidity environment' },
+    { step: 4, title: 'Store in glass jars with desiccant', description: 'Label with date and lineage' },
   ],
 };
 
@@ -177,47 +184,54 @@ const LessonDrawer = ({ isOpen, onClose, module, onModuleComplete }: LessonDrawe
               onClick={handleClose}
             />
 
-            {/* Drawer Panel */}
+            {/* Drawer Panel - Dark Soil Glass */}
             <motion.div
               className="fixed right-0 top-0 bottom-0 w-full max-w-lg z-50 overflow-y-auto"
               style={{
-                background: 'hsl(20 20% 8% / 0.85)',
+                background: 'hsl(60 100% 5% / 0.92)', // Dark Soil #1a1a00
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
                 borderLeft: `2px solid ${module.color}40`,
-                boxShadow: `-10px 0 60px rgba(0,0,0,0.7), 0 0 40px ${module.color}15`,
+                boxShadow: `-10px 0 60px rgba(0,0,0,0.8), 0 0 40px ${module.color}15`,
               }}
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             >
-              {/* Header */}
+              {/* Header with Frequency Visualizer */}
               <div 
                 className="sticky top-0 z-10 p-6 border-b"
                 style={{ 
-                  background: `linear-gradient(180deg, hsl(20 20% 8% / 0.95), hsl(20 20% 8% / 0.8))`,
+                  background: `linear-gradient(180deg, hsl(60 100% 5% / 0.98), hsl(60 100% 5% / 0.85))`,
                   backdropFilter: 'blur(10px)',
                   borderColor: `${module.color}30`,
                 }}
               >
-                {/* Close Button */}
-                <motion.button
-                  onClick={handleClose}
-                  className="absolute top-4 right-4 p-2 rounded-full transition-colors"
-                  style={{ background: 'hsl(0 0% 15%)' }}
-                  whileHover={{ 
-                    background: 'hsl(0 50% 30%)',
-                    boxShadow: '0 0 15px hsl(0 70% 50% / 0.5)',
-                  }}
-                >
-                  <X className="w-5 h-5" style={{ color: 'hsl(0 0% 70%)' }} />
-                </motion.button>
+                {/* Top Row: Frequency Visualizer (left) + Close Button (right) */}
+                <div className="flex items-start justify-between mb-4">
+                  {/* Frequency Visualizer - Top Right */}
+                  <FrequencyVisualizer level={module.level} />
+                  
+                  {/* Close Button */}
+                  <motion.button
+                    onClick={handleClose}
+                    className="p-2 rounded-full transition-colors ml-2"
+                    style={{ background: 'hsl(0 0% 12%)' }}
+                    whileHover={{ 
+                      background: 'hsl(0 50% 30%)',
+                      boxShadow: '0 0 15px hsl(0 70% 50% / 0.5)',
+                    }}
+                  >
+                    <X className="w-5 h-5" style={{ color: 'hsl(0 0% 70%)' }} />
+                  </motion.button>
+                </div>
 
                 {/* Title Badge */}
                 <div 
                   className="inline-block px-3 py-1 rounded-full text-xs font-mono mb-3"
                   style={{
+                    fontFamily: "'Space Mono', monospace",
                     background: `${module.color}20`,
                     color: module.color,
                     border: `1px solid ${module.color}`,
