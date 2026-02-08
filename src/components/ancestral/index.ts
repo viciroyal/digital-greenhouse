@@ -30,3 +30,4 @@ export { default as CulturalProtocols } from './CulturalProtocols';
 export { default as SignalCircuitBoard } from './SignalCircuitBoard';
 export { default as BodyCheckIn } from './BodyCheckIn';
 export { default as AvatarProtocol } from './AvatarProtocol';
+export { default as EmergencySOSButton } from './EmergencySOSButton';
