@@ -9,6 +9,11 @@ export { default as EthericAntennaModule } from './EthericAntennaModule';
 export { default as ChainBreakingCelebration } from './ChainBreakingCelebration';
 export { default as BlessingCeremony } from './BlessingCeremony';
 export { default as AscensionMap } from './AscensionMap';
+export { default as GoldenTicketCelebration } from './GoldenTicketCelebration';
+export { default as SoilScanningAnimation } from './SoilScanningAnimation';
+export { default as HazardWarning } from './HazardWarning';
+export { default as VideoPlaceholder } from './VideoPlaceholder';
+export { default as ProtocolSteps } from './ProtocolSteps';
 export { 
   SpiralMoundIcon, 
   KanagaMaskIcon, 
