@@ -114,6 +114,13 @@ const Index = () => {
               frequency="417Hz"
               colorHsl="25 80% 55%"
             />
+            <VibrationalAudioPlayer 
+              src="https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/3.%20Vici%20Royal%20-%20No%20Nouns%20.wav"
+              title="No Nouns"
+              artist="Vici Royàl"
+              frequency="528Hz"
+              colorHsl="45 90% 55%"
+            />
           </div>
           <AutomajicSoundSystem />
         </section>
