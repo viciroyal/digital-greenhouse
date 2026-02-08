@@ -29,10 +29,10 @@ const TouchRipple = () => {
 
     setRipples((prev) => [...prev, newRipple]);
 
-    // Remove ripple after animation
+    // Remove ripple after animation (increased duration)
     setTimeout(() => {
       setRipples((prev) => prev.filter((r) => r.id !== newRipple.id));
-    }, 800);
+    }, 1400);
   }, []);
 
   useEffect(() => {
@@ -67,69 +67,89 @@ const TouchRipple = () => {
               transform: 'translate(-50%, -50%)',
             }}
           >
-            {/* Outer ring */}
+            {/* Outer ring - largest */}
             <motion.div
               className="absolute rounded-full"
               style={{
-                width: 120,
-                height: 120,
-                left: -60,
-                top: -60,
-                border: '2px solid hsl(185 80% 55%)',
+                width: 200,
+                height: 200,
+                left: -100,
+                top: -100,
+                border: '3px solid hsl(185 80% 55%)',
+                boxShadow: '0 0 20px hsl(185 80% 55% / 0.4)',
               }}
-              initial={{ scale: 0, opacity: 0.8 }}
-              animate={{ scale: 1.5, opacity: 0 }}
+              initial={{ scale: 0, opacity: 1 }}
+              animate={{ scale: 2, opacity: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
+              transition={{ duration: 1.2, ease: 'easeOut' }}
             />
             
-            {/* Middle ring */}
+            {/* Second ring */}
             <motion.div
               className="absolute rounded-full"
               style={{
-                width: 80,
-                height: 80,
-                left: -40,
-                top: -40,
-                border: '2px solid hsl(185 70% 60%)',
+                width: 150,
+                height: 150,
+                left: -75,
+                top: -75,
+                border: '3px solid hsl(185 85% 60%)',
+                boxShadow: '0 0 15px hsl(185 85% 60% / 0.5)',
               }}
-              initial={{ scale: 0, opacity: 0.8 }}
-              animate={{ scale: 1.8, opacity: 0 }}
+              initial={{ scale: 0, opacity: 1 }}
+              animate={{ scale: 2.2, opacity: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.05 }}
+              transition={{ duration: 1, ease: 'easeOut', delay: 0.05 }}
+            />
+            
+            {/* Third ring */}
+            <motion.div
+              className="absolute rounded-full"
+              style={{
+                width: 100,
+                height: 100,
+                left: -50,
+                top: -50,
+                border: '3px solid hsl(185 90% 65%)',
+                boxShadow: '0 0 12px hsl(185 90% 65% / 0.6)',
+              }}
+              initial={{ scale: 0, opacity: 1 }}
+              animate={{ scale: 2.5, opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
             />
             
             {/* Inner ring */}
             <motion.div
               className="absolute rounded-full"
               style={{
-                width: 40,
-                height: 40,
-                left: -20,
-                top: -20,
-                border: '2px solid hsl(185 90% 65%)',
+                width: 60,
+                height: 60,
+                left: -30,
+                top: -30,
+                border: '2px solid hsl(185 95% 70%)',
+                boxShadow: '0 0 10px hsl(185 95% 70% / 0.7)',
               }}
               initial={{ scale: 0, opacity: 1 }}
-              animate={{ scale: 2.5, opacity: 0 }}
+              animate={{ scale: 3, opacity: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.4, ease: 'easeOut', delay: 0.1 }}
+              transition={{ duration: 0.6, ease: 'easeOut', delay: 0.15 }}
             />
             
-            {/* Center dot */}
+            {/* Center burst */}
             <motion.div
               className="absolute rounded-full"
               style={{
-                width: 8,
-                height: 8,
-                left: -4,
-                top: -4,
-                background: 'radial-gradient(circle, hsl(185 100% 70%), hsl(185 80% 50%))',
-                boxShadow: '0 0 15px hsl(185 80% 55% / 0.6)',
+                width: 20,
+                height: 20,
+                left: -10,
+                top: -10,
+                background: 'radial-gradient(circle, hsl(185 100% 80%), hsl(185 90% 55%))',
+                boxShadow: '0 0 30px hsl(185 90% 60% / 0.8), 0 0 60px hsl(185 80% 50% / 0.4)',
               }}
               initial={{ scale: 0, opacity: 1 }}
-              animate={{ scale: 1.5, opacity: 0 }}
+              animate={{ scale: 2, opacity: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
             />
           </div>
         ))}
