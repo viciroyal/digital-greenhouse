@@ -42,3 +42,4 @@ export { default as ScavengerBadge } from './ScavengerBadge';
 export * from './scaleProtocolData';
 export { default as ViewModeToggle, type ViewMode } from './ViewModeToggle';
 export { default as GrimoireView } from './GrimoireView';
+export { default as ChapterView, chapterData } from './ChapterView';
