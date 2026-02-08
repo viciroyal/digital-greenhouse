@@ -344,6 +344,23 @@ const AncestralPath = () => {
             </Button>
           )}
           
+          {/* Profile Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2 font-mono text-xs"
+            style={{
+              background: 'linear-gradient(135deg, hsl(280 40% 15%), hsl(250 30% 12%))',
+              border: '1px solid hsl(280 60% 50%)',
+              color: 'hsl(280 60% 70%)',
+              boxShadow: '0 0 15px hsl(280 60% 40% / 0.3)',
+            }}
+            onClick={() => navigate('/pharmer-profile')}
+          >
+            <User className="w-3 h-3" />
+            My Journal
+          </Button>
+
           <div 
             className="flex items-center gap-2 px-3 py-2 rounded-full font-mono text-xs"
             style={{
