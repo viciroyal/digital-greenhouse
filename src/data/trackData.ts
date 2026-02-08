@@ -402,6 +402,7 @@ export const trackData: TrackData[] = [
     crystal: 'Selenite',
     colorKey: 'chakra-source',
     colorHsl: '112 64% 96%',
+    audioUrl: 'https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/12.%20Vici%20Royal%20-%20Lie%20To%20Me%20.wav',
     organs: ['The Aura', 'Electromagnetic Field'],
     bodyArea: 'crown',
     moonPhase: 'Dark Moon',
