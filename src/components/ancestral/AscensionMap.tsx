@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Pickaxe, Mountain, Zap, Sun, Droplets } from 'lucide-react';
+import { Lock, Pickaxe, Mountain, Zap, Sun, Droplets, KeyRound } from 'lucide-react';
+import InitiationModal from './InitiationModal';
+import AscensionLessonDrawer from './AscensionLessonDrawer';
 
 // Level content data with cultural/scientific themes
 interface LevelData {
@@ -407,10 +409,17 @@ const CentralCord = () => {
 const AscensionMap = () => {
   // State: Current level tracks user progress
   const [currentLevel, setCurrentLevel] = useState(1);
+  
+  // Modal and Drawer states
+  const [isInitiationOpen, setIsInitiationOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
 
-  // Handle card selection
+  // Handle card selection - opens Lesson Drawer
   const handleCardSelect = (level: number) => {
     console.log(`OPEN LESSON DRAWER - Level ${level}`);
+    setSelectedLevel(level);
+    setIsDrawerOpen(true);
   };
 
   // Simulate level up for debugging
@@ -432,6 +441,33 @@ const AscensionMap = () => {
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
         }}
       />
+
+      {/* Keyhole Icon - Opens Initiation Modal */}
+      <motion.button
+        className="fixed top-6 left-6 z-50 p-3 rounded-full"
+        style={{
+          background: 'rgba(26, 26, 0, 0.9)',
+          border: '1px solid hsl(45 50% 30%)',
+          boxShadow: '0 0 20px hsl(45 50% 25% / 0.3)',
+        }}
+        whileHover={{ 
+          scale: 1.1,
+          boxShadow: '0 0 30px hsl(45 60% 40% / 0.5)',
+        }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setIsInitiationOpen(true)}
+        initial={{ opacity: 0, x: -30 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        <KeyRound 
+          className="w-6 h-6" 
+          style={{ 
+            color: 'hsl(45 60% 55%)',
+            filter: 'drop-shadow(0 0 8px hsl(45 60% 50% / 0.5))',
+          }} 
+        />
+      </motion.button>
 
       {/* Central Mycelial Cord */}
       <CentralCord />
@@ -482,6 +518,19 @@ const AscensionMap = () => {
       >
         🧪 SIMULATE LEVEL UP (Current: {currentLevel})
       </motion.button>
+
+      {/* Initiation Modal */}
+      <InitiationModal 
+        isOpen={isInitiationOpen} 
+        onClose={() => setIsInitiationOpen(false)} 
+      />
+
+      {/* Lesson Drawer */}
+      <AscensionLessonDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        level={selectedLevel}
+      />
     </section>
   );
 };
