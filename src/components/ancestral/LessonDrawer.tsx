@@ -5,6 +5,7 @@ import FileDropZone from './FileDropZone';
 import HogonSeal from './HogonSeal';
 import EthericAntennaModule from './EthericAntennaModule';
 import EarthAcupunctureModule from './EarthAcupunctureModule';
+import VedicFireModule from './VedicFireModule';
 import { useAncestralProgress } from '@/hooks/useAncestralProgress';
 
 interface LessonDrawerProps {
@@ -88,6 +89,7 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
   // Check if this is a specialized module lesson
   const isEthericAntennaLesson = currentLesson?.name === 'etheric-antenna';
   const isEarthAcupunctureLesson = currentLesson?.name === 'earth-acupuncture';
+  const isVedicFireLesson = currentLesson?.name === 'vedic-fire';
 
   const lessonContent = currentLesson ? {
     videoTitle: currentLesson.display_name,
@@ -272,6 +274,11 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                         color={module.color}
                         onUploadClick={() => setActiveTab('journal')}
                       />
+                    ) : isVedicFireLesson ? (
+                      <VedicFireModule 
+                        color={module.color}
+                        onUploadClick={() => setActiveTab('journal')}
+                      />
                     ) : (
                       <>
                         {/* Video Player Placeholder */}
@@ -317,7 +324,7 @@ const LessonDrawer = ({ isOpen, onClose, module }: LessonDrawerProps) => {
                     )}
 
                     {/* Only show completion status and mission for non-specialized lessons */}
-                    {!isEthericAntennaLesson && !isEarthAcupunctureLesson && (
+                    {!isEthericAntennaLesson && !isEarthAcupunctureLesson && !isVedicFireLesson && (
                       <>
                         {/* Completion status */}
                         {isCurrentLessonCompleted && (
