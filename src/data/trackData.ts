@@ -311,6 +311,7 @@ export const trackData: TrackData[] = [
     crystal: 'Amethyst',
     colorKey: 'chakra-vision',
     colorHsl: '280 60% 55%',
+    audioUrl: 'https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/9.%20Vici%20Royal%20-%20LAFS%20(ft.%20Nicholle)%20.wav',
     organs: ['Eyes', 'Pituitary Gland', 'Brain'],
     bodyArea: 'eyes',
     moonPhase: 'Waning Gibbous',
