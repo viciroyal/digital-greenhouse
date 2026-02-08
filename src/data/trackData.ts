@@ -213,6 +213,7 @@ export const trackData: TrackData[] = [
     crystal: 'Rose Quartz',
     colorKey: 'chakra-heart',
     colorHsl: '140 50% 45%',
+    audioUrl: 'https://ejuiamegojiwcnvsfgke.supabase.co/storage/v1/object/public/audio-assets/6.%20Vici%20Royal%20-%20Allow%20Me%20(ft.%20Sarafina%20Ethereal,%20&%20James%20Cambridge%20IV)%20.wav',
     organs: ['Hands', 'Arms', 'Thymus Gland'],
     bodyArea: 'heart',
     moonPhase: 'Waxing Gibbous',
