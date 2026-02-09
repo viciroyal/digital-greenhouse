@@ -5,6 +5,29 @@ import { supabase } from '@/integrations/supabase/client';
  * Master Crop type from database
  * Includes focus_tag for 7-Zone Octave sorting protocol
  */
+/**
+ * Chord Interval types for Complete Chord validation
+ */
+export type ChordInterval = 
+  | 'Root (Lead)'      // Main harvest crop
+  | '3rd (Triad)'      // Pest defense support
+  | '5th (Stabilizer)' // Deep mineral puller
+  | '7th (Signal)';    // Pollinator/aromatic
+
+/**
+ * Chord Category types for crop classification
+ */
+export type ChordCategory = 
+  | 'Sustenance'           // Food crops
+  | 'Sentinel/Miner'       // Pest defense & minerals
+  | 'Nitrogen/Bio-Mass'    // Nitrogen fixers, cover crops
+  | 'Dye/Fiber/Aromatic';  // Pollinators, dyes, fibers
+
+/**
+ * Master Crop type from database
+ * Includes focus_tag for 7-Zone Octave sorting protocol
+ * and chord_interval for Complete Chord validation
+ */
 export interface MasterCrop {
   id: string;
   name: string;
@@ -13,9 +36,10 @@ export interface MasterCrop {
   zone_name: string;
   zone_color: string;
   element: string;
-  category: string;
+  category: string; // ChordCategory: Sustenance, Sentinel/Miner, Nitrogen/Bio-Mass, Dye/Fiber/Aromatic
+  chord_interval: string | null; // ChordInterval: Root (Lead), 3rd (Triad), 5th (Stabilizer), 7th (Signal)
   focus_tag: string | null; // ROOT_FOCUS, FLOW_FOCUS, etc.
-  guild_role: string | null; // Lead, Sentinel, Miner, Enhancer
+  guild_role: string | null; // Lead, Sentinel, Miner, Enhancer (legacy)
   cultural_role: string | null;
   dominant_mineral: string | null;
   soil_protocol_focus: string | null;

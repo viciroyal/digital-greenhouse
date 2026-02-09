@@ -14,11 +14,27 @@ export interface GardenBed {
   updated_at: string;
 }
 
+/**
+ * Chord Interval types for Complete Chord validation
+ */
+export type ChordInterval = 
+  | 'Root (Lead)'      // Main harvest crop
+  | '3rd (Triad)'      // Pest defense support
+  | '5th (Stabilizer)' // Deep mineral puller
+  | '7th (Signal)';    // Pollinator/aromatic
+
+export const CHORD_INTERVALS: ChordInterval[] = [
+  'Root (Lead)',
+  '3rd (Triad)',
+  '5th (Stabilizer)',
+  '7th (Signal)',
+];
+
 export interface BedPlanting {
   id: string;
   bed_id: string;
   crop_id: string;
-  guild_role: 'Lead' | 'Sentinel' | 'Miner' | 'Enhancer';
+  guild_role: string; // Legacy: Lead, Sentinel, Miner, Enhancer
   plant_count: number;
   planted_at: string;
   created_at: string;
@@ -28,6 +44,7 @@ export interface BedPlanting {
     common_name: string | null;
     frequency_hz: number;
     guild_role: string | null;
+    chord_interval: string | null; // Root (Lead), 3rd (Triad), 5th (Stabilizer), 7th (Signal)
     spacing_inches: string | null;
     brix_target_min: number | null;
     brix_target_max: number | null;
@@ -72,7 +89,7 @@ export const useBedPlantings = (bedId: string | null) => {
         .select(`
           *,
           crop:master_crops(
-            id, name, common_name, frequency_hz, guild_role, 
+            id, name, common_name, frequency_hz, guild_role, chord_interval,
             spacing_inches, brix_target_min, brix_target_max
           )
         `)
