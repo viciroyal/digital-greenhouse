@@ -11,7 +11,7 @@ export interface WisdomProtocol {
   source: string;
   rule: string;
   citation: string;
-  category: 'root' | 'regeneration' | 'biology' | 'mineral' | 'frequency' | 'cosmic' | 'ancestral';
+  category: 'root' | 'regeneration' | 'biology' | 'mineral' | 'frequency' | 'cosmic' | 'ancestral' | 'ecological';
 }
 
 export interface AmendmentRecommendation {
@@ -177,6 +177,48 @@ export const wisdomProtocols: WisdomProtocol[] = [
     rule: 'Build up, not down. The mound catches the blessing.',
     citation: 'Raise the bed. Honor the ancestors below.',
     category: 'ancestral',
+  },
+  
+  // BATCH 4: The Ecological & Natural
+  {
+    id: 'fukuoka-do-nothing',
+    name: 'The Fukuoka Method',
+    source: 'Masanobu Fukuoka (One Straw Revolution)',
+    rule: 'No plowing, no weeding, no chemicals.',
+    citation: 'The ultimate goal is not to cultivate, but to allow.',
+    category: 'ecological',
+  },
+  {
+    id: 'fukuoka-no-till',
+    name: 'The No-Till Imperative',
+    source: 'Masanobu Fukuoka',
+    rule: 'To plow is to wound. To till is to kill.',
+    citation: 'Wait. Consider Occultation or Broadforking.',
+    category: 'ecological',
+  },
+  {
+    id: 'permaculture-zones',
+    name: 'The Permaculture Zone System',
+    source: 'Bill Mollison / David Holmgren',
+    rule: 'Place the elements most used nearest to the center.',
+    citation: 'Zone 1 is daily. Zone 5 is wild.',
+    category: 'ecological',
+  },
+  {
+    id: 'knf-imu',
+    name: 'The JADAM/KNF Principle',
+    source: 'Korean Natural Farming',
+    rule: 'Cultivate Indigenous Microorganisms. The soil knows.',
+    citation: 'The microbes of your land are your best teachers.',
+    category: 'ecological',
+  },
+  {
+    id: 'least-resistance',
+    name: 'The Path of Least Resistance',
+    source: 'Natural Farming Philosophy',
+    rule: 'Nature does not force. It flows.',
+    citation: 'Work with the land, not against it.',
+    category: 'ecological',
   },
 ];
 
@@ -366,7 +408,7 @@ export const sacredSeedZone = {
  * Get wisdom citation for a specific action type
  */
 export const getWisdomCitation = (
-  actionType: 'root' | 'check' | 'plant' | 'reset' | 'cosmic' | 'frequency' | 'polyculture' | 'seed'
+  actionType: 'root' | 'check' | 'plant' | 'reset' | 'cosmic' | 'frequency' | 'polyculture' | 'seed' | 'notill' | 'natural'
 ): string => {
   switch (actionType) {
     case 'root':
@@ -384,6 +426,10 @@ export const getWisdomCitation = (
       return wisdomProtocols.find(p => p.id === 'three-sisters')?.citation || '';
     case 'seed':
       return wisdomProtocols.find(p => p.id === 'dogon-seed-lineage')?.citation || '';
+    case 'notill':
+      return wisdomProtocols.find(p => p.id === 'fukuoka-no-till')?.citation || '';
+    case 'natural':
+      return wisdomProtocols.find(p => p.id === 'fukuoka-do-nothing')?.citation || '';
     default:
       return '';
   }
@@ -491,3 +537,113 @@ export const forbiddenAmendments = [
   'Muriate of Potash',
   'Any "-cide" (pesticide, herbicide, fungicide)',
 ];
+
+/**
+ * FORBIDDEN ACTIONS (Fukuoka Protocol)
+ * 
+ * Actions that trigger a STOP alert with alternatives.
+ */
+export interface ForbiddenAction {
+  action: string;
+  alternatives: string[];
+  citation: string;
+  source: string;
+}
+
+export const forbiddenActions: ForbiddenAction[] = [
+  {
+    action: 'tilling',
+    alternatives: ['Occultation (tarping)', 'Broadforking', 'Sheet Mulching'],
+    citation: 'Wait. Consider Occultation or Broadforking.',
+    source: 'Masanobu Fukuoka',
+  },
+  {
+    action: 'plowing',
+    alternatives: ['No-till seeding', 'Chop and drop', 'Cover cropping'],
+    citation: 'To plow is to wound. To till is to kill.',
+    source: 'Masanobu Fukuoka',
+  },
+  {
+    action: 'rototilling',
+    alternatives: ['Broadforking', 'Deep mulching', 'Occultation'],
+    citation: 'The soil is a living city. Would you rototill a city?',
+    source: 'Elaine Ingham',
+  },
+  {
+    action: 'weeding',
+    alternatives: ['Chop and drop', 'Occultation', 'Living mulch'],
+    citation: 'Weeds are the soil\'s attempt to heal itself.',
+    source: 'Masanobu Fukuoka',
+  },
+];
+
+/**
+ * Check if an action is forbidden (Fukuoka Protocol)
+ */
+export const checkForbiddenAction = (actionText: string): ForbiddenAction | null => {
+  const lowerAction = actionText.toLowerCase();
+  return forbiddenActions.find(fa => 
+    lowerAction.includes(fa.action)
+  ) || null;
+};
+
+/**
+ * PERMACULTURE ZONE PRIORITIZATION
+ * 
+ * Zone 1 (396Hz) = Daily attention
+ * Zone 5 (741Hz+) = Weekly/seasonal attention
+ */
+export interface ZonePriority {
+  hz: number;
+  zone: number;
+  frequency: 'daily' | 'weekly' | 'seasonal' | 'wild';
+  alertPriority: number; // 1 = highest, 5 = lowest
+}
+
+export const zonePriorities: ZonePriority[] = [
+  { hz: 396, zone: 1, frequency: 'daily', alertPriority: 1 },
+  { hz: 417, zone: 2, frequency: 'daily', alertPriority: 2 },
+  { hz: 528, zone: 3, frequency: 'weekly', alertPriority: 3 },
+  { hz: 639, zone: 4, frequency: 'weekly', alertPriority: 4 },
+  { hz: 741, zone: 5, frequency: 'seasonal', alertPriority: 5 },
+  { hz: 852, zone: 6, frequency: 'seasonal', alertPriority: 6 },
+  { hz: 963, zone: 7, frequency: 'wild', alertPriority: 7 },
+];
+
+/**
+ * Get zone priority for task scheduling
+ */
+export const getZonePriority = (hz: number): ZonePriority => {
+  return zonePriorities.find(z => z.hz === hz) || zonePriorities[0];
+};
+
+/**
+ * Check if a zone needs daily attention
+ */
+export const isDailyZone = (hz: number): boolean => {
+  const priority = getZonePriority(hz);
+  return priority.frequency === 'daily';
+};
+
+/**
+ * Get natural alternatives to conventional methods
+ */
+export const getNaturalAlternatives = () => {
+  return {
+    tillAlternatives: [
+      { name: 'Occultation', description: 'Cover soil with tarp for 4-6 weeks. Kills weeds, preserves biology.' },
+      { name: 'Broadforking', description: 'Gentle aeration without inversion. Preserves soil layers.' },
+      { name: 'Sheet Mulching', description: 'Cardboard + compost + mulch. Builds soil while smothering weeds.' },
+    ],
+    weedAlternatives: [
+      { name: 'Chop and Drop', description: 'Cut weeds at soil level. Leave as mulch. Free fertilizer.' },
+      { name: 'Living Mulch', description: 'Plant clover between rows. Outcompetes weeds, fixes nitrogen.' },
+      { name: 'Dense Planting', description: 'Close spacing shades out weeds. Intensive polyculture.' },
+    ],
+    fertilizerAlternatives: [
+      { name: 'IMO (Indigenous Microorganisms)', description: 'Collect local microbes. JADAM/KNF method.' },
+      { name: 'Compost Tea', description: 'Aerated compost extract. Living biology in liquid form.' },
+      { name: 'Fermented Plant Juice', description: 'Lacto-fermented plant matter. Fast nutrient cycling.' },
+    ],
+  };
+};
