@@ -7,121 +7,98 @@ import { LearnMoreButton } from '@/components/almanac';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * THE VITALITY ENGINE (BRIX CHECK)
+ * THE VITALITY CHECK (Silent Engine Protocol)
  * ═══════════════════════════════════════════════════════════════════════════
  * 
- * GOAL: Immediate course correction. Binary logic only.
+ * MECHANISM: Binary status signal. No noise.
  * 
- * LOGIC:
- * 1. INPUT: User enters NIR Spectroscopy value (0-30)
- * 2. THRESHOLD: 12.0 is the dividing line
- * 3. OUTPUT:
- *    - RED (< 12): "Low Energy. Apply Mineral Anchor / Sea Agri."
- *    - GREEN (≥ 12): "Optimal Flow. Maintain."
+ * INPUT: User enters NIR Spectroscopy value (0-30)
+ * 
+ * THE LOGIC:
+ *   IF < 12  → [RED ALERT] "Deficiency Detected. Intercept with Mineral Anchor."
+ *   IF 12-24 → [GREEN SIGNAL] "Resonance High. Flow State."
  */
 
-// Storage key for Brix logs
+// Storage key
 const STORAGE_KEY_BRIX_LOGS = 'pharmer-brix-logs';
 
-// Logic states - BINARY ONLY
-type LogicState = 'IDLE' | 'RED' | 'GREEN';
+// Binary logic states
+type Signal = 'IDLE' | 'RED' | 'GREEN';
 
 interface BrixLog {
   id: string;
   date: string;
   value: number;
-  state: 'RED' | 'GREEN';
+  signal: 'RED' | 'GREEN';
 }
 
-// Cross-sync event for journal
-const dispatchJournalPrompt = (brixValue: number) => {
-  const event = new CustomEvent('brix-needs-attention', {
-    detail: { brixValue, date: new Date().toISOString() }
-  });
-  window.dispatchEvent(event);
+// Cross-sync event
+const dispatchJournalPrompt = (value: number) => {
+  window.dispatchEvent(new CustomEvent('brix-needs-attention', {
+    detail: { brixValue: value, date: new Date().toISOString() }
+  }));
 };
 
 const VitalityEngine = () => {
-  // INPUT STATE
+  // INPUT
   const [inputValue, setInputValue] = useState('');
   
-  // OUTPUT STATE
-  const [logicState, setLogicState] = useState<LogicState>('IDLE');
-  const [isProcessing, setIsProcessing] = useState(false);
+  // OUTPUT (Binary)
+  const [signal, setSignal] = useState<Signal>('IDLE');
   
-  // Brix history
+  // History
   const [logs, setLogs] = useState<BrixLog[]>(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY_BRIX_LOGS);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
+      return JSON.parse(localStorage.getItem(STORAGE_KEY_BRIX_LOGS) || '[]');
+    } catch { return []; }
   });
   
-  // Persist logs
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_BRIX_LOGS, JSON.stringify(logs));
   }, [logs]);
 
-  // THE LOGIC: Threshold check
-  const handleValidate = () => {
+  // THE LOGIC
+  const handleCheck = () => {
     const value = parseFloat(inputValue);
-    if (isNaN(value) || value < 0 || value > 32) return;
+    if (isNaN(value) || value < 0 || value > 30) return;
     
-    setIsProcessing(true);
+    // Binary threshold: 12
+    const result: 'RED' | 'GREEN' = value < 12 ? 'RED' : 'GREEN';
+    setSignal(result);
     
-    // Brief processing animation
-    setTimeout(() => {
-      // THRESHOLD LOGIC: 12.0 is the dividing line
-      const state: 'RED' | 'GREEN' = value < 12 ? 'RED' : 'GREEN';
-      setLogicState(state);
-      setIsProcessing(false);
-      
-      // Log the reading
-      const newLog: BrixLog = {
-        id: Date.now().toString(),
-        date: new Date().toISOString(),
-        value,
-        state,
-      };
-      setLogs(prev => [newLog, ...prev.slice(0, 9)]);
-      
-      // Cross-sync for low readings
-      if (state === 'RED') {
-        dispatchJournalPrompt(value);
-      }
-    }, 400);
+    // Log
+    setLogs(prev => [{
+      id: Date.now().toString(),
+      date: new Date().toISOString(),
+      value,
+      signal: result,
+    }, ...prev.slice(0, 9)]);
+    
+    // Cross-sync for deficiency
+    if (result === 'RED') dispatchJournalPrompt(value);
   };
 
   const handleReset = () => {
     setInputValue('');
-    setLogicState('IDLE');
-  };
-
-  // Dynamic border/background based on state
-  const getStateStyles = () => {
-    switch (logicState) {
-      case 'RED':
-        return {
-          background: 'linear-gradient(180deg, hsl(0 35% 12%), hsl(0 0% 8%))',
-          border: '3px solid hsl(0 70% 50%)',
-        };
-      case 'GREEN':
-        return {
-          background: 'linear-gradient(180deg, hsl(120 25% 12%), hsl(0 0% 8%))',
-          border: '3px solid hsl(120 60% 45%)',
-        };
-      default:
-        return {
-          background: 'hsl(195 20% 10%)',
-          border: '2px solid hsl(195 50% 40%)',
-        };
-    }
+    setSignal('IDLE');
   };
 
   return (
-    <div className="rounded-xl overflow-hidden" style={getStateStyles()}>
+    <div
+      className="rounded-xl overflow-hidden transition-colors duration-300"
+      style={{
+        background: signal === 'RED' 
+          ? 'linear-gradient(180deg, hsl(0 35% 12%), hsl(0 0% 8%))'
+          : signal === 'GREEN'
+          ? 'linear-gradient(180deg, hsl(120 25% 12%), hsl(0 0% 8%))'
+          : 'hsl(195 20% 10%)',
+        border: `2px solid ${
+          signal === 'RED' ? 'hsl(0 70% 50%)' 
+          : signal === 'GREEN' ? 'hsl(120 60% 45%)' 
+          : 'hsl(195 50% 40%)'
+        }`,
+      }}
+    >
       {/* Header */}
       <div
         className="p-4 text-center"
@@ -134,47 +111,35 @@ const VitalityEngine = () => {
           <Zap className="w-5 h-5" style={{ color: 'hsl(195 60% 60%)' }} />
           <h3
             className="text-lg tracking-wider"
-            style={{
-              fontFamily: "'Staatliches', sans-serif",
-              color: 'hsl(195 60% 65%)',
-            }}
+            style={{ fontFamily: "'Staatliches', sans-serif", color: 'hsl(195 60% 65%)' }}
           >
-            VITALITY ENGINE
+            VITALITY CHECK
           </h3>
           <LearnMoreButton wisdomKey="carver-regeneration" size="sm" />
         </div>
-        <p
-          className="text-xs font-mono mt-1"
-          style={{ color: 'hsl(195 40% 50%)' }}
-        >
-          INPUT → THRESHOLD → OUTPUT
-        </p>
       </div>
 
-      {/* INPUT PANEL */}
+      {/* INPUT */}
       <div className="p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <span
-            className="text-sm font-mono tracking-widest font-bold"
-            style={{ color: 'hsl(195 50% 60%)' }}
-          >
-            INPUT: BRIX VALUE (0-30)
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xs font-mono tracking-widest" style={{ color: 'hsl(195 50% 60%)' }}>
+            INPUT: BRIX VALUE
           </span>
         </div>
         
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <Input
             type="number"
             min="0"
-            max="32"
+            max="30"
             step="0.1"
-            placeholder="Enter reading..."
+            placeholder="0-30"
             value={inputValue}
             onChange={(e) => {
               setInputValue(e.target.value);
-              if (logicState !== 'IDLE') setLogicState('IDLE');
+              if (signal !== 'IDLE') setSignal('IDLE');
             }}
-            className="font-mono text-2xl h-16 text-center"
+            className="font-mono text-2xl h-14 text-center"
             style={{
               background: 'hsl(0 0% 8%)',
               border: '2px solid hsl(195 40% 30%)',
@@ -182,140 +147,88 @@ const VitalityEngine = () => {
             }}
           />
           <Button
-            onClick={handleValidate}
-            disabled={!inputValue || isProcessing}
-            className="h-16 px-8 text-lg"
+            onClick={handleCheck}
+            disabled={!inputValue}
+            className="h-14 px-6 text-lg"
             style={{
               fontFamily: "'Staatliches', sans-serif",
-              letterSpacing: '0.1em',
               background: 'linear-gradient(135deg, hsl(195 60% 40%), hsl(210 50% 35%))',
               border: '2px solid hsl(195 50% 50%)',
               color: 'white',
             }}
           >
-            {isProcessing ? '...' : 'CHECK'}
+            CHECK
           </Button>
         </div>
 
-        {/* Threshold Indicator */}
-        <div className="mt-4 flex items-center justify-center gap-4">
-          <div className="flex items-center gap-2">
-            <div
-              className="w-4 h-4 rounded-full"
-              style={{ background: 'hsl(0 70% 50%)', boxShadow: '0 0 10px hsl(0 70% 50% / 0.5)' }}
-            />
-            <span className="text-xs font-mono" style={{ color: 'hsl(0 60% 60%)' }}>
-              0-11 (DEFICIENT)
+        {/* Threshold Legend */}
+        <div className="mt-3 flex justify-center gap-6">
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full" style={{ background: 'hsl(0 70% 50%)' }} />
+            <span className="text-[10px] font-mono" style={{ color: 'hsl(0 60% 60%)' }}>
+              {'<12 RED'}
             </span>
           </div>
-          <div
-            className="w-px h-6"
-            style={{ background: 'hsl(0 0% 30%)' }}
-          />
-          <div className="flex items-center gap-2">
-            <div
-              className="w-4 h-4 rounded-full"
-              style={{ background: 'hsl(120 60% 45%)', boxShadow: '0 0 10px hsl(120 60% 45% / 0.5)' }}
-            />
-            <span className="text-xs font-mono" style={{ color: 'hsl(120 50% 60%)' }}>
-              12+ (RESONANT)
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full" style={{ background: 'hsl(120 60% 45%)' }} />
+            <span className="text-[10px] font-mono" style={{ color: 'hsl(120 50% 60%)' }}>
+              12+ GREEN
             </span>
           </div>
         </div>
       </div>
 
-      {/* OUTPUT PANEL */}
+      {/* OUTPUT (Binary Signal) */}
       <AnimatePresence>
-        {logicState !== 'IDLE' && (
+        {signal !== 'IDLE' && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="p-4 pt-0"
+            className="px-4 pb-4"
           >
-            <div className="flex items-center gap-2 mb-3">
-              <span
-                className="text-sm font-mono tracking-widest font-bold"
-                style={{ 
-                  color: logicState === 'RED' ? 'hsl(0 60% 60%)' : 'hsl(120 50% 60%)',
-                }}
-              >
-                OUTPUT: {logicState === 'RED' ? 'DEFICIENCY DETECTED' : 'OPTIMAL FLOW'}
-              </span>
-            </div>
-            
             <div
-              className="p-4 rounded-xl flex items-start gap-4"
+              className="p-4 rounded-xl flex items-center gap-4"
               style={{
-                background: logicState === 'RED' ? 'hsl(0 40% 12%)' : 'hsl(120 30% 12%)',
-                border: `2px solid ${logicState === 'RED' ? 'hsl(0 60% 45%)' : 'hsl(120 50% 45%)'}`,
+                background: signal === 'RED' ? 'hsl(0 40% 12%)' : 'hsl(120 30% 12%)',
+                border: `2px solid ${signal === 'RED' ? 'hsl(0 60% 45%)' : 'hsl(120 50% 45%)'}`,
               }}
             >
-              {/* Status Icon */}
+              {/* Signal Light */}
               <div
-                className="w-16 h-16 rounded-full flex items-center justify-center shrink-0"
+                className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
                 style={{
-                  background: logicState === 'RED' 
-                    ? 'radial-gradient(circle, hsl(0 70% 45%) 0%, hsl(0 60% 30%) 100%)'
-                    : 'radial-gradient(circle, hsl(120 60% 40%) 0%, hsl(120 50% 25%) 100%)',
-                  boxShadow: logicState === 'RED'
-                    ? '0 0 30px hsl(0 70% 45% / 0.6)'
-                    : '0 0 30px hsl(120 60% 40% / 0.6)',
+                  background: signal === 'RED' 
+                    ? 'radial-gradient(circle, hsl(0 70% 50%) 0%, hsl(0 60% 35%) 100%)'
+                    : 'radial-gradient(circle, hsl(120 60% 45%) 0%, hsl(120 50% 30%) 100%)',
+                  boxShadow: signal === 'RED'
+                    ? '0 0 30px hsl(0 70% 50% / 0.6)'
+                    : '0 0 30px hsl(120 60% 45% / 0.6)',
                 }}
               >
-                {logicState === 'RED' ? (
-                  <AlertTriangle className="w-8 h-8 text-white" />
+                {signal === 'RED' ? (
+                  <AlertTriangle className="w-7 h-7 text-white" />
                 ) : (
-                  <CheckCircle className="w-8 h-8 text-white" />
+                  <CheckCircle className="w-7 h-7 text-white" />
                 )}
               </div>
               
               {/* Message */}
-              <div className="flex-1">
+              <div>
                 <h4
-                  className="text-xl tracking-wider mb-2"
+                  className="text-lg tracking-wider"
                   style={{
                     fontFamily: "'Staatliches', sans-serif",
-                    color: logicState === 'RED' ? 'hsl(0 70% 65%)' : 'hsl(120 60% 65%)',
+                    color: signal === 'RED' ? 'hsl(0 70% 65%)' : 'hsl(120 60% 65%)',
                   }}
                 >
-                  {logicState === 'RED' ? 'LOW ENERGY' : 'OPTIMAL FLOW'}
+                  {signal === 'RED' ? 'DEFICIENCY DETECTED' : 'RESONANCE HIGH'}
                 </h4>
-                <p
-                  className="text-sm font-mono"
-                  style={{ color: 'hsl(0 0% 70%)' }}
-                >
-                  {logicState === 'RED' 
-                    ? 'Apply Mineral Anchor / Sea Agri. Consider foliar spray with compost tea.'
-                    : 'Maintain current protocol. Continue weekly observation.'}
+                <p className="text-sm font-mono" style={{ color: 'hsl(0 0% 65%)' }}>
+                  {signal === 'RED' 
+                    ? 'Intercept with Mineral Anchor / Sea Agri.'
+                    : 'Flow State. Maintain.'}
                 </p>
-                
-                {/* Action Task for RED state */}
-                {logicState === 'RED' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="mt-3 p-3 rounded-lg"
-                    style={{
-                      background: 'hsl(45 30% 12%)',
-                      border: '1px solid hsl(45 50% 35%)',
-                    }}
-                  >
-                    <span
-                      className="text-xs font-mono tracking-wider block mb-1"
-                      style={{ color: 'hsl(45 60% 60%)' }}
-                    >
-                      TASK OUTPUT:
-                    </span>
-                    <p
-                      className="text-sm font-mono font-bold"
-                      style={{ color: 'hsl(45 70% 70%)' }}
-                    >
-                      Apply foliar spray (Compost Tea + Kelp) within 3 days
-                    </p>
-                  </motion.div>
-                )}
               </div>
             </div>
             
@@ -335,35 +248,24 @@ const VitalityEngine = () => {
         )}
       </AnimatePresence>
       
-      {/* Recent Logs (collapsed) */}
-      {logs.length > 0 && logicState === 'IDLE' && (
+      {/* Recent (minimal) */}
+      {logs.length > 0 && signal === 'IDLE' && (
         <div className="px-4 pb-4">
-          <div className="flex items-center gap-2 mb-2">
-            <span
-              className="text-[10px] font-mono tracking-wider"
-              style={{ color: 'hsl(0 0% 45%)' }}
-            >
-              RECENT READINGS
-            </span>
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-1.5 overflow-x-auto">
             {logs.slice(0, 5).map((log) => (
               <div
                 key={log.id}
-                className="shrink-0 px-3 py-2 rounded-lg text-center"
+                className="shrink-0 px-2 py-1 rounded text-center"
                 style={{
-                  background: log.state === 'RED' ? 'hsl(0 30% 15%)' : 'hsl(120 25% 15%)',
-                  border: `1px solid ${log.state === 'RED' ? 'hsl(0 50% 40%)' : 'hsl(120 40% 40%)'}`,
+                  background: log.signal === 'RED' ? 'hsl(0 30% 15%)' : 'hsl(120 25% 15%)',
+                  border: `1px solid ${log.signal === 'RED' ? 'hsl(0 50% 40%)' : 'hsl(120 40% 40%)'}`,
                 }}
               >
                 <span
-                  className="text-lg font-mono font-bold block"
-                  style={{ color: log.state === 'RED' ? 'hsl(0 60% 60%)' : 'hsl(120 50% 60%)' }}
+                  className="text-sm font-mono font-bold"
+                  style={{ color: log.signal === 'RED' ? 'hsl(0 60% 60%)' : 'hsl(120 50% 60%)' }}
                 >
                   {log.value}
-                </span>
-                <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
-                  {new Date(log.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </span>
               </div>
             ))}

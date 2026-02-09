@@ -1,109 +1,62 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, Activity, Radio, Sprout } from 'lucide-react';
+import { Calculator, Activity, Radio } from 'lucide-react';
 import { SovereigntyFooter } from '@/components/almanac';
 import { DynamicSoilEngine, VitalityEngine, ResonanceEngine } from './engines';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * THE FIELD GUIDE - AGROMAJIC SCIENCE CORE
+ * THE SILENT ENGINE PROTOCOL
  * ═══════════════════════════════════════════════════════════════════════════
  * 
- * A high-efficiency, logic-driven dashboard with three engines:
+ * PHILOSOPHY: Radical Efficiency. Input → Output is immediate.
  * 
- * 1. DYNAMIC SOIL ENGINE (Bed Reset)
- *    Input → Calculation → Output
- *    
- * 2. VITALITY ENGINE (Brix Check)
- *    Input → Threshold → Output
- *    
- * 3. RESONANCE ENGINE (Zone Filter)
- *    Input → Filter → Output
- * 
- * PHILOSOPHY: Action Over Info. Direct Input → Output.
+ * THREE ENGINES:
+ * 1. SOIL CALCULATOR  → Bed dimensions → Scaled recipe
+ * 2. VITALITY CHECK   → Brix value → Binary signal (RED/GREEN)
+ * 3. ZONE FILTER      → Frequency → Filtered view + accent color
  */
 
-type EngineTab = 'soil' | 'vitality' | 'resonance';
+type Engine = 'soil' | 'vitality' | 'zone';
 
 const BeginnerFieldGuide = () => {
-  const [activeEngine, setActiveEngine] = useState<EngineTab>('soil');
+  const [activeEngine, setActiveEngine] = useState<Engine>('soil');
 
   const engines = [
-    { 
-      id: 'soil' as const, 
-      label: 'SOIL ENGINE', 
-      icon: RefreshCw, 
-      color: 'hsl(35 70% 55%)',
-      description: 'Bed Reset',
-    },
-    { 
-      id: 'vitality' as const, 
-      label: 'VITALITY', 
-      icon: Activity, 
-      color: 'hsl(195 70% 55%)',
-      description: 'Brix Check',
-    },
-    { 
-      id: 'resonance' as const, 
-      label: 'RESONANCE', 
-      icon: Radio, 
-      color: 'hsl(270 60% 55%)',
-      description: 'Zone Filter',
-    },
+    { id: 'soil' as const, label: 'SOIL', icon: Calculator, color: 'hsl(35 70% 55%)' },
+    { id: 'vitality' as const, label: 'VITALITY', icon: Activity, color: 'hsl(195 70% 55%)' },
+    { id: 'zone' as const, label: 'ZONE', icon: Radio, color: 'hsl(270 60% 55%)' },
   ];
 
   return (
     <div className="max-w-xl mx-auto px-4 pb-32">
-      {/* Header */}
+      {/* Header - Minimal */}
       <motion.div
         className="text-center mb-6"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <div
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4"
-          style={{
-            background: 'hsl(35 40% 15%)',
-            border: '2px solid hsl(35 70% 50%)',
-          }}
-        >
-          <Sprout className="w-4 h-4" style={{ color: 'hsl(35 80% 60%)' }} />
-          <span
-            className="text-xs font-mono tracking-widest"
-            style={{ color: 'hsl(35 70% 65%)' }}
-          >
-            SCIENCE CORE
-          </span>
-        </div>
-
         <h1
-          className="text-2xl md:text-3xl mb-2 tracking-[0.15em]"
+          className="text-2xl md:text-3xl tracking-[0.2em]"
           style={{
             fontFamily: "'Staatliches', sans-serif",
             color: 'hsl(35 60% 60%)',
             textShadow: '0 0 20px hsl(35 50% 35% / 0.4)',
           }}
         >
-          AGROMAJIC ENGINES
+          SCIENCE CORE
         </h1>
-        <p
-          className="text-sm font-mono"
-          style={{ color: 'hsl(35 40% 55%)' }}
-        >
-          Input → Logic → Output
+        <p className="text-[10px] font-mono tracking-widest mt-1" style={{ color: 'hsl(0 0% 45%)' }}>
+          INPUT → OUTPUT
         </p>
       </motion.div>
 
-      {/* Engine Tabs */}
+      {/* Engine Tabs - Compact */}
       <motion.div
-        className="flex rounded-xl overflow-hidden mb-6"
-        style={{
-          background: 'hsl(0 0% 8%)',
-          border: '2px solid hsl(0 0% 18%)',
-        }}
+        className="flex rounded-lg overflow-hidden mb-4"
+        style={{ background: 'hsl(0 0% 8%)', border: '1px solid hsl(0 0% 18%)' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.1 }}
       >
         {engines.map((engine) => {
           const Icon = engine.icon;
@@ -111,19 +64,16 @@ const BeginnerFieldGuide = () => {
           return (
             <button
               key={engine.id}
-              className="flex-1 flex flex-col items-center gap-1 py-3 transition-all"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 transition-all"
               style={{
                 background: isActive ? `${engine.color}20` : 'transparent',
-                borderBottom: isActive ? `3px solid ${engine.color}` : '3px solid transparent',
+                borderBottom: isActive ? `2px solid ${engine.color}` : '2px solid transparent',
               }}
               onClick={() => setActiveEngine(engine.id)}
             >
               <Icon
-                className="w-5 h-5"
-                style={{
-                  color: isActive ? engine.color : 'hsl(0 0% 45%)',
-                  filter: isActive ? `drop-shadow(0 0 5px ${engine.color})` : 'none',
-                }}
+                className="w-4 h-4"
+                style={{ color: isActive ? engine.color : 'hsl(0 0% 45%)' }}
               />
               <span
                 className="text-[10px] font-mono tracking-wider"
@@ -140,18 +90,17 @@ const BeginnerFieldGuide = () => {
       <AnimatePresence mode="wait">
         <motion.div
           key={activeEngine}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
+          exit={{ opacity: 0, y: -15 }}
+          transition={{ duration: 0.2 }}
         >
           {activeEngine === 'soil' && <DynamicSoilEngine />}
           {activeEngine === 'vitality' && <VitalityEngine />}
-          {activeEngine === 'resonance' && <ResonanceEngine />}
+          {activeEngine === 'zone' && <ResonanceEngine />}
         </motion.div>
       </AnimatePresence>
 
-      {/* Sovereignty Footer */}
       <SovereigntyFooter />
     </div>
   );
