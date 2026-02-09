@@ -40,18 +40,30 @@ interface MixComponent {
   role: 'VISION' | 'ALCHEMY' | 'ANCHOR' | 'STRUCTURE' | 'BRIDGE' | 'SHELTER';
   baseQuarts: number;
   roleColor: string;
+  frequencyBoost?: number[]; // Hz values that double this component
 }
 
 const MASTER_MIX_PROTOCOL: MixComponent[] = [
   { id: 'promix', name: 'Pro-Mix (Peat Base)', role: 'VISION', baseQuarts: 5, roleColor: 'hsl(270 50% 55%)' },
-  { id: 'alfalfa', name: 'Alfalfa Meal', role: 'ALCHEMY', baseQuarts: 2, roleColor: 'hsl(45 70% 55%)' },
-  { id: 'soybean', name: 'Soybean Meal', role: 'ALCHEMY', baseQuarts: 1, roleColor: 'hsl(45 70% 55%)' },
-  { id: 'kelp', name: 'Kelp Meal', role: 'ANCHOR', baseQuarts: 1, roleColor: 'hsl(180 50% 50%)' },
-  { id: 'seamineral', name: 'Sea Minerals', role: 'ANCHOR', baseQuarts: 0.5, roleColor: 'hsl(180 50% 50%)' },
-  { id: 'harmony', name: 'Harmony Calcium', role: 'STRUCTURE', baseQuarts: 1, roleColor: 'hsl(0 0% 70%)' },
+  { id: 'alfalfa', name: 'Alfalfa Meal', role: 'ALCHEMY', baseQuarts: 2, roleColor: 'hsl(45 70% 55%)', frequencyBoost: [528] },
+  { id: 'soybean', name: 'Soybean Meal', role: 'ALCHEMY', baseQuarts: 1, roleColor: 'hsl(45 70% 55%)', frequencyBoost: [528] },
+  { id: 'kelp', name: 'Kelp Meal', role: 'ANCHOR', baseQuarts: 1, roleColor: 'hsl(180 50% 50%)', frequencyBoost: [396] },
+  { id: 'seamineral', name: 'Sea Minerals', role: 'ANCHOR', baseQuarts: 0.5, roleColor: 'hsl(180 50% 50%)', frequencyBoost: [396] },
+  { id: 'harmony', name: 'Harmony Calcium', role: 'STRUCTURE', baseQuarts: 1, roleColor: 'hsl(0 0% 70%)', frequencyBoost: [639] },
   { id: 'wormcast', name: 'Worm Castings', role: 'BRIDGE', baseQuarts: 1, roleColor: 'hsl(35 60% 50%)' },
-  { id: 'humates', name: 'Humates', role: 'SHELTER', baseQuarts: 1, roleColor: 'hsl(25 40% 40%)' },
+  { id: 'humates', name: 'Humates', role: 'SHELTER', baseQuarts: 1, roleColor: 'hsl(25 40% 40%)', frequencyBoost: [417] },
 ];
+
+// Frequency-specific soil protocols
+const FREQUENCY_PROTOCOLS: Record<number, { name: string; color: string; focus: string }> = {
+  396: { name: 'ROOT', color: 'hsl(0 60% 50%)', focus: '2× Kelp & Sea Minerals' },
+  417: { name: 'VINE', color: 'hsl(30 70% 50%)', focus: '2× Humates for moisture' },
+  528: { name: 'SOLAR', color: 'hsl(51 80% 50%)', focus: '2× Alfalfa & Soybean for N' },
+  639: { name: 'HEART', color: 'hsl(120 50% 45%)', focus: '2× Harmony Calcium' },
+  741: { name: 'THROAT', color: 'hsl(210 60% 50%)', focus: 'Standard Mix' },
+  852: { name: 'VISION', color: 'hsl(270 50% 50%)', focus: 'Standard Mix' },
+  963: { name: 'SOURCE', color: 'hsl(300 50% 50%)', focus: 'Standard Mix' },
+};
 
 // Unit conversion logic
 const formatQuantity = (quarts: number): string => {
@@ -68,6 +80,7 @@ const DynamicSoilEngine = () => {
   // INPUT STATE (with spec defaults)
   const [bedWidth, setBedWidth] = useState(2.5);   // Default: 2.5ft
   const [bedLength, setBedLength] = useState(60);  // Default: 60ft
+  const [selectedHz, setSelectedHz] = useState<number | null>(null);
   
   // Checklist state
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
@@ -81,14 +94,20 @@ const DynamicSoilEngine = () => {
     };
   }, [bedWidth, bedLength]);
 
-  // OUTPUT: Scaled quantities (instant)
+  // OUTPUT: Scaled quantities with frequency boost
   const scaledProtocol = useMemo(() => {
-    return MASTER_MIX_PROTOCOL.map(item => ({
-      ...item,
-      scaledQuarts: item.baseQuarts * scaleFactor,
-      display: formatQuantity(item.baseQuarts * scaleFactor),
-    }));
-  }, [scaleFactor]);
+    return MASTER_MIX_PROTOCOL.map(item => {
+      const isBoosted = selectedHz && item.frequencyBoost?.includes(selectedHz);
+      const baseAmount = isBoosted ? item.baseQuarts * 2 : item.baseQuarts;
+      const scaled = baseAmount * scaleFactor;
+      return {
+        ...item,
+        scaledQuarts: scaled,
+        display: formatQuantity(scaled),
+        isBoosted,
+      };
+    });
+  }, [scaleFactor, selectedHz]);
 
   // Toggle check
   const toggleCheck = (id: string) => {
@@ -229,13 +248,67 @@ const DynamicSoilEngine = () => {
             </div>
           </div>
         </div>
+        
+        {/* Frequency Selector for Zone-Specific Boost */}
+        <div
+          className="mt-4 p-3 rounded-lg"
+          style={{ background: 'hsl(0 0% 8%)', border: '1px solid hsl(0 0% 18%)' }}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] font-mono tracking-widest" style={{ color: 'hsl(0 0% 50%)' }}>
+              ZONE BOOST (Optional)
+            </span>
+            {selectedHz && (
+              <button
+                onClick={() => setSelectedHz(null)}
+                className="text-[9px] font-mono px-2 py-0.5 rounded"
+                style={{ background: 'hsl(0 0% 15%)', color: 'hsl(0 0% 55%)' }}
+              >
+                CLEAR
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {Object.entries(FREQUENCY_PROTOCOLS).map(([hz, protocol]) => {
+              const hzNum = parseInt(hz);
+              const isSelected = selectedHz === hzNum;
+              return (
+                <button
+                  key={hz}
+                  onClick={() => setSelectedHz(isSelected ? null : hzNum)}
+                  className="flex items-center gap-1 px-2 py-1 rounded text-[9px] font-mono"
+                  style={{
+                    background: isSelected ? `${protocol.color}25` : 'hsl(0 0% 12%)',
+                    border: `1px solid ${isSelected ? protocol.color : 'hsl(0 0% 22%)'}`,
+                    color: isSelected ? protocol.color : 'hsl(0 0% 50%)',
+                  }}
+                >
+                  {protocol.name}
+                </button>
+              );
+            })}
+          </div>
+          {selectedHz && FREQUENCY_PROTOCOLS[selectedHz] && (
+            <div
+              className="mt-2 p-2 rounded"
+              style={{
+                background: `${FREQUENCY_PROTOCOLS[selectedHz].color}15`,
+                border: `1px solid ${FREQUENCY_PROTOCOLS[selectedHz].color}40`,
+              }}
+            >
+              <span className="text-[10px] font-mono" style={{ color: FREQUENCY_PROTOCOLS[selectedHz].color }}>
+                {FREQUENCY_PROTOCOLS[selectedHz].focus}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* OUTPUT: Master Mix Protocol (Instant) */}
       <div className="p-4">
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-mono tracking-widest" style={{ color: 'hsl(35 60% 60%)' }}>
-            OUTPUT: MASTER MIX
+            OUTPUT: MASTER MIX {selectedHz && `(${selectedHz}Hz)`}
           </span>
           <LearnMoreButton wisdomKey="ingham-soil-food-web" size="sm" />
         </div>
@@ -248,8 +321,8 @@ const DynamicSoilEngine = () => {
                 key={item.id}
                 className="w-full flex items-center gap-3 p-2.5 rounded-lg text-left"
                 style={{
-                  background: isChecked ? 'hsl(120 30% 15%)' : 'hsl(0 0% 10%)',
-                  border: `1px solid ${isChecked ? 'hsl(120 50% 40%)' : 'hsl(0 0% 18%)'}`,
+                  background: isChecked ? 'hsl(120 30% 15%)' : item.isBoosted ? 'hsl(45 30% 12%)' : 'hsl(0 0% 10%)',
+                  border: `1px solid ${isChecked ? 'hsl(120 50% 40%)' : item.isBoosted ? 'hsl(45 60% 40%)' : 'hsl(0 0% 18%)'}`,
                 }}
                 onClick={() => toggleCheck(item.id)}
                 whileTap={{ scale: 0.98 }}
@@ -278,23 +351,33 @@ const DynamicSoilEngine = () => {
                 </span>
 
                 {/* Name */}
-                <span
-                  className="flex-1 text-sm font-mono truncate"
-                  style={{
-                    color: isChecked ? 'hsl(120 50% 65%)' : 'hsl(35 50% 70%)',
-                    textDecoration: isChecked ? 'line-through' : 'none',
-                  }}
-                >
-                  {item.name}
-                </span>
+                <div className="flex-1 flex items-center gap-1.5 min-w-0">
+                  <span
+                    className="text-sm font-mono truncate"
+                    style={{
+                      color: isChecked ? 'hsl(120 50% 65%)' : item.isBoosted ? 'hsl(45 70% 65%)' : 'hsl(35 50% 70%)',
+                      textDecoration: isChecked ? 'line-through' : 'none',
+                    }}
+                  >
+                    {item.name}
+                  </span>
+                  {item.isBoosted && (
+                    <span
+                      className="text-[8px] font-mono font-bold px-1 py-0.5 rounded shrink-0"
+                      style={{ background: 'hsl(45 60% 30%)', color: 'hsl(45 80% 70%)' }}
+                    >
+                      2×
+                    </span>
+                  )}
+                </div>
 
                 {/* Quantity - THE OUTPUT */}
                 <span
                   className="text-sm font-mono font-bold px-2 py-0.5 rounded shrink-0"
                   style={{
-                    background: 'hsl(51 50% 15%)',
-                    color: 'hsl(51 80% 60%)',
-                    border: '1px solid hsl(51 50% 30%)',
+                    background: item.isBoosted ? 'hsl(45 50% 18%)' : 'hsl(51 50% 15%)',
+                    color: item.isBoosted ? 'hsl(45 80% 65%)' : 'hsl(51 80% 60%)',
+                    border: `1px solid ${item.isBoosted ? 'hsl(45 60% 40%)' : 'hsl(51 50% 30%)'}`,
                   }}
                 >
                   {item.display}
