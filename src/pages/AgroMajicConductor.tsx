@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Music, Shield, Eye, Settings, Loader2 } from 'lucide-react';
-import { BedGrid, BedDetailPanel, SevenPillarsSidebar } from '@/components/conductor';
+import { BedGrid, BedDetailPanel, SevenPillarsSidebar, LiveFeed } from '@/components/conductor';
 import { SovereigntyFooter } from '@/components/almanac';
 import { 
   useGardenBeds, 
@@ -202,6 +202,12 @@ const AgroMajicConductor = () => {
                   bedPlantingsMap={allPlantingsMap}
                 />
               </div>
+
+              {/* THE LIVE FEED */}
+              <LiveFeed
+                beds={beds}
+                bedPlantingsMap={allPlantingsMap}
+              />
 
               {/* Bed Detail Panel */}
               <AnimatePresence>
