@@ -2,7 +2,8 @@ import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Plus, Check, AlertTriangle, Leaf, Shield, 
-  Pickaxe, Sparkles, Music, Loader2, Trash2, Zap, Network, Droplets, TreeDeciduous, Crown, Lightbulb, Wand2 
+  Pickaxe, Sparkles, Music, Loader2, Trash2, Zap, Network, Droplets, TreeDeciduous, Crown, Lightbulb, Wand2,
+  Activity, Target, Radio
 } from 'lucide-react';
 import { 
   GardenBed, BedPlanting, calculatePlantCount, useAddPlanting, useRemovePlanting, 
@@ -18,6 +19,8 @@ import { getZoneRecommendation } from '@/data/jazzVoicingRecommendations';
 import { useAutoGeneration, checkDissonance, getMasterMixSetting, INSTRUMENT_ICONS, InstrumentType } from '@/hooks/useAutoGeneration';
 import ChordSheet from './ChordSheet';
 import DissonanceWarning from './DissonanceWarning';
+import { getZoneAreaMapping, getStatusIndicators, getActionTriggers } from '@/data/zoneStatusMatrix';
+import { getZoneByFrequency } from '@/data/harmonicZoneProtocol';
 
 // Extended bed type with aerial crop data
 interface BedWithAerial extends GardenBed {
@@ -452,6 +455,114 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
           </button>
         </div>
       </div>
+
+      {/* ZONE STATUS INDICATORS - from Zone Status Matrix */}
+      {(() => {
+        const zoneMapping = getZoneAreaMapping(bed.frequency_hz);
+        const harmonicZone = getZoneByFrequency(bed.frequency_hz);
+        
+        if (!zoneMapping || !harmonicZone) return null;
+        
+        return (
+          <div className="px-4 py-3">
+            <div 
+              className="p-3 rounded-xl"
+              style={{
+                background: `linear-gradient(135deg, ${bed.zone_color}08, hsl(0 0% 6%))`,
+                border: `1px solid ${bed.zone_color}25`,
+              }}
+            >
+              {/* Zone Identity Header */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="w-6 h-6 rounded-lg flex items-center justify-center"
+                    style={{ background: `${bed.zone_color}25`, border: `1px solid ${bed.zone_color}40` }}
+                  >
+                    <span className="text-xs font-mono font-bold" style={{ color: bed.zone_color }}>
+                      {harmonicZone.note}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: bed.zone_color }}>
+                      {harmonicZone.agroIdentity.toUpperCase()}
+                    </span>
+                    <span className="text-[9px] font-mono ml-2" style={{ color: 'hsl(0 0% 45%)' }}>
+                      → {zoneMapping.pillar.pillarName}
+                    </span>
+                  </div>
+                </div>
+                <Radio className="w-3.5 h-3.5" style={{ color: bed.zone_color, opacity: 0.6 }} />
+              </div>
+
+              {/* Operational Signal */}
+              <div 
+                className="px-3 py-2 rounded-lg mb-3"
+                style={{ background: 'hsl(0 0% 8%)', border: '1px solid hsl(0 0% 15%)' }}
+              >
+                <p className="text-[11px] font-mono" style={{ color: bed.zone_color }}>
+                  ⚡ {harmonicZone.operationalSignal}
+                </p>
+              </div>
+
+              {/* Status Indicators */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Activity className="w-3 h-3" style={{ color: 'hsl(0 0% 50%)' }} />
+                  <span className="text-[9px] font-mono tracking-wider" style={{ color: 'hsl(0 0% 50%)' }}>
+                    STATUS INDICATORS
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {zoneMapping.statusIndicators.map((indicator, idx) => (
+                    <div
+                      key={idx}
+                      className="px-2 py-1 rounded-md"
+                      style={{ 
+                        background: `${bed.zone_color}10`,
+                        border: `1px solid ${bed.zone_color}20`,
+                      }}
+                    >
+                      <span className="text-[9px] font-mono" style={{ color: `${bed.zone_color}cc` }}>
+                        {indicator}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action Triggers - Admin Only */}
+              {isAdmin && (
+                <div className="mt-3 pt-3 space-y-2" style={{ borderTop: '1px solid hsl(0 0% 12%)' }}>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Target className="w-3 h-3" style={{ color: 'hsl(45 70% 55%)' }} />
+                    <span className="text-[9px] font-mono tracking-wider" style={{ color: 'hsl(45 70% 55%)' }}>
+                      ACTION TRIGGERS
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    {zoneMapping.actionTriggers.map((trigger, idx) => (
+                      <div
+                        key={idx}
+                        className="px-2 py-1.5 rounded-md flex items-start gap-2"
+                        style={{ 
+                          background: 'hsl(45 30% 8%)',
+                          border: '1px solid hsl(45 40% 20%)',
+                        }}
+                      >
+                        <span className="text-[10px]" style={{ color: 'hsl(45 70% 55%)' }}>→</span>
+                        <span className="text-[10px] font-mono" style={{ color: 'hsl(45 50% 65%)' }}>
+                          {trigger}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* MEMBER VIEW: Simplified Chord Display */}
       {!isAdmin && (
