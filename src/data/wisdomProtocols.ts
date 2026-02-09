@@ -11,16 +11,32 @@ export interface WisdomProtocol {
   source: string;
   rule: string;
   citation: string;
-  category: 'root' | 'regeneration' | 'biology' | 'mineral' | 'frequency' | 'cosmic';
+  category: 'root' | 'regeneration' | 'biology' | 'mineral' | 'frequency' | 'cosmic' | 'ancestral';
 }
 
 export interface AmendmentRecommendation {
   id: string;
   name: string;
-  type: 'biological' | 'mineral' | 'cover-crop' | 'biodynamic';
+  type: 'biological' | 'mineral' | 'cover-crop' | 'biodynamic' | 'polyculture';
   description: string;
   zone?: number; // Solfeggio zone (396, 417, 528, etc.)
   moonPhase?: 'ascending' | 'descending' | 'full' | 'new';
+}
+
+/**
+ * SEED LINEAGE INTERFACE
+ * 
+ * The Dogon Star Link: "The seed holds the pattern of the universe."
+ * Track the sacred lineage of every seed.
+ */
+export interface SeedLineage {
+  id: string;
+  cropName: string;
+  variety: string;
+  sourceLineage: string; // Where did this seed come from?
+  generationsGrown: number;
+  isSaved: boolean; // Has this seed been saved (not purchased)?
+  notes?: string;
 }
 
 /**
@@ -119,6 +135,48 @@ export const wisdomProtocols: WisdomProtocol[] = [
     rule: 'As above, so below; as below, so above.',
     citation: 'The stars guide the roots. The roots mirror the stars.',
     category: 'cosmic',
+  },
+  
+  // BATCH 3: The Ancestral & Indigenous
+  {
+    id: 'three-sisters',
+    name: 'The Three Sisters Protocol',
+    source: 'Turtle Island (Haudenosaunee)',
+    rule: 'Corn is the Ladder, Bean is the Giver, Squash is the Shelter.',
+    citation: 'Plant in community. Monoculture is isolation.',
+    category: 'ancestral',
+  },
+  {
+    id: 'polyculture-priority',
+    name: 'The Polyculture Imperative',
+    source: 'Indigenous Agriculture',
+    rule: 'In Zone 3 (528Hz), always suggest Polyculture over Monoculture.',
+    citation: 'Diversity is resilience. Monoculture is vulnerability.',
+    category: 'ancestral',
+  },
+  {
+    id: 'dogon-seed-lineage',
+    name: 'The Dogon Star Link',
+    source: 'Dogon Cosmology (Sirius)',
+    rule: 'The seed holds the pattern of the universe.',
+    citation: 'Save the seed, save the stars.',
+    category: 'ancestral',
+  },
+  {
+    id: 'kemetic-nile',
+    name: 'The Kemetic Flood Principle',
+    source: 'Egyptian/Kemetic Agriculture',
+    rule: 'The river brings the gift. Receive it with gratitude.',
+    citation: 'What the water gives, the soil remembers.',
+    category: 'ancestral',
+  },
+  {
+    id: 'muscogee-mounds',
+    name: 'The Muscogee Mound Builder',
+    source: 'Muscogee/Creek Wisdom',
+    rule: 'Build up, not down. The mound catches the blessing.',
+    citation: 'Raise the bed. Honor the ancestors below.',
+    category: 'ancestral',
   },
 ];
 
@@ -264,9 +322,52 @@ export const coverCropsByZone: AmendmentRecommendation[] = [
 ];
 
 /**
+ * THE THREE SISTERS (Polyculture)
+ * 
+ * The Haudenosaunee Protocol: Corn, Bean, and Squash planted together.
+ * Zone 3 (528Hz) - ALWAYS recommend polyculture over monoculture.
+ */
+export const threeSisters = {
+  corn: {
+    role: 'The Ladder',
+    description: 'Provides structure for beans to climb.',
+    zone: 528,
+    emoji: '🌽',
+  },
+  bean: {
+    role: 'The Giver',
+    description: 'Fixes nitrogen for all three sisters.',
+    zone: 528,
+    emoji: '🫘',
+  },
+  squash: {
+    role: 'The Shelter',
+    description: 'Shades soil, retains moisture, deters pests.',
+    zone: 528,
+    emoji: '🎃',
+  },
+};
+
+/**
+ * SACRED SEED ZONES
+ * 
+ * Zone 7 (963Hz) is the Source Code - where seeds are saved.
+ * Seed saving is a sacred act, not just a task.
+ */
+export const sacredSeedZone = {
+  hz: 963,
+  name: 'Source Code',
+  protocol: 'dogon-seed-lineage',
+  isSacred: true,
+  citation: 'Save the seed, save the stars.',
+};
+
+/**
  * Get wisdom citation for a specific action type
  */
-export const getWisdomCitation = (actionType: 'root' | 'check' | 'plant' | 'reset' | 'cosmic' | 'frequency'): string => {
+export const getWisdomCitation = (
+  actionType: 'root' | 'check' | 'plant' | 'reset' | 'cosmic' | 'frequency' | 'polyculture' | 'seed'
+): string => {
   switch (actionType) {
     case 'root':
     case 'reset':
@@ -279,6 +380,10 @@ export const getWisdomCitation = (actionType: 'root' | 'check' | 'plant' | 'rese
       return wisdomProtocols.find(p => p.id === 'steiner-organism')?.citation || '';
     case 'frequency':
       return wisdomProtocols.find(p => p.id === 'hermetic-vibration')?.citation || '';
+    case 'polyculture':
+      return wisdomProtocols.find(p => p.id === 'three-sisters')?.citation || '';
+    case 'seed':
+      return wisdomProtocols.find(p => p.id === 'dogon-seed-lineage')?.citation || '';
     default:
       return '';
   }
@@ -289,6 +394,32 @@ export const getWisdomCitation = (actionType: 'root' | 'check' | 'plant' | 'rese
  */
 export const getZoneInfo = (hz: number) => {
   return solfeggioOctave.find(z => z.hz === hz) || solfeggioOctave[0];
+};
+
+/**
+ * Check if a zone should recommend polyculture (Three Sisters)
+ */
+export const shouldRecommendPolyculture = (hz: number): boolean => {
+  // Zone 3 (528Hz) - Always recommend polyculture
+  return hz === 528;
+};
+
+/**
+ * Get Three Sisters recommendation for Zone 3
+ */
+export const getThreeSistersRecommendation = () => {
+  return {
+    protocol: threeSisters,
+    citation: wisdomProtocols.find(p => p.id === 'three-sisters')?.citation || '',
+    source: 'Turtle Island (Haudenosaunee)',
+  };
+};
+
+/**
+ * Check if this is a seed-saving zone (sacred)
+ */
+export const isSeedSavingZone = (hz: number): boolean => {
+  return hz === 963;
 };
 
 /**
