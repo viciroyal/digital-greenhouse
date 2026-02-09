@@ -1,192 +1,148 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Radio, Filter, Leaf } from 'lucide-react';
+import { Radio, Leaf } from 'lucide-react';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { LearnMoreButton } from '@/components/almanac';
-import { Badge } from '@/components/ui/badge';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * THE RESONANCE ENGINE (ZONE FILTER)
+ * THE ADAPTIVE FILTER (Silent Engine Protocol)
  * ═══════════════════════════════════════════════════════════════════════════
  * 
- * GOAL: Context-aware focus. Filter the visible world by frequency.
+ * MECHANISM: Context-aware toggle. Zone focus.
  * 
- * LOGIC:
- * 1. INPUT: User selects a Frequency (e.g., 396Hz)
- * 2. REACTION: Interface filters to show ONLY that zone
- *    - HIDE: All crops/tasks NOT tagged with selected Hz
- *    - SHOW: Only matching crops, tasks, and logic
- * 3. VISUAL CUE: Interface accent color changes to match zone
+ * INPUT: User selects a Frequency (e.g., 396Hz)
+ * 
+ * THE REACTION:
+ *   - HIDE: All non-essential data
+ *   - SHOW: Only relevant crops, tasks, and logic
+ *   - VISUAL CUE: Shift interface accent color to match zone
  */
 
-// Solfeggio frequency zones with colors
-interface FrequencyZone {
+// Frequency zones with accent colors
+interface Zone {
   hz: number;
   name: string;
   color: string;
-  element: string;
-  priority: 'DAILY' | 'WEEKLY' | 'SEASONAL' | 'WILD';
+  focus: string;
   wisdomKey: string;
 }
 
-const FREQUENCY_ZONES: FrequencyZone[] = [
-  { hz: 396, name: 'THE ROOT', color: 'hsl(0 60% 50%)', element: 'Earth', priority: 'DAILY', wisdomKey: 'hermetic-vibration' },
-  { hz: 417, name: 'THE SACRAL', color: 'hsl(30 70% 50%)', element: 'Water', priority: 'DAILY', wisdomKey: 'hermetic-vibration' },
-  { hz: 528, name: 'THE HEART', color: 'hsl(120 50% 45%)', element: 'Fire', priority: 'WEEKLY', wisdomKey: 'three-sisters' },
-  { hz: 639, name: 'THE THROAT', color: 'hsl(51 80% 50%)', element: 'Air', priority: 'WEEKLY', wisdomKey: 'hermetic-vibration' },
-  { hz: 741, name: 'THE VISION', color: 'hsl(180 50% 45%)', element: 'Ether', priority: 'SEASONAL', wisdomKey: 'hermetic-vibration' },
-  { hz: 852, name: 'THE CROWN', color: 'hsl(270 50% 50%)', element: 'Spirit', priority: 'SEASONAL', wisdomKey: 'hermetic-vibration' },
-  { hz: 963, name: 'THE SOURCE', color: 'hsl(300 50% 50%)', element: 'Void', priority: 'WILD', wisdomKey: 'dogon-seed-lineage' },
+const ZONES: Zone[] = [
+  { hz: 396, name: 'ROOT', color: 'hsl(0 60% 50%)', focus: 'Tomato Guild • Phosphorus • Root Logic', wisdomKey: 'hermetic-vibration' },
+  { hz: 417, name: 'SACRAL', color: 'hsl(30 70% 50%)', focus: 'Squash Family • Potassium • Flow', wisdomKey: 'hermetic-vibration' },
+  { hz: 528, name: 'HEART', color: 'hsl(120 50% 45%)', focus: 'Three Sisters • Nitrogen • Love', wisdomKey: 'three-sisters' },
+  { hz: 639, name: 'THROAT', color: 'hsl(51 80% 50%)', focus: 'Sweet Crops • Communication', wisdomKey: 'hermetic-vibration' },
+  { hz: 741, name: 'VISION', color: 'hsl(180 50% 45%)', focus: 'Herbs & Medicine • Clarity', wisdomKey: 'hermetic-vibration' },
+  { hz: 852, name: 'CROWN', color: 'hsl(270 50% 50%)', focus: 'Fruiting Trees • Intuition', wisdomKey: 'hermetic-vibration' },
+  { hz: 963, name: 'SOURCE', color: 'hsl(300 50% 50%)', focus: 'Seed Sanctuary • Unity', wisdomKey: 'dogon-seed-lineage' },
 ];
 
 const ResonanceEngine = () => {
-  // INPUT STATE: Selected frequency
+  // INPUT: Selected frequency
   const [selectedHz, setSelectedHz] = useState<number | null>(null);
   
-  // Fetch crops from database
+  // Fetch crops
   const { data: allCrops, isLoading } = useMasterCrops();
   
-  // Get selected zone data
+  // Selected zone
   const selectedZone = useMemo(() => 
-    FREQUENCY_ZONES.find(z => z.hz === selectedHz) || null
+    ZONES.find(z => z.hz === selectedHz) || null
   , [selectedHz]);
   
-  // FILTER LOGIC: Show only crops matching selected Hz
+  // FILTER: Show only matching crops
   const filteredCrops = useMemo(() => {
     if (!selectedHz || !allCrops) return [];
-    return allCrops.filter(crop => crop.frequency_hz === selectedHz);
+    return allCrops.filter(c => c.frequency_hz === selectedHz);
   }, [selectedHz, allCrops]);
   
-  // Group all crops by frequency for "ALL" view
-  const cropsByZone = useMemo(() => {
+  // Crop counts per zone
+  const zoneCounts = useMemo(() => {
     if (!allCrops) return {};
-    return allCrops.reduce((acc, crop) => {
-      if (!acc[crop.frequency_hz]) acc[crop.frequency_hz] = [];
-      acc[crop.frequency_hz].push(crop);
+    return allCrops.reduce((acc, c) => {
+      acc[c.frequency_hz] = (acc[c.frequency_hz] || 0) + 1;
       return acc;
-    }, {} as Record<number, MasterCrop[]>);
+    }, {} as Record<number, number>);
   }, [allCrops]);
 
-  // Dynamic accent color based on selection
-  const accentColor = selectedZone?.color || 'hsl(195 50% 50%)';
+  // VISUAL CUE: Dynamic accent
+  const accent = selectedZone?.color || 'hsl(195 50% 50%)';
 
   return (
     <div
-      className="rounded-xl overflow-hidden transition-all duration-500"
+      className="rounded-xl overflow-hidden transition-all duration-300"
       style={{
-        background: selectedHz 
-          ? `linear-gradient(180deg, ${accentColor}15, hsl(0 0% 8%))`
-          : 'hsl(0 0% 10%)',
-        border: `2px solid ${selectedHz ? accentColor : 'hsl(0 0% 20%)'}`,
+        background: selectedHz ? `linear-gradient(180deg, ${accent}12, hsl(0 0% 8%))` : 'hsl(0 0% 10%)',
+        border: `2px solid ${selectedHz ? accent : 'hsl(0 0% 20%)'}`,
       }}
     >
       {/* Header */}
       <div
         className="p-4"
         style={{
-          background: selectedHz 
-            ? `linear-gradient(135deg, ${accentColor}25, ${accentColor}10)`
-            : 'linear-gradient(135deg, hsl(0 0% 15%), hsl(0 0% 10%))',
-          borderBottom: `1px solid ${selectedHz ? accentColor : 'hsl(0 0% 20%)'}50`,
+          background: selectedHz ? `${accent}15` : 'hsl(0 0% 12%)',
+          borderBottom: `1px solid ${selectedHz ? accent : 'hsl(0 0% 20%)'}40`,
         }}
       >
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Radio 
-              className="w-5 h-5" 
-              style={{ color: accentColor }}
-            />
+            <Radio className="w-5 h-5" style={{ color: accent }} />
             <h3
               className="text-lg tracking-wider"
-              style={{
-                fontFamily: "'Staatliches', sans-serif",
-                color: accentColor,
-              }}
+              style={{ fontFamily: "'Staatliches', sans-serif", color: accent }}
             >
-              RESONANCE ENGINE
+              ZONE FILTER
             </h3>
           </div>
           {selectedHz && (
             <button
               onClick={() => setSelectedHz(null)}
-              className="text-xs font-mono px-2 py-1 rounded"
-              style={{
-                background: 'hsl(0 0% 15%)',
-                border: '1px solid hsl(0 0% 30%)',
-                color: 'hsl(0 0% 60%)',
-              }}
+              className="text-[10px] font-mono px-2 py-1 rounded"
+              style={{ background: 'hsl(0 0% 15%)', color: 'hsl(0 0% 55%)', border: '1px solid hsl(0 0% 25%)' }}
             >
-              CLEAR FILTER
+              CLEAR
             </button>
           )}
         </div>
-        <p
-          className="text-xs font-mono"
-          style={{ color: 'hsl(0 0% 50%)' }}
-        >
-          INPUT: Select Frequency → OUTPUT: Filtered View
-        </p>
       </div>
 
-      {/* INPUT PANEL: Frequency Selector */}
+      {/* INPUT: Frequency Toggle */}
       <div className="p-4">
         <div className="flex items-center gap-2 mb-3">
-          <Filter className="w-4 h-4" style={{ color: accentColor }} />
-          <span
-            className="text-sm font-mono tracking-widest font-bold"
-            style={{ color: accentColor }}
-          >
+          <span className="text-xs font-mono tracking-widest" style={{ color: accent }}>
             INPUT: SELECT FREQUENCY
           </span>
         </div>
         
-        <div className="grid grid-cols-4 gap-2 md:grid-cols-7">
-          {FREQUENCY_ZONES.map((zone) => {
+        <div className="grid grid-cols-7 gap-1.5">
+          {ZONES.map((zone) => {
             const isSelected = selectedHz === zone.hz;
-            const cropCount = cropsByZone[zone.hz]?.length || 0;
+            const count = zoneCounts[zone.hz] || 0;
             
             return (
               <motion.button
                 key={zone.hz}
-                className="relative flex flex-col items-center gap-1 p-2 rounded-lg transition-all"
+                className="relative flex flex-col items-center py-2 rounded-lg"
                 style={{
-                  background: isSelected 
-                    ? `linear-gradient(180deg, ${zone.color}40, ${zone.color}20)`
-                    : 'hsl(0 0% 12%)',
+                  background: isSelected ? `${zone.color}30` : 'hsl(0 0% 12%)',
                   border: `2px solid ${isSelected ? zone.color : 'hsl(0 0% 20%)'}`,
-                  boxShadow: isSelected ? `0 0 20px ${zone.color}40` : 'none',
+                  boxShadow: isSelected ? `0 0 15px ${zone.color}40` : 'none',
                 }}
                 onClick={() => setSelectedHz(isSelected ? null : zone.hz)}
-                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                {/* Hz Value */}
                 <span
-                  className="text-sm font-mono font-bold"
-                  style={{ color: isSelected ? zone.color : 'hsl(0 0% 55%)' }}
+                  className="text-xs font-mono font-bold"
+                  style={{ color: isSelected ? zone.color : 'hsl(0 0% 50%)' }}
                 >
                   {zone.hz}
                 </span>
-                
-                {/* Zone Name (truncated) */}
-                <span
-                  className="text-[8px] font-mono tracking-wider truncate w-full text-center"
-                  style={{ color: isSelected ? zone.color : 'hsl(0 0% 40%)' }}
-                >
-                  {zone.name.replace('THE ', '')}
-                </span>
-                
-                {/* Crop count badge */}
-                {cropCount > 0 && (
+                {count > 0 && (
                   <span
-                    className="absolute -top-1 -right-1 text-[9px] font-mono px-1.5 rounded-full"
-                    style={{
-                      background: zone.color,
-                      color: 'white',
-                    }}
+                    className="absolute -top-1 -right-1 text-[8px] font-mono w-4 h-4 rounded-full flex items-center justify-center"
+                    style={{ background: zone.color, color: 'white' }}
                   >
-                    {cropCount}
+                    {count}
                   </span>
                 )}
               </motion.button>
@@ -195,7 +151,7 @@ const ResonanceEngine = () => {
         </div>
       </div>
 
-      {/* OUTPUT PANEL: Filtered Crops */}
+      {/* OUTPUT: Filtered View */}
       <AnimatePresence mode="wait">
         {selectedHz && selectedZone && (
           <motion.div
@@ -205,132 +161,66 @@ const ResonanceEngine = () => {
             exit={{ opacity: 0, height: 0 }}
             className="px-4 pb-4"
           >
-            {/* Zone Info Banner */}
+            {/* Zone Focus Banner */}
             <div
-              className="p-3 rounded-lg mb-4 flex items-center justify-between"
-              style={{
-                background: `${accentColor}15`,
-                border: `1px solid ${accentColor}50`,
-              }}
+              className="p-3 rounded-lg mb-3 flex items-center gap-3"
+              style={{ background: `${accent}15`, border: `1px solid ${accent}40` }}
             >
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center"
-                  style={{
-                    background: `radial-gradient(circle, ${accentColor} 0%, ${accentColor}50 100%)`,
-                    boxShadow: `0 0 20px ${accentColor}60`,
-                  }}
-                >
-                  <span className="text-white font-bold text-sm">{selectedZone.hz}</span>
-                </div>
-                <div>
-                  <span
-                    className="text-sm font-mono font-bold block"
-                    style={{ color: accentColor }}
-                  >
-                    {selectedZone.name}
-                  </span>
-                  <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
-                    Element: {selectedZone.element}
-                  </span>
-                </div>
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{
+                  background: `radial-gradient(circle, ${accent} 0%, ${accent}60 100%)`,
+                  boxShadow: `0 0 15px ${accent}50`,
+                }}
+              >
+                <span className="text-white font-bold text-[10px]">{selectedZone.hz}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge
-                  className="text-[10px] font-mono"
-                  style={{
-                    background: selectedZone.priority === 'DAILY' 
-                      ? 'hsl(0 50% 25%)'
-                      : selectedZone.priority === 'WEEKLY'
-                      ? 'hsl(45 50% 25%)'
-                      : selectedZone.priority === 'WILD'
-                      ? 'hsl(270 40% 25%)'
-                      : 'hsl(180 40% 25%)',
-                    color: selectedZone.priority === 'DAILY' 
-                      ? 'hsl(0 60% 65%)'
-                      : selectedZone.priority === 'WEEKLY'
-                      ? 'hsl(45 70% 65%)'
-                      : selectedZone.priority === 'WILD'
-                      ? 'hsl(270 50% 70%)'
-                      : 'hsl(180 50% 65%)',
-                    border: 'none',
-                  }}
-                >
-                  {selectedZone.priority}
-                </Badge>
-                <LearnMoreButton wisdomKey={selectedZone.wisdomKey} size="sm" />
+              <div className="flex-1">
+                <span className="text-sm font-mono font-bold block" style={{ color: accent }}>
+                  {selectedZone.name}
+                </span>
+                <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 55%)' }}>
+                  {selectedZone.focus}
+                </span>
               </div>
+              <LearnMoreButton wisdomKey={selectedZone.wisdomKey} size="sm" />
             </div>
             
-            {/* Filtered Crops List */}
-            <div className="flex items-center gap-2 mb-3">
-              <Leaf className="w-4 h-4" style={{ color: accentColor }} />
-              <span
-                className="text-sm font-mono tracking-widest font-bold"
-                style={{ color: accentColor }}
-              >
-                OUTPUT: {filteredCrops.length} CROPS IN ZONE
+            {/* Filtered Crops */}
+            <div className="flex items-center gap-2 mb-2">
+              <Leaf className="w-4 h-4" style={{ color: accent }} />
+              <span className="text-xs font-mono" style={{ color: accent }}>
+                {filteredCrops.length} CROPS
               </span>
             </div>
             
             {isLoading ? (
               <div className="text-center py-4">
-                <span className="text-sm font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
-                  Loading crops...
-                </span>
+                <span className="text-sm font-mono" style={{ color: 'hsl(0 0% 50%)' }}>Loading...</span>
               </div>
             ) : filteredCrops.length > 0 ? (
-              <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+              <div className="grid grid-cols-2 gap-1.5">
                 {filteredCrops.map((crop) => (
                   <motion.div
                     key={crop.id}
-                    className="p-3 rounded-lg"
-                    style={{
-                      background: 'hsl(0 0% 10%)',
-                      border: `1px solid ${accentColor}40`,
-                    }}
-                    initial={{ opacity: 0, scale: 0.9 }}
+                    className="p-2 rounded-lg"
+                    style={{ background: 'hsl(0 0% 10%)', border: `1px solid ${accent}30` }}
+                    initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.2 }}
                   >
-                    <span
-                      className="text-sm font-mono block truncate"
-                      style={{ color: 'hsl(40 50% 70%)' }}
-                    >
+                    <span className="text-sm font-mono truncate block" style={{ color: 'hsl(40 50% 70%)' }}>
                       {crop.common_name || crop.name}
                     </span>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span
-                        className="text-[10px] font-mono px-1.5 py-0.5 rounded"
-                        style={{
-                          background: `${accentColor}20`,
-                          color: accentColor,
-                        }}
-                      >
-                        {crop.category}
-                      </span>
-                      {crop.brix_target_min && (
-                        <span
-                          className="text-[9px] font-mono"
-                          style={{ color: 'hsl(0 0% 45%)' }}
-                        >
-                          Brix: {crop.brix_target_min}-{crop.brix_target_max}
-                        </span>
-                      )}
-                    </div>
+                    <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>
+                      {crop.category}
+                    </span>
                   </motion.div>
                 ))}
               </div>
             ) : (
-              <div
-                className="text-center py-6 rounded-lg"
-                style={{
-                  background: 'hsl(0 0% 10%)',
-                  border: '1px dashed hsl(0 0% 25%)',
-                }}
-              >
+              <div className="text-center py-4 rounded-lg" style={{ background: 'hsl(0 0% 10%)', border: '1px dashed hsl(0 0% 25%)' }}>
                 <span className="text-sm font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
-                  No crops in database for this frequency yet.
+                  No crops in this zone yet
                 </span>
               </div>
             )}
@@ -338,22 +228,11 @@ const ResonanceEngine = () => {
         )}
       </AnimatePresence>
       
-      {/* Default state: Show all zones summary */}
+      {/* Default hint */}
       {!selectedHz && (
         <div className="px-4 pb-4">
-          <div className="flex items-center gap-2 mb-3">
-            <span
-              className="text-sm font-mono tracking-widest"
-              style={{ color: 'hsl(0 0% 50%)' }}
-            >
-              SELECT A ZONE TO FILTER
-            </span>
-          </div>
-          <p
-            className="text-xs font-mono"
-            style={{ color: 'hsl(0 0% 40%)' }}
-          >
-            The Hermetic Law: "Everything vibrates." Choose a frequency to focus your attention.
+          <p className="text-[10px] font-mono text-center" style={{ color: 'hsl(0 0% 40%)' }}>
+            Select a frequency to focus your view
           </p>
         </div>
       )}
