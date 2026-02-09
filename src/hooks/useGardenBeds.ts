@@ -102,6 +102,37 @@ export const useBedPlantings = (bedId: string | null) => {
   });
 };
 
+// Fetch ALL plantings for chord status display on grid
+export const useAllBedPlantings = () => {
+  return useQuery({
+    queryKey: ['all-bed-plantings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('bed_plantings')
+        .select(`
+          *,
+          crop:master_crops(
+            id, name, common_name, frequency_hz, guild_role, chord_interval,
+            spacing_inches, brix_target_min, brix_target_max
+          )
+        `);
+      
+      if (error) throw error;
+      
+      // Group by bed_id for easy lookup
+      const plantingsMap: Record<string, BedPlanting[]> = {};
+      (data as BedPlanting[]).forEach(planting => {
+        if (!plantingsMap[planting.bed_id]) {
+          plantingsMap[planting.bed_id] = [];
+        }
+        plantingsMap[planting.bed_id].push(planting);
+      });
+      
+      return plantingsMap;
+    },
+  });
+}
+
 // Fetch Seven Pillars status
 export const useSevenPillars = () => {
   return useQuery({
