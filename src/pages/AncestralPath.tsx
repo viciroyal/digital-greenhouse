@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogIn, LogOut, User, Shield, Sparkles, Compass, BookOpen } from 'lucide-react';
+import { ArrowLeft, LogIn, LogOut, User, Shield, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   ModuleNode,
@@ -18,20 +18,19 @@ import {
   SovereignIcon,
   GoldenTicketCelebration,
   EmergencySOSButton,
-  ViewModeToggle,
-  GrimoireView,
-  StewardsLog,
   JuniorGuardians,
   StewardsUtilityBelt,
   AgroSonicRadio,
   BannekerAlmanac,
+  UnifiedViewToggle,
+  FieldAlmanacEmbed,
+  PathContentView,
 } from '@/components/ancestral';
-import { ViewMode } from '@/components/ancestral/ViewModeToggle';
+import { UnifiedViewMode } from '@/components/ancestral/UnifiedViewToggle';
 import { OgunIcon, BabaluAyeIcon, ShangoIcon, OshunIcon, OrishaBadge } from '@/components/ancestral/OrishaIcons';
 import { useAncestralProgress, Module } from '@/hooks/useAncestralProgress';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { Button } from '@/components/ui/button';
-import { VibrationalLegend, SevenPillars, SovereigntyFooter } from '@/components/almanac';
 
 // Icon mapping for module icons
 const iconMap: Record<string, React.ComponentType<{ color?: string; className?: string; animated?: boolean }>> = {
@@ -121,10 +120,11 @@ const fallbackModules = [
 ];
 
 /**
- * THE ANCESTRAL PATH - The Learning Hub
+ * THE ANCESTRAL PATH - Unified Learning Hub
  * 
- * A vertical skill tree mimicking plant growth.
- * User starts at the bottom (roots) and ascends to mastery.
+ * Two Primary Pillars:
+ * - THE PATH: The "Why" / Theory / Vision / Spirit (with sub-tabs: Almanac, Spirit, Log)
+ * - THE ALMANAC: The "How" / Tools / Actions / Utility (Field Mode)
  */
 const AncestralPath = () => {
   const navigate = useNavigate();
@@ -143,9 +143,8 @@ const AncestralPath = () => {
   // Track currently open level for Sky Watcher Header
   const [currentOpenLevel, setCurrentOpenLevel] = useState<number | null>(null);
 
-  // View Mode: 'path' (gamified) or 'book' (textbook/grimoire)
-  // Default to 'book' mode - Library First Architecture
-  const [viewMode, setViewMode] = useState<ViewMode>('book');
+  // Unified View Mode: 'path' (Theory/Spirit) or 'almanac' (Field/Action)
+  const [unifiedView, setUnifiedView] = useState<UnifiedViewMode>('path');
 
   // Kids Mode (Junior Guardians)
   const [isKidsMode, setIsKidsMode] = useState(false);
@@ -251,14 +250,6 @@ const AncestralPath = () => {
     setBlessingData(null);
   }, []);
 
-  // Scroll to bottom on mount (start at roots)
-  useEffect(() => {
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth',
-    });
-  }, []);
-
   // Transform database modules to display format
   const displayModules = modules.length > 0
     ? [...modules].reverse().map((m: Module) => ({
@@ -297,25 +288,6 @@ const AncestralPath = () => {
   // Check if Level 4 is complete to show Level 5
   const isLevel4Complete = displayModules.find(m => m.level === 4)?.isCompleted || false;
 
-  // Build the final display modules list (add Level 5 if Level 4 is complete)
-  const level5Data = {
-    id: 'level-5-sovereign',
-    level: 5,
-    title: 'LEVEL 5: THE MAROON BRAID',
-    mission: 'The Songline does not end; it loops. The Grandmothers braided the seed. You are now the Ancestor.',
-    lineage: 'Sovereignty — The Seed Keepers',
-    color: 'hsl(0 0% 85%)', // Iridescent Pearl
-    iconName: 'sovereign',
-    isUnlocked: isLevel4Complete,
-    isCompleted: false,
-    completionPercent: 0,
-  };
-
-  // Insert Level 5 at the top of the totem if Level 4 is complete
-  const finalDisplayModules = isLevel4Complete 
-    ? [level5Data, ...displayModules]
-    : displayModules;
-
   // Detect Level 4 completion and trigger Golden Ticket celebration
   useEffect(() => {
     if (isLevel4Complete && !hasShownGoldenTicketRef.current && user) {
@@ -331,7 +303,7 @@ const AncestralPath = () => {
   // Handle opening Almanac from Kids Mode
   const handleOpenAlmanacFromKidsMode = (zoneNumber: number) => {
     setIsKidsMode(false);
-    setViewMode('book');
+    setUnifiedView('path');
     // Find the module for this zone and open the drawer
     const targetModule = displayModules.find(m => m.level === zoneNumber);
     if (targetModule) {
@@ -352,7 +324,8 @@ const AncestralPath = () => {
   return (
     <main 
       ref={containerRef}
-      className="min-h-[300vh] relative overflow-x-hidden"
+      className="min-h-screen relative overflow-x-hidden"
+      style={{ cursor: 'default' }}
     >
       {/* Sky Watcher Header - Lunar Rhythm Display */}
       <SkyWatcherHeader currentOpenLevel={currentOpenLevel} />
@@ -397,23 +370,6 @@ const AncestralPath = () => {
         ))}
       </div>
 
-      {/* Soil texture at bottom */}
-      <div 
-        className="fixed bottom-0 left-0 right-0 h-1/4 pointer-events-none"
-        style={{
-          background: `linear-gradient(0deg,
-            hsl(20 50% 8%) 0%,
-            transparent 100%
-          )`,
-        }}
-      />
-      <div 
-        className="fixed bottom-0 left-0 right-0 h-40 pointer-events-none opacity-20"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }}
-      />
-
       {/* Darkroom overlay */}
       <div className="fixed inset-0 bg-black/30 pointer-events-none" />
 
@@ -430,6 +386,7 @@ const AncestralPath = () => {
             background: 'hsl(20 30% 12% / 0.9)',
             border: '1px solid hsl(40 40% 30%)',
             backdropFilter: 'blur(10px)',
+            cursor: 'pointer',
           }}
           whileHover={{ scale: 1.05, x: -5 }}
           whileTap={{ scale: 0.98 }}
@@ -467,6 +424,7 @@ const AncestralPath = () => {
               background: 'hsl(20 30% 12% / 0.9)',
               border: '1px solid hsl(40 40% 30%)',
               color: 'hsl(40 50% 70%)',
+              cursor: 'pointer',
             }}
             onClick={() => navigate('/auth')}
           >
@@ -497,6 +455,7 @@ const AncestralPath = () => {
                 border: '1px solid hsl(51 100% 50%)',
                 color: 'hsl(51 100% 60%)',
                 boxShadow: '0 0 15px hsl(51 80% 40% / 0.3)',
+                cursor: 'pointer',
               }}
               onClick={() => navigate('/hogon-review')}
             >
@@ -515,6 +474,7 @@ const AncestralPath = () => {
               border: '1px solid hsl(280 60% 50%)',
               color: 'hsl(280 60% 70%)',
               boxShadow: '0 0 15px hsl(280 60% 40% / 0.3)',
+              cursor: 'pointer',
             }}
             onClick={() => navigate('/pharmer-profile')}
           >
@@ -541,6 +501,7 @@ const AncestralPath = () => {
               background: 'hsl(20 30% 12% / 0.9)',
               border: '1px solid hsl(0 40% 30%)',
               color: 'hsl(0 50% 60%)',
+              cursor: 'pointer',
             }}
             onClick={async () => {
               await supabase.auth.signOut();
@@ -556,7 +517,7 @@ const AncestralPath = () => {
       {/* Sap Rise Progress Bar */}
       <SapRiseProgress overallProgress={getOverallProgress()} />
 
-      {/* Main Content - The Totem */}
+      {/* Main Content */}
       <div className="relative z-10 pt-36 pb-32">
         
         {/* Header */}
@@ -570,73 +531,35 @@ const AncestralPath = () => {
             className="text-3xl md:text-5xl lg:text-6xl mb-4 tracking-[0.1em]"
             style={{
               fontFamily: "'Staatliches', sans-serif",
-              color: viewMode === 'book' 
-                ? 'hsl(40 70% 65%)' 
-                : viewMode === 'log'
-                ? 'hsl(140 50% 60%)'
-                : viewMode === 'spirit'
-                ? 'hsl(270 60% 70%)'
-                : 'hsl(51 100% 50%)',
-              textShadow: viewMode === 'book'
-                ? '0 0 40px hsl(40 60% 40% / 0.4)'
-                : viewMode === 'log'
-                ? '0 0 40px hsl(140 60% 35% / 0.4)'
-                : viewMode === 'spirit'
+              color: unifiedView === 'path' 
+                ? 'hsl(270 60% 70%)' 
+                : 'hsl(45 100% 60%)',
+              textShadow: unifiedView === 'path'
                 ? '0 0 40px hsl(270 50% 40% / 0.5)'
-                : `2px 2px 0 hsl(20 50% 10%), 0 0 40px hsl(51 80% 40% / 0.4)`,
+                : '0 0 40px hsl(45 80% 40% / 0.4)',
             }}
           >
-            {viewMode === 'book' 
-              ? 'THE LIVING ALMANAC' 
-              : viewMode === 'log'
-              ? "THE STEWARD'S LOG"
-              : viewMode === 'spirit'
-              ? 'THE SPIRIT'
-              : 'THE ANCESTRAL PATH'}
+            {unifiedView === 'path' 
+              ? 'THE ANCESTRAL PATH' 
+              : 'THE FIELD ALMANAC'}
           </h1>
           <p 
             className="text-lg md:text-xl font-mono mb-6"
             style={{ color: 'hsl(40 50% 65%)' }}
           >
-            {viewMode === 'book' 
-              ? 'Listen when the soil whispers. Act when the stars signal.'
-              : viewMode === 'log'
-              ? 'Record. Reflect. Remember.'
-              : viewMode === 'spirit'
-              ? 'The Vibrational Legend & The Seven Pillars'
-              : 'Ascend from Root to Crown'}
+            {unifiedView === 'path' 
+              ? 'The "Why" — Theory • Vision • Spirit'
+              : 'The "How" — Tools • Actions • Utility'}
           </p>
           
-          {/* View Mode Toggle */}
-          <div className="flex justify-center mb-4">
-            <ViewModeToggle value={viewMode} onChange={setViewMode} showPath={true} showSpirit={true} />
+          {/* Unified View Toggle - Two Pillars */}
+          <div className="flex justify-center mb-6">
+            <UnifiedViewToggle value={unifiedView} onChange={setUnifiedView} />
           </div>
-          
-          {/* Field Almanac Quick Access */}
-          <motion.div
-            className="flex justify-center mb-4"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <Button
-              className="rounded-full px-5 py-2 font-mono text-sm gap-2"
-              style={{
-                background: 'linear-gradient(135deg, hsl(35 80% 45%), hsl(25 70% 35%))',
-                border: '2px solid hsl(45 80% 55%)',
-                color: 'hsl(45 100% 95%)',
-                boxShadow: '0 4px 20px hsl(35 80% 40% / 0.3)',
-              }}
-              onClick={() => navigate('/field-almanac')}
-            >
-              <Compass className="w-4 h-4" />
-              ENTER FIELD ALMANAC
-            </Button>
-          </motion.div>
 
           {/* Junior Guardians (Kids Mode) Button */}
           <motion.div
-            className="flex justify-center mb-4"
+            className="flex justify-center"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.6 }}
@@ -649,6 +572,7 @@ const AncestralPath = () => {
                 color: 'white',
                 border: '3px solid white',
                 boxShadow: '0 4px 20px hsl(120 60% 50% / 0.4)',
+                cursor: 'pointer',
               }}
               onClick={() => setIsKidsMode(true)}
             >
@@ -658,9 +582,9 @@ const AncestralPath = () => {
             </Button>
           </motion.div>
 
-          {user && viewMode === 'path' && (
+          {user && unifiedView === 'path' && (
             <motion.p
-              className="mt-2 text-sm font-mono"
+              className="mt-4 text-sm font-mono"
               style={{ color: 'hsl(140 50% 50%)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -671,235 +595,32 @@ const AncestralPath = () => {
           )}
         </motion.div>
 
-        {/* Conditional Content: Spirit, Almanac, Log, or Path View */}
+        {/* Conditional Content: Path (Theory) or Almanac (Action) */}
         <AnimatePresence mode="wait">
-          {viewMode === 'spirit' ? (
+          {unifiedView === 'path' ? (
             <motion.div
-              key="spirit"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              key="path-content"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3 }}
             >
-              {/* The Spirit Layer: Deep Knowledge Repository */}
-              <div className="space-y-12 pb-8">
-                <VibrationalLegend />
-                <SevenPillars />
-                <SovereigntyFooter />
-              </div>
-            </motion.div>
-          ) : viewMode === 'book' ? (
-            <motion.div
-              key="grimoire"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <GrimoireView
-                onEnterFieldLab={(moduleLevel) => {
-                  // Find the module for this level and open the drawer
-                  const targetModule = displayModules.find(m => m.level === moduleLevel);
-                  if (targetModule) {
-                    handleModuleSelect(targetModule);
-                  }
-                }}
+              <PathContentView
+                userId={user?.id}
+                displayModules={displayModules}
+                onModuleSelect={handleModuleSelect}
+                onEnterKidsMode={() => setIsKidsMode(true)}
               />
-              <SovereigntyFooter />
-            </motion.div>
-          ) : viewMode === 'log' ? (
-            <motion.div
-              key="stewards-log"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <StewardsLog userId={user?.id} />
-              <SovereigntyFooter />
             </motion.div>
           ) : (
             <motion.div
-              key="path"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              key="almanac-content"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
             >
-
-        {/* Skill Tree Container */}
-        <div className="max-w-3xl mx-auto px-6 md:px-12">
-          
-          {/* Module Nodes with Mycelial Cords and Orisha Guardians */}
-          {finalDisplayModules.map((module, index) => {
-            const IconComponent = module.level === 5 
-              ? SovereignIcon 
-              : (iconMap[module.iconName] || SpiralMoundIcon);
-            const orishaData = orishaMap[module.level];
-            const OrishaIcon = orishaData?.Icon;
-            
-            return (
-              <div key={module.id} className="relative">
-                {/* Mycelial Cord connector (except for last/top node) */}
-                {index < finalDisplayModules.length - 1 && (
-                  <div className="absolute left-10 md:left-14 top-full z-0">
-                    <MycelialCord 
-                      height="120px" 
-                      isActive={module.isUnlocked || finalDisplayModules[index + 1]?.isUnlocked}
-                    />
-                  </div>
-                )}
-
-                {/* Module Node with Orisha */}
-                <div className="relative z-10 py-8">
-                  <div className="flex items-start gap-4">
-                    {/* Orisha Guardian Icon (left side on desktop) */}
-                    {orishaData && (
-                      <motion.div
-                        className="hidden md:flex flex-col items-center gap-2 min-w-[80px]"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: module.isUnlocked ? 1 : 0.4, x: 0 }}
-                        transition={{ delay: 0.3 + index * 0.1 }}
-                      >
-                        <div 
-                          className="w-16 h-16 rounded-full flex items-center justify-center"
-                          style={{
-                            background: module.isCompleted 
-                              ? `radial-gradient(circle at 30% 30%, ${module.color}40, ${module.color}20)`
-                              : 'hsl(0 0% 12%)',
-                            border: `2px solid ${module.isCompleted ? module.color : 'hsl(0 0% 25%)'}`,
-                            boxShadow: module.isCompleted ? `0 0 20px ${module.color}40` : 'none',
-                            filter: module.isUnlocked ? 'none' : 'grayscale(100%)',
-                          }}
-                        >
-                          <OrishaIcon className="w-10 h-10" animated={module.isUnlocked} />
-                        </div>
-                        <p 
-                          className="text-xs text-center tracking-wider"
-                          style={{ 
-                            fontFamily: "'Staatliches', sans-serif",
-                            color: module.isCompleted ? module.color : 'hsl(0 0% 40%)',
-                          }}
-                        >
-                          {orishaData.name}
-                        </p>
-                        {module.isCompleted && (
-                          <motion.p
-                            className="text-[10px] font-mono text-center"
-                            style={{ color: module.color }}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                          >
-                            ✦ BLESSED ✦
-                          </motion.p>
-                        )}
-                      </motion.div>
-                    )}
-                    
-                    {/* Main Module Node */}
-                    <div className="flex-1">
-                      <ModuleNode
-                        level={module.level}
-                        title={module.title}
-                        mission={module.mission}
-                        lineage={module.lineage}
-                        color={module.color}
-                        icon={<IconComponent color={module.color} />}
-                        isUnlocked={module.isUnlocked}
-                        isCompleted={module.isCompleted}
-                        completionPercent={module.completionPercent}
-                        onSelect={() => handleModuleSelect(module)}
-                      />
-                      
-                      {/* Lore, Science & Task info (shown when unlocked) */}
-                      {module.isUnlocked && orishaData && (
-                        <motion.div
-                          className="mt-3 ml-20 md:ml-24 space-y-2"
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.5 }}
-                        >
-                          {/* Category Badge */}
-                          <p 
-                            className="text-[10px] font-mono tracking-widest"
-                            style={{ color: module.color, opacity: 0.8 }}
-                          >
-                            ◆ {orishaData.category}
-                          </p>
-                          {/* Lore */}
-                          <p 
-                            className="text-xs italic"
-                            style={{ 
-                              fontFamily: "'Staatliches', sans-serif",
-                              color: 'hsl(40 40% 70%)',
-                              letterSpacing: '0.02em',
-                            }}
-                          >
-                            "{orishaData.lore}"
-                          </p>
-                          {/* Science */}
-                          <p 
-                            className="text-xs font-mono"
-                            style={{ color: 'hsl(195 60% 60%)' }}
-                          >
-                            ⚗ {orishaData.science}
-                          </p>
-                          {/* Task */}
-                          <p 
-                            className="text-xs font-mono"
-                            style={{ color: 'hsl(40 50% 50%)' }}
-                          >
-                            📷 {orishaData.task}
-                          </p>
-                        </motion.div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-
-          {/* Root symbol at the very bottom */}
-          <motion.div
-            className="flex flex-col items-center mt-16"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.5 }}
-          >
-            <div 
-              className="w-20 h-20 rounded-full flex items-center justify-center"
-              style={{
-                background: 'radial-gradient(circle at 30% 30%, hsl(20 50% 25%), hsl(20 40% 10%))',
-                border: '2px solid hsl(20 40% 30%)',
-                boxShadow: '0 0 30px hsl(20 50% 20% / 0.5)',
-              }}
-            >
-              <svg viewBox="0 0 32 32" className="w-10 h-10">
-                <motion.path
-                  d="M16 4 L16 28 M16 12 L8 20 M16 12 L24 20 M16 18 L10 26 M16 18 L22 26"
-                  stroke="hsl(20 50% 50%)"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  fill="none"
-                  animate={{
-                    opacity: [0.5, 1, 0.5],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                  }}
-                />
-              </svg>
-            </div>
-            <p 
-              className="mt-4 text-sm font-mono tracking-wider"
-              style={{ color: 'hsl(20 40% 50%)' }}
-            >
-              BEGIN HERE — SCROLL UP TO ASCEND
-            </p>
-          </motion.div>
-        </div>
+              <FieldAlmanacEmbed />
             </motion.div>
           )}
         </AnimatePresence>
