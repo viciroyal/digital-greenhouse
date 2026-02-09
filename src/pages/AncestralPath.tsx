@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogIn, LogOut, User, Shield, Sparkles } from 'lucide-react';
+import { ArrowLeft, LogIn, LogOut, User, Shield, Sparkles, Compass, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   ModuleNode,
@@ -31,6 +31,7 @@ import { OgunIcon, BabaluAyeIcon, ShangoIcon, OshunIcon, OrishaBadge } from '@/c
 import { useAncestralProgress, Module } from '@/hooks/useAncestralProgress';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { Button } from '@/components/ui/button';
+import { VibrationalLegend, SevenPillars, SovereigntyFooter } from '@/components/almanac';
 
 // Icon mapping for module icons
 const iconMap: Record<string, React.ComponentType<{ color?: string; className?: string; animated?: boolean }>> = {
@@ -573,11 +574,15 @@ const AncestralPath = () => {
                 ? 'hsl(40 70% 65%)' 
                 : viewMode === 'log'
                 ? 'hsl(140 50% 60%)'
+                : viewMode === 'spirit'
+                ? 'hsl(270 60% 70%)'
                 : 'hsl(51 100% 50%)',
               textShadow: viewMode === 'book'
                 ? '0 0 40px hsl(40 60% 40% / 0.4)'
                 : viewMode === 'log'
                 ? '0 0 40px hsl(140 60% 35% / 0.4)'
+                : viewMode === 'spirit'
+                ? '0 0 40px hsl(270 50% 40% / 0.5)'
                 : `2px 2px 0 hsl(20 50% 10%), 0 0 40px hsl(51 80% 40% / 0.4)`,
             }}
           >
@@ -585,6 +590,8 @@ const AncestralPath = () => {
               ? 'THE LIVING ALMANAC' 
               : viewMode === 'log'
               ? "THE STEWARD'S LOG"
+              : viewMode === 'spirit'
+              ? 'THE SPIRIT'
               : 'THE ANCESTRAL PATH'}
           </h1>
           <p 
@@ -595,13 +602,37 @@ const AncestralPath = () => {
               ? 'Listen when the soil whispers. Act when the stars signal.'
               : viewMode === 'log'
               ? 'Record. Reflect. Remember.'
+              : viewMode === 'spirit'
+              ? 'The Vibrational Legend & The Seven Pillars'
               : 'Ascend from Root to Crown'}
           </p>
           
           {/* View Mode Toggle */}
           <div className="flex justify-center mb-4">
-            <ViewModeToggle value={viewMode} onChange={setViewMode} showPath={true} />
+            <ViewModeToggle value={viewMode} onChange={setViewMode} showPath={true} showSpirit={true} />
           </div>
+          
+          {/* Field Almanac Quick Access */}
+          <motion.div
+            className="flex justify-center mb-4"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <Button
+              className="rounded-full px-5 py-2 font-mono text-sm gap-2"
+              style={{
+                background: 'linear-gradient(135deg, hsl(35 80% 45%), hsl(25 70% 35%))',
+                border: '2px solid hsl(45 80% 55%)',
+                color: 'hsl(45 100% 95%)',
+                boxShadow: '0 4px 20px hsl(35 80% 40% / 0.3)',
+              }}
+              onClick={() => navigate('/field-almanac')}
+            >
+              <Compass className="w-4 h-4" />
+              ENTER FIELD ALMANAC
+            </Button>
+          </motion.div>
 
           {/* Junior Guardians (Kids Mode) Button */}
           <motion.div
@@ -640,9 +671,24 @@ const AncestralPath = () => {
           )}
         </motion.div>
 
-        {/* Conditional Content: Almanac, Log, or Path View */}
+        {/* Conditional Content: Spirit, Almanac, Log, or Path View */}
         <AnimatePresence mode="wait">
-          {viewMode === 'book' ? (
+          {viewMode === 'spirit' ? (
+            <motion.div
+              key="spirit"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* The Spirit Layer: Deep Knowledge Repository */}
+              <div className="space-y-12 pb-8">
+                <VibrationalLegend />
+                <SevenPillars />
+                <SovereigntyFooter />
+              </div>
+            </motion.div>
+          ) : viewMode === 'book' ? (
             <motion.div
               key="grimoire"
               initial={{ opacity: 0, y: 20 }}
@@ -659,6 +705,7 @@ const AncestralPath = () => {
                   }
                 }}
               />
+              <SovereigntyFooter />
             </motion.div>
           ) : viewMode === 'log' ? (
             <motion.div
@@ -669,6 +716,7 @@ const AncestralPath = () => {
               transition={{ duration: 0.3 }}
             >
               <StewardsLog userId={user?.id} />
+              <SovereigntyFooter />
             </motion.div>
           ) : (
             <motion.div
