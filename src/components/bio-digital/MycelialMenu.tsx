@@ -72,7 +72,7 @@ const MycelialMenu = ({ onInitiationClick }: MycelialMenuProps) => {
   return (
     <div 
       ref={containerRef}
-      className="fixed top-6 right-6 z-50 flex items-center gap-3"
+      className="fixed top-6 left-6 z-50 flex items-center gap-3"
     >
       {/* The Initiation Keyhole */}
       <KeyholeButton onClick={onInitiationClick || (() => {})} />
@@ -129,7 +129,7 @@ const MycelialMenu = ({ onInitiationClick }: MycelialMenuProps) => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="absolute top-0 right-0 w-80 h-80"
+            className="absolute top-0 left-0 w-80 h-80"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
