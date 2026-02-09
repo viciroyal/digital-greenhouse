@@ -3,7 +3,7 @@
  * AGROMAJIC SCIENCE CORE - ENGINE EXPORTS
  * ═══════════════════════════════════════════════════════════════════════════
  * 
- * Eight high-efficiency, logic-driven engines:
+ * Eleven high-efficiency, logic-driven engines:
  * 1. DynamicSoilEngine - Bed Reset (Input → Calculation → Output)
  * 2. VitalityEngine - Brix Check (Input → Threshold → Output)
  * 3. ResonanceEngine - Zone Filter (Input → Filter → Output)
@@ -12,6 +12,9 @@
  * 6. HarmonicEngine - Inter-Zone Dependencies (Input → Musical Logic → Output)
  * 7. CelestialEngine - Cosmic Timing (Input → Gate Validation → Output)
  * 8. RolesEngine - Ecological Roles (Input → Scientific Mode → Output)
+ * 9. ExtractionEngine - Harvest Logic (Input → Quality Tag → Feedback Loop)
+ * 10. DistributionEngine - CSA Logic (Input → Fair Division → Scarcity Alert)
+ * 11. RegenerationEngine - Waste Logic (Input → Role Assignment → Legacy Task)
  */
 
 export { default as DynamicSoilEngine } from './DynamicSoilEngine';
@@ -22,3 +25,6 @@ export { default as InterventionEngine } from './InterventionEngine';
 export { default as HarmonicEngine } from './HarmonicEngine';
 export { default as CelestialEngine } from './CelestialEngine';
 export { default as RolesEngine } from './RolesEngine';
+export { default as ExtractionEngine } from './ExtractionEngine';
+export { default as DistributionEngine } from './DistributionEngine';
+export { default as RegenerationEngine } from './RegenerationEngine';
