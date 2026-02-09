@@ -20,6 +20,7 @@ import PharmerProfile from "./pages/PharmerProfile";
 import FieldAlmanac from "./pages/FieldAlmanac";
 import AgroMajicConductor from "./pages/AgroMajicConductor";
 import LinerNotes from "./pages/LinerNotes";
+import MasterBuild from "./pages/MasterBuild";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -50,6 +51,7 @@ const App = () => (
                 <Route path="/field-almanac" element={<FieldAlmanac />} />
                 <Route path="/conductor" element={<AgroMajicConductor />} />
                 <Route path="/liner-notes" element={<LinerNotes />} />
+                <Route path="/master-build" element={<MasterBuild />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
