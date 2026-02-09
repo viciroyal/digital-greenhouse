@@ -6,6 +6,7 @@ import TransposeToggle, { TransposeMode } from '@/components/master-build/Transp
 import ArtistTracklist from '@/components/master-build/ArtistTracklist';
 import MixingDesk from '@/components/master-build/MixingDesk';
 import BedMap from '@/components/master-build/BedMap';
+import SeasonalMovements from '@/components/master-build/SeasonalMovements';
 
 /**
  * AGROMAJIC MASTER BUILD
@@ -151,6 +152,9 @@ const MasterBuild = () => {
               transition={{ duration: 0.3 }}
               className="space-y-10"
             >
+              {/* Module 5: Seasonal Movements */}
+              <SeasonalMovements />
+
               {/* Module 3: Mixing Desk */}
               <MixingDesk />
 
@@ -161,12 +165,34 @@ const MasterBuild = () => {
         </AnimatePresence>
       </div>
 
-      {/* Footer */}
-      <footer className="relative z-10 px-6 py-8 text-center">
+      {/* Footer — Sovereignty & Mission */}
+      <footer className="relative z-10 px-6 py-10 text-center">
+        {/* Mission Statement */}
+        <motion.p
+          className="text-sm font-mono leading-relaxed max-w-md mx-auto mb-6"
+          style={{ color: 'hsl(30 30% 50%)', fontStyle: 'italic' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          "To listen when the soil whispers, to act when the stars signal, and to grow the 'Majic' until the whole world remembers how to sing along."
+        </motion.p>
+
         <div
           className="h-px max-w-xs mx-auto mb-4"
           style={{ background: 'linear-gradient(90deg, transparent, hsl(40 30% 20%), transparent)' }}
         />
+
+        {/* Charles Legend Sovereignty */}
+        <p className="font-mono text-[9px] tracking-wider mb-2" style={{ color: 'hsl(45 40% 35%)' }}>
+          DATA AND SEEDS ARE THE SOVEREIGN PROPERTY OF THE STEWARD UNDER THE CHARLES LEGEND.
+        </p>
+
+        {/* NIR Spectroscopy Standard */}
+        <p className="font-mono text-[8px] tracking-wider mb-3" style={{ color: 'hsl(0 0% 25%)' }}>
+          ALL NUTRIENT DENSITY DATA VALIDATED VIA NIR SPECTROSCOPY
+        </p>
+
         <p className="font-mono text-[9px] tracking-wider" style={{ color: 'hsl(0 0% 20%)' }}>
           1.1-ACRE RESEARCH INCUBATOR • ROCKDALE COUNTY, GA
         </p>
