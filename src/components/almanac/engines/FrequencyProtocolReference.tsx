@@ -15,7 +15,7 @@ import { LearnMoreButton } from '@/components/almanac';
  * - Soil Protocol Focus
  */
 
-interface FrequencyProtocol {
+export interface FrequencyProtocol {
   hz: number;
   color: string;
   culturalRole: string;
@@ -97,6 +97,41 @@ const FREQUENCY_PROTOCOLS: FrequencyProtocol[] = [
     cropGuild: ['Garlic', 'Onions', 'Zinnias'],
     soilProtocolFocus: 'The Carry',
     soilProtocolDetail: 'Ensure sufficient Calcium to prevent bulb rot.',
+  },
+];
+
+// Integration Protocol: How each layer is applied across the farm
+export interface IntegrationLayer {
+  layer: 'Science' | 'Action' | 'Theory' | 'Spirit';
+  method: string;
+  status: string;
+  type: 'action' | 'theory' | 'spirit';
+}
+
+export const INTEGRATION_PROTOCOL: IntegrationLayer[] = [
+  {
+    layer: 'Science',
+    method: 'Interplanting',
+    status: 'Integrated into the 44-bed layout.',
+    type: 'action',
+  },
+  {
+    layer: 'Action',
+    method: '5-Quart Reset',
+    status: 'Applied to the full Guild footprint.',
+    type: 'action',
+  },
+  {
+    layer: 'Theory',
+    method: 'Bio-Harmonic Guilds',
+    status: 'Documented as "Standard Operating Procedure."',
+    type: 'theory',
+  },
+  {
+    layer: 'Spirit',
+    method: 'Hz Broadcast',
+    status: 'Scheduled via the Educational Pavilion PA.',
+    type: 'spirit',
   },
 ];
 
@@ -279,4 +314,3 @@ export default FrequencyProtocolReference;
 
 // Export the protocol data for use in other engines
 export { FREQUENCY_PROTOCOLS };
-export type { FrequencyProtocol };
