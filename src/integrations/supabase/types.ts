@@ -115,6 +115,7 @@ export type Database = {
           created_at: string
           description: string | null
           element: string
+          focus_tag: string | null
           frequency_hz: number
           harvest_days: number | null
           id: string
@@ -133,6 +134,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           element: string
+          focus_tag?: string | null
           frequency_hz: number
           harvest_days?: number | null
           id?: string
@@ -151,6 +153,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           element?: string
+          focus_tag?: string | null
           frequency_hz?: number
           harvest_days?: number | null
           id?: string

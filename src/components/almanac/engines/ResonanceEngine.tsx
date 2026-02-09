@@ -19,23 +19,24 @@ import { LearnMoreButton } from '@/components/almanac';
  *   - VISUAL CUE: Shift interface accent color to match zone
  */
 
-// Frequency zones with accent colors
+// THE 7-ZONE OCTAVE with Focus Tags
 interface Zone {
   hz: number;
   name: string;
   color: string;
+  focusTag: string;  // For database filtering
   focus: string;
   wisdomKey: string;
 }
 
 const ZONES: Zone[] = [
-  { hz: 396, name: 'ROOT', color: 'hsl(0 60% 50%)', focus: 'Tomato Guild • Phosphorus • Root Logic', wisdomKey: 'hermetic-vibration' },
-  { hz: 417, name: 'SACRAL', color: 'hsl(30 70% 50%)', focus: 'Squash Family • Potassium • Flow', wisdomKey: 'hermetic-vibration' },
-  { hz: 528, name: 'HEART', color: 'hsl(120 50% 45%)', focus: 'Three Sisters • Nitrogen • Love', wisdomKey: 'three-sisters' },
-  { hz: 639, name: 'THROAT', color: 'hsl(51 80% 50%)', focus: 'Sweet Crops • Communication', wisdomKey: 'hermetic-vibration' },
-  { hz: 741, name: 'VISION', color: 'hsl(180 50% 45%)', focus: 'Herbs & Medicine • Clarity', wisdomKey: 'hermetic-vibration' },
-  { hz: 852, name: 'CROWN', color: 'hsl(270 50% 50%)', focus: 'Fruiting Trees • Intuition', wisdomKey: 'hermetic-vibration' },
-  { hz: 963, name: 'SOURCE', color: 'hsl(300 50% 50%)', focus: 'Seed Sanctuary • Unity', wisdomKey: 'dogon-seed-lineage' },
+  { hz: 396, name: 'ROOT', color: 'hsl(0 60% 50%)', focusTag: 'ROOT_FOCUS', focus: 'Tomatoes • Peppers • Melons', wisdomKey: 'hermetic-vibration' },
+  { hz: 417, name: 'SACRAL', color: 'hsl(30 70% 50%)', focusTag: 'FLOW_FOCUS', focus: 'Sweet Potato • Squash • Carrots', wisdomKey: 'hermetic-vibration' },
+  { hz: 528, name: 'SOLAR', color: 'hsl(51 80% 50%)', focusTag: 'SOLAR_FOCUS', focus: 'Corn • Beans • Sunflowers', wisdomKey: 'three-sisters' },
+  { hz: 639, name: 'HEART', color: 'hsl(120 50% 45%)', focusTag: 'HEART_FOCUS', focus: 'Kale • Broccoli • Apples', wisdomKey: 'hermetic-vibration' },
+  { hz: 741, name: 'THROAT', color: 'hsl(210 60% 50%)', focusTag: 'EXPRESSION_FOCUS', focus: 'Blueberries • Grapes • Cucumbers', wisdomKey: 'hermetic-vibration' },
+  { hz: 852, name: 'THIRD EYE', color: 'hsl(270 50% 50%)', focusTag: 'INTUITION_FOCUS', focus: 'Eggplant • Figs • Herbs', wisdomKey: 'hermetic-vibration' },
+  { hz: 963, name: 'SOURCE', color: 'hsl(300 50% 50%)', focusTag: 'SOURCE_FOCUS', focus: 'Garlic • Onions • Flowers', wisdomKey: 'dogon-seed-lineage' },
 ];
 
 const ResonanceEngine = () => {
