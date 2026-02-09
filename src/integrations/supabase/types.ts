@@ -115,6 +115,7 @@ export type Database = {
           created_at: string
           frequency_hz: number
           id: string
+          inoculant_type: string | null
           internal_brix: number | null
           notes: string | null
           updated_at: string
@@ -127,6 +128,7 @@ export type Database = {
           created_at?: string
           frequency_hz: number
           id?: string
+          inoculant_type?: string | null
           internal_brix?: number | null
           notes?: string | null
           updated_at?: string
@@ -139,6 +141,7 @@ export type Database = {
           created_at?: string
           frequency_hz?: number
           id?: string
+          inoculant_type?: string | null
           internal_brix?: number | null
           notes?: string | null
           updated_at?: string

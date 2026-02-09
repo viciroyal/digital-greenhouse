@@ -2,11 +2,16 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Plus, Check, AlertTriangle, Leaf, Shield, 
-  Pickaxe, Sparkles, Music, Loader2, Trash2, Zap 
+  Pickaxe, Sparkles, Music, Loader2, Trash2, Zap, Network, Droplets 
 } from 'lucide-react';
-import { GardenBed, BedPlanting, calculatePlantCount, useAddPlanting, useRemovePlanting, useUpdateBedBrix, ChordInterval, CHORD_INTERVALS } from '@/hooks/useGardenBeds';
+import { 
+  GardenBed, BedPlanting, calculatePlantCount, useAddPlanting, useRemovePlanting, 
+  useUpdateBedBrix, useUpdateBedInoculant, calculateWaterReduction,
+  ChordInterval, CHORD_INTERVALS, InoculantType, INOCULANT_OPTIONS 
+} from '@/hooks/useGardenBeds';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 
 interface BedDetailPanelProps {
@@ -94,6 +99,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
   const addPlanting = useAddPlanting();
   const removePlanting = useRemovePlanting();
   const updateBrix = useUpdateBedBrix();
+  const updateInoculant = useUpdateBedInoculant();
 
   // Filter crops by frequency AND chord interval
   const frequencyMatchedCrops = allCrops.filter(
@@ -120,6 +126,10 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
   // 7th Mask: Pest masking when 7th is present
   const hasPestMasking = chordStatus['7th (Signal)'];
 
+  // 11th Interval: Fungal Network status
+  const has11thInterval = bed.inoculant_type !== null;
+  const waterReductionMultiplier = calculateWaterReduction(has11thInterval);
+
   // Get chord name and vitality note for member view
   const chordName = getChordName(bed.frequency_hz);
   const vitalityNote = getVitalityNote(isCompleteChord, has5thBonus, bed.internal_brix);
@@ -129,6 +139,22 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
 
   // Smart suggestion: When Root is planted, show 5th and 7th suggestions
   const showSmartSuggestions = chordStatus['Root (Lead)'] && !isCompleteChord && isAdmin && !isAddingCrop;
+
+  const handleInoculantChange = async (value: string) => {
+    if (!isAdmin) {
+      toast.error('Only admins can update inoculant');
+      return;
+    }
+    
+    const inoculantType = value === 'none' ? null : value as InoculantType;
+    
+    try {
+      await updateInoculant.mutateAsync({ bedId: bed.id, inoculantType });
+      toast.success(inoculantType ? `${inoculantType} Network Activated` : 'Fungal Network Deactivated');
+    } catch (error) {
+      toast.error('Failed to update inoculant');
+    }
+  };
 
   const handleAddCrop = async (crop: MasterCrop) => {
     if (!isAdmin) {
@@ -377,6 +403,108 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
                   </motion.button>
                 );
               })}
+            </div>
+          </div>
+
+          {/* 11th Interval - Fungal Network */}
+          <div className="px-4 pb-4">
+            <div 
+              className="p-3 rounded-xl space-y-3"
+              style={{ 
+                background: has11thInterval 
+                  ? 'linear-gradient(135deg, hsl(180 30% 12%), hsl(180 20% 8%))'
+                  : 'hsl(0 0% 8%)', 
+                border: has11thInterval 
+                  ? '2px solid hsl(180 50% 40%)'
+                  : '1px solid hsl(0 0% 18%)',
+                boxShadow: has11thInterval ? '0 0 20px hsl(180 50% 30% / 0.3)' : 'none',
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <motion.div
+                    animate={has11thInterval ? { 
+                      scale: [1, 1.15, 1],
+                      opacity: [0.8, 1, 0.8],
+                    } : {}}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <Network className="w-4 h-4" style={{ color: has11thInterval ? 'hsl(180 60% 55%)' : 'hsl(0 0% 40%)' }} />
+                  </motion.div>
+                  <span className="text-[10px] font-mono tracking-wider" style={{ color: has11thInterval ? 'hsl(180 60% 55%)' : 'hsl(0 0% 45%)' }}>
+                    11th INTERVAL • FUNGAL NETWORK
+                  </span>
+                </div>
+                {has11thInterval && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex items-center gap-1.5 px-2 py-1 rounded-full"
+                    style={{ background: 'hsl(180 50% 20%)', border: '1px solid hsl(180 50% 40%)' }}
+                  >
+                    <span className="text-[9px] font-mono font-bold" style={{ color: 'hsl(180 60% 60%)' }}>
+                      NETWORK ACTIVE
+                    </span>
+                  </motion.div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
+                  INOCULANT TYPE:
+                </span>
+                <Select
+                  value={bed.inoculant_type || 'none'}
+                  onValueChange={handleInoculantChange}
+                  disabled={!isAdmin}
+                >
+                  <SelectTrigger 
+                    className="w-40 h-8 text-xs font-mono"
+                    style={{ 
+                      background: 'hsl(0 0% 10%)', 
+                      border: '1px solid hsl(180 30% 30%)',
+                      color: has11thInterval ? 'hsl(180 60% 60%)' : 'hsl(0 0% 60%)',
+                    }}
+                  >
+                    <SelectValue placeholder="Select inoculant" />
+                  </SelectTrigger>
+                  <SelectContent 
+                    className="z-[100]"
+                    style={{ 
+                      background: 'hsl(0 0% 10%)', 
+                      border: '1px solid hsl(180 30% 30%)',
+                    }}
+                  >
+                    <SelectItem value="none" className="text-xs font-mono" style={{ color: 'hsl(0 0% 60%)' }}>
+                      None
+                    </SelectItem>
+                    {INOCULANT_OPTIONS.map((type) => (
+                      <SelectItem 
+                        key={type} 
+                        value={type!} 
+                        className="text-xs font-mono"
+                        style={{ color: 'hsl(180 60% 60%)' }}
+                      >
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Water Reduction Display */}
+              {has11thInterval && chordStatus['Root (Lead)'] && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 mt-2"
+                >
+                  <Droplets className="w-4 h-4" style={{ color: 'hsl(200 70% 55%)' }} />
+                  <span className="text-[10px] font-mono" style={{ color: 'hsl(200 70% 55%)' }}>
+                    WATER EFFICIENCY: <span className="font-bold">-10%</span> (Fungal Retention)
+                  </span>
+                </motion.div>
+              )}
             </div>
           </div>
 
