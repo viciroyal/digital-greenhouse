@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Plus, Check, AlertTriangle, Leaf, Shield, 
-  Pickaxe, Sparkles, Music, Loader2, Trash2, Zap, Network, Droplets, TreeDeciduous 
+  Pickaxe, Sparkles, Music, Loader2, Trash2, Zap, Network, Droplets, TreeDeciduous, Crown 
 } from 'lucide-react';
 import { 
   GardenBed, BedPlanting, calculatePlantCount, useAddPlanting, useRemovePlanting, 
   useUpdateBedBrix, useUpdateBedInoculant, useUpdateBedAerialCrop, calculateWaterReduction,
-  ChordInterval, CHORD_INTERVALS, InoculantType, INOCULANT_OPTIONS, AERIAL_PLANT_COUNT 
+  calculateComplexityScore, ChordInterval, CHORD_INTERVALS, InoculantType, INOCULANT_OPTIONS, AERIAL_PLANT_COUNT 
 } from '@/hooks/useGardenBeds';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { Input } from '@/components/ui/input';
@@ -142,6 +142,9 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
   // 11th Interval: Fungal Network status
   const has11thInterval = bed.inoculant_type !== null;
   const waterReductionMultiplier = calculateWaterReduction(has11thInterval);
+
+  // Jazz Voicing Complexity Score
+  const complexityScore = calculateComplexityScore(chordStatus, has11thInterval, has13thInterval);
 
   // Get chord name and vitality note for member view
   const chordName = getChordName(bed.frequency_hz);
@@ -432,6 +435,111 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
                   </motion.button>
                 );
               })}
+            </div>
+          </div>
+
+          {/* JAZZ VOICING COMPLEXITY SCORE */}
+          <div className="px-4 pb-4">
+            <div 
+              className="p-4 rounded-xl"
+              style={{ 
+                background: complexityScore.isMasterConductor 
+                  ? 'linear-gradient(135deg, hsl(45 60% 15%), hsl(35 50% 10%))'
+                  : 'linear-gradient(135deg, hsl(270 20% 12%), hsl(270 15% 8%))',
+                border: complexityScore.isMasterConductor 
+                  ? '2px solid hsl(45 80% 55%)'
+                  : '1px solid hsl(270 30% 30%)',
+                boxShadow: complexityScore.isMasterConductor 
+                  ? '0 0 30px hsl(45 80% 50% / 0.3)'
+                  : 'none',
+              }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Music className="w-4 h-4" style={{ color: complexityScore.isMasterConductor ? 'hsl(45 80% 60%)' : 'hsl(270 50% 60%)' }} />
+                  <span className="text-[10px] font-mono tracking-wider" style={{ color: complexityScore.isMasterConductor ? 'hsl(45 80% 60%)' : 'hsl(270 50% 60%)' }}>
+                    JAZZ VOICING COMPLEXITY
+                  </span>
+                </div>
+                {complexityScore.isMasterConductor && (
+                  <motion.div
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                    style={{ 
+                      background: 'linear-gradient(135deg, hsl(45 70% 45%), hsl(35 60% 35%))',
+                      border: '2px solid hsl(45 90% 60%)',
+                      boxShadow: '0 0 20px hsl(45 80% 50% / 0.5)',
+                    }}
+                    animate={{
+                      boxShadow: [
+                        '0 0 15px hsl(45 80% 50% / 0.4)',
+                        '0 0 25px hsl(45 80% 55% / 0.6)',
+                        '0 0 15px hsl(45 80% 50% / 0.4)',
+                      ],
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <Crown className="w-4 h-4" style={{ color: 'hsl(45 100% 90%)' }} />
+                    <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: 'hsl(45 100% 95%)' }}>
+                      MASTER CONDUCTOR
+                    </span>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Complexity Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono font-bold" style={{ color: complexityScore.isMasterConductor ? 'hsl(45 80% 65%)' : 'hsl(270 50% 65%)' }}>
+                    {complexityScore.label}
+                  </span>
+                  <span className="text-sm font-mono font-bold" style={{ color: complexityScore.isMasterConductor ? 'hsl(45 90% 65%)' : 'hsl(0 0% 60%)' }}>
+                    {complexityScore.percentage}%
+                  </span>
+                </div>
+                <div 
+                  className="h-3 rounded-full overflow-hidden"
+                  style={{ background: 'hsl(0 0% 15%)' }}
+                >
+                  <motion.div
+                    className="h-full rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${complexityScore.percentage}%` }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                    style={{
+                      background: complexityScore.isMasterConductor
+                        ? 'linear-gradient(90deg, hsl(45 70% 50%), hsl(35 80% 55%))'
+                        : complexityScore.level === 'seventh'
+                          ? 'linear-gradient(90deg, hsl(270 50% 50%), hsl(280 60% 55%))'
+                          : complexityScore.level === 'triad'
+                            ? 'linear-gradient(90deg, hsl(120 40% 45%), hsl(90 50% 50%))'
+                            : 'linear-gradient(90deg, hsl(0 0% 40%), hsl(0 0% 50%))',
+                    }}
+                  />
+                </div>
+
+                {/* Complexity Breakdown */}
+                <div className="flex items-center justify-between pt-2" style={{ borderTop: '1px dashed hsl(0 0% 20%)' }}>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1">
+                      <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>GROUND:</span>
+                      <span className="text-[10px] font-mono font-bold" style={{ color: isCompleteChord ? 'hsl(120 50% 55%)' : 'hsl(0 0% 55%)' }}>
+                        {Object.values(chordStatus).filter(Boolean).length}/4
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>OVERLAYS:</span>
+                      <span className="text-[10px] font-mono font-bold" style={{ color: (has11thInterval && has13thInterval) ? 'hsl(90 50% 55%)' : 'hsl(0 0% 55%)' }}>
+                        {[has11thInterval, has13thInterval].filter(Boolean).length}/2
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Overlay Explanation */}
+                <p className="text-[9px] font-mono pt-1" style={{ color: 'hsl(0 0% 40%)' }}>
+                  11th & 13th are biological overlays — they add to yield without subtracting ground space.
+                </p>
+              </div>
             </div>
           </div>
 

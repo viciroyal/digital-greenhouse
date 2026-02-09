@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { GardenBed, BedPlanting, ChordInterval, CHORD_INTERVALS } from '@/hooks/useGardenBeds';
-import { Music, Sparkles, AlertCircle, Loader2, Zap, Network, TreeDeciduous } from 'lucide-react';
+import { GardenBed, BedPlanting, ChordInterval, CHORD_INTERVALS, calculateComplexityScore } from '@/hooks/useGardenBeds';
+import { Music, Sparkles, AlertCircle, Loader2, Zap, Network, TreeDeciduous, Crown } from 'lucide-react';
 
 // Extended bed type with aerial crop data
 interface BedWithAerial extends GardenBed {
@@ -16,12 +16,24 @@ interface BedGridProps {
   bedPlantingsMap?: Record<string, BedPlanting[]>;
 }
 
-// Check if a bed has a complete chord (all 4 intervals)
-const isCompleteChord = (plantings: BedPlanting[] = []): boolean => {
+// Get chord status from plantings
+const getChordStatus = (plantings: BedPlanting[] = []): Record<ChordInterval, boolean> => {
   const hasInterval = (interval: ChordInterval) => 
     plantings.some(p => p.crop?.chord_interval === interval);
   
-  return CHORD_INTERVALS.every(interval => hasInterval(interval));
+  return {
+    'Root (Lead)': hasInterval('Root (Lead)'),
+    '3rd (Triad)': hasInterval('3rd (Triad)'),
+    '5th (Stabilizer)': hasInterval('5th (Stabilizer)'),
+    '7th (Signal)': hasInterval('7th (Signal)'),
+  };
+};
+
+// Check if a bed has a complete chord (all 4 intervals)
+const isCompleteChord = (plantings: BedPlanting[] = []): boolean => {
+  return CHORD_INTERVALS.every(interval => 
+    plantings.some(p => p.crop?.chord_interval === interval)
+  );
 };
 
 // Check if bed has 13th Interval (Aerial Signal) active
@@ -118,34 +130,45 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlan
             {zone.beds.map((bed) => {
               const isSelected = selectedBedId === bed.id;
               const plantings = bedPlantingsMap[bed.id] || [];
+              const chordStatus = getChordStatus(plantings);
               const isTuned = isCompleteChord(plantings);
               const hasNetwork = bed.inoculant_type !== null;
               const hasAerial = hasAerialSignal(bed);
               
+              // Calculate complexity score
+              const complexity = calculateComplexityScore(chordStatus, hasNetwork, hasAerial);
+              const isMasterConductor = complexity.isMasterConductor;
+              
               return (
                 <motion.button
                   key={bed.id}
-                  className="relative aspect-square rounded-xl flex flex-col items-center justify-center transition-all"
+                  className="relative aspect-square rounded-xl flex flex-col items-center justify-center transition-all overflow-visible"
                   style={{
                     background: isSelected 
                       ? `linear-gradient(135deg, ${zone.color}40, ${zone.color}20)`
-                      : isTuned
-                        ? `linear-gradient(135deg, ${zone.color}25, ${zone.color}10)`
-                        : hasNetwork
-                          ? 'linear-gradient(135deg, hsl(180 30% 15%), hsl(180 20% 10%))'
-                          : 'hsl(0 0% 12%)',
+                      : isMasterConductor
+                        ? `linear-gradient(135deg, hsl(45 70% 25%), hsl(45 50% 15%))`
+                        : isTuned
+                          ? `linear-gradient(135deg, ${zone.color}25, ${zone.color}10)`
+                          : hasNetwork
+                            ? 'linear-gradient(135deg, hsl(180 30% 15%), hsl(180 20% 10%))'
+                            : 'hsl(0 0% 12%)',
                     border: isSelected 
                       ? `2px solid ${zone.color}` 
-                      : isTuned
-                        ? `2px solid ${zone.color}80`
-                        : hasNetwork
-                          ? '2px solid hsl(180 50% 40%)'
-                          : '1px solid hsl(0 0% 20%)',
+                      : isMasterConductor
+                        ? '2px solid hsl(45 80% 55%)'
+                        : isTuned
+                          ? `2px solid ${zone.color}80`
+                          : hasNetwork
+                            ? '2px solid hsl(180 50% 40%)'
+                            : '1px solid hsl(0 0% 20%)',
                     boxShadow: isSelected 
                       ? `0 0 20px ${zone.color}50` 
-                      : isTuned
-                        ? `0 0 15px ${zone.color}30`
-                        : 'none',
+                      : isMasterConductor
+                        ? '0 0 25px hsl(45 80% 50% / 0.5), 0 0 50px hsl(45 60% 40% / 0.3)'
+                        : isTuned
+                          ? `0 0 15px ${zone.color}30`
+                          : 'none',
                   }}
                   whileHover={{ 
                     scale: 1.08,
@@ -155,25 +178,33 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlan
                   whileTap={{ scale: 0.95 }}
                   onClick={() => onSelectBed(bed)}
                   animate={
-                    isTuned && !isSelected 
+                    isMasterConductor && !isSelected
                       ? {
                           boxShadow: [
-                            `0 0 10px ${zone.color}20`,
-                            `0 0 20px ${zone.color}40`,
-                            `0 0 10px ${zone.color}20`,
+                            '0 0 20px hsl(45 80% 50% / 0.4), 0 0 40px hsl(45 60% 40% / 0.2)',
+                            '0 0 30px hsl(45 80% 55% / 0.6), 0 0 60px hsl(45 60% 45% / 0.3)',
+                            '0 0 20px hsl(45 80% 50% / 0.4), 0 0 40px hsl(45 60% 40% / 0.2)',
                           ],
                         }
-                      : hasNetwork && !isSelected
+                      : isTuned && !isSelected 
                         ? {
                             boxShadow: [
-                              '0 0 8px hsl(180 50% 30%)',
-                              '0 0 16px hsl(180 60% 40%)',
-                              '0 0 8px hsl(180 50% 30%)',
+                              `0 0 10px ${zone.color}20`,
+                              `0 0 20px ${zone.color}40`,
+                              `0 0 10px ${zone.color}20`,
                             ],
                           }
-                        : {}
+                        : hasNetwork && !isSelected
+                          ? {
+                              boxShadow: [
+                                '0 0 8px hsl(180 50% 30%)',
+                                '0 0 16px hsl(180 60% 40%)',
+                                '0 0 8px hsl(180 50% 30%)',
+                              ],
+                            }
+                          : {}
                   }
-                  transition={{ duration: 3, repeat: (isTuned || hasNetwork) && !isSelected ? Infinity : 0 }}
+                  transition={{ duration: 3, repeat: (isMasterConductor || isTuned || hasNetwork) && !isSelected ? Infinity : 0 }}
                 >
                   <span 
                     className="text-sm font-mono font-bold"
@@ -187,8 +218,32 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlan
                     {getVitalityIcon(bed)}
                   </div>
 
-                  {/* 13th Interval - Floating Aerial Signal Icon */}
-                  {hasAerial && (
+                  {/* Master Conductor Crown (100% Jazz 13th) */}
+                  {isMasterConductor && (
+                    <motion.div
+                      className="absolute -top-3 left-1/2 -translate-x-1/2"
+                      initial={{ scale: 0 }}
+                      animate={{ 
+                        scale: [1, 1.1, 1],
+                        rotate: [-2, 2, -2],
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <div 
+                        className="p-1 rounded-full"
+                        style={{ 
+                          background: 'linear-gradient(135deg, hsl(45 80% 50%), hsl(35 70% 40%))',
+                          border: '2px solid hsl(45 90% 60%)',
+                          boxShadow: '0 0 15px hsl(45 80% 50% / 0.6)',
+                        }}
+                      >
+                        <Crown className="w-3 h-3" style={{ color: 'hsl(45 100% 90%)' }} />
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* 13th Interval - Floating Aerial Signal Icon (only show if not Master Conductor) */}
+                  {hasAerial && !isMasterConductor && (
                     <motion.div
                       className="absolute -top-2 left-1/2 -translate-x-1/2"
                       initial={{ y: 0 }}
@@ -198,7 +253,7 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlan
                       }}
                       transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                     >
-                      <div 
+                      <div
                         className="p-1 rounded-full"
                         style={{ 
                           background: 'hsl(90 40% 20% / 0.7)',
