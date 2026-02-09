@@ -7,8 +7,8 @@ import { CircadianProvider } from "@/contexts/CircadianContext";
 import { AudioBiomeProvider } from "@/contexts/AudioBiomeContext";
 import { FieldModeProvider } from "@/contexts/FieldModeContext";
 
-// --- FIX: Import the cursor components ---
-import { MycelialCursor, TouchRipple } from "@/components"; 
+// Cursor components
+import { MycelialCursor, TouchRipple } from "@/components/cursor";
 
 import Index from "./pages/Index";
 import StarMapping from "./pages/StarMapping";
