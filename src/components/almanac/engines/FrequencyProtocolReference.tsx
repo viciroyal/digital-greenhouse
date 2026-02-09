@@ -235,6 +235,59 @@ export const PLANTING_ALGORITHM: PlantingAlgorithmStep[] = [
   },
 ];
 
+// Seven Pillars: Site infrastructure mapped to resonant functions and app data
+export interface SevenPillar {
+  pillar: number;
+  siteName: string;
+  resonantFunction: string;
+  appDataPoint: string;
+}
+
+export const SEVEN_PILLARS: SevenPillar[] = [
+  {
+    pillar: 1,
+    siteName: 'The Vortex',
+    resonantFunction: 'Waste-to-Soil (Compost)',
+    appDataPoint: '"Master Mix" Inventory Level',
+  },
+  {
+    pillar: 2,
+    siteName: 'Sirius Master',
+    resonantFunction: 'Main Farm Entrance/Security',
+    appDataPoint: 'Access Logs / Gates',
+  },
+  {
+    pillar: 3,
+    siteName: 'Solar Alchemist',
+    resonantFunction: 'Well-to-Irrigation / Solar Array',
+    appDataPoint: 'Flow Rate (GPM) & Energy Yield',
+  },
+  {
+    pillar: 4,
+    siteName: 'Toltec Heart',
+    resonantFunction: 'Educational Pavilion / Stage',
+    appDataPoint: 'Event Calendar / Frequency Playback',
+  },
+  {
+    pillar: 5,
+    siteName: 'Dogon Signal',
+    resonantFunction: 'Wash/Pack & Cold Chain',
+    appDataPoint: 'Post-Harvest Temperature/Brix Hold',
+  },
+  {
+    pillar: 6,
+    siteName: 'Aboriginal Vision',
+    resonantFunction: 'Tool Shed & Technology Hub',
+    appDataPoint: 'Inventory of NIR Spectrometers',
+  },
+  {
+    pillar: 7,
+    siteName: 'Hermetic Source',
+    resonantFunction: 'Perimeter Shield (Garlic/Cotton)',
+    appDataPoint: 'Perimeter Health Status',
+  },
+];
+
 interface Props {
   isBeginnerMode?: boolean;
 }
