@@ -6,6 +6,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CircadianProvider } from "@/contexts/CircadianContext";
 import { AudioBiomeProvider } from "@/contexts/AudioBiomeContext";
 import { FieldModeProvider } from "@/contexts/FieldModeContext";
+
+// --- FIX: Import the cursor components ---
+import { MycelialCursor, TouchRipple } from "@/components"; 
+
 import Index from "./pages/Index";
 import StarMapping from "./pages/StarMapping";
 import ResonanceReport from "./pages/ResonanceReport";
@@ -26,6 +30,11 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
+            
+            {/* --- FIX: Render them here (Global Scope) --- */}
+            <MycelialCursor />
+            <TouchRipple />
+
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
@@ -36,7 +45,6 @@ const App = () => (
                 <Route path="/hogon-review" element={<HogonReview />} />
                 <Route path="/pharmer-profile" element={<PharmerProfile />} />
                 <Route path="/auth" element={<Auth />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
