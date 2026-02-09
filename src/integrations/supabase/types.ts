@@ -120,6 +120,7 @@ export type Database = {
           element: string
           focus_tag: string | null
           frequency_hz: number
+          guild_role: string | null
           harvest_days: number | null
           id: string
           library_note: string | null
@@ -145,6 +146,7 @@ export type Database = {
           element: string
           focus_tag?: string | null
           frequency_hz: number
+          guild_role?: string | null
           harvest_days?: number | null
           id?: string
           library_note?: string | null
@@ -170,6 +172,7 @@ export type Database = {
           element?: string
           focus_tag?: string | null
           frequency_hz?: number
+          guild_role?: string | null
           harvest_days?: number | null
           id?: string
           library_note?: string | null
