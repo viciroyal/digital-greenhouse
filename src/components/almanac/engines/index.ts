@@ -29,4 +29,4 @@ export { default as RolesEngine } from './RolesEngine';
 export { default as ExtractionEngine } from './ExtractionEngine';
 export { default as DistributionEngine } from './DistributionEngine';
 export { default as RegenerationEngine } from './RegenerationEngine';
-export { default as FrequencyProtocolReference, FREQUENCY_PROTOCOLS, type FrequencyProtocol } from './FrequencyProtocolReference';
+export { default as FrequencyProtocolReference, FREQUENCY_PROTOCOLS, INTEGRATION_PROTOCOL, type FrequencyProtocol, type IntegrationLayer } from './FrequencyProtocolReference';
