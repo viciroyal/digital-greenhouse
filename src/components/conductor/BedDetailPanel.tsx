@@ -4,7 +4,7 @@ import {
   X, Plus, Check, AlertTriangle, Leaf, Shield, 
   Pickaxe, Sparkles, Music, Loader2, Trash2 
 } from 'lucide-react';
-import { GardenBed, BedPlanting, calculatePlantCount, useAddPlanting, useRemovePlanting, useUpdateBedBrix } from '@/hooks/useGardenBeds';
+import { GardenBed, BedPlanting, calculatePlantCount, useAddPlanting, useRemovePlanting, useUpdateBedBrix, ChordInterval, CHORD_INTERVALS } from '@/hooks/useGardenBeds';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -16,31 +16,40 @@ interface BedDetailPanelProps {
   onClose: () => void;
 }
 
-const GUILD_ROLES = ['Lead', 'Sentinel', 'Miner', 'Enhancer'] as const;
-
-const getRoleIcon = (role: string) => {
-  switch (role) {
-    case 'Lead': return Leaf;
-    case 'Sentinel': return Shield;
-    case 'Miner': return Pickaxe;
-    case 'Enhancer': return Sparkles;
+// Map chord intervals to icons and colors
+const getIntervalIcon = (interval: string) => {
+  switch (interval) {
+    case 'Root (Lead)': return Leaf;
+    case '3rd (Triad)': return Shield;
+    case '5th (Stabilizer)': return Pickaxe;
+    case '7th (Signal)': return Sparkles;
     default: return Leaf;
   }
 };
 
-const getRoleColor = (role: string) => {
-  switch (role) {
-    case 'Lead': return 'hsl(120 50% 50%)';
-    case 'Sentinel': return 'hsl(0 60% 55%)';
-    case 'Miner': return 'hsl(35 70% 55%)';
-    case 'Enhancer': return 'hsl(270 50% 60%)';
+const getIntervalColor = (interval: string) => {
+  switch (interval) {
+    case 'Root (Lead)': return 'hsl(120 50% 50%)';      // Green - main harvest
+    case '3rd (Triad)': return 'hsl(0 60% 55%)';        // Red - sentinel defense
+    case '5th (Stabilizer)': return 'hsl(35 70% 55%)';  // Orange - mineral miner
+    case '7th (Signal)': return 'hsl(270 50% 60%)';     // Purple - signal/aromatic
     default: return 'hsl(0 0% 50%)';
+  }
+};
+
+const getIntervalLabel = (interval: string) => {
+  switch (interval) {
+    case 'Root (Lead)': return 'Root';
+    case '3rd (Triad)': return '3rd';
+    case '5th (Stabilizer)': return '5th';
+    case '7th (Signal)': return '7th';
+    default: return interval;
   }
 };
 
 const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProps) => {
   const [isAddingCrop, setIsAddingCrop] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<string>('Lead');
+  const [selectedInterval, setSelectedInterval] = useState<ChordInterval>('Root (Lead)');
   const [brixInput, setBrixInput] = useState(bed.internal_brix?.toString() || '');
   
   const { data: allCrops = [], isLoading: cropsLoading } = useMasterCrops();
@@ -48,20 +57,22 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
   const removePlanting = useRemovePlanting();
   const updateBrix = useUpdateBedBrix();
 
-  // Filter crops by frequency
+  // Filter crops by frequency AND chord interval
   const frequencyMatchedCrops = allCrops.filter(
-    (crop) => crop.frequency_hz === bed.frequency_hz
+    (crop) => crop.frequency_hz === bed.frequency_hz && crop.chord_interval === selectedInterval
   );
 
-  // Check harmonic trio completion
-  const hasRole = (role: string) => plantings.some(p => p.guild_role === role);
-  const harmonicTrio = {
-    Lead: hasRole('Lead'),
-    Sentinel: hasRole('Sentinel'),
-    Miner: hasRole('Miner'),
-    Enhancer: hasRole('Enhancer'),
+  // Check Complete Chord status (Root + 3rd + 5th + 7th)
+  const hasInterval = (interval: ChordInterval) => 
+    plantings.some(p => p.crop?.chord_interval === interval);
+  
+  const chordStatus = {
+    'Root (Lead)': hasInterval('Root (Lead)'),
+    '3rd (Triad)': hasInterval('3rd (Triad)'),
+    '5th (Stabilizer)': hasInterval('5th (Stabilizer)'),
+    '7th (Signal)': hasInterval('7th (Signal)'),
   };
-  const isHarmonicComplete = Object.values(harmonicTrio).every(Boolean);
+  const isCompleteChord = Object.values(chordStatus).every(Boolean);
 
   const handleAddCrop = async (crop: MasterCrop) => {
     if (!isAdmin) {
@@ -75,7 +86,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
       await addPlanting.mutateAsync({
         bedId: bed.id,
         cropId: crop.id,
-        guildRole: selectedRole,
+        guildRole: selectedInterval, // Using chord interval as guild role
         plantCount,
       });
       toast.success(`Added ${crop.name} (${plantCount} plants)`);
@@ -164,13 +175,13 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
         </button>
       </div>
 
-      {/* Harmonic Trio Checklist */}
+      {/* Complete Chord Checklist */}
       <div className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono tracking-wider" style={{ color: 'hsl(0 0% 55%)' }}>
-            HARMONIC TRIO
+            COMPLETE CHORD
           </span>
-          {isHarmonicComplete && (
+          {isCompleteChord && (
             <span className="text-[10px] font-mono px-2 py-0.5 rounded-full" 
               style={{ background: 'hsl(120 50% 30%)', color: 'hsl(120 50% 70%)' }}>
               ✓ COMPLETE
@@ -179,14 +190,15 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
         </div>
         
         <div className="grid grid-cols-4 gap-2">
-          {GUILD_ROLES.map((role) => {
-            const Icon = getRoleIcon(role);
-            const hasIt = harmonicTrio[role];
-            const color = getRoleColor(role);
+          {CHORD_INTERVALS.map((interval) => {
+            const Icon = getIntervalIcon(interval);
+            const hasIt = chordStatus[interval];
+            const color = getIntervalColor(interval);
+            const label = getIntervalLabel(interval);
             
             return (
               <div
-                key={role}
+                key={interval}
                 className="flex flex-col items-center gap-1 p-2 rounded-lg"
                 style={{
                   background: hasIt ? `${color}15` : 'hsl(0 0% 8%)',
@@ -201,7 +213,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
                   className="text-[9px] font-mono"
                   style={{ color: hasIt ? color : 'hsl(0 0% 35%)' }}
                 >
-                  {role}
+                  {label}
                 </span>
                 {hasIt && <Check className="w-3 h-3" style={{ color }} />}
               </div>
@@ -250,8 +262,9 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
         ) : (
           <div className="space-y-2">
             {plantings.map((planting) => {
-              const Icon = getRoleIcon(planting.guild_role);
-              const color = getRoleColor(planting.guild_role);
+              const interval = planting.crop?.chord_interval || planting.guild_role;
+              const Icon = getIntervalIcon(interval);
+              const color = getIntervalColor(interval);
               
               return (
                 <div
@@ -265,7 +278,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
                       {planting.crop?.name || 'Unknown'}
                     </span>
                     <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>
-                      {planting.plant_count} plants • {planting.guild_role}
+                      {planting.plant_count} plants • {getIntervalLabel(interval)}
                     </span>
                   </div>
                   {isAdmin && (
@@ -304,22 +317,26 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
             </motion.button>
           ) : (
             <div className="space-y-3">
-              {/* Role Selector */}
+              {/* Chord Interval Selector */}
               <div className="flex gap-1">
-                {GUILD_ROLES.map((role) => (
-                  <button
-                    key={role}
-                    onClick={() => setSelectedRole(role)}
-                    className="flex-1 py-1.5 rounded text-[10px] font-mono transition-all"
-                    style={{
-                      background: selectedRole === role ? getRoleColor(role) + '30' : 'hsl(0 0% 10%)',
-                      border: `1px solid ${selectedRole === role ? getRoleColor(role) : 'hsl(0 0% 20%)'}`,
-                      color: selectedRole === role ? getRoleColor(role) : 'hsl(0 0% 50%)',
-                    }}
-                  >
-                    {role}
-                  </button>
-                ))}
+                {CHORD_INTERVALS.map((interval) => {
+                  const label = getIntervalLabel(interval);
+                  const color = getIntervalColor(interval);
+                  return (
+                    <button
+                      key={interval}
+                      onClick={() => setSelectedInterval(interval)}
+                      className="flex-1 py-1.5 rounded text-[10px] font-mono transition-all"
+                      style={{
+                        background: selectedInterval === interval ? `${color}30` : 'hsl(0 0% 10%)',
+                        border: `1px solid ${selectedInterval === interval ? color : 'hsl(0 0% 20%)'}`,
+                        color: selectedInterval === interval ? color : 'hsl(0 0% 50%)',
+                      }}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Frequency-Matched Crops */}

@@ -194,6 +194,7 @@ export type Database = {
           brix_target_max: number | null
           brix_target_min: number | null
           category: string
+          chord_interval: string | null
           common_name: string | null
           companion_crops: string[] | null
           created_at: string
@@ -220,6 +221,7 @@ export type Database = {
           brix_target_max?: number | null
           brix_target_min?: number | null
           category?: string
+          chord_interval?: string | null
           common_name?: string | null
           companion_crops?: string[] | null
           created_at?: string
@@ -246,6 +248,7 @@ export type Database = {
           brix_target_max?: number | null
           brix_target_min?: number | null
           category?: string
+          chord_interval?: string | null
           common_name?: string | null
           companion_crops?: string[] | null
           created_at?: string
