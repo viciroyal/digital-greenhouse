@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogIn, LogOut, User, Shield, Sparkles } from 'lucide-react';
+import { ArrowLeft, LogIn, LogOut, User, Shield, Sparkles, Music } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   ModuleNode,
@@ -463,6 +463,24 @@ const AncestralPath = () => {
               Hogon's Chamber
             </Button>
           )}
+          
+          {/* Piano Almanac Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2 font-mono text-xs"
+            style={{
+              background: 'linear-gradient(135deg, hsl(270 40% 15%), hsl(300 30% 12%))',
+              border: '1px solid hsl(270 60% 50%)',
+              color: 'hsl(270 60% 70%)',
+              boxShadow: '0 0 15px hsl(270 60% 40% / 0.3)',
+              cursor: 'pointer',
+            }}
+            onClick={() => navigate('/piano-almanac')}
+          >
+            <Music className="w-3 h-3" />
+            Piano Almanac
+          </Button>
           
           {/* Profile Button */}
           <Button
