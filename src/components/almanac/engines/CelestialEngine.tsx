@@ -230,20 +230,26 @@ interface CelestialTask {
 }
 
 const CELESTIAL_TASKS: CelestialTask[] = [
-  // Lunar Gate - Root (396Hz)
+  // Lunar Gate - Root (396Hz) - Waning Moon or Earth Signs
   { id: 'root-carrots', name: 'Plant Carrots', hz: 396, crop: 'Carrots', gate: 'lunar', action: 'Root Planting' },
   { id: 'root-beets', name: 'Plant Beets', hz: 396, crop: 'Beets', gate: 'lunar', action: 'Root Planting' },
-  // Lunar Gate - Leaf (639Hz)
+  { id: 'root-potatoes', name: 'Plant Potatoes', hz: 396, crop: 'Potatoes', gate: 'lunar', action: 'Root Planting' },
+  // Lunar Gate - Leaf/Heart (639Hz) - Waxing Moon or Water Signs
   { id: 'leaf-kale', name: 'Plant Kale', hz: 639, crop: 'Kale', gate: 'lunar', action: 'Leaf Planting' },
   { id: 'leaf-lettuce', name: 'Plant Lettuce', hz: 639, crop: 'Lettuce', gate: 'lunar', action: 'Leaf Planting' },
-  // Lunar Gate - Fruit (741Hz)
+  { id: 'leaf-spinach', name: 'Plant Spinach', hz: 639, crop: 'Spinach', gate: 'lunar', action: 'Leaf Planting' },
+  // Lunar Gate - Fruit/Signal (741Hz) - Full Moon Approach or Fire Signs
   { id: 'fruit-tomato', name: 'Feed Tomatoes', hz: 741, crop: 'Tomatoes', gate: 'lunar', action: 'Fruit Feeding' },
   { id: 'fruit-berry', name: 'Feed Blueberries', hz: 741, crop: 'Blueberries', gate: 'lunar', action: 'Fruit Feeding' },
-  // Sirius Gate - Seed (963Hz)
+  { id: 'fruit-peppers', name: 'Feed Peppers', hz: 741, crop: 'Peppers', gate: 'lunar', action: 'Fruit Feeding' },
+  // Sirius Gate - Seed (963Hz) - Surveyor Mode Only - Dry/Fire Windows
   { id: 'seed-save', name: 'Harvest for Seed', hz: 963, crop: 'Seeds', gate: 'sirius', action: 'Seed Saving' },
+  { id: 'seed-tomato', name: 'Save Tomato Seed', hz: 963, crop: 'Tomato Seeds', gate: 'sirius', action: 'Seed Saving' },
+  { id: 'seed-pepper', name: 'Save Pepper Seed', hz: 963, crop: 'Pepper Seeds', gate: 'sirius', action: 'Seed Saving' },
   // Seasonal Gate
   { id: 'heat-okra', name: 'Plant Okra', hz: 528, crop: 'Okra', gate: 'seasonal', action: 'Heat Crop Planting' },
   { id: 'heat-melon', name: 'Plant Watermelon', hz: 528, crop: 'Watermelon', gate: 'seasonal', action: 'Heat Crop Planting' },
+  { id: 'heat-eggplant', name: 'Plant Eggplant', hz: 528, crop: 'Eggplant', gate: 'seasonal', action: 'Heat Crop Planting' },
 ];
 
 // Gate validation result
@@ -258,6 +264,8 @@ interface GateResult {
 // Validate Lunar Gate
 const validateLunarGate = (task: CelestialTask, lunar: LunarData): GateResult => {
   // Root crops (396Hz) - Need waning moon OR earth signs
+  // Biological: "As above, so below. The water moves with the moon."
+  // Root energy is strong when moon pulls downward (waning)
   if (task.hz === 396) {
     const earthSigns = ['Taurus', 'Virgo', 'Capricorn'];
     const isWaning = lunar.category === 'waning';
@@ -267,20 +275,21 @@ const validateLunarGate = (task: CelestialTask, lunar: LunarData): GateResult =>
       return {
         passed: true,
         gate: 'LUNAR GATE',
-        message: `Root Window OPEN: ${isWaning ? 'Waning Moon' : `Moon in ${lunar.zodiacSign} (Earth)`}`,
+        message: `Root Window OPEN: ${isWaning ? 'Waning Moon (energy descending)' : `Moon in ${lunar.zodiacSign} (Earth Sign)`}`,
       };
     }
     
     return {
       passed: false,
       gate: 'LUNAR GATE',
-      message: `Cosmic Drag: Root energy is weak today (${lunar.phase}, Moon in ${lunar.zodiacSign}).`,
-      resolution: 'Wait for the Waning Phase or Earth Sign transit.',
-      waitUntil: 'Next waning moon or Earth sign day',
+      message: `Cosmic Drag: Root energy is weak today. Wait for the Waning Phase.`,
+      resolution: `Current: ${lunar.phase}, Moon in ${lunar.zodiacSign}. Root crops need descending energy.`,
+      waitUntil: 'Next waning moon or Earth sign (Taurus/Virgo/Capricorn)',
     };
   }
   
-  // Leaf crops (639Hz) - Need waxing moon OR water signs
+  // Leaf/Heart crops (639Hz) - Need waxing moon OR water signs
+  // Biological: Leaf energy needs rising water (waxing moon pulls upward)
   if (task.hz === 639) {
     const waterSigns = ['Cancer', 'Scorpio', 'Pisces'];
     const isWaxing = lunar.category === 'waxing' || lunar.category === 'new';
@@ -290,20 +299,21 @@ const validateLunarGate = (task: CelestialTask, lunar: LunarData): GateResult =>
       return {
         passed: true,
         gate: 'LUNAR GATE',
-        message: `Leaf Window OPEN: ${isWaxing ? 'Waxing Moon' : `Moon in ${lunar.zodiacSign} (Water)`}`,
+        message: `Leaf Window OPEN: ${isWaxing ? 'Waxing Moon (energy rising)' : `Moon in ${lunar.zodiacSign} (Water Sign)`}`,
       };
     }
     
     return {
       passed: false,
       gate: 'LUNAR GATE',
-      message: `Cosmic Drag: Leaf energy needs rising water (${lunar.phase}, Moon in ${lunar.zodiacSign}).`,
-      resolution: 'Wait for the Waxing Phase or Water Sign transit.',
-      waitUntil: 'Next waxing moon or Water sign day',
+      message: `Cosmic Drag: Leaf energy needs rising water. Wait for the Waxing Phase.`,
+      resolution: `Current: ${lunar.phase}, Moon in ${lunar.zodiacSign}. Leaf crops need ascending energy.`,
+      waitUntil: 'Next waxing moon or Water sign (Cancer/Scorpio/Pisces)',
     };
   }
   
-  // Fruit crops (741Hz) - Need full moon approach OR fire signs
+  // Fruit/Signal crops (741Hz) - Need full moon approach OR fire signs
+  // Biological: Fruit swelling peaks with maximum lunar light (full moon)
   if (task.hz === 741) {
     const fireSigns = ['Aries', 'Leo', 'Sagittarius'];
     const isFullApproach = lunar.category === 'full' || lunar.phase === 'waxing-gibbous';
@@ -313,38 +323,41 @@ const validateLunarGate = (task: CelestialTask, lunar: LunarData): GateResult =>
       return {
         passed: true,
         gate: 'LUNAR GATE',
-        message: `Fruit Window OPEN: ${isFullApproach ? 'Full Moon Energy' : `Moon in ${lunar.zodiacSign} (Fire)`}`,
+        message: `Fruit Window OPEN: ${isFullApproach ? 'Full Moon Approach (maximum light)' : `Moon in ${lunar.zodiacSign} (Fire Sign)`}`,
       };
     }
     
     return {
       passed: false,
       gate: 'LUNAR GATE',
-      message: `Cosmic Drag: Fruit energy needs fire/full moon (${lunar.phase}, Moon in ${lunar.zodiacSign}).`,
-      resolution: 'Wait for Full Moon approach or Fire Sign transit.',
-      waitUntil: 'Next full moon or Fire sign day',
+      message: `Cosmic Drag: Fruit energy needs fire/full moon. Wait for Full Moon Approach.`,
+      resolution: `Current: ${lunar.phase}, Moon in ${lunar.zodiacSign}. Fruit crops need peak energy.`,
+      waitUntil: 'Next full moon or Fire sign (Aries/Leo/Sagittarius)',
     };
   }
   
   return { passed: true, gate: 'LUNAR GATE', message: 'Gate Open' };
 };
 
-// Validate Sirius Gate (Seed Saving)
+// Validate Sirius Gate (Seed Saving - Surveyor Mode Constraint)
+// Rule: "The Seed holds the Pattern of the Universe" (Dogon)
+// Constraint: ONLY allow during Dry/Fire Days to prevent mold
 const validateSiriusGate = (task: CelestialTask, lunar: LunarData): GateResult => {
   if (task.gate !== 'sirius') return { passed: true, gate: 'SIRIUS GATE', message: 'Not applicable' };
   
-  // Fire/Air days are dry days
+  // Fire/Air days are dry days (low humidity favorable for seed drying)
   const dryElements = ['fire', 'air'];
   const isDryDay = dryElements.includes(lunar.element);
   
-  // Also check moon phase - waning is better for seed saving
+  // High energy windows: waning (descending energy for preservation) or full (peak vitality)
   const isHighEnergy = lunar.category === 'waning' || lunar.category === 'full';
   
+  // Both conditions must be met for seed saving
   if (isDryDay && isHighEnergy) {
     return {
       passed: true,
       gate: 'SIRIUS GATE',
-      message: `Seed Window OPEN: Dry Day (${lunar.zodiacSign}) + ${lunar.category} energy`,
+      message: `Seed Window OPEN: Dry Day (Moon in ${lunar.zodiacSign} / ${lunar.element}) + ${lunar.category} energy`,
     };
   }
   
@@ -352,18 +365,18 @@ const validateSiriusGate = (task: CelestialTask, lunar: LunarData): GateResult =
     return {
       passed: false,
       gate: 'SIRIUS GATE',
-      message: `Warning: Moisture/Humidity High (Moon in ${lunar.zodiacSign} - ${lunar.element}).`,
-      resolution: 'The Seed will not sleep. Wait for the Dry Signal.',
-      waitUntil: 'Next Fire or Air sign day',
+      message: `Warning: Moisture/Humidity High. The Seed will not sleep.`,
+      resolution: `Moon in ${lunar.zodiacSign} (${lunar.element} element). Seeds require Fire or Air days to dry properly and prevent mold.`,
+      waitUntil: 'Wait for Dry Signal: Fire sign (Aries/Leo/Sagittarius) or Air sign (Gemini/Libra/Aquarius)',
     };
   }
   
   return {
     passed: false,
     gate: 'SIRIUS GATE',
-    message: 'Low energy window. Seeds prefer waning or full moon energy.',
-    resolution: 'Wait for higher energy phase.',
-    waitUntil: 'Next waning or full moon',
+    message: `Low energy window for seed preservation.`,
+    resolution: `Current: ${lunar.phase}. Seeds prefer waning (descending energy for dormancy) or full moon (peak vitality capture).`,
+    waitUntil: 'Next waning or full moon phase',
   };
 };
 
