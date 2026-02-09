@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, Activity, Radio, Link2, ShieldAlert, Music } from 'lucide-react';
+import { Calculator, Activity, Radio, Link2, ShieldAlert, Music, Star } from 'lucide-react';
 import { SovereigntyFooter } from '@/components/almanac';
-import { DynamicSoilEngine, VitalityEngine, ResonanceEngine, CompanionEngine, InterventionEngine, HarmonicEngine } from './engines';
+import { DynamicSoilEngine, VitalityEngine, ResonanceEngine, CompanionEngine, InterventionEngine, HarmonicEngine, CelestialEngine } from './engines';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -11,16 +11,17 @@ import { DynamicSoilEngine, VitalityEngine, ResonanceEngine, CompanionEngine, In
  * 
  * PHILOSOPHY: Radical Efficiency. Input → Output is immediate.
  * 
- * SIX ENGINES:
+ * SEVEN ENGINES:
  * 1. SOIL CALCULATOR  → Bed dimensions → Scaled recipe
  * 2. VITALITY CHECK   → Brix value → Binary signal (RED/GREEN)
  * 3. ZONE FILTER      → Frequency → Filtered view + accent color
  * 4. COMPANION        → Crop selection → Auto-suggested companions
  * 5. INTERVENTION     → Task/Pest/Zone → Restraint alerts
  * 6. HARMONIC         → Zone dependencies → Musical logic alerts
+ * 7. CELESTIAL        → Cosmic timing → Gate validation
  */
 
-type Engine = 'soil' | 'vitality' | 'zone' | 'companion' | 'intervene' | 'harmonic';
+type Engine = 'soil' | 'vitality' | 'zone' | 'companion' | 'intervene' | 'harmonic' | 'celestial';
 
 const BeginnerFieldGuide = () => {
   const [activeEngine, setActiveEngine] = useState<Engine>('soil');
@@ -32,6 +33,7 @@ const BeginnerFieldGuide = () => {
     { id: 'companion' as const, label: 'PAIR', icon: Link2, color: 'hsl(45 70% 55%)' },
     { id: 'intervene' as const, label: 'STOP', icon: ShieldAlert, color: 'hsl(0 60% 55%)' },
     { id: 'harmonic' as const, label: 'CHORD', icon: Music, color: 'hsl(280 60% 60%)' },
+    { id: 'celestial' as const, label: 'SKY', icon: Star, color: 'hsl(45 80% 60%)' },
   ];
 
   return (
@@ -107,6 +109,7 @@ const BeginnerFieldGuide = () => {
           {activeEngine === 'companion' && <CompanionEngine />}
           {activeEngine === 'intervene' && <InterventionEngine />}
           {activeEngine === 'harmonic' && <HarmonicEngine />}
+          {activeEngine === 'celestial' && <CelestialEngine />}
         </motion.div>
       </AnimatePresence>
 
