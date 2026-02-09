@@ -1,11 +1,16 @@
 import { motion } from 'framer-motion';
 import { GardenBed, BedPlanting, ChordInterval, CHORD_INTERVALS } from '@/hooks/useGardenBeds';
-import { Music, Sparkles, AlertCircle, Loader2, Zap, Network } from 'lucide-react';
+import { Music, Sparkles, AlertCircle, Loader2, Zap, Network, TreeDeciduous } from 'lucide-react';
+
+// Extended bed type with aerial crop data
+interface BedWithAerial extends GardenBed {
+  aerial_crop?: { id: string; name: string; common_name: string | null; frequency_hz: number } | null;
+}
 
 interface BedGridProps {
-  beds: GardenBed[];
+  beds: BedWithAerial[];
   selectedBedId: string | null;
-  onSelectBed: (bed: GardenBed) => void;
+  onSelectBed: (bed: BedWithAerial) => void;
   isAdmin: boolean;
   isLoading?: boolean;
   bedPlantingsMap?: Record<string, BedPlanting[]>;
@@ -19,9 +24,9 @@ const isCompleteChord = (plantings: BedPlanting[] = []): boolean => {
   return CHORD_INTERVALS.every(interval => hasInterval(interval));
 };
 
-// Check if bed has 11th Interval (Fungal Network) active
-const hasNetworkActive = (bed: GardenBed): boolean => {
-  return bed.inoculant_type !== null;
+// Check if bed has 13th Interval (Aerial Signal) active
+const hasAerialSignal = (bed: BedWithAerial): boolean => {
+  return bed.aerial_crop_id !== null || bed.aerial_crop !== null;
 };
 
 const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlantingsMap = {} }: BedGridProps) => {
@@ -44,10 +49,10 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlan
     { name: 'The Shield', hz: 963, color: 'hsl(300 50% 50%)', beds: beds.filter(b => b.frequency_hz === 963) },
   ];
 
-  const getVitalityIcon = (bed: GardenBed) => {
+  const getVitalityIcon = (bed: BedWithAerial) => {
     const plantings = bedPlantingsMap[bed.id] || [];
     const isTuned = isCompleteChord(plantings);
-    const hasNetwork = hasNetworkActive(bed);
+    const hasNetwork = bed.inoculant_type !== null;
 
     // Show Harmonically Tuned icon if complete chord
     if (isTuned) {
@@ -114,7 +119,8 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlan
               const isSelected = selectedBedId === bed.id;
               const plantings = bedPlantingsMap[bed.id] || [];
               const isTuned = isCompleteChord(plantings);
-              const hasNetwork = hasNetworkActive(bed);
+              const hasNetwork = bed.inoculant_type !== null;
+              const hasAerial = hasAerialSignal(bed);
               
               return (
                 <motion.button
@@ -180,6 +186,30 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlan
                   <div className="absolute top-1 right-1">
                     {getVitalityIcon(bed)}
                   </div>
+
+                  {/* 13th Interval - Floating Aerial Signal Icon */}
+                  {hasAerial && (
+                    <motion.div
+                      className="absolute -top-2 left-1/2 -translate-x-1/2"
+                      initial={{ y: 0 }}
+                      animate={{ 
+                        y: [-2, 2, -2],
+                        opacity: [0.5, 0.8, 0.5],
+                      }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <div 
+                        className="p-1 rounded-full"
+                        style={{ 
+                          background: 'hsl(90 40% 20% / 0.7)',
+                          border: '1px solid hsl(90 50% 40%)',
+                          boxShadow: '0 2px 8px hsl(90 50% 30% / 0.4)',
+                        }}
+                      >
+                        <TreeDeciduous className="w-2.5 h-2.5" style={{ color: 'hsl(90 60% 55%)' }} />
+                      </div>
+                    </motion.div>
+                  )}
                 </motion.button>
               );
             })}

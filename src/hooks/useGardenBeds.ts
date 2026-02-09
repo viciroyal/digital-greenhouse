@@ -23,9 +23,17 @@ export interface GardenBed {
   internal_brix: number | null;
   vitality_status: 'pending' | 'thriving' | 'needs_attention';
   inoculant_type: InoculantType;
+  aerial_crop_id: string | null; // 13th Interval - Aerial Signal overstory crop
   created_at: string;
   updated_at: string;
 }
+
+/**
+ * 13th Interval - Aerial Signal (Overstory Layer)
+ * Scattered pattern: 1 plant per 100 sq ft
+ * For a 60ft x 2.5ft bed (150 sq ft), this means ~1-2 plants per bed
+ */
+export const AERIAL_PLANT_COUNT = 2; // Per 60ft bed (scattered pattern)
 
 /**
  * Chord Interval types for Complete Chord validation
@@ -74,18 +82,23 @@ export interface SevenPillarStatus {
   last_updated: string;
 }
 
-// Fetch all garden beds
+// Fetch all garden beds with aerial crop data
 export const useGardenBeds = () => {
   return useQuery({
     queryKey: ['garden-beds'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('garden_beds')
-        .select('*')
+        .select(`
+          *,
+          aerial_crop:master_crops!garden_beds_aerial_crop_id_fkey(
+            id, name, common_name, frequency_hz
+          )
+        `)
         .order('bed_number');
       
       if (error) throw error;
-      return data as GardenBed[];
+      return data as (GardenBed & { aerial_crop?: { id: string; name: string; common_name: string | null; frequency_hz: number } | null })[];
     },
   });
 };
@@ -217,6 +230,28 @@ export const useUpdateBedInoculant = () => {
  */
 export const calculateWaterReduction = (hasInoculant: boolean): number => {
   return hasInoculant ? 0.90 : 1.0; // 10% reduction when fungal network is active
+};
+
+// Update bed aerial_crop_id (13th Interval - Admin only)
+export const useUpdateBedAerialCrop = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ bedId, aerialCropId }: { bedId: string; aerialCropId: string | null }) => {
+      const { data, error } = await supabase
+        .from('garden_beds')
+        .update({ aerial_crop_id: aerialCropId })
+        .eq('id', bedId)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['garden-beds'] });
+    },
+  });
 };
 
 // Add planting to bed
