@@ -6,3 +6,4 @@ export { default as SovereigntyFooter } from './SovereigntyFooter';
 export { default as FiveQuartReset } from './FiveQuartReset';
 export { default as BrixValidator } from './BrixValidator';
 export { default as AgroChordFilter } from './AgroChordFilter';
+export { default as BeginnerFieldGuide } from './BeginnerFieldGuide';
