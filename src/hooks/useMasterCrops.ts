@@ -15,9 +15,16 @@ export interface MasterCrop {
   element: string;
   category: string;
   focus_tag: string | null; // ROOT_FOCUS, FLOW_FOCUS, etc.
+  guild_role: string | null; // Lead, Sentinel, Miner, Enhancer
+  cultural_role: string | null;
+  dominant_mineral: string | null;
+  soil_protocol_focus: string | null;
   planting_season: string[] | null;
   harvest_days: number | null;
   companion_crops: string[] | null;
+  crop_guild: string[] | null;
+  spacing_inches: string | null;
+  library_note: string | null;
   description: string | null;
   brix_target_min: number | null;
   brix_target_max: number | null;
