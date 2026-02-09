@@ -20,6 +20,7 @@ import {
   getWisdomCitation, 
   getDepletionRecommendation,
   coverCropsByZone,
+  solfeggioOctave,
 } from '@/data/wisdomProtocols';
 
 // Storage keys for persistence (shared with Profile Dashboard)
@@ -139,8 +140,8 @@ const BeginnerFieldGuide = () => {
     localStorage.setItem(STORAGE_KEY_BRIX_LOGS, JSON.stringify(brixLogs));
   }, [brixLogs]);
 
-  // Hz visibility toggle
-  const [showHz, setShowHz] = useState(false);
+  // Hz visibility toggle - NOW DEFAULT TO TRUE (Hermetic Law: Everything vibrates)
+  const [showHz, setShowHz] = useState(true);
 
   // Track bed reset completions
   const [bedResetCount, setBedResetCount] = useState(() => {
@@ -844,6 +845,33 @@ const BeginnerFieldGuide = () => {
             exit={{ opacity: 0, y: -20 }}
             className="space-y-3"
           >
+            {/* Hermetic Law Citation */}
+            <motion.div
+              className="p-3 rounded-lg flex items-start gap-2"
+              style={{
+                background: 'hsl(270 20% 12%)',
+                border: '1px solid hsl(270 30% 25%)',
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <Quote className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'hsl(270 50% 60%)' }} />
+              <div>
+                <p
+                  className="text-sm italic"
+                  style={{ color: 'hsl(270 40% 70%)' }}
+                >
+                  "{getWisdomCitation('frequency')}"
+                </p>
+                <p
+                  className="text-[10px] font-mono mt-1"
+                  style={{ color: 'hsl(270 30% 50%)' }}
+                >
+                  — The Hermetic Law of Vibration (Kybalion)
+                </p>
+              </div>
+            </motion.div>
+
             {/* Hz Toggle */}
             <button
               className="w-full flex items-center justify-between p-3 rounded-lg"
@@ -857,7 +885,7 @@ const BeginnerFieldGuide = () => {
                 className="text-xs font-mono"
                 style={{ color: 'hsl(0 0% 55%)' }}
               >
-                Show frequency data (Hz)
+                {showHz ? 'Showing the 7-Zone Octave' : 'Hide frequency data'}
               </span>
               <div
                 className="w-10 h-5 rounded-full relative transition-all"
@@ -897,30 +925,40 @@ const BeginnerFieldGuide = () => {
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-xl">{category.emoji}</span>
-                    <span
-                      className="font-mono text-sm tracking-wider"
-                      style={{ color: category.color }}
-                    >
-                      {category.name}
-                    </span>
+                    <div>
+                      <span
+                        className="font-mono text-sm tracking-wider block"
+                        style={{ color: category.color }}
+                      >
+                        {category.name}
+                      </span>
+                      {showHz && (
+                        <span
+                          className="text-[10px] font-mono"
+                          style={{ color: 'hsl(0 0% 50%)' }}
+                        >
+                          Zone {solfeggioOctave.find(z => z.hz === category.hz)?.zone || '?'}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  {showHz && (
-                    <span
-                      className="text-xs font-mono px-2 py-1 rounded"
-                      style={{
-                        background: `${category.color}25`,
-                        color: category.color,
-                      }}
-                    >
-                      {category.hz}Hz
-                    </span>
-                  )}
+                  {/* Always show Hz badge per Hermetic Law */}
+                  <span
+                    className="text-xs font-mono px-2 py-1 rounded font-bold"
+                    style={{
+                      background: `${category.color}25`,
+                      color: category.color,
+                      border: `1px solid ${category.color}50`,
+                    }}
+                  >
+                    {category.hz}Hz
+                  </span>
                 </div>
                 <div className="p-3 flex flex-wrap gap-2">
                   {category.crops.map((crop) => (
                     <span
                       key={crop}
-                      className="text-xs font-mono px-2 py-1 rounded"
+                      className="text-xs font-mono px-2 py-1 rounded flex items-center gap-1"
                       style={{
                         background: 'hsl(0 0% 12%)',
                         color: 'hsl(40 50% 70%)',
@@ -928,6 +966,14 @@ const BeginnerFieldGuide = () => {
                       }}
                     >
                       {crop}
+                      {showHz && (
+                        <span
+                          className="text-[9px] opacity-60"
+                          style={{ color: category.color }}
+                        >
+                          ♪
+                        </span>
+                      )}
                     </span>
                   ))}
                 </div>
