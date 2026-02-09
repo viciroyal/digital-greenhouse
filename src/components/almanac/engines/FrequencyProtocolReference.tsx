@@ -205,6 +205,36 @@ export const INFRASTRUCTURE_COMPONENTS: InfrastructureComponent[] = [
   },
 ];
 
+// Planting Algorithm: Step-by-step logic for bed preparation
+export interface PlantingAlgorithmStep {
+  step: number;
+  component: string;
+  algorithmLogic: string;
+}
+
+export const PLANTING_ALGORITHM: PlantingAlgorithmStep[] = [
+  {
+    step: 1,
+    component: 'Frequency Lock',
+    algorithmLogic: 'If CropZone != CurrentZone THEN Display: Locked',
+  },
+  {
+    step: 2,
+    component: 'Role Check',
+    algorithmLogic: 'Ensure [1 Sentinel + 1 Miner + 1 Enhancer] per Lead',
+  },
+  {
+    step: 3,
+    component: 'Volume Check',
+    algorithmLogic: '(BedArea / HexSpacing) = TotalPlugsNeeded',
+  },
+  {
+    step: 4,
+    component: '5th Agreement',
+    algorithmLogic: 'Output: NIR-Calibration_Settings for Batch',
+  },
+];
+
 interface Props {
   isBeginnerMode?: boolean;
 }

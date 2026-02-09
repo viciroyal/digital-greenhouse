@@ -29,4 +29,4 @@ export { default as RolesEngine } from './RolesEngine';
 export { default as ExtractionEngine } from './ExtractionEngine';
 export { default as DistributionEngine } from './DistributionEngine';
 export { default as RegenerationEngine } from './RegenerationEngine';
-export { default as FrequencyProtocolReference, FREQUENCY_PROTOCOLS, INTEGRATION_PROTOCOL, HOLE_PLUG_PROTOCOL, INFRASTRUCTURE_COMPONENTS, type FrequencyProtocol, type IntegrationLayer, type HolePlugMapping, type InfrastructureComponent } from './FrequencyProtocolReference';
+export { default as FrequencyProtocolReference, FREQUENCY_PROTOCOLS, INTEGRATION_PROTOCOL, HOLE_PLUG_PROTOCOL, INFRASTRUCTURE_COMPONENTS, PLANTING_ALGORITHM, type FrequencyProtocol, type IntegrationLayer, type HolePlugMapping, type InfrastructureComponent, type PlantingAlgorithmStep } from './FrequencyProtocolReference';
