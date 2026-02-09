@@ -9,3 +9,6 @@ export { default as AgroChordFilter } from './AgroChordFilter';
 export { default as BeginnerFieldGuide } from './BeginnerFieldGuide';
 export { default as WisdomOverlay } from './WisdomOverlay';
 export { default as LearnMoreButton } from './LearnMoreButton';
+
+// AgroMajic Science Core Engines
+export { DynamicSoilEngine, VitalityEngine, ResonanceEngine } from './engines';
