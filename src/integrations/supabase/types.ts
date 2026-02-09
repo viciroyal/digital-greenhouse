@@ -111,6 +111,7 @@ export type Database = {
       }
       garden_beds: {
         Row: {
+          aerial_crop_id: string | null
           bed_number: number
           created_at: string
           frequency_hz: number
@@ -124,6 +125,7 @@ export type Database = {
           zone_name: string
         }
         Insert: {
+          aerial_crop_id?: string | null
           bed_number: number
           created_at?: string
           frequency_hz: number
@@ -137,6 +139,7 @@ export type Database = {
           zone_name: string
         }
         Update: {
+          aerial_crop_id?: string | null
           bed_number?: number
           created_at?: string
           frequency_hz?: number
@@ -149,7 +152,15 @@ export type Database = {
           zone_color?: string
           zone_name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "garden_beds_aerial_crop_id_fkey"
+            columns: ["aerial_crop_id"]
+            isOneToOne: false
+            referencedRelation: "master_crops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lessons: {
         Row: {

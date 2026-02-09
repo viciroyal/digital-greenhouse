@@ -2,20 +2,25 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Plus, Check, AlertTriangle, Leaf, Shield, 
-  Pickaxe, Sparkles, Music, Loader2, Trash2, Zap, Network, Droplets 
+  Pickaxe, Sparkles, Music, Loader2, Trash2, Zap, Network, Droplets, TreeDeciduous 
 } from 'lucide-react';
 import { 
   GardenBed, BedPlanting, calculatePlantCount, useAddPlanting, useRemovePlanting, 
-  useUpdateBedBrix, useUpdateBedInoculant, calculateWaterReduction,
-  ChordInterval, CHORD_INTERVALS, InoculantType, INOCULANT_OPTIONS 
+  useUpdateBedBrix, useUpdateBedInoculant, useUpdateBedAerialCrop, calculateWaterReduction,
+  ChordInterval, CHORD_INTERVALS, InoculantType, INOCULANT_OPTIONS, AERIAL_PLANT_COUNT 
 } from '@/hooks/useGardenBeds';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 
+// Extended bed type with aerial crop data
+interface BedWithAerial extends GardenBed {
+  aerial_crop?: { id: string; name: string; common_name: string | null; frequency_hz: number } | null;
+}
+
 interface BedDetailPanelProps {
-  bed: GardenBed;
+  bed: BedWithAerial;
   plantings: BedPlanting[];
   isAdmin: boolean;
   onClose: () => void;
@@ -100,6 +105,14 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
   const removePlanting = useRemovePlanting();
   const updateBrix = useUpdateBedBrix();
   const updateInoculant = useUpdateBedInoculant();
+  const updateAerialCrop = useUpdateBedAerialCrop();
+
+  // 13th Interval: Get available aerial/overstory crops (trees, tall perennials)
+  // These should ideally be filtered by a category, but for now we'll show all crops
+  const aerialCrops = allCrops.filter(crop => 
+    crop.category === 'tree' || crop.category === 'perennial' || crop.guild_role === 'Enhancer'
+  );
+  const has13thInterval = bed.aerial_crop_id !== null || bed.aerial_crop !== null;
 
   // Filter crops by frequency AND chord interval
   const frequencyMatchedCrops = allCrops.filter(
@@ -153,6 +166,22 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
       toast.success(inoculantType ? `${inoculantType} Network Activated` : 'Fungal Network Deactivated');
     } catch (error) {
       toast.error('Failed to update inoculant');
+    }
+  };
+
+  const handleAerialCropChange = async (value: string) => {
+    if (!isAdmin) {
+      toast.error('Only admins can update aerial crops');
+      return;
+    }
+    
+    const aerialCropId = value === 'none' ? null : value;
+    
+    try {
+      await updateAerialCrop.mutateAsync({ bedId: bed.id, aerialCropId });
+      toast.success(aerialCropId ? '13th Interval Activated - Aerial Signal Set' : '13th Interval Deactivated');
+    } catch (error) {
+      toast.error('Failed to update aerial crop');
     }
   };
 
@@ -503,6 +532,144 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
                   <span className="text-[10px] font-mono" style={{ color: 'hsl(200 70% 55%)' }}>
                     WATER EFFICIENCY: <span className="font-bold">-10%</span> (Fungal Retention)
                   </span>
+                </motion.div>
+              )}
+            </div>
+          </div>
+
+          {/* 13th Interval - Aerial Signal (Overstory Layer) */}
+          <div className="px-4 pb-4">
+            <div 
+              className="p-3 rounded-xl space-y-3"
+              style={{ 
+                background: has13thInterval 
+                  ? 'linear-gradient(135deg, hsl(90 30% 12%), hsl(90 20% 8%))'
+                  : 'hsl(0 0% 8%)', 
+                border: has13thInterval 
+                  ? '2px solid hsl(90 50% 40%)'
+                  : '1px solid hsl(0 0% 18%)',
+                boxShadow: has13thInterval ? '0 0 20px hsl(90 50% 30% / 0.3)' : 'none',
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <motion.div
+                    animate={has13thInterval ? { 
+                      y: [-2, 2, -2],
+                      opacity: [0.7, 1, 0.7],
+                    } : {}}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  >
+                    <TreeDeciduous className="w-4 h-4" style={{ color: has13thInterval ? 'hsl(90 60% 55%)' : 'hsl(0 0% 40%)' }} />
+                  </motion.div>
+                  <span className="text-[10px] font-mono tracking-wider" style={{ color: has13thInterval ? 'hsl(90 60% 55%)' : 'hsl(0 0% 45%)' }}>
+                    13th INTERVAL • AERIAL SIGNAL
+                  </span>
+                </div>
+                {has13thInterval && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1, y: [-1, 1, -1] }}
+                    transition={{ y: { duration: 2, repeat: Infinity } }}
+                    className="flex items-center gap-1.5 px-2 py-1 rounded-full"
+                    style={{ background: 'hsl(90 40% 20%)', border: '1px solid hsl(90 50% 40%)' }}
+                  >
+                    <span className="text-[9px] font-mono font-bold" style={{ color: 'hsl(90 60% 60%)' }}>
+                      OVERSTORY ACTIVE
+                    </span>
+                  </motion.div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
+                  AERIAL CROP:
+                </span>
+                <Select
+                  value={bed.aerial_crop_id || 'none'}
+                  onValueChange={handleAerialCropChange}
+                  disabled={!isAdmin}
+                >
+                  <SelectTrigger 
+                    className="w-44 h-8 text-xs font-mono"
+                    style={{ 
+                      background: 'hsl(0 0% 10%)', 
+                      border: '1px solid hsl(90 30% 30%)',
+                      color: has13thInterval ? 'hsl(90 60% 60%)' : 'hsl(0 0% 60%)',
+                    }}
+                  >
+                    <SelectValue placeholder="Select aerial crop" />
+                  </SelectTrigger>
+                  <SelectContent 
+                    className="z-[100] max-h-60"
+                    style={{ 
+                      background: 'hsl(0 0% 10%)', 
+                      border: '1px solid hsl(90 30% 30%)',
+                    }}
+                  >
+                    <SelectItem value="none" className="text-xs font-mono" style={{ color: 'hsl(0 0% 60%)' }}>
+                      None
+                    </SelectItem>
+                    {allCrops.map((crop) => (
+                      <SelectItem 
+                        key={crop.id} 
+                        value={crop.id} 
+                        className="text-xs font-mono"
+                        style={{ color: 'hsl(90 60% 60%)' }}
+                      >
+                        {crop.name} {crop.common_name ? `(${crop.common_name})` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Spacing Info */}
+              {has13thInterval && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center justify-between mt-2 pt-2"
+                  style={{ borderTop: '1px dashed hsl(90 30% 25%)' }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono" style={{ color: 'hsl(90 50% 50%)' }}>
+                      SCATTERED PATTERN
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
+                      1 per 100 sq ft →
+                    </span>
+                    <span 
+                      className="px-2 py-0.5 rounded font-mono text-xs font-bold"
+                      style={{ background: 'hsl(90 40% 20%)', color: 'hsl(90 60% 60%)' }}
+                    >
+                      {AERIAL_PLANT_COUNT} plants
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Current Aerial Crop Display */}
+              {bed.aerial_crop && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex items-center gap-2 mt-2 p-2 rounded-lg"
+                  style={{ background: 'hsl(90 30% 15%)', border: '1px solid hsl(90 40% 30%)' }}
+                >
+                  <TreeDeciduous className="w-4 h-4" style={{ color: 'hsl(90 60% 55%)' }} />
+                  <div className="flex-1">
+                    <span className="text-xs font-mono block" style={{ color: 'hsl(90 60% 65%)' }}>
+                      {bed.aerial_crop.name}
+                    </span>
+                    {bed.aerial_crop.common_name && (
+                      <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
+                        {bed.aerial_crop.common_name}
+                      </span>
+                    )}
+                  </div>
                 </motion.div>
               )}
             </div>
