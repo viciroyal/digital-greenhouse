@@ -36,6 +36,90 @@ export interface GardenBed {
 export const AERIAL_PLANT_COUNT = 2; // Per 60ft bed (scattered pattern)
 
 /**
+ * JAZZ VOICING COMPLEXITY ENGINE
+ * 
+ * Complexity Levels:
+ * - Triad (Root + 3rd + 5th) = 60%
+ * - 7th Chord (Root + 3rd + 5th + 7th) = 80%
+ * - 13th Jazz Chord (complete chord + 11th + 13th) = 100%
+ * 
+ * The 11th (Fungal Network) and 13th (Aerial Signal) are BIOLOGICAL OVERLAYS.
+ * They do NOT subtract from ground crop space - they exist in different ecological niches:
+ * - 11th operates in the sub-soil layer (mycorrhizal network)
+ * - 13th operates in the overstory layer (aerial canopy)
+ */
+export type ComplexityLevel = 'incomplete' | 'triad' | 'seventh' | 'jazz_13th';
+
+export interface ComplexityScore {
+  level: ComplexityLevel;
+  percentage: number;
+  label: string;
+  isMasterConductor: boolean;
+}
+
+export const calculateComplexityScore = (
+  chordStatus: Record<ChordInterval, boolean>,
+  has11thInterval: boolean,
+  has13thInterval: boolean
+): ComplexityScore => {
+  const hasRoot = chordStatus['Root (Lead)'];
+  const has3rd = chordStatus['3rd (Triad)'];
+  const has5th = chordStatus['5th (Stabilizer)'];
+  const has7th = chordStatus['7th (Signal)'];
+
+  // Check for complete 7th chord (ground layer complete)
+  const isComplete7th = hasRoot && has3rd && has5th && has7th;
+  
+  // Check for triad (Root + 3rd + 5th)
+  const isTriad = hasRoot && has3rd && has5th;
+
+  // 13th Jazz Chord: Complete ground chord + both biological overlays
+  if (isComplete7th && has11thInterval && has13thInterval) {
+    return {
+      level: 'jazz_13th',
+      percentage: 100,
+      label: 'Jazz 13th',
+      isMasterConductor: true,
+    };
+  }
+
+  // 7th Chord: All ground intervals
+  if (isComplete7th) {
+    return {
+      level: 'seventh',
+      percentage: 80,
+      label: '7th Chord',
+      isMasterConductor: false,
+    };
+  }
+
+  // Triad: Root + 3rd + 5th
+  if (isTriad) {
+    return {
+      level: 'triad',
+      percentage: 60,
+      label: 'Triad',
+      isMasterConductor: false,
+    };
+  }
+
+  // Incomplete - calculate partial progress
+  const groundIntervalCount = [hasRoot, has3rd, has5th, has7th].filter(Boolean).length;
+  const overlayCount = [has11thInterval, has13thInterval].filter(Boolean).length;
+  
+  // Ground intervals are worth 80% total (20% each), overlays are worth 20% total (10% each)
+  const groundPercentage = groundIntervalCount * 20;
+  const overlayPercentage = overlayCount * 10;
+  
+  return {
+    level: 'incomplete',
+    percentage: Math.min(groundPercentage + overlayPercentage, 59), // Cap at 59% if not a full triad
+    label: 'Building...',
+    isMasterConductor: false,
+  };
+};
+
+/**
  * Chord Interval types for Complete Chord validation
  */
 export type ChordInterval = 
