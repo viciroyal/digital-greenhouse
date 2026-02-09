@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, Activity, Radio, Link2, ShieldAlert } from 'lucide-react';
+import { Calculator, Activity, Radio, Link2, ShieldAlert, Music } from 'lucide-react';
 import { SovereigntyFooter } from '@/components/almanac';
-import { DynamicSoilEngine, VitalityEngine, ResonanceEngine, CompanionEngine, InterventionEngine } from './engines';
+import { DynamicSoilEngine, VitalityEngine, ResonanceEngine, CompanionEngine, InterventionEngine, HarmonicEngine } from './engines';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -11,15 +11,16 @@ import { DynamicSoilEngine, VitalityEngine, ResonanceEngine, CompanionEngine, In
  * 
  * PHILOSOPHY: Radical Efficiency. Input → Output is immediate.
  * 
- * FIVE ENGINES:
+ * SIX ENGINES:
  * 1. SOIL CALCULATOR  → Bed dimensions → Scaled recipe
  * 2. VITALITY CHECK   → Brix value → Binary signal (RED/GREEN)
  * 3. ZONE FILTER      → Frequency → Filtered view + accent color
  * 4. COMPANION        → Crop selection → Auto-suggested companions
  * 5. INTERVENTION     → Task/Pest/Zone → Restraint alerts
+ * 6. HARMONIC         → Zone dependencies → Musical logic alerts
  */
 
-type Engine = 'soil' | 'vitality' | 'zone' | 'companion' | 'intervene';
+type Engine = 'soil' | 'vitality' | 'zone' | 'companion' | 'intervene' | 'harmonic';
 
 const BeginnerFieldGuide = () => {
   const [activeEngine, setActiveEngine] = useState<Engine>('soil');
@@ -30,6 +31,7 @@ const BeginnerFieldGuide = () => {
     { id: 'zone' as const, label: 'ZONE', icon: Radio, color: 'hsl(270 60% 55%)' },
     { id: 'companion' as const, label: 'PAIR', icon: Link2, color: 'hsl(45 70% 55%)' },
     { id: 'intervene' as const, label: 'STOP', icon: ShieldAlert, color: 'hsl(0 60% 55%)' },
+    { id: 'harmonic' as const, label: 'CHORD', icon: Music, color: 'hsl(280 60% 60%)' },
   ];
 
   return (
@@ -104,6 +106,7 @@ const BeginnerFieldGuide = () => {
           {activeEngine === 'zone' && <ResonanceEngine />}
           {activeEngine === 'companion' && <CompanionEngine />}
           {activeEngine === 'intervene' && <InterventionEngine />}
+          {activeEngine === 'harmonic' && <HarmonicEngine />}
         </motion.div>
       </AnimatePresence>
 
