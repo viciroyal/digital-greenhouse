@@ -113,7 +113,10 @@ export type Database = {
           common_name: string | null
           companion_crops: string[] | null
           created_at: string
+          crop_guild: string[] | null
+          cultural_role: string | null
           description: string | null
+          dominant_mineral: string | null
           element: string
           focus_tag: string | null
           frequency_hz: number
@@ -121,6 +124,7 @@ export type Database = {
           id: string
           name: string
           planting_season: string[] | null
+          soil_protocol_focus: string | null
           updated_at: string
           zone_color: string
           zone_name: string
@@ -132,7 +136,10 @@ export type Database = {
           common_name?: string | null
           companion_crops?: string[] | null
           created_at?: string
+          crop_guild?: string[] | null
+          cultural_role?: string | null
           description?: string | null
+          dominant_mineral?: string | null
           element: string
           focus_tag?: string | null
           frequency_hz: number
@@ -140,6 +147,7 @@ export type Database = {
           id?: string
           name: string
           planting_season?: string[] | null
+          soil_protocol_focus?: string | null
           updated_at?: string
           zone_color: string
           zone_name: string
@@ -151,7 +159,10 @@ export type Database = {
           common_name?: string | null
           companion_crops?: string[] | null
           created_at?: string
+          crop_guild?: string[] | null
+          cultural_role?: string | null
           description?: string | null
+          dominant_mineral?: string | null
           element?: string
           focus_tag?: string | null
           frequency_hz?: number
@@ -159,6 +170,7 @@ export type Database = {
           id?: string
           name?: string
           planting_season?: string[] | null
+          soil_protocol_focus?: string | null
           updated_at?: string
           zone_color?: string
           zone_name?: string

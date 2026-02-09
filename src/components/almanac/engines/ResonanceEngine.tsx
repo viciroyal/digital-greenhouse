@@ -39,7 +39,22 @@ const ZONES: Zone[] = [
   { hz: 963, name: 'SOURCE', color: 'hsl(300 50% 50%)', focusTag: 'SOURCE_FOCUS', focus: 'Garlic • Onions • Flowers', wisdomKey: 'dogon-seed-lineage' },
 ];
 
-const ResonanceEngine = () => {
+// Cultural roles and minerals for each frequency
+const FREQUENCY_METADATA: Record<number, { culturalRole: string; mineral: string; soilFocus: string }> = {
+  396: { culturalRole: 'The Heat & Root', mineral: 'Phosphorus (P)', soilFocus: 'Double Kelp and Sea Minerals for root anchoring.' },
+  417: { culturalRole: 'The Vine & Water', mineral: 'Hydrogen/Carbon (H/C)', soilFocus: 'High Humates to hold moisture for heavy vines.' },
+  528: { culturalRole: 'The Solar Engine', mineral: 'Nitrogen (N)', soilFocus: 'Nitrogen-fixing legumes support the corn scaffold.' },
+  639: { culturalRole: 'The Heart & Breath', mineral: 'Calcium (Ca)', soilFocus: 'Harmony Calcium for cell wall integrity.' },
+  741: { culturalRole: 'The Voice & Expression', mineral: 'Potassium (K)', soilFocus: 'Potassium for fruit sugar transport.' },
+  852: { culturalRole: 'The Vision & Intuition', mineral: 'Magnesium (Mg)', soilFocus: 'Magnesium as heart of chlorophyll.' },
+  963: { culturalRole: 'The Source & Seed', mineral: 'Sulfur (S)', soilFocus: 'Sulfur compounds for pest resistance.' },
+};
+
+interface Props {
+  isBeginnerMode?: boolean;
+}
+
+const ResonanceEngine = ({ isBeginnerMode = false }: Props) => {
   // INPUT: Selected frequency
   const [selectedHz, setSelectedHz] = useState<number | null>(null);
   
@@ -164,27 +179,53 @@ const ResonanceEngine = () => {
           >
             {/* Zone Focus Banner */}
             <div
-              className="p-3 rounded-lg mb-3 flex items-center gap-3"
+              className="p-3 rounded-lg mb-3"
               style={{ background: `${accent}15`, border: `1px solid ${accent}40` }}
             >
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center"
-                style={{
-                  background: `radial-gradient(circle, ${accent} 0%, ${accent}60 100%)`,
-                  boxShadow: `0 0 15px ${accent}50`,
-                }}
-              >
-                <span className="text-white font-bold text-[10px]">{selectedZone.hz}</span>
+              <div className="flex items-center gap-3 mb-2">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  style={{
+                    background: `radial-gradient(circle, ${accent} 0%, ${accent}60 100%)`,
+                    boxShadow: `0 0 15px ${accent}50`,
+                  }}
+                >
+                  <span className="text-white font-bold text-[10px]">{selectedZone.hz}</span>
+                </div>
+                <div className="flex-1">
+                  <span className="text-sm font-mono font-bold block" style={{ color: accent }}>
+                    {selectedZone.name}
+                  </span>
+                  <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 55%)' }}>
+                    {selectedZone.focus}
+                  </span>
+                </div>
+                <LearnMoreButton wisdomKey={selectedZone.wisdomKey} size="sm" />
               </div>
-              <div className="flex-1">
-                <span className="text-sm font-mono font-bold block" style={{ color: accent }}>
-                  {selectedZone.name}
-                </span>
-                <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 55%)' }}>
-                  {selectedZone.focus}
-                </span>
-              </div>
-              <LearnMoreButton wisdomKey={selectedZone.wisdomKey} size="sm" />
+              
+              {/* Cultural Role & Mineral (Farmer Mode) */}
+              {!isBeginnerMode && FREQUENCY_METADATA[selectedHz] && (
+                <div className="pt-2 space-y-1" style={{ borderTop: `1px solid ${accent}30` }}>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>Role:</span>
+                    <span className="text-[10px] font-mono font-bold" style={{ color: accent }}>
+                      {FREQUENCY_METADATA[selectedHz].culturalRole}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>Mineral:</span>
+                    <span className="text-[10px] font-mono font-bold" style={{ color: 'hsl(35 60% 60%)' }}>
+                      {FREQUENCY_METADATA[selectedHz].mineral}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-[9px] font-mono shrink-0" style={{ color: 'hsl(0 0% 45%)' }}>Soil:</span>
+                    <span className="text-[10px] font-mono" style={{ color: 'hsl(120 40% 55%)' }}>
+                      {FREQUENCY_METADATA[selectedHz].soilFocus}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
             
             {/* Filtered Crops */}
