@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useSoilAmendments } from '@/hooks/useMasterCrops';
-import { SovereigntyFooter } from '@/components/almanac';
+import { SovereigntyFooter, LearnMoreButton } from '@/components/almanac';
 import { 
   getWisdomCitation, 
   getDepletionRecommendation,
@@ -613,12 +613,16 @@ const BeginnerFieldGuide = () => {
                           {amendment.name}
                         </span>
                       </div>
-                      <span
-                        className="text-sm font-mono font-bold shrink-0 text-right"
-                        style={{ color: 'hsl(51 70% 60%)', minWidth: '80px' }}
-                      >
-                        {scaleQuantity(amendment.quantity_per_60ft, scaleFactor)}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="text-sm font-mono font-bold shrink-0 text-right"
+                          style={{ color: 'hsl(51 70% 60%)', minWidth: '70px' }}
+                        >
+                          {scaleQuantity(amendment.quantity_per_60ft, scaleFactor)}
+                        </span>
+                        {/* ℹ️ Learn More - Links to Ancestral Path */}
+                        <LearnMoreButton wisdomKey="ingham-soil-food-web" size="sm" />
+                      </div>
                     </motion.button>
                   ))
                 )}
@@ -710,15 +714,18 @@ const BeginnerFieldGuide = () => {
                   borderBottom: '1px solid hsl(195 30% 25%)',
                 }}
               >
-                <h3
-                  className="text-lg tracking-wider"
-                  style={{
-                    fontFamily: "'Staatliches', sans-serif",
-                    color: 'hsl(195 60% 65%)',
-                  }}
-                >
-                  🔬 BRIX CHECK
-                </h3>
+                <div className="flex items-center justify-center gap-2">
+                  <h3
+                    className="text-lg tracking-wider"
+                    style={{
+                      fontFamily: "'Staatliches', sans-serif",
+                      color: 'hsl(195 60% 65%)',
+                    }}
+                  >
+                    🔬 BRIX CHECK
+                  </h3>
+                  <LearnMoreButton wisdomKey="carver-regeneration" size="sm" />
+                </div>
                 <p
                   className="text-xs font-mono"
                   style={{ color: 'hsl(195 40% 50%)' }}
@@ -1052,6 +1059,15 @@ const BeginnerFieldGuide = () => {
                     >
                       {category.hz}Hz
                     </span>
+                    {/* ℹ️ Learn More - Links to Ancestral Path based on zone */}
+                    <LearnMoreButton 
+                      wisdomKey={
+                        category.hz === 528 ? 'three-sisters' 
+                        : category.hz === 963 ? 'dogon-seed-lineage'
+                        : 'hermetic-vibration'
+                      } 
+                      size="sm" 
+                    />
                   </div>
                 </div>
 

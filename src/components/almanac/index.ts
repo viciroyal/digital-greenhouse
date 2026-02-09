@@ -7,3 +7,5 @@ export { default as FiveQuartReset } from './FiveQuartReset';
 export { default as BrixValidator } from './BrixValidator';
 export { default as AgroChordFilter } from './AgroChordFilter';
 export { default as BeginnerFieldGuide } from './BeginnerFieldGuide';
+export { default as WisdomOverlay } from './WisdomOverlay';
+export { default as LearnMoreButton } from './LearnMoreButton';
