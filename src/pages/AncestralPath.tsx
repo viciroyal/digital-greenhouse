@@ -22,6 +22,7 @@ import {
   GrimoireView,
   StewardsLog,
   JuniorGuardians,
+  StewardsUtilityBelt,
   AgroSonicRadio,
   BannekerAlmanac,
 } from '@/components/ancestral';
@@ -892,6 +893,9 @@ const AncestralPath = () => {
 
       {/* Emergency SOS Button - Always Visible Safety Feature */}
       <EmergencySOSButton />
+
+      {/* Steward's Utility Belt - Fixed Bottom Navigation */}
+      <StewardsUtilityBelt />
     </main>
   );
 };
