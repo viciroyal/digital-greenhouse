@@ -8,12 +8,19 @@ import {
   AlertTriangle,
   RefreshCw,
   Ruler,
+  Quote,
+  Flower2,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useSoilAmendments } from '@/hooks/useMasterCrops';
 import { SovereigntyFooter } from '@/components/almanac';
+import { 
+  getWisdomCitation, 
+  getDepletionRecommendation,
+  coverCropsByZone,
+} from '@/data/wisdomProtocols';
 
 // Storage keys for persistence (shared with Profile Dashboard)
 const STORAGE_KEY_BRIX_LOGS = 'pharmer-brix-logs';
@@ -574,6 +581,35 @@ const BeginnerFieldGuide = () => {
                   >
                     {Object.values(checkedItems).filter(Boolean).length} of {amendments.length} ingredients added
                   </p>
+                  
+                  {/* Wisdom Citation - Shows when any item is checked */}
+                  {Object.values(checkedItems).some(Boolean) && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-3 p-3 rounded-lg flex items-start gap-2"
+                      style={{
+                        background: 'hsl(280 20% 12%)',
+                        border: '1px solid hsl(280 30% 25%)',
+                      }}
+                    >
+                      <Quote className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'hsl(280 50% 60%)' }} />
+                      <div>
+                        <p
+                          className="text-sm italic"
+                          style={{ color: 'hsl(280 40% 70%)' }}
+                        >
+                          "{getWisdomCitation('root')}"
+                        </p>
+                        <p
+                          className="text-[10px] font-mono mt-1"
+                          style={{ color: 'hsl(280 30% 50%)' }}
+                        >
+                          — The Law of the Soil Food Web (Ingham)
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
               )}
             </div>
@@ -695,7 +731,7 @@ const BeginnerFieldGuide = () => {
                       ) : (
                         <CheckCircle className="w-8 h-8 shrink-0" style={{ color: 'hsl(120 60% 55%)' }} />
                       )}
-                      <div>
+                      <div className="flex-1">
                         <h4
                           className="text-lg tracking-wider mb-1"
                           style={{
@@ -703,16 +739,74 @@ const BeginnerFieldGuide = () => {
                             color: brixStatus === 'low' ? 'hsl(0 70% 65%)' : 'hsl(120 60% 65%)',
                           }}
                         >
-                          {brixStatus === 'low' ? '⚠️ NEEDS HELP' : '✓ LOOKING GOOD!'}
+                          {brixStatus === 'low' ? '⚠️ NEEDS HEALING' : '✓ LOOKING GOOD!'}
                         </h4>
                         <p
                           className="text-sm"
                           style={{ color: 'hsl(0 0% 65%)' }}
                         >
                           {brixStatus === 'low' 
-                            ? 'The soil needs more minerals. Try adding sea minerals or kelp.'
+                            ? 'The soil needs biological restoration — not synthetic fertilizer.'
                             : 'Great nutrient density! Your plants are thriving.'}
                         </p>
+                        
+                        {/* Cover Crop Alert (Carver Protocol) */}
+                        {brixStatus === 'low' && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                            className="mt-3 p-3 rounded-lg"
+                            style={{
+                              background: 'hsl(120 25% 12%)',
+                              border: '1px solid hsl(120 40% 30%)',
+                            }}
+                          >
+                            <div className="flex items-center gap-2 mb-2">
+                              <Flower2 className="w-4 h-4" style={{ color: 'hsl(120 50% 55%)' }} />
+                              <span
+                                className="text-xs font-mono tracking-wider"
+                                style={{ color: 'hsl(120 50% 60%)' }}
+                              >
+                                COVER CROP ALERT
+                              </span>
+                            </div>
+                            <p
+                              className="text-sm mb-2"
+                              style={{ color: 'hsl(120 40% 70%)' }}
+                            >
+                              Plant nitrogen fixers to heal the soil:
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {coverCropsByZone
+                                .filter(c => c.zone === 528)
+                                .slice(0, 3)
+                                .map(crop => (
+                                  <span
+                                    key={crop.id}
+                                    className="text-xs font-mono px-2 py-1 rounded"
+                                    style={{
+                                      background: 'hsl(120 30% 18%)',
+                                      color: 'hsl(120 50% 65%)',
+                                      border: '1px solid hsl(120 40% 35%)',
+                                    }}
+                                  >
+                                    🌱 {crop.name}
+                                  </span>
+                                ))}
+                            </div>
+                            <p
+                              className="text-[10px] font-mono italic mt-2"
+                              style={{ color: 'hsl(280 40% 60%)' }}
+                            >
+                              "{getDepletionRecommendation(parseFloat(brixValue) || 0).citation}"
+                              <span className="block mt-1 not-italic" style={{ color: 'hsl(280 30% 50%)' }}>
+                                — The Carver Protocol
+                              </span>
+                            </p>
+                          </motion.div>
+                        )}
+                        
                         {brixStatus === 'low' && (
                           <p
                             className="text-xs mt-2 italic"
