@@ -10,6 +10,8 @@ import {
   Ruler,
   Quote,
   Flower2,
+  AlertOctagon,
+  Shovel,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -24,6 +26,8 @@ import {
   shouldRecommendPolyculture,
   getThreeSistersRecommendation,
   isSeedSavingZone,
+  getNaturalAlternatives,
+  getZonePriority,
 } from '@/data/wisdomProtocols';
 
 // Storage keys for persistence (shared with Profile Dashboard)
@@ -199,7 +203,7 @@ const BeginnerFieldGuide = () => {
     setBrixStatus('idle');
   };
 
-  // Crop categories with ancestral wisdom markers
+  // Crop categories with ancestral wisdom markers and Permaculture zone priorities
   const cropCategories = [
     { 
       name: 'Root Vegetables', 
@@ -208,6 +212,7 @@ const BeginnerFieldGuide = () => {
       emoji: '🥕',
       color: 'hsl(0 60% 50%)',
       ancestralNote: null,
+      permaculturePriority: 'daily', // Zone 1 - nearest to home
     },
     { 
       name: 'Squash & Melons', 
@@ -216,6 +221,7 @@ const BeginnerFieldGuide = () => {
       emoji: '🎃',
       color: 'hsl(30 60% 50%)',
       ancestralNote: null,
+      permaculturePriority: 'daily',
     },
     { 
       name: 'Leafy Greens & Three Sisters', 
@@ -225,6 +231,7 @@ const BeginnerFieldGuide = () => {
       color: 'hsl(120 50% 45%)',
       ancestralNote: 'THREE SISTERS ZONE — Plant in community, not isolation.',
       isPolyculture: true,
+      permaculturePriority: 'weekly',
     },
     { 
       name: 'Sweet Crops', 
@@ -233,6 +240,7 @@ const BeginnerFieldGuide = () => {
       emoji: '🍓',
       color: 'hsl(51 80% 50%)',
       ancestralNote: null,
+      permaculturePriority: 'weekly',
     },
     { 
       name: 'Herbs & Medicine', 
@@ -241,6 +249,7 @@ const BeginnerFieldGuide = () => {
       emoji: '🌿',
       color: 'hsl(180 50% 45%)',
       ancestralNote: null,
+      permaculturePriority: 'seasonal', // Zone 5 - outer edges
     },
     { 
       name: 'Seed Sanctuary', 
@@ -250,6 +259,7 @@ const BeginnerFieldGuide = () => {
       color: 'hsl(300 50% 50%)',
       ancestralNote: 'SACRED ZONE — Save the seed, save the stars.',
       isSacred: true,
+      permaculturePriority: 'wild', // Zone 7 - sacred / wild
     },
   ];
 
@@ -515,6 +525,41 @@ const BeginnerFieldGuide = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Fukuoka No-Till Wisdom (BATCH 4) */}
+              <motion.div
+                className="p-3 rounded-lg flex items-start gap-2"
+                style={{
+                  background: 'hsl(45 30% 12%)',
+                  border: '1px dashed hsl(45 50% 40%)',
+                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <AlertOctagon className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'hsl(45 80% 55%)' }} />
+                <div>
+                  <p
+                    className="text-xs font-mono tracking-wider mb-1"
+                    style={{ color: 'hsl(45 70% 60%)' }}
+                  >
+                    FUKUOKA PROTOCOL
+                  </p>
+                  <p
+                    className="text-sm"
+                    style={{ color: 'hsl(45 50% 70%)' }}
+                  >
+                    This recipe builds soil <strong>without tilling</strong>. Consider{' '}
+                    <span style={{ color: 'hsl(120 50% 60%)' }}>Occultation</span> or{' '}
+                    <span style={{ color: 'hsl(120 50% 60%)' }}>Broadforking</span> to prepare your bed.
+                  </p>
+                  <p
+                    className="text-[10px] font-mono mt-1 italic"
+                    style={{ color: 'hsl(45 40% 50%)' }}
+                  >
+                    "{getWisdomCitation('natural')}" — Masanobu Fukuoka
+                  </p>
+                </div>
+              </motion.div>
 
               {/* Checklist */}
               <div className="p-4 space-y-2">
@@ -964,17 +1009,50 @@ const BeginnerFieldGuide = () => {
                       )}
                     </div>
                   </div>
-                  {/* Always show Hz badge per Hermetic Law */}
-                  <span
-                    className="text-xs font-mono px-2 py-1 rounded font-bold"
-                    style={{
-                      background: `${category.color}25`,
-                      color: category.color,
-                      border: `1px solid ${category.color}50`,
-                    }}
-                  >
-                    {category.hz}Hz
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {/* Permaculture Priority Badge (Batch 4) */}
+                    <span
+                      className="text-[9px] font-mono px-1.5 py-0.5 rounded"
+                      style={{
+                        background: (category as any).permaculturePriority === 'daily' 
+                          ? 'hsl(0 50% 25%)'
+                          : (category as any).permaculturePriority === 'weekly'
+                          ? 'hsl(45 50% 25%)'
+                          : (category as any).permaculturePriority === 'wild'
+                          ? 'hsl(270 40% 25%)'
+                          : 'hsl(180 40% 25%)',
+                        color: (category as any).permaculturePriority === 'daily' 
+                          ? 'hsl(0 60% 65%)'
+                          : (category as any).permaculturePriority === 'weekly'
+                          ? 'hsl(45 70% 65%)'
+                          : (category as any).permaculturePriority === 'wild'
+                          ? 'hsl(270 50% 70%)'
+                          : 'hsl(180 50% 65%)',
+                        border: `1px solid ${
+                          (category as any).permaculturePriority === 'daily' 
+                            ? 'hsl(0 50% 40%)'
+                            : (category as any).permaculturePriority === 'weekly'
+                            ? 'hsl(45 50% 40%)'
+                            : (category as any).permaculturePriority === 'wild'
+                            ? 'hsl(270 40% 40%)'
+                            : 'hsl(180 40% 40%)'
+                        }`,
+                      }}
+                    >
+                      {(category as any).permaculturePriority?.toUpperCase()}
+                    </span>
+                    {/* Always show Hz badge per Hermetic Law */}
+                    <span
+                      className="text-xs font-mono px-2 py-1 rounded font-bold"
+                      style={{
+                        background: `${category.color}25`,
+                        color: category.color,
+                        border: `1px solid ${category.color}50`,
+                      }}
+                    >
+                      {category.hz}Hz
+                    </span>
+                  </div>
                 </div>
 
                 {/* Ancestral Note (Three Sisters / Seed Sanctuary) */}
