@@ -19,6 +19,7 @@ import HogonReview from "./pages/HogonReview";
 import PharmerProfile from "./pages/PharmerProfile";
 import FieldAlmanac from "./pages/FieldAlmanac";
 import AgroMajicConductor from "./pages/AgroMajicConductor";
+import LinerNotes from "./pages/LinerNotes";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -48,6 +49,7 @@ const App = () => (
                 <Route path="/pharmer-profile" element={<PharmerProfile />} />
                 <Route path="/field-almanac" element={<FieldAlmanac />} />
                 <Route path="/conductor" element={<AgroMajicConductor />} />
+                <Route path="/liner-notes" element={<LinerNotes />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
