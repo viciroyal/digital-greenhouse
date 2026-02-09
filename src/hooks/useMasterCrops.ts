@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Master Crop type from database
+ * Includes focus_tag for 7-Zone Octave sorting protocol
  */
 export interface MasterCrop {
   id: string;
@@ -13,6 +14,7 @@ export interface MasterCrop {
   zone_color: string;
   element: string;
   category: string;
+  focus_tag: string | null; // ROOT_FOCUS, FLOW_FOCUS, etc.
   planting_season: string[] | null;
   harvest_days: number | null;
   companion_crops: string[] | null;
@@ -22,6 +24,16 @@ export interface MasterCrop {
   created_at: string;
   updated_at: string;
 }
+
+// Focus tag type for strict filtering
+export type FocusTag = 
+  | 'ROOT_FOCUS'      // 396Hz
+  | 'FLOW_FOCUS'      // 417Hz
+  | 'SOLAR_FOCUS'     // 528Hz
+  | 'HEART_FOCUS'     // 639Hz
+  | 'EXPRESSION_FOCUS'// 741Hz
+  | 'INTUITION_FOCUS' // 852Hz
+  | 'SOURCE_FOCUS';   // 963Hz
 
 /**
  * Soil Amendment type from database
