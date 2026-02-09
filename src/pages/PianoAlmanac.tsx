@@ -5,13 +5,14 @@ import { ArrowLeft, Music, Eye, Settings } from 'lucide-react';
 import { useGardenBeds } from '@/hooks/useGardenBeds';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import ChromaticWheel from '@/components/piano-almanac/ChromaticWheel';
-import HarmonicCard from '@/components/piano-almanac/HarmonicCard';
+import UnifiedAlmanacCard from '@/components/piano-almanac/UnifiedAlmanacCard';
 import { SovereigntyFooter } from '@/components/almanac';
 import { ChromaticTone } from '@/data/chromaticToneMapping';
 
 /**
  * AGROMAJIC PIANO ALMANAC
  * 12-Tone Chromatic Interface for garden bed management
+ * Unified Field Almanac with Chord-Pair Database
  */
 
 const PianoAlmanac = () => {
@@ -97,11 +98,14 @@ const PianoAlmanac = () => {
           isLoading={isLoading}
         />
 
-        {/* Harmonic Card for Selected Tone */}
+        {/* Unified Almanac Card for Selected Tone */}
         <AnimatePresence>
           {selectedTone && (
-            <HarmonicCard
+            <UnifiedAlmanacCard
               tone={selectedTone}
+              beds={beds}
+              brixValue={brixValue}
+              onBrixChange={setBrixValue}
               onClose={handleCloseToneDetail}
             />
           )}
@@ -119,10 +123,10 @@ const PianoAlmanac = () => {
             }}
           >
             <p className="text-sm text-white/60">
-              Select a tone to view its <span className="text-purple-400 font-bold">Harmonic Card</span>
+              Select a tone to view its <span className="text-purple-400 font-bold">Unified Almanac Card</span>
             </p>
             <p className="text-xs text-white/40 mt-1">
-              Rotate the wheel to see bed distribution across the 12-tone chromatic scale
+              Each tone maps to an Instrument Group with Paired Plants, Soil Recipe, and Frequency Signal
             </p>
           </motion.div>
         )}
