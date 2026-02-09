@@ -288,6 +288,46 @@ export const SEVEN_PILLARS: SevenPillar[] = [
   },
 ];
 
+// Data Visibility Matrix: Internal (Staff/Admin) vs External (Customer/CSA) views
+export interface DataVisibilityRule {
+  dataPoint: string;
+  internalView: string;
+  internalLabel: string;
+  externalView: string;
+  externalLabel: string;
+}
+
+export const DATA_VISIBILITY_MATRIX: DataVisibilityRule[] = [
+  {
+    dataPoint: 'Brix Scores',
+    internalView: 'Full NIR logs for validation.',
+    internalLabel: 'VISIBLE',
+    externalView: 'No raw data shown.',
+    externalLabel: 'HIDDEN',
+  },
+  {
+    dataPoint: 'Frequency',
+    internalView: '396Hz–963Hz mapping.',
+    internalLabel: 'TECHNICAL',
+    externalView: 'The "Season Chord" or color zone.',
+    externalLabel: 'ARTISTIC',
+  },
+  {
+    dataPoint: 'Crop Details',
+    internalView: 'Variety, Spacing, Support Trio.',
+    internalLabel: 'DETAILED',
+    externalView: 'Heritage, Flavor Profile, Mission.',
+    externalLabel: 'STORY',
+  },
+  {
+    dataPoint: 'Soil Health',
+    internalView: 'Master Mix Reset status.',
+    internalLabel: 'METRIC',
+    externalView: '"The Soil is Singing."',
+    externalLabel: 'NARRATIVE',
+  },
+];
+
 interface Props {
   isBeginnerMode?: boolean;
 }
