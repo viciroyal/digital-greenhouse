@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Plus, Check, AlertTriangle, Leaf, Shield, 
-  Pickaxe, Sparkles, Music, Loader2, Trash2, Zap, Network, Droplets, TreeDeciduous, Crown 
+  Pickaxe, Sparkles, Music, Loader2, Trash2, Zap, Network, Droplets, TreeDeciduous, Crown, Lightbulb 
 } from 'lucide-react';
 import { 
   GardenBed, BedPlanting, calculatePlantCount, useAddPlanting, useRemovePlanting, 
@@ -13,6 +13,8 @@ import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { getZoneRecommendation } from '@/data/jazzVoicingRecommendations';
 
 // Extended bed type with aerial crop data
 interface BedWithAerial extends GardenBed {
@@ -544,244 +546,342 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
           </div>
 
           {/* 11th Interval - Fungal Network */}
-          <div className="px-4 pb-4">
-            <div 
-              className="p-3 rounded-xl space-y-3"
-              style={{ 
-                background: has11thInterval 
-                  ? 'linear-gradient(135deg, hsl(180 30% 12%), hsl(180 20% 8%))'
-                  : 'hsl(0 0% 8%)', 
-                border: has11thInterval 
-                  ? '2px solid hsl(180 50% 40%)'
-                  : '1px solid hsl(0 0% 18%)',
-                boxShadow: has11thInterval ? '0 0 20px hsl(180 50% 30% / 0.3)' : 'none',
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <motion.div
-                    animate={has11thInterval ? { 
-                      scale: [1, 1.15, 1],
-                      opacity: [0.8, 1, 0.8],
-                    } : {}}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    <Network className="w-4 h-4" style={{ color: has11thInterval ? 'hsl(180 60% 55%)' : 'hsl(0 0% 40%)' }} />
-                  </motion.div>
-                  <span className="text-[10px] font-mono tracking-wider" style={{ color: has11thInterval ? 'hsl(180 60% 55%)' : 'hsl(0 0% 45%)' }}>
-                    11th INTERVAL • FUNGAL NETWORK
-                  </span>
-                </div>
-                {has11thInterval && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex items-center gap-1.5 px-2 py-1 rounded-full"
-                    style={{ background: 'hsl(180 50% 20%)', border: '1px solid hsl(180 50% 40%)' }}
-                  >
-                    <span className="text-[9px] font-mono font-bold" style={{ color: 'hsl(180 60% 60%)' }}>
-                      NETWORK ACTIVE
-                    </span>
-                  </motion.div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
-                  INOCULANT TYPE:
-                </span>
-                <Select
-                  value={bed.inoculant_type || 'none'}
-                  onValueChange={handleInoculantChange}
-                  disabled={!isAdmin}
+          {(() => {
+            const zoneRec = getZoneRecommendation(bed.frequency_hz);
+            return (
+              <div className="px-4 pb-4">
+                <div 
+                  className="p-3 rounded-xl space-y-3"
+                  style={{ 
+                    background: has11thInterval 
+                      ? 'linear-gradient(135deg, hsl(180 30% 12%), hsl(180 20% 8%))'
+                      : 'hsl(0 0% 8%)', 
+                    border: has11thInterval 
+                      ? '2px solid hsl(180 50% 40%)'
+                      : '1px solid hsl(0 0% 18%)',
+                    boxShadow: has11thInterval ? '0 0 20px hsl(180 50% 30% / 0.3)' : 'none',
+                  }}
                 >
-                  <SelectTrigger 
-                    className="w-40 h-8 text-xs font-mono"
-                    style={{ 
-                      background: 'hsl(0 0% 10%)', 
-                      border: '1px solid hsl(180 30% 30%)',
-                      color: has11thInterval ? 'hsl(180 60% 60%)' : 'hsl(0 0% 60%)',
-                    }}
-                  >
-                    <SelectValue placeholder="Select inoculant" />
-                  </SelectTrigger>
-                  <SelectContent 
-                    className="z-[100]"
-                    style={{ 
-                      background: 'hsl(0 0% 10%)', 
-                      border: '1px solid hsl(180 30% 30%)',
-                    }}
-                  >
-                    <SelectItem value="none" className="text-xs font-mono" style={{ color: 'hsl(0 0% 60%)' }}>
-                      None
-                    </SelectItem>
-                    {INOCULANT_OPTIONS.map((type) => (
-                      <SelectItem 
-                        key={type} 
-                        value={type!} 
-                        className="text-xs font-mono"
-                        style={{ color: 'hsl(180 60% 60%)' }}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <motion.div
+                        animate={has11thInterval ? { 
+                          scale: [1, 1.15, 1],
+                          opacity: [0.8, 1, 0.8],
+                        } : {}}
+                        transition={{ duration: 2, repeat: Infinity }}
                       >
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Water Reduction Display */}
-              {has11thInterval && chordStatus['Root (Lead)'] && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-2 mt-2"
-                >
-                  <Droplets className="w-4 h-4" style={{ color: 'hsl(200 70% 55%)' }} />
-                  <span className="text-[10px] font-mono" style={{ color: 'hsl(200 70% 55%)' }}>
-                    WATER EFFICIENCY: <span className="font-bold">-10%</span> (Fungal Retention)
-                  </span>
-                </motion.div>
-              )}
-            </div>
-          </div>
-
-          {/* 13th Interval - Aerial Signal (Overstory Layer) */}
-          <div className="px-4 pb-4">
-            <div 
-              className="p-3 rounded-xl space-y-3"
-              style={{ 
-                background: has13thInterval 
-                  ? 'linear-gradient(135deg, hsl(90 30% 12%), hsl(90 20% 8%))'
-                  : 'hsl(0 0% 8%)', 
-                border: has13thInterval 
-                  ? '2px solid hsl(90 50% 40%)'
-                  : '1px solid hsl(0 0% 18%)',
-                boxShadow: has13thInterval ? '0 0 20px hsl(90 50% 30% / 0.3)' : 'none',
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <motion.div
-                    animate={has13thInterval ? { 
-                      y: [-2, 2, -2],
-                      opacity: [0.7, 1, 0.7],
-                    } : {}}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  >
-                    <TreeDeciduous className="w-4 h-4" style={{ color: has13thInterval ? 'hsl(90 60% 55%)' : 'hsl(0 0% 40%)' }} />
-                  </motion.div>
-                  <span className="text-[10px] font-mono tracking-wider" style={{ color: has13thInterval ? 'hsl(90 60% 55%)' : 'hsl(0 0% 45%)' }}>
-                    13th INTERVAL • AERIAL SIGNAL
-                  </span>
-                </div>
-                {has13thInterval && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1, y: [-1, 1, -1] }}
-                    transition={{ y: { duration: 2, repeat: Infinity } }}
-                    className="flex items-center gap-1.5 px-2 py-1 rounded-full"
-                    style={{ background: 'hsl(90 40% 20%)', border: '1px solid hsl(90 50% 40%)' }}
-                  >
-                    <span className="text-[9px] font-mono font-bold" style={{ color: 'hsl(90 60% 60%)' }}>
-                      OVERSTORY ACTIVE
-                    </span>
-                  </motion.div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-3 flex-wrap">
-                <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
-                  AERIAL CROP:
-                </span>
-                <Select
-                  value={bed.aerial_crop_id || 'none'}
-                  onValueChange={handleAerialCropChange}
-                  disabled={!isAdmin}
-                >
-                  <SelectTrigger 
-                    className="w-44 h-8 text-xs font-mono"
-                    style={{ 
-                      background: 'hsl(0 0% 10%)', 
-                      border: '1px solid hsl(90 30% 30%)',
-                      color: has13thInterval ? 'hsl(90 60% 60%)' : 'hsl(0 0% 60%)',
-                    }}
-                  >
-                    <SelectValue placeholder="Select aerial crop" />
-                  </SelectTrigger>
-                  <SelectContent 
-                    className="z-[100] max-h-60"
-                    style={{ 
-                      background: 'hsl(0 0% 10%)', 
-                      border: '1px solid hsl(90 30% 30%)',
-                    }}
-                  >
-                    <SelectItem value="none" className="text-xs font-mono" style={{ color: 'hsl(0 0% 60%)' }}>
-                      None
-                    </SelectItem>
-                    {allCrops.map((crop) => (
-                      <SelectItem 
-                        key={crop.id} 
-                        value={crop.id} 
-                        className="text-xs font-mono"
-                        style={{ color: 'hsl(90 60% 60%)' }}
-                      >
-                        {crop.name} {crop.common_name ? `(${crop.common_name})` : ''}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Spacing Info */}
-              {has13thInterval && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center justify-between mt-2 pt-2"
-                  style={{ borderTop: '1px dashed hsl(90 30% 25%)' }}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono" style={{ color: 'hsl(90 50% 50%)' }}>
-                      SCATTERED PATTERN
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
-                      1 per 100 sq ft →
-                    </span>
-                    <span 
-                      className="px-2 py-0.5 rounded font-mono text-xs font-bold"
-                      style={{ background: 'hsl(90 40% 20%)', color: 'hsl(90 60% 60%)' }}
-                    >
-                      {AERIAL_PLANT_COUNT} plants
-                    </span>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Current Aerial Crop Display */}
-              {bed.aerial_crop && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex items-center gap-2 mt-2 p-2 rounded-lg"
-                  style={{ background: 'hsl(90 30% 15%)', border: '1px solid hsl(90 40% 30%)' }}
-                >
-                  <TreeDeciduous className="w-4 h-4" style={{ color: 'hsl(90 60% 55%)' }} />
-                  <div className="flex-1">
-                    <span className="text-xs font-mono block" style={{ color: 'hsl(90 60% 65%)' }}>
-                      {bed.aerial_crop.name}
-                    </span>
-                    {bed.aerial_crop.common_name && (
-                      <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
-                        {bed.aerial_crop.common_name}
+                        <Network className="w-4 h-4" style={{ color: has11thInterval ? 'hsl(180 60% 55%)' : 'hsl(0 0% 40%)' }} />
+                      </motion.div>
+                      <span className="text-[10px] font-mono tracking-wider" style={{ color: has11thInterval ? 'hsl(180 60% 55%)' : 'hsl(0 0% 45%)' }}>
+                        11th INTERVAL • FUNGAL NETWORK
                       </span>
+                    </div>
+                    {has11thInterval && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex items-center gap-1.5 px-2 py-1 rounded-full"
+                        style={{ background: 'hsl(180 50% 20%)', border: '1px solid hsl(180 50% 40%)' }}
+                      >
+                        <span className="text-[9px] font-mono font-bold" style={{ color: 'hsl(180 60% 60%)' }}>
+                          NETWORK ACTIVE
+                        </span>
+                      </motion.div>
                     )}
                   </div>
-                </motion.div>
-              )}
-            </div>
-          </div>
+
+                  {/* Zone-Specific Recommendation */}
+                  {zoneRec && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex items-center gap-2 p-2 rounded-lg cursor-help"
+                            style={{ 
+                              background: `${zoneRec.zoneColor}10`, 
+                              border: `1px dashed ${zoneRec.zoneColor}50`,
+                            }}
+                          >
+                            <Lightbulb className="w-3.5 h-3.5" style={{ color: zoneRec.zoneColor }} />
+                            <div className="flex-1">
+                              <span className="text-[10px] font-mono block" style={{ color: zoneRec.zoneColor }}>
+                                RECOMMENDED: {zoneRec.eleventh.name}
+                              </span>
+                              <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
+                                {zoneRec.eleventh.description}
+                              </span>
+                            </div>
+                          </motion.div>
+                        </TooltipTrigger>
+                        <TooltipContent 
+                          side="top" 
+                          className="max-w-xs p-3"
+                          style={{ 
+                            background: 'hsl(0 0% 10%)', 
+                            border: `1px solid ${zoneRec.zoneColor}`,
+                          }}
+                        >
+                          <p className="text-xs font-mono" style={{ color: zoneRec.zoneColor }}>
+                            🎷 WHY IT PLAYS JAZZ
+                          </p>
+                          <p className="text-[11px] mt-1" style={{ color: 'hsl(0 0% 70%)' }}>
+                            {zoneRec.jazzRationale}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
+                      INOCULANT TYPE:
+                    </span>
+                    <Select
+                      value={bed.inoculant_type || 'none'}
+                      onValueChange={handleInoculantChange}
+                      disabled={!isAdmin}
+                    >
+                      <SelectTrigger 
+                        className="w-40 h-8 text-xs font-mono"
+                        style={{ 
+                          background: 'hsl(0 0% 10%)', 
+                          border: '1px solid hsl(180 30% 30%)',
+                          color: has11thInterval ? 'hsl(180 60% 60%)' : 'hsl(0 0% 60%)',
+                        }}
+                      >
+                        <SelectValue placeholder="Select inoculant" />
+                      </SelectTrigger>
+                      <SelectContent 
+                        className="z-[100]"
+                        style={{ 
+                          background: 'hsl(0 0% 10%)', 
+                          border: '1px solid hsl(180 30% 30%)',
+                        }}
+                      >
+                        <SelectItem value="none" className="text-xs font-mono" style={{ color: 'hsl(0 0% 60%)' }}>
+                          None
+                        </SelectItem>
+                        {INOCULANT_OPTIONS.map((type) => (
+                          <SelectItem 
+                            key={type} 
+                            value={type!} 
+                            className="text-xs font-mono"
+                            style={{ color: 'hsl(180 60% 60%)' }}
+                          >
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Water Reduction Display */}
+                  {has11thInterval && chordStatus['Root (Lead)'] && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center gap-2 mt-2"
+                    >
+                      <Droplets className="w-4 h-4" style={{ color: 'hsl(200 70% 55%)' }} />
+                      <span className="text-[10px] font-mono" style={{ color: 'hsl(200 70% 55%)' }}>
+                        WATER EFFICIENCY: <span className="font-bold">-10%</span> (Fungal Retention)
+                      </span>
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* 13th Interval - Aerial Signal (Overstory Layer) */}
+          {(() => {
+            const zoneRec = getZoneRecommendation(bed.frequency_hz);
+            return (
+              <div className="px-4 pb-4">
+                <div 
+                  className="p-3 rounded-xl space-y-3"
+                  style={{ 
+                    background: has13thInterval 
+                      ? 'linear-gradient(135deg, hsl(90 30% 12%), hsl(90 20% 8%))'
+                      : 'hsl(0 0% 8%)', 
+                    border: has13thInterval 
+                      ? '2px solid hsl(90 50% 40%)'
+                      : '1px solid hsl(0 0% 18%)',
+                    boxShadow: has13thInterval ? '0 0 20px hsl(90 50% 30% / 0.3)' : 'none',
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <motion.div
+                        animate={has13thInterval ? { 
+                          y: [-2, 2, -2],
+                          opacity: [0.7, 1, 0.7],
+                        } : {}}
+                        transition={{ duration: 3, repeat: Infinity }}
+                      >
+                        <TreeDeciduous className="w-4 h-4" style={{ color: has13thInterval ? 'hsl(90 60% 55%)' : 'hsl(0 0% 40%)' }} />
+                      </motion.div>
+                      <span className="text-[10px] font-mono tracking-wider" style={{ color: has13thInterval ? 'hsl(90 60% 55%)' : 'hsl(0 0% 45%)' }}>
+                        13th INTERVAL • AERIAL SIGNAL
+                      </span>
+                    </div>
+                    {has13thInterval && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1, y: [-1, 1, -1] }}
+                        transition={{ y: { duration: 2, repeat: Infinity } }}
+                        className="flex items-center gap-1.5 px-2 py-1 rounded-full"
+                        style={{ background: 'hsl(90 40% 20%)', border: '1px solid hsl(90 50% 40%)' }}
+                      >
+                        <span className="text-[9px] font-mono font-bold" style={{ color: 'hsl(90 60% 60%)' }}>
+                          OVERSTORY ACTIVE
+                        </span>
+                      </motion.div>
+                    )}
+                  </div>
+
+                  {/* Zone-Specific Recommendation */}
+                  {zoneRec && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="flex items-center gap-2 p-2 rounded-lg cursor-help"
+                            style={{ 
+                              background: `${zoneRec.zoneColor}10`, 
+                              border: `1px dashed ${zoneRec.zoneColor}50`,
+                            }}
+                          >
+                            <Lightbulb className="w-3.5 h-3.5" style={{ color: zoneRec.zoneColor }} />
+                            <div className="flex-1">
+                              <span className="text-[10px] font-mono block" style={{ color: zoneRec.zoneColor }}>
+                                RECOMMENDED: {zoneRec.thirteenth.name}
+                              </span>
+                              <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
+                                {zoneRec.thirteenth.description}
+                              </span>
+                            </div>
+                          </motion.div>
+                        </TooltipTrigger>
+                        <TooltipContent 
+                          side="top" 
+                          className="max-w-xs p-3"
+                          style={{ 
+                            background: 'hsl(0 0% 10%)', 
+                            border: `1px solid ${zoneRec.zoneColor}`,
+                          }}
+                        >
+                          <p className="text-xs font-mono" style={{ color: zoneRec.zoneColor }}>
+                            🎷 WHY IT PLAYS JAZZ
+                          </p>
+                          <p className="text-[11px] mt-1" style={{ color: 'hsl(0 0% 70%)' }}>
+                            {zoneRec.jazzRationale}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
+                      AERIAL CROP:
+                    </span>
+                    <Select
+                      value={bed.aerial_crop_id || 'none'}
+                      onValueChange={handleAerialCropChange}
+                      disabled={!isAdmin}
+                    >
+                      <SelectTrigger 
+                        className="w-44 h-8 text-xs font-mono"
+                        style={{ 
+                          background: 'hsl(0 0% 10%)', 
+                          border: '1px solid hsl(90 30% 30%)',
+                          color: has13thInterval ? 'hsl(90 60% 60%)' : 'hsl(0 0% 60%)',
+                        }}
+                      >
+                        <SelectValue placeholder="Select aerial crop" />
+                      </SelectTrigger>
+                      <SelectContent 
+                        className="z-[100] max-h-60"
+                        style={{ 
+                          background: 'hsl(0 0% 10%)', 
+                          border: '1px solid hsl(90 30% 30%)',
+                        }}
+                      >
+                        <SelectItem value="none" className="text-xs font-mono" style={{ color: 'hsl(0 0% 60%)' }}>
+                          None
+                        </SelectItem>
+                        {allCrops.map((crop) => (
+                          <SelectItem 
+                            key={crop.id} 
+                            value={crop.id} 
+                            className="text-xs font-mono"
+                            style={{ color: 'hsl(90 60% 60%)' }}
+                          >
+                            {crop.name} {crop.common_name ? `(${crop.common_name})` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Spacing Info */}
+                  {has13thInterval && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center justify-between mt-2 pt-2"
+                      style={{ borderTop: '1px dashed hsl(90 30% 25%)' }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono" style={{ color: 'hsl(90 50% 50%)' }}>
+                          SCATTERED PATTERN
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
+                          1 per 100 sq ft →
+                        </span>
+                        <span 
+                          className="px-2 py-0.5 rounded font-mono text-xs font-bold"
+                          style={{ background: 'hsl(90 40% 20%)', color: 'hsl(90 60% 60%)' }}
+                        >
+                          {AERIAL_PLANT_COUNT} plants
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Current Aerial Crop Display */}
+                  {bed.aerial_crop && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center gap-2 mt-2 p-2 rounded-lg"
+                      style={{ background: 'hsl(90 30% 15%)', border: '1px solid hsl(90 40% 30%)' }}
+                    >
+                      <TreeDeciduous className="w-4 h-4" style={{ color: 'hsl(90 60% 55%)' }} />
+                      <div className="flex-1">
+                        <span className="text-xs font-mono block" style={{ color: 'hsl(90 60% 65%)' }}>
+                          {bed.aerial_crop.name}
+                        </span>
+                        {bed.aerial_crop.common_name && (
+                          <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
+                            {bed.aerial_crop.common_name}
+                          </span>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* 5th Bonus & 7th Mask Indicators */}
           {(has5thBonus || hasPestMasking) && (
