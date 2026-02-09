@@ -328,6 +328,35 @@ export const DATA_VISIBILITY_MATRIX: DataVisibilityRule[] = [
   },
 ];
 
+// Implementation Action Queue: Categorized tasks with target dates
+export type ActionCategory = 'Digital' | 'Physical' | 'Protocol';
+export type TargetDate = 'Today' | 'This Week' | 'This Month' | 'This Season';
+
+export interface ImplementationTask {
+  category: ActionCategory;
+  action: string;
+  targetDate: TargetDate;
+  completed?: boolean;
+}
+
+export const IMPLEMENTATION_QUEUE: ImplementationTask[] = [
+  {
+    category: 'Digital',
+    action: 'Paste the "Agro-Chord" prompt into Lovable.',
+    targetDate: 'Today',
+  },
+  {
+    category: 'Physical',
+    action: 'Order the Drip Solenoids for the 7 Zones.',
+    targetDate: 'This Week',
+  },
+  {
+    category: 'Protocol',
+    action: 'Log the first "Second Symphony" varieties into the Ledger.',
+    targetDate: 'This Week',
+  },
+];
+
 interface Props {
   isBeginnerMode?: boolean;
 }
