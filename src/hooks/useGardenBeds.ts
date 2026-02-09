@@ -1,6 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+/**
+ * Inoculant types for the 11th Interval (Fungal Network)
+ */
+export type InoculantType = 'Mycorrhizae' | 'Wine Cap' | 'Oyster' | 'Reishi' | null;
+
+export const INOCULANT_OPTIONS: InoculantType[] = [
+  'Mycorrhizae',
+  'Wine Cap', 
+  'Oyster',
+  'Reishi',
+];
+
 export interface GardenBed {
   id: string;
   bed_number: number;
@@ -10,6 +22,7 @@ export interface GardenBed {
   notes: string | null;
   internal_brix: number | null;
   vitality_status: 'pending' | 'thriving' | 'needs_attention';
+  inoculant_type: InoculantType;
   created_at: string;
   updated_at: string;
 }
@@ -174,6 +187,36 @@ export const useUpdateBedBrix = () => {
       queryClient.invalidateQueries({ queryKey: ['garden-beds'] });
     },
   });
+};
+
+// Update bed inoculant_type (11th Interval - Admin only)
+export const useUpdateBedInoculant = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ bedId, inoculantType }: { bedId: string; inoculantType: InoculantType }) => {
+      const { data, error } = await supabase
+        .from('garden_beds')
+        .update({ inoculant_type: inoculantType })
+        .eq('id', bedId)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['garden-beds'] });
+    },
+  });
+};
+
+/**
+ * Calculate water requirement reduction when 11th Interval is active
+ * @returns The percentage of original water needed (90% = 10% reduction)
+ */
+export const calculateWaterReduction = (hasInoculant: boolean): number => {
+  return hasInoculant ? 0.90 : 1.0; // 10% reduction when fungal network is active
 };
 
 // Add planting to bed

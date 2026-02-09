@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { GardenBed, BedPlanting, ChordInterval, CHORD_INTERVALS } from '@/hooks/useGardenBeds';
-import { Music, Sparkles, AlertCircle, Loader2, Zap } from 'lucide-react';
+import { Music, Sparkles, AlertCircle, Loader2, Zap, Network } from 'lucide-react';
 
 interface BedGridProps {
   beds: GardenBed[];
@@ -8,7 +8,7 @@ interface BedGridProps {
   onSelectBed: (bed: GardenBed) => void;
   isAdmin: boolean;
   isLoading?: boolean;
-  bedPlantingsMap?: Record<string, BedPlanting[]>; // Optional: map of bed_id -> plantings for chord status
+  bedPlantingsMap?: Record<string, BedPlanting[]>;
 }
 
 // Check if a bed has a complete chord (all 4 intervals)
@@ -17,6 +17,11 @@ const isCompleteChord = (plantings: BedPlanting[] = []): boolean => {
     plantings.some(p => p.crop?.chord_interval === interval);
   
   return CHORD_INTERVALS.every(interval => hasInterval(interval));
+};
+
+// Check if bed has 11th Interval (Fungal Network) active
+const hasNetworkActive = (bed: GardenBed): boolean => {
+  return bed.inoculant_type !== null;
 };
 
 const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlantingsMap = {} }: BedGridProps) => {
@@ -42,10 +47,26 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlan
   const getVitalityIcon = (bed: GardenBed) => {
     const plantings = bedPlantingsMap[bed.id] || [];
     const isTuned = isCompleteChord(plantings);
+    const hasNetwork = hasNetworkActive(bed);
 
     // Show Harmonically Tuned icon if complete chord
     if (isTuned) {
       return <Zap className="w-3 h-3" style={{ color: bed.zone_color }} />;
+    }
+
+    // Show Network Active icon if 11th Interval is active
+    if (hasNetwork) {
+      return (
+        <motion.div
+          animate={{ 
+            opacity: [0.6, 1, 0.6],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <Network className="w-3 h-3" style={{ color: 'hsl(180 60% 50%)' }} />
+        </motion.div>
+      );
     }
 
     if (isAdmin) {
@@ -93,6 +114,7 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlan
               const isSelected = selectedBedId === bed.id;
               const plantings = bedPlantingsMap[bed.id] || [];
               const isTuned = isCompleteChord(plantings);
+              const hasNetwork = hasNetworkActive(bed);
               
               return (
                 <motion.button
@@ -103,12 +125,16 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlan
                       ? `linear-gradient(135deg, ${zone.color}40, ${zone.color}20)`
                       : isTuned
                         ? `linear-gradient(135deg, ${zone.color}25, ${zone.color}10)`
-                        : 'hsl(0 0% 12%)',
+                        : hasNetwork
+                          ? 'linear-gradient(135deg, hsl(180 30% 15%), hsl(180 20% 10%))'
+                          : 'hsl(0 0% 12%)',
                     border: isSelected 
                       ? `2px solid ${zone.color}` 
                       : isTuned
                         ? `2px solid ${zone.color}80`
-                        : '1px solid hsl(0 0% 20%)',
+                        : hasNetwork
+                          ? '2px solid hsl(180 50% 40%)'
+                          : '1px solid hsl(0 0% 20%)',
                     boxShadow: isSelected 
                       ? `0 0 20px ${zone.color}50` 
                       : isTuned
@@ -122,14 +148,26 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlan
                   }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => onSelectBed(bed)}
-                  animate={isTuned && !isSelected ? {
-                    boxShadow: [
-                      `0 0 10px ${zone.color}20`,
-                      `0 0 20px ${zone.color}40`,
-                      `0 0 10px ${zone.color}20`,
-                    ],
-                  } : {}}
-                  transition={{ duration: 3, repeat: isTuned && !isSelected ? Infinity : 0 }}
+                  animate={
+                    isTuned && !isSelected 
+                      ? {
+                          boxShadow: [
+                            `0 0 10px ${zone.color}20`,
+                            `0 0 20px ${zone.color}40`,
+                            `0 0 10px ${zone.color}20`,
+                          ],
+                        }
+                      : hasNetwork && !isSelected
+                        ? {
+                            boxShadow: [
+                              '0 0 8px hsl(180 50% 30%)',
+                              '0 0 16px hsl(180 60% 40%)',
+                              '0 0 8px hsl(180 50% 30%)',
+                            ],
+                          }
+                        : {}
+                  }
+                  transition={{ duration: 3, repeat: (isTuned || hasNetwork) && !isSelected ? Infinity : 0 }}
                 >
                   <span 
                     className="text-sm font-mono font-bold"
