@@ -234,6 +234,72 @@ const LinerNotes = () => {
         </div>
       </div>
 
+      {/* JOIN THE MOVEMENT — CTA */}
+      <div className="relative z-10 px-6 py-10">
+        <motion.div
+          className="max-w-xl mx-auto text-center p-8 rounded-2xl"
+          style={{
+            background: 'linear-gradient(135deg, hsl(45 30% 8%), hsl(30 20% 6%), hsl(20 15% 5%))',
+            border: '1px solid hsl(45 40% 25%)',
+            boxShadow: '0 0 60px hsl(45 40% 15% / 0.3), inset 0 1px 0 hsl(45 40% 30% / 0.15)',
+          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <motion.div
+            className="w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(135deg, hsl(45 70% 45%), hsl(35 60% 35%))',
+              boxShadow: '0 0 25px hsl(45 60% 40% / 0.5)',
+            }}
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            <Waves className="w-6 h-6" style={{ color: 'hsl(45 100% 90%)' }} />
+          </motion.div>
+
+          <h2
+            className="text-2xl md:text-3xl tracking-[0.1em] mb-3"
+            style={{
+              fontFamily: "'Staatliches', sans-serif",
+              color: 'hsl(45 80% 65%)',
+              textShadow: '0 0 20px hsl(45 60% 30% / 0.4)',
+            }}
+          >
+            JOIN THE MOVEMENT
+          </h2>
+
+          <p
+            className="text-sm leading-relaxed mb-6 max-w-sm mx-auto"
+            style={{ color: 'hsl(30 20% 55%)', fontFamily: "'Space Mono', monospace" }}
+          >
+            Support the Art of the Earth. Your membership funds the frequency, the soil, and the sound of AgroMajic.
+          </p>
+
+          <motion.button
+            className="px-8 py-3.5 rounded-full font-mono text-sm tracking-[0.15em] uppercase"
+            style={{
+              background: 'linear-gradient(135deg, hsl(45 70% 48%), hsl(35 65% 40%))',
+              color: 'hsl(30 20% 8%)',
+              boxShadow: '0 0 30px hsl(45 60% 40% / 0.4), 0 4px 15px hsl(0 0% 0% / 0.3)',
+              fontWeight: 700,
+            }}
+            whileHover={{
+              scale: 1.04,
+              boxShadow: '0 0 45px hsl(45 70% 45% / 0.6), 0 6px 20px hsl(0 0% 0% / 0.4)',
+            }}
+            whileTap={{ scale: 0.97 }}
+          >
+            Secure Dosage
+          </motion.button>
+
+          <p className="font-mono text-[9px] mt-4 tracking-wider" style={{ color: 'hsl(0 0% 30%)' }}>
+            2026 CSA MEMBERSHIP • SOVEREIGN HARVEST
+          </p>
+        </motion.div>
+      </div>
+
       {/* Credits Footer */}
       <footer className="relative z-10 px-6 py-8 text-center">
         <div
