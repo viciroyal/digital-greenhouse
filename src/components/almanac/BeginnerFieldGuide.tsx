@@ -1,22 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Leaf, 
   Activity, 
   Sprout, 
-  ChevronDown,
   CheckCircle,
   AlertTriangle,
   RefreshCw,
+  Ruler,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 import { useSoilAmendments } from '@/hooks/useMasterCrops';
 import { SovereigntyFooter } from '@/components/almanac';
 
 // Storage keys for persistence (shared with Profile Dashboard)
 const STORAGE_KEY_BRIX_LOGS = 'pharmer-brix-logs';
 const STORAGE_KEY_BED_RESETS = 'pharmer-bed-reset-count';
+
+// Base reference: 60 ft x 2.5 ft = 150 sq ft
+const BASE_AREA_SQ_FT = 150;
 
 interface BrixLog {
   id: string;
@@ -25,6 +29,51 @@ interface BrixLog {
   status: 'low' | 'optimal';
   crop?: string;
 }
+
+// Parse quantity string to extract numeric value and unit
+const parseQuantity = (quantityStr: string): { value: number; unit: string } => {
+  // Match patterns like "5 quarts", "2.5 cups", "1 quart", etc.
+  const match = quantityStr.match(/^([\d.]+)\s*(.*)$/i);
+  if (match) {
+    return { value: parseFloat(match[1]), unit: match[2].toLowerCase().trim() };
+  }
+  return { value: 1, unit: quantityStr };
+};
+
+// Convert to smart units (quarts vs cups)
+const formatSmartUnits = (quarts: number): string => {
+  if (quarts >= 1) {
+    // Round to 1 decimal place
+    const rounded = Math.round(quarts * 10) / 10;
+    return `${rounded} ${rounded === 1 ? 'quart' : 'quarts'}`;
+  } else {
+    // Convert to cups (1 quart = 4 cups)
+    const cups = quarts * 4;
+    const rounded = Math.round(cups * 10) / 10;
+    return `${rounded} ${rounded === 1 ? 'cup' : 'cups'}`;
+  }
+};
+
+// Scale quantity based on area factor
+const scaleQuantity = (quantityStr: string, scaleFactor: number): string => {
+  const { value, unit } = parseQuantity(quantityStr);
+  
+  // Check if unit is quarts-based
+  const isQuarts = unit.includes('quart');
+  const isCups = unit.includes('cup');
+  
+  if (isQuarts || isCups) {
+    // Convert to quarts first if cups
+    const baseQuarts = isCups ? value / 4 : value;
+    const scaledQuarts = baseQuarts * scaleFactor;
+    return formatSmartUnits(scaledQuarts);
+  }
+  
+  // For other units, just scale the number
+  const scaled = value * scaleFactor;
+  const rounded = Math.round(scaled * 10) / 10;
+  return `${rounded} ${unit}`;
+};
 
 // Cross-sync event for journal entries
 const dispatchJournalPrompt = (brixValue: number) => {
@@ -38,7 +87,7 @@ const dispatchJournalPrompt = (brixValue: number) => {
  * BEGINNER'S FIELD GUIDE
  * 
  * Simplified checklist dashboard with:
- * - Reset Bed button (Master Mix recipe)
+ * - Reset Bed button (Master Mix recipe with dynamic calculator)
  * - Brix Check (Green/Red light)
  * - Simple crop list (no Hz jargon)
  */
@@ -48,6 +97,20 @@ const BeginnerFieldGuide = () => {
 
   // Master Mix checklist state
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
+
+  // Bed dimension calculator state
+  const [bedWidth, setBedWidth] = useState(2.5); // Default 2.5 ft
+  const [bedLength, setBedLength] = useState(60); // Default 60 ft
+  const [useInches, setUseInches] = useState(false);
+
+  // Calculate scaling factor
+  const { currentArea, scaleFactor } = useMemo(() => {
+    const area = bedWidth * bedLength;
+    return {
+      currentArea: area,
+      scaleFactor: area / BASE_AREA_SQ_FT,
+    };
+  }, [bedWidth, bedLength]);
 
   // Brix validator state
   const [brixValue, setBrixValue] = useState<string>('');
@@ -269,43 +332,162 @@ const BeginnerFieldGuide = () => {
             >
               {/* Header */}
               <div
-                className="p-4 flex items-center justify-between"
+                className="p-4"
                 style={{
                   background: 'linear-gradient(135deg, hsl(35 40% 18%), hsl(35 35% 12%))',
                   borderBottom: '1px solid hsl(35 40% 30%)',
                 }}
               >
-                <div>
-                  <h3
-                    className="text-lg tracking-wider"
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3
+                      className="text-lg tracking-wider"
+                      style={{
+                        fontFamily: "'Staatliches', sans-serif",
+                        color: 'hsl(35 70% 65%)',
+                      }}
+                    >
+                      🌱 MASTER MIX RECIPE
+                    </h3>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={resetChecklist}
+                    className="text-xs font-mono"
                     style={{
-                      fontFamily: "'Staatliches', sans-serif",
-                      color: 'hsl(35 70% 65%)',
+                      background: 'transparent',
+                      border: '1px solid hsl(0 0% 30%)',
+                      color: 'hsl(0 0% 60%)',
                     }}
                   >
-                    🌱 MASTER MIX RECIPE
-                  </h3>
-                  <p
-                    className="text-xs font-mono"
-                    style={{ color: 'hsl(35 40% 50%)' }}
-                  >
-                    For a 60-foot bed
-                  </p>
+                    <RefreshCw className="w-3 h-3 mr-1" />
+                    Clear
+                  </Button>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={resetChecklist}
-                  className="text-xs font-mono"
+
+                {/* Dimension Calculator */}
+                <div
+                  className="p-3 rounded-lg space-y-3"
                   style={{
-                    background: 'transparent',
-                    border: '1px solid hsl(0 0% 30%)',
-                    color: 'hsl(0 0% 60%)',
+                    background: 'hsl(35 30% 12%)',
+                    border: '1px solid hsl(35 40% 25%)',
                   }}
                 >
-                  <RefreshCw className="w-3 h-3 mr-1" />
-                  Clear
-                </Button>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Ruler className="w-4 h-4" style={{ color: 'hsl(35 60% 55%)' }} />
+                    <span
+                      className="text-xs font-mono tracking-wider"
+                      style={{ color: 'hsl(35 50% 60%)' }}
+                    >
+                      BED DIMENSIONS
+                    </span>
+                    <button
+                      onClick={() => setUseInches(!useInches)}
+                      className="ml-auto text-[10px] font-mono px-2 py-0.5 rounded"
+                      style={{
+                        background: useInches ? 'hsl(195 50% 30%)' : 'transparent',
+                        border: '1px solid hsl(195 40% 40%)',
+                        color: 'hsl(195 60% 65%)',
+                      }}
+                    >
+                      {useInches ? 'INCHES' : 'FEET'}
+                    </button>
+                  </div>
+
+                  {/* Width Slider */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-mono" style={{ color: 'hsl(0 0% 55%)' }}>
+                        Width
+                      </span>
+                      <span
+                        className="text-sm font-mono font-bold"
+                        style={{ color: 'hsl(51 80% 60%)' }}
+                      >
+                        {useInches ? `${Math.round(bedWidth * 12)}"` : `${bedWidth} ft`}
+                      </span>
+                    </div>
+                    <Slider
+                      value={[bedWidth]}
+                      onValueChange={([val]) => setBedWidth(val)}
+                      min={2}
+                      max={10}
+                      step={0.5}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                      <span>2 ft</span>
+                      <span>10 ft</span>
+                    </div>
+                  </div>
+
+                  {/* Length Slider */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-mono" style={{ color: 'hsl(0 0% 55%)' }}>
+                        Length
+                      </span>
+                      <span
+                        className="text-sm font-mono font-bold"
+                        style={{ color: 'hsl(51 80% 60%)' }}
+                      >
+                        {useInches ? `${Math.round(bedLength * 12)}"` : `${bedLength} ft`}
+                      </span>
+                    </div>
+                    <Slider
+                      value={[bedLength]}
+                      onValueChange={([val]) => setBedLength(val)}
+                      min={5}
+                      max={100}
+                      step={5}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                      <span>5 ft</span>
+                      <span>100 ft</span>
+                    </div>
+                  </div>
+
+                  {/* Area & Scale Display */}
+                  <div
+                    className="flex items-center justify-between p-2 rounded-lg mt-2"
+                    style={{
+                      background: 'hsl(120 20% 12%)',
+                      border: '1px solid hsl(120 30% 25%)',
+                    }}
+                  >
+                    <div className="text-center flex-1">
+                      <span className="text-[10px] font-mono block" style={{ color: 'hsl(0 0% 50%)' }}>
+                        AREA
+                      </span>
+                      <span className="text-sm font-mono font-bold" style={{ color: 'hsl(120 50% 60%)' }}>
+                        {currentArea} sq ft
+                      </span>
+                    </div>
+                    <div
+                      className="w-px h-8 mx-2"
+                      style={{ background: 'hsl(0 0% 25%)' }}
+                    />
+                    <div className="text-center flex-1">
+                      <span className="text-[10px] font-mono block" style={{ color: 'hsl(0 0% 50%)' }}>
+                        SCALE
+                      </span>
+                      <span
+                        className="text-sm font-mono font-bold"
+                        style={{
+                          color: scaleFactor === 1 
+                            ? 'hsl(0 0% 60%)' 
+                            : scaleFactor > 1 
+                            ? 'hsl(51 70% 55%)' 
+                            : 'hsl(195 60% 60%)',
+                        }}
+                      >
+                        {scaleFactor === 1 ? '1x (base)' : `${Math.round(scaleFactor * 100) / 100}x`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Checklist */}
@@ -347,9 +529,9 @@ const BeginnerFieldGuide = () => {
                           <CheckCircle className="w-4 h-4 text-white" />
                         )}
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <span
-                          className="font-mono text-sm"
+                          className="font-mono text-sm block truncate"
                           style={{
                             color: checkedItems[amendment.id] 
                               ? 'hsl(120 50% 65%)' 
@@ -361,10 +543,10 @@ const BeginnerFieldGuide = () => {
                         </span>
                       </div>
                       <span
-                        className="text-sm font-mono font-bold shrink-0"
-                        style={{ color: 'hsl(51 70% 60%)' }}
+                        className="text-sm font-mono font-bold shrink-0 text-right"
+                        style={{ color: 'hsl(51 70% 60%)', minWidth: '80px' }}
                       >
-                        {amendment.quantity_per_60ft}
+                        {scaleQuantity(amendment.quantity_per_60ft, scaleFactor)}
                       </span>
                     </motion.button>
                   ))
