@@ -11,16 +11,33 @@ export interface WisdomProtocol {
   source: string;
   rule: string;
   citation: string;
-  category: 'root' | 'regeneration' | 'biology' | 'mineral' | 'frequency';
+  category: 'root' | 'regeneration' | 'biology' | 'mineral' | 'frequency' | 'cosmic';
 }
 
 export interface AmendmentRecommendation {
   id: string;
   name: string;
-  type: 'biological' | 'mineral' | 'cover-crop';
+  type: 'biological' | 'mineral' | 'cover-crop' | 'biodynamic';
   description: string;
   zone?: number; // Solfeggio zone (396, 417, 528, etc.)
+  moonPhase?: 'ascending' | 'descending' | 'full' | 'new';
 }
+
+/**
+ * THE 7-ZONE OCTAVE
+ * 
+ * The Hermetic Law: "Nothing rests; everything moves; everything vibrates."
+ * All crops are organized by their resonant frequency.
+ */
+export const solfeggioOctave = [
+  { hz: 396, name: 'Root Pulse', element: 'Earth', color: 'hsl(0 60% 50%)', zone: 1 },
+  { hz: 417, name: 'Stone Hum', element: 'Fire', color: 'hsl(30 60% 50%)', zone: 2 },
+  { hz: 528, name: 'The Songline', element: 'Air', color: 'hsl(120 50% 45%)', zone: 3 },
+  { hz: 639, name: 'Gold Flow', element: 'Water', color: 'hsl(51 80% 50%)', zone: 4 },
+  { hz: 741, name: 'Voice Gate', element: 'Ether', color: 'hsl(180 50% 45%)', zone: 5 },
+  { hz: 852, name: 'Third Eye', element: 'Light', color: 'hsl(270 50% 50%)', zone: 6 },
+  { hz: 963, name: 'Source Code', element: 'Spirit', color: 'hsl(300 50% 50%)', zone: 7 },
+] as const;
 
 /**
  * THE CORE PROTOCOLS
@@ -28,6 +45,7 @@ export interface AmendmentRecommendation {
  * These are the immutable laws that govern all recommendations.
  */
 export const wisdomProtocols: WisdomProtocol[] = [
+  // BATCH 1: The Microscopic Foundation
   {
     id: 'ingham-soil-food-web',
     name: 'The Law of the Soil Food Web',
@@ -67,6 +85,83 @@ export const wisdomProtocols: WisdomProtocol[] = [
     rule: 'Prioritize legumes and beans in Zone 3 (528Hz).',
     citation: 'Let the plants do the work of feeding themselves.',
     category: 'biology',
+  },
+  
+  // BATCH 2: The Cosmic & Vibrational
+  {
+    id: 'steiner-organism',
+    name: 'The Steiner Principle',
+    source: 'Rudolf Steiner (Biodynamics)',
+    rule: 'The farm is a living organism with organs and a soul.',
+    citation: 'The compost pile is the stomach of the farm.',
+    category: 'cosmic',
+  },
+  {
+    id: 'steiner-lunar',
+    name: 'The Lunar Alignment',
+    source: 'Rudolf Steiner (Biodynamics)',
+    rule: 'Align foliar sprays with the Moon Phase — Silica in ascending, Horn in descending.',
+    citation: 'The cosmos breathes through the soil.',
+    category: 'cosmic',
+  },
+  {
+    id: 'hermetic-vibration',
+    name: 'The Hermetic Law of Vibration',
+    source: 'The Kybalion',
+    rule: 'Nothing rests; everything moves; everything vibrates.',
+    citation: 'Every crop has its frequency. Tune the soil to the song.',
+    category: 'frequency',
+  },
+  {
+    id: 'hermetic-correspondence',
+    name: 'The Hermetic Law of Correspondence',
+    source: 'The Kybalion',
+    rule: 'As above, so below; as below, so above.',
+    citation: 'The stars guide the roots. The roots mirror the stars.',
+    category: 'cosmic',
+  },
+];
+
+/**
+ * BIODYNAMIC PREPARATIONS
+ * 
+ * Aligned with moon phases per Steiner Protocol.
+ */
+export const biodynamicPreparations: AmendmentRecommendation[] = [
+  {
+    id: 'bd-500',
+    name: 'Horn Manure (BD 500)',
+    type: 'biodynamic',
+    description: 'Spray in evening. Stimulates root growth and soil biology.',
+    moonPhase: 'descending',
+  },
+  {
+    id: 'bd-501',
+    name: 'Horn Silica (BD 501)',
+    type: 'biodynamic',
+    description: 'Spray at dawn. Enhances photosynthesis and light reception.',
+    moonPhase: 'ascending',
+  },
+  {
+    id: 'bd-502',
+    name: 'Yarrow Preparation (BD 502)',
+    type: 'biodynamic',
+    description: 'For compost. Activates potassium and sulfur processes.',
+    moonPhase: 'full',
+  },
+  {
+    id: 'bd-503',
+    name: 'Chamomile Preparation (BD 503)',
+    type: 'biodynamic',
+    description: 'For compost. Stabilizes nitrogen and calcium.',
+    moonPhase: 'full',
+  },
+  {
+    id: 'bd-507',
+    name: 'Valerian Preparation (BD 507)',
+    type: 'biodynamic',
+    description: 'For compost. Protects from frost. Phosphorus activator.',
+    moonPhase: 'full',
   },
 ];
 
@@ -171,7 +266,7 @@ export const coverCropsByZone: AmendmentRecommendation[] = [
 /**
  * Get wisdom citation for a specific action type
  */
-export const getWisdomCitation = (actionType: 'root' | 'check' | 'plant' | 'reset'): string => {
+export const getWisdomCitation = (actionType: 'root' | 'check' | 'plant' | 'reset' | 'cosmic' | 'frequency'): string => {
   switch (actionType) {
     case 'root':
     case 'reset':
@@ -180,9 +275,34 @@ export const getWisdomCitation = (actionType: 'root' | 'check' | 'plant' | 'rese
       return wisdomProtocols.find(p => p.id === 'carver-regeneration')?.citation || '';
     case 'plant':
       return wisdomProtocols.find(p => p.id === 'nitrogen-fixer-priority')?.citation || '';
+    case 'cosmic':
+      return wisdomProtocols.find(p => p.id === 'steiner-organism')?.citation || '';
+    case 'frequency':
+      return wisdomProtocols.find(p => p.id === 'hermetic-vibration')?.citation || '';
     default:
       return '';
   }
+};
+
+/**
+ * Get the Solfeggio zone info for a frequency
+ */
+export const getZoneInfo = (hz: number) => {
+  return solfeggioOctave.find(z => z.hz === hz) || solfeggioOctave[0];
+};
+
+/**
+ * Get biodynamic spray recommendation based on moon phase
+ */
+export const getBiodynamicSpray = (phase: 'ascending' | 'descending' | 'full' | 'new'): {
+  preparation: AmendmentRecommendation | undefined;
+  citation: string;
+} => {
+  const prep = biodynamicPreparations.find(p => p.moonPhase === phase);
+  return {
+    preparation: prep,
+    citation: wisdomProtocols.find(p => p.id === 'steiner-lunar')?.citation || '',
+  };
 };
 
 /**
