@@ -12,3 +12,4 @@
 export { default as DynamicSoilEngine } from './DynamicSoilEngine';
 export { default as VitalityEngine } from './VitalityEngine';
 export { default as ResonanceEngine } from './ResonanceEngine';
+export { default as CompanionEngine } from './CompanionEngine';

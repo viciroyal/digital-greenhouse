@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, Activity, Radio } from 'lucide-react';
+import { Calculator, Activity, Radio, Link2 } from 'lucide-react';
 import { SovereigntyFooter } from '@/components/almanac';
-import { DynamicSoilEngine, VitalityEngine, ResonanceEngine } from './engines';
+import { DynamicSoilEngine, VitalityEngine, ResonanceEngine, CompanionEngine } from './engines';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -11,13 +11,14 @@ import { DynamicSoilEngine, VitalityEngine, ResonanceEngine } from './engines';
  * 
  * PHILOSOPHY: Radical Efficiency. Input → Output is immediate.
  * 
- * THREE ENGINES:
+ * FOUR ENGINES:
  * 1. SOIL CALCULATOR  → Bed dimensions → Scaled recipe
  * 2. VITALITY CHECK   → Brix value → Binary signal (RED/GREEN)
  * 3. ZONE FILTER      → Frequency → Filtered view + accent color
+ * 4. COMPANION        → Crop selection → Auto-suggested companions
  */
 
-type Engine = 'soil' | 'vitality' | 'zone';
+type Engine = 'soil' | 'vitality' | 'zone' | 'companion';
 
 const BeginnerFieldGuide = () => {
   const [activeEngine, setActiveEngine] = useState<Engine>('soil');
@@ -26,6 +27,7 @@ const BeginnerFieldGuide = () => {
     { id: 'soil' as const, label: 'SOIL', icon: Calculator, color: 'hsl(35 70% 55%)' },
     { id: 'vitality' as const, label: 'VITALITY', icon: Activity, color: 'hsl(195 70% 55%)' },
     { id: 'zone' as const, label: 'ZONE', icon: Radio, color: 'hsl(270 60% 55%)' },
+    { id: 'companion' as const, label: 'COMPANION', icon: Link2, color: 'hsl(45 70% 55%)' },
   ];
 
   return (
@@ -98,6 +100,7 @@ const BeginnerFieldGuide = () => {
           {activeEngine === 'soil' && <DynamicSoilEngine />}
           {activeEngine === 'vitality' && <VitalityEngine />}
           {activeEngine === 'zone' && <ResonanceEngine />}
+          {activeEngine === 'companion' && <CompanionEngine />}
         </motion.div>
       </AnimatePresence>
 
