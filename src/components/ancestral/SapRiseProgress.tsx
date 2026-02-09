@@ -29,8 +29,8 @@ const SapRiseProgress = ({ overallProgress }: SapRiseProgressProps) => {
 
   return (
     <motion.div
-      className="fixed right-4 md:right-8 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-2"
-      initial={{ opacity: 0, x: 50 }}
+      className="fixed left-4 md:left-8 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-2"
+      initial={{ opacity: 0, x: -50 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 1, duration: 0.8 }}
     >
