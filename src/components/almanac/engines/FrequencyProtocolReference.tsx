@@ -170,6 +170,41 @@ export const HOLE_PLUG_PROTOCOL: HolePlugMapping[] = [
   },
 ];
 
+// Infrastructure Components: Missing elements mapped to vibrational alignment
+export interface InfrastructureComponent {
+  component: string;
+  missingElement: string;
+  vibrationalAlignment: string;
+  hzRange?: string;
+}
+
+export const INFRASTRUCTURE_COMPONENTS: InfrastructureComponent[] = [
+  {
+    component: 'Irrigation',
+    missingElement: 'Zone-Specific Drip Timers',
+    vibrationalAlignment: '396Hz (Deep) to 963Hz (Mist)',
+    hzRange: '396-963',
+  },
+  {
+    component: 'Harvest',
+    missingElement: 'Structured Water Wash Station',
+    vibrationalAlignment: '528Hz (Solar/Cleaning)',
+    hzRange: '528',
+  },
+  {
+    component: 'Data',
+    missingElement: 'NIR/Brix Digital Ledger',
+    vibrationalAlignment: 'The "5th Agreement" Record',
+    hzRange: '741',
+  },
+  {
+    component: 'Security',
+    missingElement: 'Perimeter "Garlic Shield" Expansion',
+    vibrationalAlignment: '963Hz (Protection)',
+    hzRange: '963',
+  },
+];
+
 interface Props {
   isBeginnerMode?: boolean;
 }
