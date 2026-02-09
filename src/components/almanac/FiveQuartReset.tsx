@@ -1,32 +1,19 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Beaker, Scale, Check, RefreshCw } from 'lucide-react';
+import { Beaker, Scale, Check, RefreshCw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useSoilAmendments } from '@/hooks/useMasterCrops';
 
 /**
  * THE 5-QUART RESET
  * Quick-action button for the Master Mix recipe
- * Scaled for a 60-foot bed (5 quarts total)
+ * Now connected to the soil_amendments database table
  */
-
-interface Ingredient {
-  name: string;
-  quantity: string;
-  description: string;
-}
-
-const masterMixIngredients: Ingredient[] = [
-  { name: 'Pro-Mix / Base Media', quantity: '1 qt', description: 'Peat-based growing medium' },
-  { name: 'Alfalfa / Soybean Meal', quantity: '1 qt', description: 'Nitrogen & growth hormones' },
-  { name: 'Kelp / Sea Minerals', quantity: '1 qt', description: 'Trace minerals & cytokinins' },
-  { name: 'Harmony Calcium', quantity: '1 qt', description: 'Calcium carbonate balance' },
-  { name: 'Worm Castings', quantity: '½ qt', description: 'Living microbiology' },
-  { name: 'Humates', quantity: '½ qt', description: 'Carbon & chelation' },
-];
 
 const FiveQuartReset = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
+  const { data: amendments, isLoading } = useSoilAmendments();
 
   const toggleItem = (name: string) => {
     const newChecked = new Set(checkedItems);
@@ -42,7 +29,8 @@ const FiveQuartReset = () => {
     setCheckedItems(new Set());
   };
 
-  const allChecked = checkedItems.size === masterMixIngredients.length;
+  const displayAmendments = amendments || [];
+  const allChecked = displayAmendments.length > 0 && checkedItems.size === displayAmendments.length;
 
   return (
     <div className="w-full max-w-lg mx-auto">
@@ -112,7 +100,7 @@ const FiveQuartReset = () => {
                       className="text-xs font-mono"
                       style={{ color: 'hsl(40 50% 50%)' }}
                     >
-                      SOIL RESET PROTOCOL
+                      SOIL RESET PROTOCOL • Database Synced
                     </p>
                   </div>
                   <div
@@ -167,25 +155,30 @@ const FiveQuartReset = () => {
                   >
                     INGREDIENTS
                   </p>
-                  <button
-                    onClick={resetChecklist}
-                    className="flex items-center gap-1 text-xs font-mono px-2 py-1 rounded"
-                    style={{
-                      color: 'hsl(0 0% 50%)',
-                      background: 'hsl(0 0% 15%)',
-                      border: '1px solid hsl(0 0% 25%)',
-                    }}
-                  >
-                    <RefreshCw className="w-3 h-3" />
-                    Reset
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {isLoading && (
+                      <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'hsl(40 60% 50%)' }} />
+                    )}
+                    <button
+                      onClick={resetChecklist}
+                      className="flex items-center gap-1 text-xs font-mono px-2 py-1 rounded"
+                      style={{
+                        color: 'hsl(0 0% 50%)',
+                        background: 'hsl(0 0% 15%)',
+                        border: '1px solid hsl(0 0% 25%)',
+                      }}
+                    >
+                      <RefreshCw className="w-3 h-3" />
+                      Reset
+                    </button>
+                  </div>
                 </div>
 
-                {masterMixIngredients.map((ingredient, index) => {
-                  const isChecked = checkedItems.has(ingredient.name);
+                {displayAmendments.map((amendment, index) => {
+                  const isChecked = checkedItems.has(amendment.name);
                   return (
                     <motion.button
-                      key={ingredient.name}
+                      key={amendment.id}
                       className="w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all"
                       style={{
                         background: isChecked ? 'hsl(120 40% 15%)' : 'hsl(0 0% 12%)',
@@ -196,7 +189,7 @@ const FiveQuartReset = () => {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      onClick={() => toggleItem(ingredient.name)}
+                      onClick={() => toggleItem(amendment.name)}
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                     >
@@ -225,7 +218,7 @@ const FiveQuartReset = () => {
                               textDecoration: isChecked ? 'line-through' : 'none',
                             }}
                           >
-                            {ingredient.name}
+                            {amendment.name}
                           </span>
                           <span
                             className="text-sm font-mono font-bold px-2 py-0.5 rounded"
@@ -235,14 +228,14 @@ const FiveQuartReset = () => {
                               border: '1px solid hsl(35 60% 40%)',
                             }}
                           >
-                            {ingredient.quantity}
+                            {amendment.quantity_per_60ft}
                           </span>
                         </div>
                         <p
                           className="text-[10px] font-mono"
                           style={{ color: 'hsl(0 0% 45%)' }}
                         >
-                          {ingredient.description}
+                          {amendment.description}
                         </p>
                       </div>
                     </motion.button>

@@ -66,7 +66,7 @@ const MycelialCursor = () => {
   if (!isVisible || isMobile) return null;
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[9999]">
+    <div className="fixed inset-0 pointer-events-none z-[99999]" style={{ isolation: 'isolate' }}>
       {/* Mycelial trail threads */}
       <svg className="absolute inset-0 w-full h-full">
         <defs>
@@ -135,26 +135,28 @@ const MycelialCursor = () => {
           ease: 'easeInOut',
         }}
       >
-        {/* Outer glow */}
+        {/* Outer glow - Enhanced for visibility */}
         <div
           className="absolute rounded-full"
           style={{
-            width: 24,
-            height: 24,
-            left: -12,
-            top: -12,
-            background: 'radial-gradient(circle, hsl(45 90% 70% / 0.3) 0%, transparent 70%)',
+            width: 32,
+            height: 32,
+            left: -16,
+            top: -16,
+            background: 'radial-gradient(circle, hsl(45 100% 80% / 0.5) 0%, hsl(45 90% 60% / 0.2) 50%, transparent 70%)',
+            filter: 'blur(2px)',
           }}
         />
 
-        {/* Core spore */}
+        {/* Core spore - High contrast */}
         <div
           className="rounded-full"
           style={{
-            width: 8,
-            height: 8,
-            background: 'radial-gradient(circle at 30% 30%, hsl(45 100% 90%), hsl(45 90% 60%))',
-            boxShadow: '0 0 10px hsl(45 90% 60% / 0.8), 0 0 20px hsl(45 90% 50% / 0.4)',
+            width: 12,
+            height: 12,
+            background: 'radial-gradient(circle at 30% 30%, hsl(45 100% 95%), hsl(45 90% 70%))',
+            boxShadow: '0 0 15px hsl(45 100% 70%), 0 0 30px hsl(45 90% 50% / 0.6), 0 0 4px 2px hsl(0 0% 100% / 0.8)',
+            border: '1px solid hsl(0 0% 100% / 0.5)',
           }}
         />
       </motion.div>

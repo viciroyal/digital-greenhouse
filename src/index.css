@@ -94,7 +94,17 @@
 @layer base {
   * {
     @apply border-border;
-    cursor: none !important;
+  }
+
+  /* Ensure cursor is always visible with high contrast */
+  html, body, * {
+    cursor: auto;
+  }
+
+  /* Interactive elements get pointer cursor */
+  a, button, [role="button"], input[type="submit"], input[type="button"],
+  [onclick], .cursor-pointer {
+    cursor: pointer !important;
   }
 
   html {
