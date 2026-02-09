@@ -3,7 +3,7 @@
  * AGROMAJIC SCIENCE CORE - ENGINE EXPORTS
  * ═══════════════════════════════════════════════════════════════════════════
  * 
- * Eleven high-efficiency, logic-driven engines:
+ * Twelve high-efficiency, logic-driven engines:
  * 1. DynamicSoilEngine - Bed Reset (Input → Calculation → Output)
  * 2. VitalityEngine - Brix Check (Input → Threshold → Output)
  * 3. ResonanceEngine - Zone Filter (Input → Filter → Output)
@@ -15,6 +15,7 @@
  * 9. ExtractionEngine - Harvest Logic (Input → Quality Tag → Feedback Loop)
  * 10. DistributionEngine - CSA Logic (Input → Fair Division → Scarcity Alert)
  * 11. RegenerationEngine - Waste Logic (Input → Role Assignment → Legacy Task)
+ * 12. FrequencyProtocolReference - Master Protocol Map (Frequency → Role → Mineral → Soil)
  */
 
 export { default as DynamicSoilEngine } from './DynamicSoilEngine';
@@ -28,3 +29,4 @@ export { default as RolesEngine } from './RolesEngine';
 export { default as ExtractionEngine } from './ExtractionEngine';
 export { default as DistributionEngine } from './DistributionEngine';
 export { default as RegenerationEngine } from './RegenerationEngine';
+export { default as FrequencyProtocolReference, FREQUENCY_PROTOCOLS, type FrequencyProtocol } from './FrequencyProtocolReference';

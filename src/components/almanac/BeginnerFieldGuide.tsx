@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, Activity, Radio, Link2, ShieldAlert, Music, Star, Users, Scale, Package, Recycle } from 'lucide-react';
+import { Calculator, Activity, Radio, Link2, ShieldAlert, Music, Star, Users, Scale, Package, Recycle, BookOpen, Sprout, Tractor } from 'lucide-react';
 import { SovereigntyFooter } from '@/components/almanac';
 import { 
   DynamicSoilEngine, 
@@ -14,6 +14,7 @@ import {
   ExtractionEngine,
   DistributionEngine,
   RegenerationEngine,
+  FrequencyProtocolReference,
 } from './engines';
 
 /**
@@ -23,7 +24,7 @@ import {
  * 
  * PHILOSOPHY: Radical Efficiency. Input → Output is immediate.
  * 
- * ELEVEN ENGINES (3 Sections):
+ * TWELVE ENGINES (3 Sections + Reference):
  * 
  * INPUT ENGINES:
  * 1. SOIL CALCULATOR  → Bed dimensions → Scaled recipe
@@ -41,9 +42,13 @@ import {
  * 9. EXTRACTION       → Harvest → Quality tag + Feedback loop
  * 10. DISTRIBUTION    → CSA shares → Fair division + Scarcity alerts
  * 11. REGENERATION    → Waste → Role assignment + Legacy tasks
+ * 
+ * REFERENCE:
+ * 12. PROTOCOL MAP    → Frequency → Role → Mineral → Soil Focus
  */
 
-type Engine = 'soil' | 'vitality' | 'zone' | 'companion' | 'intervene' | 'harmonic' | 'celestial' | 'roles' | 'extract' | 'distribute' | 'regen';
+type Engine = 'soil' | 'vitality' | 'zone' | 'companion' | 'intervene' | 'harmonic' | 'celestial' | 'roles' | 'extract' | 'distribute' | 'regen' | 'protocol';
+type ScienceMode = 'beginner' | 'farmer';
 
 interface EngineConfig {
   id: Engine;
@@ -54,6 +59,20 @@ interface EngineConfig {
 
 const BeginnerFieldGuide = () => {
   const [activeEngine, setActiveEngine] = useState<Engine>('soil');
+  const [scienceMode, setScienceMode] = useState<ScienceMode>(() => {
+    try {
+      const stored = localStorage.getItem('pharmer-science-mode');
+      return (stored === 'beginner' || stored === 'farmer') ? stored : 'farmer';
+    } catch { return 'farmer'; }
+  });
+
+  const isBeginnerMode = scienceMode === 'beginner';
+
+  const toggleMode = () => {
+    const newMode = scienceMode === 'beginner' ? 'farmer' : 'beginner';
+    setScienceMode(newMode);
+    localStorage.setItem('pharmer-science-mode', newMode);
+  };
 
   // Grouped engines for organized display
   const inputEngines: EngineConfig[] = [
@@ -74,6 +93,7 @@ const BeginnerFieldGuide = () => {
     { id: 'extract', label: 'YIELD', icon: Scale, color: 'hsl(120 50% 55%)' },
     { id: 'distribute', label: 'CSA', icon: Package, color: 'hsl(210 60% 55%)' },
     { id: 'regen', label: 'CYCLE', icon: Recycle, color: 'hsl(35 60% 55%)' },
+    { id: 'protocol', label: 'MAP', icon: BookOpen, color: 'hsl(270 50% 60%)' },
   ];
 
   const renderEngineRow = (engines: EngineConfig[], label: string) => (
@@ -117,7 +137,7 @@ const BeginnerFieldGuide = () => {
 
   return (
     <div className="max-w-xl mx-auto px-4 pb-32">
-      {/* Header - Minimal */}
+      {/* Header with Mode Toggle */}
       <motion.div
         className="text-center mb-4"
         initial={{ opacity: 0, y: -20 }}
@@ -136,6 +156,30 @@ const BeginnerFieldGuide = () => {
         <p className="text-[10px] font-mono tracking-widest mt-1" style={{ color: 'hsl(0 0% 45%)' }}>
           INPUT → LOGIC → OUTPUT
         </p>
+        
+        {/* Mode Toggle */}
+        <div className="flex items-center justify-center gap-2 mt-3">
+          <button
+            onClick={toggleMode}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all"
+            style={{
+              background: isBeginnerMode ? 'hsl(120 30% 15%)' : 'hsl(35 30% 15%)',
+              border: `1px solid ${isBeginnerMode ? 'hsl(120 50% 40%)' : 'hsl(35 50% 40%)'}`,
+            }}
+          >
+            {isBeginnerMode ? (
+              <Sprout className="w-4 h-4" style={{ color: 'hsl(120 50% 55%)' }} />
+            ) : (
+              <Tractor className="w-4 h-4" style={{ color: 'hsl(35 60% 55%)' }} />
+            )}
+            <span
+              className="text-[10px] font-mono tracking-wider"
+              style={{ color: isBeginnerMode ? 'hsl(120 50% 60%)' : 'hsl(35 60% 60%)' }}
+            >
+              {isBeginnerMode ? 'BEGINNER' : 'FARMER'}
+            </span>
+          </button>
+        </div>
       </motion.div>
 
       {/* Engine Tabs - Three Rows */}
@@ -160,7 +204,7 @@ const BeginnerFieldGuide = () => {
         >
           {activeEngine === 'soil' && <DynamicSoilEngine />}
           {activeEngine === 'vitality' && <VitalityEngine />}
-          {activeEngine === 'zone' && <ResonanceEngine />}
+          {activeEngine === 'zone' && <ResonanceEngine isBeginnerMode={isBeginnerMode} />}
           {activeEngine === 'companion' && <CompanionEngine />}
           {activeEngine === 'intervene' && <InterventionEngine />}
           {activeEngine === 'harmonic' && <HarmonicEngine />}
@@ -169,6 +213,7 @@ const BeginnerFieldGuide = () => {
           {activeEngine === 'extract' && <ExtractionEngine />}
           {activeEngine === 'distribute' && <DistributionEngine />}
           {activeEngine === 'regen' && <RegenerationEngine />}
+          {activeEngine === 'protocol' && <FrequencyProtocolReference isBeginnerMode={isBeginnerMode} />}
         </motion.div>
       </AnimatePresence>
 
