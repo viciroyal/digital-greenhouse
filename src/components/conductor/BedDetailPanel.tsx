@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Plus, Check, AlertTriangle, Leaf, Shield, 
-  Pickaxe, Sparkles, Music, Loader2, Trash2, Zap, Network, Droplets, TreeDeciduous, Crown, Lightbulb 
+  Pickaxe, Sparkles, Music, Loader2, Trash2, Zap, Network, Droplets, TreeDeciduous, Crown, Lightbulb, Wand2 
 } from 'lucide-react';
 import { 
   GardenBed, BedPlanting, calculatePlantCount, useAddPlanting, useRemovePlanting, 
@@ -15,6 +15,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getZoneRecommendation } from '@/data/jazzVoicingRecommendations';
+import { useAutoGeneration, checkDissonance, getMasterMixSetting, INSTRUMENT_ICONS, InstrumentType } from '@/hooks/useAutoGeneration';
+import ChordSheet from './ChordSheet';
+import DissonanceWarning from './DissonanceWarning';
 
 // Extended bed type with aerial crop data
 interface BedWithAerial extends GardenBed {
@@ -101,6 +104,9 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
   const [isAddingCrop, setIsAddingCrop] = useState(false);
   const [selectedInterval, setSelectedInterval] = useState<ChordInterval>('Root (Lead)');
   const [brixInput, setBrixInput] = useState(bed.internal_brix?.toString() || '');
+  const [showChordSheet, setShowChordSheet] = useState(false);
+  const [dissonanceCheck, setDissonanceCheck] = useState<{ crop: MasterCrop; interval: ChordInterval } | null>(null);
+  const [pendingCrop, setPendingCrop] = useState<MasterCrop | null>(null);
   
   const { data: allCrops = [], isLoading: cropsLoading } = useMasterCrops();
   const addPlanting = useAddPlanting();
@@ -109,8 +115,26 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
   const updateInoculant = useUpdateBedInoculant();
   const updateAerialCrop = useUpdateBedAerialCrop();
 
+  // Get the Root crop from current plantings
+  const rootPlanting = plantings.find(p => p.crop?.chord_interval === 'Root (Lead)');
+  const rootCrop = rootPlanting?.crop ? allCrops.find(c => c.id === rootPlanting.crop_id) : null;
+
+  // Auto-generation hook
+  const { zoneCrops, cropsByInterval, generateChord, checkDissonance: checkCropDissonance } = useAutoGeneration(
+    allCrops,
+    bed.frequency_hz,
+    rootCrop || null
+  );
+
+  // Generate chord when root is selected
+  const generatedChord = useMemo(() => {
+    if (rootCrop) {
+      return generateChord();
+    }
+    return null;
+  }, [rootCrop, generateChord]);
+
   // 13th Interval: Get available aerial/overstory crops (trees, tall perennials)
-  // These should ideally be filtered by a category, but for now we'll show all crops
   const aerialCrops = allCrops.filter(crop => 
     crop.category === 'tree' || crop.category === 'perennial' || crop.guild_role === 'Enhancer'
   );
@@ -158,6 +182,9 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
   // Smart suggestion: When Root is planted, show 5th and 7th suggestions
   const showSmartSuggestions = chordStatus['Root (Lead)'] && !isCompleteChord && isAdmin && !isAddingCrop;
 
+  // Get master mix setting for this zone
+  const masterMixSetting = getMasterMixSetting(bed.frequency_hz);
+
   const handleInoculantChange = async (value: string) => {
     if (!isAdmin) {
       toast.error('Only admins can update inoculant');
@@ -190,10 +217,20 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
     }
   };
 
-  const handleAddCrop = async (crop: MasterCrop) => {
+  const handleAddCrop = async (crop: MasterCrop, skipDissonanceCheck = false) => {
     if (!isAdmin) {
       toast.error('Only admins can add crops');
       return;
+    }
+
+    // Check for dissonance (frequency mismatch)
+    if (!skipDissonanceCheck) {
+      const dissonance = checkDissonance(crop, bed.frequency_hz, selectedInterval);
+      if (dissonance.isDissonant) {
+        setDissonanceCheck({ crop, interval: selectedInterval });
+        setPendingCrop(crop);
+        return;
+      }
     }
 
     const plantCount = calculatePlantCount(crop.spacing_inches);
@@ -207,8 +244,80 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
       });
       toast.success(`Added ${crop.name} (${plantCount} plants)`);
       setIsAddingCrop(false);
+      setDissonanceCheck(null);
+      setPendingCrop(null);
     } catch (error) {
       toast.error('Failed to add crop');
+    }
+  };
+
+  // Handle proceeding despite dissonance
+  const handleProceedWithDissonance = () => {
+    if (pendingCrop) {
+      handleAddCrop(pendingCrop, true);
+    }
+  };
+
+  // Handle dismissing dissonance warning
+  const handleDismissDissonance = () => {
+    setDissonanceCheck(null);
+    setPendingCrop(null);
+  };
+
+  // Auto-fill all intervals when Root is selected
+  const handleAutoFillChord = async () => {
+    if (!isAdmin || !generatedChord) {
+      toast.error('Select a Root crop first to auto-fill');
+      return;
+    }
+
+    try {
+      // Add 3rd
+      if (generatedChord.third && !chordStatus['3rd (Triad)']) {
+        const plantCount = calculatePlantCount(generatedChord.third.spacing_inches);
+        await addPlanting.mutateAsync({
+          bedId: bed.id,
+          cropId: generatedChord.third.id,
+          guildRole: '3rd (Triad)',
+          plantCount,
+        });
+      }
+
+      // Add 5th
+      if (generatedChord.fifth && !chordStatus['5th (Stabilizer)']) {
+        const plantCount = calculatePlantCount(generatedChord.fifth.spacing_inches);
+        await addPlanting.mutateAsync({
+          bedId: bed.id,
+          cropId: generatedChord.fifth.id,
+          guildRole: '5th (Stabilizer)',
+          plantCount,
+        });
+      }
+
+      // Add 7th
+      if (generatedChord.seventh && !chordStatus['7th (Signal)']) {
+        const plantCount = calculatePlantCount(generatedChord.seventh.spacing_inches);
+        await addPlanting.mutateAsync({
+          bedId: bed.id,
+          cropId: generatedChord.seventh.id,
+          guildRole: '7th (Signal)',
+          plantCount,
+        });
+      }
+
+      // Set 11th (inoculant)
+      if (generatedChord.eleventh && !has11thInterval) {
+        await updateInoculant.mutateAsync({ bedId: bed.id, inoculantType: generatedChord.eleventh });
+      }
+
+      // Set 13th (aerial crop)
+      if (generatedChord.thirteenth && !has13thInterval) {
+        await updateAerialCrop.mutateAsync({ bedId: bed.id, aerialCropId: generatedChord.thirteenth.id });
+      }
+
+      toast.success('🎵 Chord Auto-Generated! All intervals filled based on frequency zone.');
+    } catch (error) {
+      toast.error('Failed to auto-fill chord');
     }
   };
 
@@ -392,9 +501,80 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
         </div>
       )}
 
+      {/* Dissonance Warning Modal */}
+      <AnimatePresence>
+        {dissonanceCheck && pendingCrop && (
+          <div className="p-4">
+            <DissonanceWarning
+              check={checkDissonance(pendingCrop, bed.frequency_hz, dissonanceCheck.interval)}
+              onDismiss={handleDismissDissonance}
+              onProceed={handleProceedWithDissonance}
+            />
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* ADMIN VIEW: Full Chord Conductor */}
       {isAdmin && (
         <>
+          {/* Auto-Fill Button - Shows when Root is planted but chord is incomplete */}
+          {chordStatus['Root (Lead)'] && !isCompleteChord && generatedChord && (
+            <div className="px-4 pb-2">
+              <motion.button
+                className="w-full py-3 px-4 rounded-xl flex items-center justify-center gap-2"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(270 50% 25%), hsl(280 40% 20%))',
+                  border: '2px solid hsl(270 60% 50%)',
+                  boxShadow: '0 0 20px hsl(270 60% 40% / 0.3)',
+                }}
+                whileHover={{ scale: 1.02, boxShadow: '0 0 30px hsl(270 60% 50% / 0.5)' }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleAutoFillChord}
+              >
+                <Wand2 className="w-5 h-5" style={{ color: 'hsl(270 70% 70%)' }} />
+                <span className="text-sm font-mono font-bold tracking-wider" style={{ color: 'hsl(270 70% 75%)' }}>
+                  AUTO-FILL CHORD
+                </span>
+                <span className="text-[10px] font-mono ml-2 px-2 py-0.5 rounded" style={{ background: 'hsl(270 50% 35%)', color: 'hsl(270 60% 80%)' }}>
+                  3rd + 5th + 7th + 11th + 13th
+                </span>
+              </motion.button>
+            </div>
+          )}
+
+          {/* Chord Sheet Toggle */}
+          <div className="px-4 pb-2">
+            <motion.button
+              className="w-full py-2 px-4 rounded-lg flex items-center justify-between"
+              style={{
+                background: showChordSheet ? 'hsl(45 40% 15%)' : 'hsl(0 0% 10%)',
+                border: showChordSheet ? '1px solid hsl(45 60% 45%)' : '1px solid hsl(0 0% 25%)',
+              }}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              onClick={() => setShowChordSheet(!showChordSheet)}
+            >
+              <div className="flex items-center gap-2">
+                <Music className="w-4 h-4" style={{ color: showChordSheet ? 'hsl(45 70% 60%)' : 'hsl(0 0% 50%)' }} />
+                <span className="text-xs font-mono font-bold" style={{ color: showChordSheet ? 'hsl(45 70% 60%)' : 'hsl(0 0% 60%)' }}>
+                  VIEW CHORD SHEET
+                </span>
+              </div>
+              <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
+                {showChordSheet ? '▼' : '▶'}
+              </span>
+            </motion.button>
+          </div>
+
+          {/* Chord Sheet Display */}
+          <AnimatePresence>
+            {showChordSheet && generatedChord && (
+              <div className="px-4 pb-4">
+                <ChordSheet sheet={generatedChord.chordSheet} isAdmin={isAdmin} />
+              </div>
+            )}
+          </AnimatePresence>
+
           <div className="p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono tracking-wider" style={{ color: 'hsl(0 0% 55%)' }}>

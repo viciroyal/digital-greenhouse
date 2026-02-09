@@ -52,6 +52,7 @@ export interface MasterCrop {
   description: string | null;
   brix_target_min: number | null;
   brix_target_max: number | null;
+  instrument_type: string | null; // Musical instrument: Electric Guitar, Percussion, Horn Section, Bass, Synthesizers
   created_at: string;
   updated_at: string;
 }
