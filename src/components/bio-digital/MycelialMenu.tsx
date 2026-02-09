@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { KeyholeButton } from '@/components/portal';
-import WhisperTooltip from '@/components/ui/WhisperTooltip';
 
 interface MenuNode {
   id: string;
@@ -76,8 +75,8 @@ const MycelialMenu = ({ onInitiationClick }: MycelialMenuProps) => {
     >
       {/* The Initiation Keyhole */}
       <KeyholeButton onClick={onInitiationClick || (() => {})} />
-      {/* Spore/Seed Button */}
-      <WhisperTooltip whisper="Return to the Mounds" position="left">
+      {/* Spore/Seed Button - tooltip only shows when menu is closed */}
+      <div className="relative">
         <motion.button
           className="relative w-14 h-14 rounded-full flex items-center justify-center"
           style={{
@@ -123,13 +122,13 @@ const MycelialMenu = ({ onInitiationClick }: MycelialMenuProps) => {
           transition={{ duration: 0.5 }}
         />
         </motion.button>
-      </WhisperTooltip>
+      </div>
 
       {/* Mycelium Network Container */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="absolute top-0 left-0 w-80 h-80"
+            className="absolute top-0 left-0 w-[400px] h-[400px] z-[60]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
