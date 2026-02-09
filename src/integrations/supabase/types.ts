@@ -105,6 +105,63 @@ export type Database = {
           },
         ]
       }
+      master_crops: {
+        Row: {
+          brix_target_max: number | null
+          brix_target_min: number | null
+          category: string
+          common_name: string | null
+          companion_crops: string[] | null
+          created_at: string
+          description: string | null
+          element: string
+          frequency_hz: number
+          harvest_days: number | null
+          id: string
+          name: string
+          planting_season: string[] | null
+          updated_at: string
+          zone_color: string
+          zone_name: string
+        }
+        Insert: {
+          brix_target_max?: number | null
+          brix_target_min?: number | null
+          category?: string
+          common_name?: string | null
+          companion_crops?: string[] | null
+          created_at?: string
+          description?: string | null
+          element: string
+          frequency_hz: number
+          harvest_days?: number | null
+          id?: string
+          name: string
+          planting_season?: string[] | null
+          updated_at?: string
+          zone_color: string
+          zone_name: string
+        }
+        Update: {
+          brix_target_max?: number | null
+          brix_target_min?: number | null
+          category?: string
+          common_name?: string | null
+          companion_crops?: string[] | null
+          created_at?: string
+          description?: string | null
+          element?: string
+          frequency_hz?: number
+          harvest_days?: number | null
+          id?: string
+          name?: string
+          planting_season?: string[] | null
+          updated_at?: string
+          zone_color?: string
+          zone_name?: string
+        }
+        Relationships: []
+      }
       modules: {
         Row: {
           chakra_color: string
@@ -138,6 +195,39 @@ export type Database = {
           lineage?: string
           name?: string
           order_index?: number
+        }
+        Relationships: []
+      }
+      soil_amendments: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          frequency_affinity: number[] | null
+          id: string
+          name: string
+          nutrient_contribution: string | null
+          quantity_per_60ft: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          frequency_affinity?: number[] | null
+          id?: string
+          name: string
+          nutrient_contribution?: string | null
+          quantity_per_60ft: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          frequency_affinity?: number[] | null
+          id?: string
+          name?: string
+          nutrient_contribution?: string | null
+          quantity_per_60ft?: string
         }
         Relationships: []
       }
