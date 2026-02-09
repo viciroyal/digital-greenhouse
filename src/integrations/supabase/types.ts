@@ -222,6 +222,7 @@ export type Database = {
           guild_role: string | null
           harvest_days: number | null
           id: string
+          instrument_type: string | null
           library_note: string | null
           name: string
           planting_season: string[] | null
@@ -249,6 +250,7 @@ export type Database = {
           guild_role?: string | null
           harvest_days?: number | null
           id?: string
+          instrument_type?: string | null
           library_note?: string | null
           name: string
           planting_season?: string[] | null
@@ -276,6 +278,7 @@ export type Database = {
           guild_role?: string | null
           harvest_days?: number | null
           id?: string
+          instrument_type?: string | null
           library_note?: string | null
           name?: string
           planting_season?: string[] | null
