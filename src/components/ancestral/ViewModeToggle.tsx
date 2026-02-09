@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
-import { BookOpen, PenTool, Map } from 'lucide-react';
+import { BookOpen, PenTool, Map, Sparkles } from 'lucide-react';
 
-export type ViewMode = 'book' | 'log' | 'path';
+export type ViewMode = 'book' | 'log' | 'path' | 'spirit';
 
 interface ViewModeToggleProps {
   value: ViewMode;
   onChange: (mode: ViewMode) => void;
   showPath?: boolean;
+  showSpirit?: boolean;
 }
 
 /**
@@ -16,13 +17,14 @@ interface ViewModeToggleProps {
  * - THE ALMANAC: Living reference book (Read / Study / Reference)
  * - THE LOG: Personal journal (Write / Record / Reflect)
  * 
- * Secondary option (hidden by default):
+ * Secondary options:
  * - THE PATH: Gamified totem with locked levels
+ * - THE SPIRIT: Deep knowledge repository (Vibrational Legend & 7 Pillars)
  */
-const ViewModeToggle = ({ value, onChange, showPath = false }: ViewModeToggleProps) => {
+const ViewModeToggle = ({ value, onChange, showPath = false, showSpirit = false }: ViewModeToggleProps) => {
   return (
     <motion.div
-      className="flex items-center gap-1 p-1 rounded-full"
+      className="flex flex-wrap items-center justify-center gap-1 p-1 rounded-full"
       style={{
         background: 'hsl(20 30% 10% / 0.95)',
         border: '1px solid hsl(40 40% 25%)',
@@ -32,6 +34,30 @@ const ViewModeToggle = ({ value, onChange, showPath = false }: ViewModeTogglePro
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
     >
+      {/* THE SPIRIT Option (Deep Knowledge) */}
+      {showSpirit && (
+        <motion.button
+          className="flex items-center gap-2 px-4 py-2 rounded-full font-mono text-xs tracking-wider transition-all"
+          style={{
+            background: value === 'spirit' 
+              ? 'linear-gradient(135deg, hsl(270 45% 25%), hsl(280 40% 20%))'
+              : 'transparent',
+            color: value === 'spirit' 
+              ? 'hsl(270 70% 75%)' 
+              : 'hsl(40 30% 50%)',
+            boxShadow: value === 'spirit' 
+              ? '0 0 20px hsl(270 60% 40% / 0.3)' 
+              : 'none',
+          }}
+          onClick={() => onChange('spirit')}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <Sparkles className="w-4 h-4" />
+          THE SPIRIT
+        </motion.button>
+      )}
+
       {/* THE ALMANAC Option (Read) */}
       <motion.button
         className="flex items-center gap-2 px-4 py-2 rounded-full font-mono text-xs tracking-wider transition-all"
