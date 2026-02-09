@@ -135,6 +135,41 @@ export const INTEGRATION_PROTOCOL: IntegrationLayer[] = [
   },
 ];
 
+// Hole/Plug Protocol: Infrastructure gaps mapped to frequency-aligned solutions
+export interface HolePlugMapping {
+  hole: string;
+  plug: string;
+  hz: number;
+  hzLabel: string;
+}
+
+export const HOLE_PLUG_PROTOCOL: HolePlugMapping[] = [
+  {
+    hole: 'Nutrient Loss',
+    plug: 'Vortex of Return (Compost)',
+    hz: 396,
+    hzLabel: 'Foundation',
+  },
+  {
+    hole: 'Guesswork',
+    plug: 'NIR Spectroscopy Scans',
+    hz: 741,
+    hzLabel: 'Signal',
+  },
+  {
+    hole: 'Labor Leak',
+    plug: 'Well-to-Irrigation Hookup',
+    hz: 417,
+    hzLabel: 'Flow',
+  },
+  {
+    hole: 'Silence',
+    plug: 'Resonant Stage PA System',
+    hz: 963,
+    hzLabel: 'Source',
+  },
+];
+
 interface Props {
   isBeginnerMode?: boolean;
 }
