@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Plus, Check, AlertTriangle, Leaf, Shield, 
-  Pickaxe, Sparkles, Music, Loader2, Trash2 
+  Pickaxe, Sparkles, Music, Loader2, Trash2, Zap 
 } from 'lucide-react';
 import { GardenBed, BedPlanting, calculatePlantCount, useAddPlanting, useRemovePlanting, useUpdateBedBrix, ChordInterval, CHORD_INTERVALS } from '@/hooks/useGardenBeds';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -47,6 +47,16 @@ const getIntervalLabel = (interval: string) => {
   }
 };
 
+const getIntervalDescription = (interval: string) => {
+  switch (interval) {
+    case 'Root (Lead)': return 'The Anchor • Main Harvest';
+    case '3rd (Triad)': return 'Triad Support • Pest Defense';
+    case '5th (Stabilizer)': return 'Stabilizer • Deep Minerals';
+    case '7th (Signal)': return 'Signal Note • Pollinators';
+    default: return '';
+  }
+};
+
 const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProps) => {
   const [isAddingCrop, setIsAddingCrop] = useState(false);
   const [selectedInterval, setSelectedInterval] = useState<ChordInterval>('Root (Lead)');
@@ -74,6 +84,12 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
   };
   const isCompleteChord = Object.values(chordStatus).every(Boolean);
 
+  // Get missing intervals for smart suggestions
+  const missingIntervals = CHORD_INTERVALS.filter(interval => !chordStatus[interval]);
+
+  // Smart suggestion: When Root is planted, show 5th and 7th suggestions
+  const showSmartSuggestions = chordStatus['Root (Lead)'] && !isCompleteChord && isAdmin && !isAddingCrop;
+
   const handleAddCrop = async (crop: MasterCrop) => {
     if (!isAdmin) {
       toast.error('Only admins can add crops');
@@ -86,7 +102,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
       await addPlanting.mutateAsync({
         bedId: bed.id,
         cropId: crop.id,
-        guildRole: selectedInterval, // Using chord interval as guild role
+        guildRole: selectedInterval,
         plantCount,
       });
       toast.success(`Added ${crop.name} (${plantCount} plants)`);
@@ -123,18 +139,28 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
     }
   };
 
+  const handleSuggestionClick = (interval: ChordInterval) => {
+    setSelectedInterval(interval);
+    setIsAddingCrop(true);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
-      className="rounded-xl overflow-hidden"
+      className="rounded-[25px] overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 6%))',
+        background: isCompleteChord 
+          ? `linear-gradient(180deg, ${bed.zone_color}15, hsl(0 0% 6%))`
+          : 'linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 6%))',
         border: `2px solid ${bed.zone_color}`,
+        boxShadow: isCompleteChord 
+          ? `0 0 30px ${bed.zone_color}40, 0 0 60px ${bed.zone_color}20`
+          : 'none',
       }}
     >
-      {/* Header */}
+      {/* Header with Harmonically Tuned Badge */}
       <div
         className="p-4 flex items-center justify-between"
         style={{
@@ -143,17 +169,26 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
         }}
       >
         <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center"
+          <motion.div
+            className="w-12 h-12 rounded-xl flex items-center justify-center"
             style={{
               background: `${bed.zone_color}30`,
               border: `2px solid ${bed.zone_color}`,
+              boxShadow: isCompleteChord ? `0 0 15px ${bed.zone_color}60` : 'none',
             }}
+            animate={isCompleteChord ? { 
+              boxShadow: [
+                `0 0 15px ${bed.zone_color}60`,
+                `0 0 25px ${bed.zone_color}80`,
+                `0 0 15px ${bed.zone_color}60`,
+              ]
+            } : {}}
+            transition={{ duration: 2, repeat: Infinity }}
           >
-            <span className="text-lg font-mono font-bold" style={{ color: bed.zone_color }}>
+            <span className="text-xl font-mono font-bold" style={{ color: bed.zone_color }}>
               {bed.bed_number}
             </span>
-          </div>
+          </motion.div>
           <div>
             <h3 className="font-mono text-sm font-bold" style={{ color: bed.zone_color }}>
               {bed.zone_name}
@@ -167,28 +202,50 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
           </div>
         </div>
         
-        <button
-          onClick={onClose}
-          className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-        >
-          <X className="w-5 h-5" style={{ color: 'hsl(0 0% 50%)' }} />
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Harmonically Tuned Badge */}
+          <AnimatePresence>
+            {isCompleteChord && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                style={{
+                  background: `linear-gradient(135deg, ${bed.zone_color}40, ${bed.zone_color}20)`,
+                  border: `1px solid ${bed.zone_color}`,
+                  boxShadow: `0 0 20px ${bed.zone_color}50`,
+                }}
+              >
+                <Zap className="w-3.5 h-3.5" style={{ color: bed.zone_color }} />
+                <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: bed.zone_color }}>
+                  HARMONICALLY TUNED
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            <X className="w-5 h-5" style={{ color: 'hsl(0 0% 50%)' }} />
+          </button>
+        </div>
       </div>
 
-      {/* Complete Chord Checklist */}
+      {/* Complete Chord Status */}
       <div className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono tracking-wider" style={{ color: 'hsl(0 0% 55%)' }}>
-            COMPLETE CHORD
+            CHORD CONDUCTOR
           </span>
-          {isCompleteChord && (
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full" 
-              style={{ background: 'hsl(120 50% 30%)', color: 'hsl(120 50% 70%)' }}>
-              ✓ COMPLETE
-            </span>
-          )}
+          <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+            {Object.values(chordStatus).filter(Boolean).length}/4 Notes
+          </span>
         </div>
         
+        {/* Chord Interval Grid */}
         <div className="grid grid-cols-4 gap-2">
           {CHORD_INTERVALS.map((interval) => {
             const Icon = getIntervalIcon(interval);
@@ -197,30 +254,95 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
             const label = getIntervalLabel(interval);
             
             return (
-              <div
+              <motion.button
                 key={interval}
-                className="flex flex-col items-center gap-1 p-2 rounded-lg"
+                className="flex flex-col items-center gap-1 p-3 rounded-xl cursor-pointer"
                 style={{
-                  background: hasIt ? `${color}15` : 'hsl(0 0% 8%)',
-                  border: `1px solid ${hasIt ? color : 'hsl(0 0% 18%)'}`,
+                  background: hasIt ? `${color}20` : 'hsl(0 0% 8%)',
+                  border: `2px solid ${hasIt ? color : 'hsl(0 0% 18%)'}`,
+                  boxShadow: hasIt ? `0 0 12px ${color}30` : 'none',
                 }}
+                whileHover={{ scale: isAdmin ? 1.05 : 1 }}
+                whileTap={{ scale: isAdmin ? 0.95 : 1 }}
+                onClick={() => isAdmin && handleSuggestionClick(interval)}
+                disabled={!isAdmin}
               >
                 <Icon 
-                  className="w-4 h-4" 
+                  className="w-5 h-5" 
                   style={{ color: hasIt ? color : 'hsl(0 0% 35%)' }} 
                 />
                 <span 
-                  className="text-[9px] font-mono"
+                  className="text-[10px] font-mono font-bold"
                   style={{ color: hasIt ? color : 'hsl(0 0% 35%)' }}
                 >
                   {label}
                 </span>
-                {hasIt && <Check className="w-3 h-3" style={{ color }} />}
-              </div>
+                {hasIt ? (
+                  <Check className="w-3 h-3" style={{ color }} />
+                ) : isAdmin ? (
+                  <Plus className="w-3 h-3" style={{ color: 'hsl(0 0% 30%)' }} />
+                ) : null}
+              </motion.button>
             );
           })}
         </div>
       </div>
+
+      {/* Smart Suggestions - When Root is planted */}
+      <AnimatePresence>
+        {showSmartSuggestions && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="px-4 pb-4"
+          >
+            <div 
+              className="p-3 rounded-xl space-y-2"
+              style={{ 
+                background: `linear-gradient(135deg, ${bed.zone_color}10, hsl(0 0% 8%))`,
+                border: `1px dashed ${bed.zone_color}40`,
+              }}
+            >
+              <span className="text-[10px] font-mono tracking-wider" style={{ color: bed.zone_color }}>
+                ♪ COMPLETE YOUR CHORD
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {missingIntervals.map((interval) => {
+                  const Icon = getIntervalIcon(interval);
+                  const color = getIntervalColor(interval);
+                  const label = getIntervalLabel(interval);
+                  const desc = getIntervalDescription(interval);
+                  
+                  return (
+                    <motion.button
+                      key={interval}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                      style={{
+                        background: `${color}15`,
+                        border: `1px solid ${color}50`,
+                      }}
+                      whileHover={{ scale: 1.02, borderColor: color }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleSuggestionClick(interval)}
+                    >
+                      <Icon className="w-4 h-4" style={{ color }} />
+                      <div className="text-left">
+                        <span className="text-[11px] font-mono font-bold block" style={{ color }}>
+                          Add {label}
+                        </span>
+                        <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>
+                          {desc}
+                        </span>
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Admin: Brix Input */}
       {isAdmin && (
@@ -234,7 +356,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
               value={brixInput}
               onChange={(e) => setBrixInput(e.target.value)}
               onBlur={handleUpdateBrix}
-              className="w-20 h-8 text-center font-mono text-sm"
+              className="w-20 h-8 text-center font-mono text-sm rounded-lg"
               style={{ 
                 background: 'hsl(0 0% 8%)', 
                 border: '1px solid hsl(45 50% 30%)',

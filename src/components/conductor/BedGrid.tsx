@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { GardenBed } from '@/hooks/useGardenBeds';
-import { Music, Sparkles, AlertCircle, Loader2 } from 'lucide-react';
+import { GardenBed, BedPlanting, ChordInterval, CHORD_INTERVALS } from '@/hooks/useGardenBeds';
+import { Music, Sparkles, AlertCircle, Loader2, Zap } from 'lucide-react';
 
 interface BedGridProps {
   beds: GardenBed[];
@@ -8,9 +8,18 @@ interface BedGridProps {
   onSelectBed: (bed: GardenBed) => void;
   isAdmin: boolean;
   isLoading?: boolean;
+  bedPlantingsMap?: Record<string, BedPlanting[]>; // Optional: map of bed_id -> plantings for chord status
 }
 
-const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading }: BedGridProps) => {
+// Check if a bed has a complete chord (all 4 intervals)
+const isCompleteChord = (plantings: BedPlanting[] = []): boolean => {
+  const hasInterval = (interval: ChordInterval) => 
+    plantings.some(p => p.crop?.chord_interval === interval);
+  
+  return CHORD_INTERVALS.every(interval => hasInterval(interval));
+};
+
+const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlantingsMap = {} }: BedGridProps) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -31,6 +40,14 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading }: BedGr
   ];
 
   const getVitalityIcon = (bed: GardenBed) => {
+    const plantings = bedPlantingsMap[bed.id] || [];
+    const isTuned = isCompleteChord(plantings);
+
+    // Show Harmonically Tuned icon if complete chord
+    if (isTuned) {
+      return <Zap className="w-3 h-3" style={{ color: bed.zone_color }} />;
+    }
+
     if (isAdmin) {
       // Admin sees actual Brix value
       if (bed.internal_brix === null) return null;
@@ -74,35 +91,54 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading }: BedGr
           <div className="grid grid-cols-7 gap-2">
             {zone.beds.map((bed) => {
               const isSelected = selectedBedId === bed.id;
+              const plantings = bedPlantingsMap[bed.id] || [];
+              const isTuned = isCompleteChord(plantings);
               
               return (
                 <motion.button
                   key={bed.id}
-                  className="relative aspect-square rounded-lg flex flex-col items-center justify-center transition-all"
+                  className="relative aspect-square rounded-xl flex flex-col items-center justify-center transition-all"
                   style={{
                     background: isSelected 
                       ? `linear-gradient(135deg, ${zone.color}40, ${zone.color}20)`
-                      : 'hsl(0 0% 12%)',
+                      : isTuned
+                        ? `linear-gradient(135deg, ${zone.color}25, ${zone.color}10)`
+                        : 'hsl(0 0% 12%)',
                     border: isSelected 
                       ? `2px solid ${zone.color}` 
-                      : '1px solid hsl(0 0% 20%)',
-                    boxShadow: isSelected ? `0 0 15px ${zone.color}40` : 'none',
+                      : isTuned
+                        ? `2px solid ${zone.color}80`
+                        : '1px solid hsl(0 0% 20%)',
+                    boxShadow: isSelected 
+                      ? `0 0 20px ${zone.color}50` 
+                      : isTuned
+                        ? `0 0 15px ${zone.color}30`
+                        : 'none',
                   }}
                   whileHover={{ 
-                    scale: 1.05,
+                    scale: 1.08,
                     borderColor: zone.color,
+                    boxShadow: `0 0 20px ${zone.color}40`,
                   }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => onSelectBed(bed)}
+                  animate={isTuned && !isSelected ? {
+                    boxShadow: [
+                      `0 0 10px ${zone.color}20`,
+                      `0 0 20px ${zone.color}40`,
+                      `0 0 10px ${zone.color}20`,
+                    ],
+                  } : {}}
+                  transition={{ duration: 3, repeat: isTuned && !isSelected ? Infinity : 0 }}
                 >
                   <span 
                     className="text-sm font-mono font-bold"
-                    style={{ color: isSelected ? zone.color : 'hsl(0 0% 60%)' }}
+                    style={{ color: isSelected || isTuned ? zone.color : 'hsl(0 0% 60%)' }}
                   >
                     {bed.bed_number}
                   </span>
                   
-                  {/* Vitality Indicator */}
+                  {/* Vitality/Tuned Indicator */}
                   <div className="absolute top-1 right-1">
                     {getVitalityIcon(bed)}
                   </div>

@@ -8,6 +8,7 @@ import {
   useGardenBeds, 
   useBedPlantings, 
   useSevenPillars, 
+  useAllBedPlantings,
   GardenBed 
 } from '@/hooks/useGardenBeds';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -24,6 +25,7 @@ const AgroMajicConductor = () => {
   
   const { data: beds = [], isLoading: bedsLoading } = useGardenBeds();
   const { data: plantings = [], isLoading: plantingsLoading } = useBedPlantings(selectedBed?.id || null);
+  const { data: allPlantingsMap = {}, isLoading: allPlantingsLoading } = useAllBedPlantings();
   const { data: pillars = [], isLoading: pillarsLoading } = useSevenPillars();
   const { isAdmin, loading: adminLoading } = useAdminRole();
 
@@ -197,6 +199,7 @@ const AgroMajicConductor = () => {
                   onSelectBed={handleSelectBed}
                   isAdmin={isAdmin}
                   isLoading={isLoading}
+                  bedPlantingsMap={allPlantingsMap}
                 />
               </div>
 
