@@ -21,6 +21,9 @@ import {
   getDepletionRecommendation,
   coverCropsByZone,
   solfeggioOctave,
+  shouldRecommendPolyculture,
+  getThreeSistersRecommendation,
+  isSeedSavingZone,
 } from '@/data/wisdomProtocols';
 
 // Storage keys for persistence (shared with Profile Dashboard)
@@ -196,7 +199,7 @@ const BeginnerFieldGuide = () => {
     setBrixStatus('idle');
   };
 
-  // Simple crop categories (no Hz displayed by default)
+  // Crop categories with ancestral wisdom markers
   const cropCategories = [
     { 
       name: 'Root Vegetables', 
@@ -204,6 +207,7 @@ const BeginnerFieldGuide = () => {
       crops: ['Tomatoes', 'Peppers', 'Potatoes', 'Carrots', 'Beets'],
       emoji: '🥕',
       color: 'hsl(0 60% 50%)',
+      ancestralNote: null,
     },
     { 
       name: 'Squash & Melons', 
@@ -211,27 +215,41 @@ const BeginnerFieldGuide = () => {
       crops: ['Butternut Squash', 'Zucchini', 'Watermelon', 'Cantaloupe'],
       emoji: '🎃',
       color: 'hsl(30 60% 50%)',
+      ancestralNote: null,
     },
     { 
-      name: 'Leafy Greens', 
+      name: 'Leafy Greens & Three Sisters', 
       hz: 528,
-      crops: ['Kale', 'Spinach', 'Lettuce', 'Collards', 'Swiss Chard'],
+      crops: ['Kale', 'Spinach', 'Lettuce', 'Collards', 'Corn 🌽', 'Beans 🫘', 'Squash 🎃'],
       emoji: '🥬',
       color: 'hsl(120 50% 45%)',
+      ancestralNote: 'THREE SISTERS ZONE — Plant in community, not isolation.',
+      isPolyculture: true,
     },
     { 
       name: 'Sweet Crops', 
       hz: 639,
-      crops: ['Corn', 'Sweet Potato', 'Strawberries', 'Blueberries'],
-      emoji: '🌽',
+      crops: ['Sweet Potato', 'Strawberries', 'Blueberries', 'Grapes'],
+      emoji: '🍓',
       color: 'hsl(51 80% 50%)',
+      ancestralNote: null,
     },
     { 
-      name: 'Herbs', 
+      name: 'Herbs & Medicine', 
       hz: 741,
       crops: ['Basil', 'Mint', 'Lavender', 'Rosemary', 'Thyme'],
       emoji: '🌿',
       color: 'hsl(180 50% 45%)',
+      ancestralNote: null,
+    },
+    { 
+      name: 'Seed Sanctuary', 
+      hz: 963,
+      crops: ['Heirloom Seeds', 'Saved Varieties', 'Landrace Strains'],
+      emoji: '✨',
+      color: 'hsl(300 50% 50%)',
+      ancestralNote: 'SACRED ZONE — Save the seed, save the stars.',
+      isSacred: true,
     },
   ];
 
@@ -910,7 +928,11 @@ const BeginnerFieldGuide = () => {
                 className="rounded-xl overflow-hidden"
                 style={{
                   background: `${category.color}10`,
-                  border: `1px solid ${category.color}40`,
+                  border: (category as any).isSacred 
+                    ? `2px solid ${category.color}` 
+                    : (category as any).isPolyculture 
+                    ? `2px dashed ${category.color}80`
+                    : `1px solid ${category.color}40`,
                 }}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -954,6 +976,46 @@ const BeginnerFieldGuide = () => {
                     {category.hz}Hz
                   </span>
                 </div>
+
+                {/* Ancestral Note (Three Sisters / Seed Sanctuary) */}
+                {(category as any).ancestralNote && (
+                  <motion.div
+                    className="px-3 py-2 flex items-start gap-2"
+                    style={{
+                      background: (category as any).isSacred 
+                        ? 'hsl(300 30% 12%)' 
+                        : 'hsl(120 25% 12%)',
+                      borderBottom: `1px solid ${category.color}20`,
+                    }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <span className="text-sm">
+                      {(category as any).isSacred ? '⭐' : '🌱'}
+                    </span>
+                    <div>
+                      <p
+                        className="text-xs font-mono tracking-wider"
+                        style={{ 
+                          color: (category as any).isSacred 
+                            ? 'hsl(300 60% 70%)' 
+                            : 'hsl(120 50% 65%)',
+                        }}
+                      >
+                        {(category as any).ancestralNote}
+                      </p>
+                      <p
+                        className="text-[10px] font-mono mt-1 italic"
+                        style={{ color: 'hsl(0 0% 50%)' }}
+                      >
+                        {(category as any).isSacred 
+                          ? '— Dogon Cosmology (Sirius)'
+                          : '— Turtle Island (Haudenosaunee)'}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+
                 <div className="p-3 flex flex-wrap gap-2">
                   {category.crops.map((crop) => (
                     <span
