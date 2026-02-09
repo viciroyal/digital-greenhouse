@@ -18,6 +18,7 @@ import AscensionMapDemo from "./pages/AscensionMapDemo";
 import HogonReview from "./pages/HogonReview";
 import PharmerProfile from "./pages/PharmerProfile";
 import FieldAlmanac from "./pages/FieldAlmanac";
+import AgroMajicConductor from "./pages/AgroMajicConductor";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -46,6 +47,7 @@ const App = () => (
                 <Route path="/hogon-review" element={<HogonReview />} />
                 <Route path="/pharmer-profile" element={<PharmerProfile />} />
                 <Route path="/field-almanac" element={<FieldAlmanac />} />
+                <Route path="/conductor" element={<AgroMajicConductor />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

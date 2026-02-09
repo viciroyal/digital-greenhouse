@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      bed_plantings: {
+        Row: {
+          bed_id: string
+          created_at: string
+          crop_id: string
+          guild_role: string
+          id: string
+          plant_count: number
+          planted_at: string | null
+        }
+        Insert: {
+          bed_id: string
+          created_at?: string
+          crop_id: string
+          guild_role: string
+          id?: string
+          plant_count?: number
+          planted_at?: string | null
+        }
+        Update: {
+          bed_id?: string
+          created_at?: string
+          crop_id?: string
+          guild_role?: string
+          id?: string
+          plant_count?: number
+          planted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bed_plantings_bed_id_fkey"
+            columns: ["bed_id"]
+            isOneToOne: false
+            referencedRelation: "garden_beds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bed_plantings_crop_id_fkey"
+            columns: ["crop_id"]
+            isOneToOne: false
+            referencedRelation: "master_crops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       field_journal: {
         Row: {
           created_at: string
@@ -63,6 +108,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      garden_beds: {
+        Row: {
+          bed_number: number
+          created_at: string
+          frequency_hz: number
+          id: string
+          internal_brix: number | null
+          notes: string | null
+          updated_at: string
+          vitality_status: string | null
+          zone_color: string
+          zone_name: string
+        }
+        Insert: {
+          bed_number: number
+          created_at?: string
+          frequency_hz: number
+          id?: string
+          internal_brix?: number | null
+          notes?: string | null
+          updated_at?: string
+          vitality_status?: string | null
+          zone_color: string
+          zone_name: string
+        }
+        Update: {
+          bed_number?: number
+          created_at?: string
+          frequency_hz?: number
+          id?: string
+          internal_brix?: number | null
+          notes?: string | null
+          updated_at?: string
+          vitality_status?: string | null
+          zone_color?: string
+          zone_name?: string
+        }
+        Relationships: []
       }
       lessons: {
         Row: {
@@ -219,6 +303,39 @@ export type Database = {
           lineage?: string
           name?: string
           order_index?: number
+        }
+        Relationships: []
+      }
+      seven_pillars_status: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          last_updated: string
+          pillar_name: string
+          pillar_number: number
+          resonant_function: string
+          site_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_updated?: string
+          pillar_name: string
+          pillar_number: number
+          resonant_function: string
+          site_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_updated?: string
+          pillar_name?: string
+          pillar_number?: number
+          resonant_function?: string
+          site_name?: string
         }
         Relationships: []
       }
