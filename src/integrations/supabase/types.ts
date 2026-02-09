@@ -122,9 +122,11 @@ export type Database = {
           frequency_hz: number
           harvest_days: number | null
           id: string
+          library_note: string | null
           name: string
           planting_season: string[] | null
           soil_protocol_focus: string | null
+          spacing_inches: string | null
           updated_at: string
           zone_color: string
           zone_name: string
@@ -145,9 +147,11 @@ export type Database = {
           frequency_hz: number
           harvest_days?: number | null
           id?: string
+          library_note?: string | null
           name: string
           planting_season?: string[] | null
           soil_protocol_focus?: string | null
+          spacing_inches?: string | null
           updated_at?: string
           zone_color: string
           zone_name: string
@@ -168,9 +172,11 @@ export type Database = {
           frequency_hz?: number
           harvest_days?: number | null
           id?: string
+          library_note?: string | null
           name?: string
           planting_season?: string[] | null
           soil_protocol_focus?: string | null
+          spacing_inches?: string | null
           updated_at?: string
           zone_color?: string
           zone_name?: string
