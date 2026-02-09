@@ -70,8 +70,6 @@ const UnifiedAlmanacCard = ({
     }
   };
 
-  const currentBed = toneBeds[activeBedIndex];
-
   // Glow intensity based on Brix
   const glowIntensity = harmonicCompletion / 100;
   const glowColor = tone.color.replace('50%)', `${50 + glowIntensity * 30}%)`);
