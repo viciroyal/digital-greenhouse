@@ -14,8 +14,9 @@ import { Button } from '@/components/ui/button';
 import { useSoilAmendments } from '@/hooks/useMasterCrops';
 import { SovereigntyFooter } from '@/components/almanac';
 
-// Storage key for Brix logs
+// Storage keys for persistence (shared with Profile Dashboard)
 const STORAGE_KEY_BRIX_LOGS = 'pharmer-brix-logs';
+const STORAGE_KEY_BED_RESETS = 'pharmer-bed-reset-count';
 
 interface BrixLog {
   id: string;
@@ -71,8 +72,22 @@ const BeginnerFieldGuide = () => {
   // Hz visibility toggle
   const [showHz, setShowHz] = useState(false);
 
+  // Track bed reset completions
+  const [bedResetCount, setBedResetCount] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_BED_RESETS);
+    return saved ? parseInt(saved, 10) : 0;
+  });
+
   const toggleCheck = (id: string) => {
-    setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
+    const newChecked = { ...checkedItems, [id]: !checkedItems[id] };
+    setCheckedItems(newChecked);
+    
+    // Check if all items are now checked (bed reset complete)
+    if (amendments && Object.values(newChecked).filter(Boolean).length === amendments.length) {
+      const newCount = bedResetCount + 1;
+      setBedResetCount(newCount);
+      localStorage.setItem(STORAGE_KEY_BED_RESETS, newCount.toString());
+    }
   };
 
   const resetChecklist = () => {
