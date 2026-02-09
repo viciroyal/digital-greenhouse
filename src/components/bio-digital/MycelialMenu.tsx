@@ -153,8 +153,9 @@ const MycelialMenu = ({ onInitiationClick }: MycelialMenuProps) => {
               
               {/* Branch lines from center to nodes */}
               {menuNodes.map((node, i) => {
-                const angle = -45 + (i * 30);
-                const length = 100 + i * 20;
+                // Fan out to the right and downward for left-side positioning
+                const angle = 30 + (i * 25);
+                const length = 100 + i * 15;
                 const endX = 40 + Math.cos((angle * Math.PI) / 180) * length;
                 const endY = 40 + Math.sin((angle * Math.PI) / 180) * length;
                 const controlX = 40 + Math.cos((angle * Math.PI) / 180) * (length * 0.5);
@@ -200,8 +201,9 @@ const MycelialMenu = ({ onInitiationClick }: MycelialMenuProps) => {
 
             {/* Menu Nodes */}
             {menuNodes.map((node, i) => {
-              const angle = -45 + (i * 30);
-              const length = 100 + i * 20;
+              // Fan out to the right and downward for left-side positioning
+              const angle = 30 + (i * 25);
+              const length = 100 + i * 15;
               const x = Math.cos((angle * Math.PI) / 180) * length;
               const y = Math.sin((angle * Math.PI) / 180) * length;
               
