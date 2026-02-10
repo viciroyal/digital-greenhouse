@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
+import { getLunarPhase, isCropLunarReady, isZoneInSeason, getSeasonalGateMessage } from '@/hooks/useLunarPhase';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import GriotOracle from '@/components/GriotOracle';
@@ -39,7 +40,7 @@ const INTERVAL_ORDER = [
 ];
 
 /* ─── Spacing limits for containers ─── */
-const POT_MAX_SPACING = 12; // inches — exclude crops needing more
+const POT_MAX_SPACING = 12;
 
 const CropOracle = () => {
   const navigate = useNavigate();
@@ -51,6 +52,12 @@ const CropOracle = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
+  const [seasonalOverride, setSeasonalOverride] = useState(false);
+
+  // Real-time celestial data
+  const lunar = useMemo(() => getLunarPhase(), []);
 
   // Check auth state
   useEffect(() => {
@@ -114,7 +121,6 @@ const CropOracle = () => {
 
     let filtered = allCrops.filter(c => c.frequency_hz === selectedZone.hz);
 
-    // Apply environment filters
     if (environment === 'pot') {
       filtered = filtered.filter(c => {
         const spacing = c.spacing_inches ? parseInt(c.spacing_inches) : 6;
@@ -123,7 +129,6 @@ const CropOracle = () => {
     }
 
     if (environment === 'high-tunnel') {
-      // Prioritize heat-lovers and greens
       const priority = filtered.filter(c =>
         c.category === 'Nightshade' || c.category === 'Pepper' ||
         c.category === 'Green' || c.category === 'Herb' ||
@@ -134,6 +139,20 @@ const CropOracle = () => {
 
     return filtered;
   }, [allCrops, selectedZone, environment]);
+
+  /* ─── Crop search across entire registry ─── */
+  const searchResults = useMemo(() => {
+    if (!allCrops || !searchQuery || searchQuery.length < 2) return [];
+    const q = searchQuery.toLowerCase();
+    return allCrops
+      .filter(c =>
+        (c.common_name && c.common_name.toLowerCase().includes(q)) ||
+        c.name.toLowerCase().includes(q) ||
+        (c.category && c.category.toLowerCase().includes(q)) ||
+        (c.dominant_mineral && c.dominant_mineral.toLowerCase().includes(q))
+      )
+      .slice(0, 12);
+  }, [allCrops, searchQuery]);
 
   /* ─── Build 7-voice chord card ─── */
   const chordCard = useMemo(() => {
@@ -158,8 +177,6 @@ const CropOracle = () => {
 
     return INTERVAL_ORDER.map(interval => {
       let crop: MasterCrop | null = null;
-
-      // Direct chord_interval match first
       const directMatch = recipeCrops.find(c => !usedIds.has(c.id) && c.chord_interval === interval.key);
 
       switch (interval.key) {
@@ -176,7 +193,6 @@ const CropOracle = () => {
           crop = pickCrop(directMatch, c => c.chord_interval === '7th (Signal)');
           break;
         case '9th (Sub-bass)':
-          // Subterranean: Bass instruments, root vegetables, tubers
           crop = pickCrop(undefined, c =>
             c.instrument_type === 'Bass' ||
             c.name.toLowerCase().includes('potato') ||
@@ -189,7 +205,6 @@ const CropOracle = () => {
           );
           break;
         case '11th (Tension)':
-          // Sentinel alliums, fungi, protectors
           crop = pickCrop(undefined, c =>
             c.guild_role?.toLowerCase().includes('sentinel') ||
             c.name.toLowerCase().includes('garlic') ||
@@ -201,7 +216,6 @@ const CropOracle = () => {
           );
           break;
         case '13th (Top Note)':
-          // Aerial: vines, climbers, tall flowers, dye/fiber crops
           crop = pickCrop(undefined, c =>
             c.name.toLowerCase().includes('sunflower') ||
             c.name.toLowerCase().includes('morning glory') ||
@@ -217,6 +231,12 @@ const CropOracle = () => {
       return { ...interval, crop };
     });
   }, [recipeCrops]);
+
+  /* ─── Seasonal gate check ─── */
+  const seasonalGate = useMemo(() => {
+    if (!selectedZone) return null;
+    return getSeasonalGateMessage(selectedZone.hz, lunar.seasonalMovement);
+  }, [selectedZone, lunar.seasonalMovement]);
 
   if (isLoading) {
     return (
@@ -243,13 +263,68 @@ const CropOracle = () => {
         <ArrowLeft className="w-5 h-5" style={{ color: 'hsl(0 0% 60%)' }} />
       </button>
 
+      {/* ═══ Celestial Banner ═══ */}
+      <motion.div
+        className="mx-auto max-w-2xl px-4 pt-4"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div
+          className="rounded-xl px-4 py-3 flex items-center gap-3 flex-wrap"
+          style={{
+            background: 'linear-gradient(135deg, hsl(240 30% 8%), hsl(270 20% 6%))',
+            border: '1px solid hsl(270 30% 20% / 0.5)',
+            boxShadow: '0 0 20px hsl(270 40% 15% / 0.15)',
+          }}
+        >
+          <span className="text-xl">{lunar.phaseEmoji}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-mono font-bold" style={{ color: 'hsl(270 60% 75%)' }}>
+                {lunar.phaseLabel}
+              </span>
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded" style={{
+                background: 'hsl(270 30% 20% / 0.5)',
+                color: 'hsl(270 40% 60%)',
+              }}>
+                {lunar.zodiacSymbol} {lunar.zodiacSign}
+              </span>
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded" style={{
+                background: lunar.plantingType === 'harvest'
+                  ? 'hsl(45 80% 50% / 0.15)'
+                  : lunar.plantingType === 'leaf'
+                    ? 'hsl(120 40% 30% / 0.2)'
+                    : lunar.plantingType === 'fruit'
+                      ? 'hsl(30 60% 40% / 0.2)'
+                      : 'hsl(15 50% 35% / 0.2)',
+                color: lunar.plantingType === 'harvest'
+                  ? 'hsl(45 80% 65%)'
+                  : lunar.plantingType === 'leaf'
+                    ? 'hsl(120 50% 60%)'
+                    : lunar.plantingType === 'fruit'
+                      ? 'hsl(30 70% 60%)'
+                      : 'hsl(15 60% 55%)',
+              }}>
+                {lunar.plantingType === 'leaf' ? '🌿' : lunar.plantingType === 'fruit' ? '🍅' : lunar.plantingType === 'harvest' ? '🌾' : '🥕'} {lunar.plantingType.toUpperCase()} WINDOW
+              </span>
+            </div>
+            <p className="text-[10px] font-body mt-0.5 truncate" style={{ color: 'hsl(0 0% 45%)' }}>
+              {lunar.plantingLabel}
+            </p>
+          </div>
+          {lunar.seasonalMovement.active && (
+            <div className="text-[8px] font-mono text-right" style={{ color: 'hsl(270 30% 50%)' }}>
+              <div>{lunar.seasonalMovement.name}</div>
+              <div>{lunar.seasonalMovement.frequencyRange}</div>
+            </div>
+          )}
+        </div>
+      </motion.div>
+
       {/* Step Indicator */}
-      <div className="flex justify-center pt-6 pb-4 gap-3">
+      <div className="flex justify-center pt-4 pb-4 gap-3">
         {[1, 2, 3].map(s => (
-          <div
-            key={s}
-            className="flex items-center gap-2"
-          >
+          <div key={s} className="flex items-center gap-2">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold transition-all"
               style={{
@@ -285,10 +360,7 @@ const CropOracle = () => {
               exit={{ opacity: 0, x: -40 }}
               transition={{ duration: 0.3 }}
             >
-              <h2
-                className="text-center text-2xl md:text-3xl font-bubble mb-2"
-                style={{ color: 'hsl(45 80% 55%)' }}
-              >
+              <h2 className="text-center text-2xl md:text-3xl font-bubble mb-2" style={{ color: 'hsl(45 80% 55%)' }}>
                 Where are you growing?
               </h2>
               <p className="text-center text-sm font-mono mb-8" style={{ color: 'hsl(0 0% 45%)' }}>
@@ -333,10 +405,7 @@ const CropOracle = () => {
               exit={{ opacity: 0, x: -40 }}
               transition={{ duration: 0.3 }}
             >
-              <h2
-                className="text-center text-2xl md:text-3xl font-bubble mb-2"
-                style={{ color: 'hsl(45 80% 55%)' }}
-              >
+              <h2 className="text-center text-2xl md:text-3xl font-bubble mb-2" style={{ color: 'hsl(45 80% 55%)' }}>
                 What energy do you need?
               </h2>
               <p className="text-center text-sm font-mono mb-8" style={{ color: 'hsl(0 0% 45%)' }}>
@@ -344,56 +413,70 @@ const CropOracle = () => {
               </p>
 
               <div className="grid grid-cols-1 gap-3">
-                {ZONES.map(zone => (
-                  <motion.button
-                    key={zone.hz}
-                    onClick={() => { setSelectedZone(zone); setStep(3); }}
-                    className="p-4 rounded-xl text-left transition-all flex items-center gap-4"
-                    style={{
-                      background: `linear-gradient(90deg, ${zone.color}08, hsl(0 0% 6%))`,
-                      border: `2px solid ${zone.color}30`,
-                    }}
-                    whileHover={{
-                      scale: 1.01,
-                      borderColor: zone.color + '80',
-                      boxShadow: `0 0 20px ${zone.color}20`,
-                    }}
-                    whileTap={{ scale: 0.99 }}
-                  >
-                    {/* Frequency orb */}
-                    <div
-                      className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-                      style={{
-                        background: `radial-gradient(circle at 35% 35%, ${zone.color}40, ${zone.color}15)`,
-                        border: `2px solid ${zone.color}50`,
-                        boxShadow: `0 0 15px ${zone.color}20`,
+                {ZONES.map(zone => {
+                  const inSeason = isZoneInSeason(zone.hz, lunar.seasonalMovement);
+                  return (
+                    <motion.button
+                      key={zone.hz}
+                      onClick={() => {
+                        setSelectedZone(zone);
+                        setSeasonalOverride(false);
+                        setStep(3);
                       }}
+                      className="p-4 rounded-xl text-left transition-all flex items-center gap-4"
+                      style={{
+                        background: `linear-gradient(90deg, ${zone.color}08, hsl(0 0% 6%))`,
+                        border: `2px solid ${zone.color}30`,
+                        opacity: inSeason ? 1 : 0.55,
+                      }}
+                      whileHover={{
+                        scale: 1.01,
+                        borderColor: zone.color + '80',
+                        boxShadow: `0 0 20px ${zone.color}20`,
+                      }}
+                      whileTap={{ scale: 0.99 }}
                     >
-                      <span className="text-xs font-mono font-bold" style={{ color: zone.color }}>
-                        {zone.note}
-                      </span>
-                    </div>
-
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-bubble text-lg" style={{ color: zone.color }}>
-                          {zone.vibe}
-                        </h3>
-                        <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
-                          {zone.hz}Hz
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                        style={{
+                          background: `radial-gradient(circle at 35% 35%, ${zone.color}40, ${zone.color}15)`,
+                          border: `2px solid ${zone.color}50`,
+                          boxShadow: `0 0 15px ${zone.color}20`,
+                        }}
+                      >
+                        <span className="text-xs font-mono font-bold" style={{ color: zone.color }}>
+                          {zone.note}
                         </span>
                       </div>
-                      <p className="text-xs font-body" style={{ color: 'hsl(0 0% 50%)' }}>
-                        {zone.description}
-                      </p>
-                    </div>
 
-                    <ArrowRight className="w-4 h-4 shrink-0" style={{ color: zone.color + '60' }} />
-                  </motion.button>
-                ))}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bubble text-lg" style={{ color: zone.color }}>
+                            {zone.vibe}
+                          </h3>
+                          <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
+                            {zone.hz}Hz
+                          </span>
+                          {!inSeason && (
+                            <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{
+                              background: 'hsl(40 80% 45% / 0.15)',
+                              color: 'hsl(40 80% 55%)',
+                            }}>
+                              OFF-SEASON
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs font-body" style={{ color: 'hsl(0 0% 50%)' }}>
+                          {zone.description}
+                        </p>
+                      </div>
+
+                      <ArrowRight className="w-4 h-4 shrink-0" style={{ color: zone.color + '60' }} />
+                    </motion.button>
+                  );
+                })}
               </div>
 
-              {/* Back */}
               <button
                 onClick={() => setStep(1)}
                 className="mt-6 flex items-center gap-2 mx-auto text-xs font-mono"
@@ -413,18 +496,49 @@ const CropOracle = () => {
               exit={{ opacity: 0, x: -40 }}
               transition={{ duration: 0.3 }}
             >
-              <h2
-                className="text-center text-2xl md:text-3xl font-bubble mb-1"
-                style={{ color: selectedZone.color }}
-              >
+              <h2 className="text-center text-2xl md:text-3xl font-bubble mb-1" style={{ color: selectedZone.color }}>
                 Your {selectedZone.vibe} Recipe
               </h2>
               <p className="text-center text-sm font-mono mb-2" style={{ color: 'hsl(0 0% 45%)' }}>
                 STEP 3 — THE 13TH CHORD
               </p>
-              <p className="text-center text-[10px] font-mono mb-8" style={{ color: 'hsl(0 0% 30%)' }}>
+              <p className="text-center text-[10px] font-mono mb-4" style={{ color: 'hsl(0 0% 30%)' }}>
                 ZONE {ZONES.indexOf(selectedZone) + 1} • {selectedZone.name.toUpperCase()} • {selectedZone.hz}Hz • KEY OF {selectedZone.note}
               </p>
+
+              {/* ─── Seasonal Gate Warning ─── */}
+              {seasonalGate && !seasonalOverride && (
+                <motion.div
+                  className="mb-4 p-4 rounded-xl flex items-start gap-3"
+                  style={{
+                    background: 'hsl(40 80% 20% / 0.15)',
+                    border: '1px solid hsl(40 80% 45% / 0.3)',
+                  }}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" style={{ color: 'hsl(40 80% 55%)' }} />
+                  <div className="flex-1">
+                    <p className="text-xs font-mono font-bold mb-1" style={{ color: 'hsl(40 80% 55%)' }}>
+                      SEASONAL ADVISORY
+                    </p>
+                    <p className="text-xs font-body" style={{ color: 'hsl(40 50% 65%)' }}>
+                      {seasonalGate}
+                    </p>
+                    <button
+                      onClick={() => setSeasonalOverride(true)}
+                      className="mt-2 text-[10px] font-mono px-3 py-1 rounded"
+                      style={{
+                        background: 'hsl(40 60% 30% / 0.2)',
+                        color: 'hsl(40 60% 60%)',
+                        border: '1px solid hsl(40 60% 40% / 0.3)',
+                      }}
+                    >
+                      PROCEED ANYWAY →
+                    </button>
+                  </div>
+                </motion.div>
+              )}
 
               {/* Chord Card */}
               <div
@@ -451,50 +565,62 @@ const CropOracle = () => {
 
                 {/* Interval rows */}
                 <div className="divide-y" style={{ borderColor: 'hsl(0 0% 10%)' }}>
-                  {chordCard.map((slot, i) => (
-                    <motion.div
-                      key={slot.key}
-                      className="px-5 py-4 flex items-center gap-4"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.08 }}
-                    >
-                      {/* Emoji + Role */}
-                      <div className="w-10 text-center text-lg">{slot.emoji}</div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bubble text-sm" style={{ color: 'hsl(40 50% 90%)' }}>
-                            {slot.label}
-                          </span>
-                          <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{
-                            background: `${selectedZone.color}15`,
-                            color: selectedZone.color,
-                            border: `1px solid ${selectedZone.color}30`,
-                          }}>
-                            {slot.role}
-                          </span>
-                        </div>
-                        {slot.crop ? (
-                          <p className="text-xs font-body mt-0.5" style={{ color: 'hsl(0 0% 65%)' }}>
-                            {slot.crop.common_name || slot.crop.name}
-                            {slot.crop.spacing_inches && (
-                              <span style={{ color: 'hsl(0 0% 35%)' }}> • {slot.crop.spacing_inches}" spacing</span>
+                  {chordCard.map((slot, i) => {
+                    const isReady = slot.crop
+                      ? isCropLunarReady(slot.crop.category, slot.crop.common_name || slot.crop.name, lunar.plantingType)
+                      : false;
+                    return (
+                      <motion.div
+                        key={slot.key}
+                        className="px-5 py-4 flex items-center gap-4"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.08 }}
+                      >
+                        <div className="w-10 text-center text-lg">{slot.emoji}</div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-bubble text-sm" style={{ color: 'hsl(40 50% 90%)' }}>
+                              {slot.label}
+                            </span>
+                            <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{
+                              background: `${selectedZone.color}15`,
+                              color: selectedZone.color,
+                              border: `1px solid ${selectedZone.color}30`,
+                            }}>
+                              {slot.role}
+                            </span>
+                            {slot.crop && isReady && (
+                              <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{
+                                background: 'hsl(120 50% 25% / 0.3)',
+                                color: 'hsl(120 60% 60%)',
+                                border: '1px solid hsl(120 50% 40% / 0.3)',
+                              }}>
+                                {lunar.phaseEmoji} READY NOW
+                              </span>
                             )}
-                          </p>
-                        ) : (
-                          <p className="text-xs font-mono italic mt-0.5" style={{ color: 'hsl(0 0% 25%)' }}>
-                            No match in registry
-                          </p>
+                          </div>
+                          {slot.crop ? (
+                            <p className="text-xs font-body mt-0.5" style={{ color: 'hsl(0 0% 65%)' }}>
+                              {slot.crop.common_name || slot.crop.name}
+                              {slot.crop.spacing_inches && (
+                                <span style={{ color: 'hsl(0 0% 35%)' }}> • {slot.crop.spacing_inches}" spacing</span>
+                              )}
+                            </p>
+                          ) : (
+                            <p className="text-xs font-mono italic mt-0.5" style={{ color: 'hsl(0 0% 25%)' }}>
+                              No match in registry
+                            </p>
+                          )}
+                        </div>
+                        {slot.crop && (
+                          <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
+                            {slot.crop.frequency_hz}Hz
+                          </span>
                         )}
-                      </div>
-                      {/* Frequency badge */}
-                      {slot.crop && (
-                        <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
-                          {slot.crop.frequency_hz}Hz
-                        </span>
-                      )}
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    );
+                  })}
                 </div>
 
                 {/* Footer */}
@@ -534,6 +660,124 @@ const CropOracle = () => {
                   </p>
                 </motion.div>
               )}
+
+              {/* ═══ Crop Search ═══ */}
+              <motion.div
+                className="mt-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                <button
+                  onClick={() => setShowSearch(!showSearch)}
+                  className="w-full py-3 rounded-xl font-mono text-xs tracking-wider flex items-center justify-center gap-2 transition-all"
+                  style={{
+                    background: showSearch ? 'hsl(0 0% 8%)' : 'hsl(0 0% 6%)',
+                    border: `1px solid ${showSearch ? 'hsl(45 80% 55% / 0.3)' : 'hsl(0 0% 12%)'}`,
+                    color: showSearch ? 'hsl(45 80% 55%)' : 'hsl(0 0% 45%)',
+                  }}
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  {showSearch ? 'CLOSE SEARCH' : 'SEARCH CROP REGISTRY'}
+                </button>
+
+                <AnimatePresence>
+                  {showSearch && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pt-3">
+                        <div
+                          className="flex items-center gap-2 px-4 py-3 rounded-xl"
+                          style={{
+                            background: 'hsl(0 0% 6%)',
+                            border: '1px solid hsl(0 0% 15%)',
+                          }}
+                        >
+                          <Search className="w-4 h-4 shrink-0" style={{ color: 'hsl(0 0% 35%)' }} />
+                          <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            placeholder="Search 487 crops by name, category, or mineral..."
+                            className="bg-transparent flex-1 text-sm font-body outline-none"
+                            style={{ color: 'hsl(0 0% 80%)' }}
+                            autoFocus
+                          />
+                          {searchQuery && (
+                            <button onClick={() => setSearchQuery('')}>
+                              <X className="w-4 h-4" style={{ color: 'hsl(0 0% 35%)' }} />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Search Results */}
+                        {searchResults.length > 0 && (
+                          <div
+                            className="mt-2 rounded-xl overflow-hidden divide-y"
+                            style={{
+                              background: 'hsl(0 0% 5%)',
+                              border: '1px solid hsl(0 0% 12%)',
+                              borderColor: 'hsl(0 0% 10%)',
+                            }}
+                          >
+                            {searchResults.map(crop => {
+                              const zoneData = ZONES.find(z => z.hz === crop.frequency_hz);
+                              const ready = isCropLunarReady(crop.category, crop.common_name || crop.name, lunar.plantingType);
+                              return (
+                                <div
+                                  key={crop.id}
+                                  className="px-4 py-3 flex items-center gap-3"
+                                  style={{ borderColor: 'hsl(0 0% 10%)' }}
+                                >
+                                  <div
+                                    className="w-3 h-3 rounded-full shrink-0"
+                                    style={{ background: zoneData?.color || 'hsl(0 0% 30%)' }}
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className="text-sm font-body truncate" style={{ color: 'hsl(0 0% 80%)' }}>
+                                        {crop.common_name || crop.name}
+                                      </span>
+                                      {ready && (
+                                        <span className="text-[8px] font-mono px-1 py-0.5 rounded shrink-0" style={{
+                                          background: 'hsl(120 50% 25% / 0.3)',
+                                          color: 'hsl(120 60% 60%)',
+                                        }}>
+                                          {lunar.phaseEmoji} READY
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                                      {crop.frequency_hz}Hz • {zoneData?.name || crop.zone_name} • {crop.category}
+                                      {crop.chord_interval && ` • ${crop.chord_interval}`}
+                                      {crop.dominant_mineral && ` • ${crop.dominant_mineral}`}
+                                    </p>
+                                  </div>
+                                  {crop.spacing_inches && (
+                                    <span className="text-[9px] font-mono shrink-0" style={{ color: 'hsl(0 0% 30%)' }}>
+                                      {crop.spacing_inches}"
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {searchQuery.length >= 2 && searchResults.length === 0 && (
+                          <p className="text-center text-xs font-mono mt-3" style={{ color: 'hsl(0 0% 30%)' }}>
+                            No crops found for "{searchQuery}"
+                          </p>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
 
               {/* Save Recipe Button */}
               <motion.div
