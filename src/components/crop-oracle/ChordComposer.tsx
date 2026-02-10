@@ -148,6 +148,14 @@ const ChordComposer = ({
     const emptyIntervals = CHORD_INTERVALS.filter(iv => !chordStatus[iv]);
     if (emptyIntervals.length === 0) return [];
 
+    const bedWidthInches = (selectedBed.bed_width_ft || 4) * 12;
+
+    // Helper: check if a crop's spacing fits the bed width
+    const fitsInBed = (crop: MasterCrop): boolean => {
+      const spacing = parseFloat(crop.spacing_inches || '0');
+      return spacing > 0 && spacing <= bedWidthInches;
+    };
+
     // Get the Root crop's companion list (if Root is filled)
     const rootPlanting = chordStatus['Root (Lead)'];
     const rootCropData = rootPlanting?.crop;
@@ -163,30 +171,34 @@ const ChordComposer = ({
       let found: MasterCrop | undefined;
       let source: 'companion' | 'recipe' = 'companion';
 
-      // 1. Try companion guild first
+      // 1. Try companion guild first (must fit bed width)
       if (companionNames.length > 0) {
         for (const name of companionNames) {
           const match = allCrops.find(c =>
             (c.common_name?.toLowerCase() === name.toLowerCase() ||
              c.name.toLowerCase() === name.toLowerCase()) &&
-            c.chord_interval === interval
+            c.chord_interval === interval &&
+            fitsInBed(c)
           );
           if (match) { found = match; break; }
         }
       }
 
-      // 2. Fallback to chord recipe
+      // 2. Fallback to chord recipe (must fit bed width)
       if (!found && recipe) {
-        const meta = INTERVAL_META[interval];
         const recipeInterval = recipe.intervals.find(
           ri => RECIPE_INTERVAL_MAP[ri.interval] === interval
         );
         if (recipeInterval) {
-          found = allCrops.find(c =>
-            c.common_name?.toLowerCase() === recipeInterval.cropName.toLowerCase() ||
-            c.name.toLowerCase() === recipeInterval.cropName.toLowerCase()
+          const recipeMatch = allCrops.find(c =>
+            (c.common_name?.toLowerCase() === recipeInterval.cropName.toLowerCase() ||
+            c.name.toLowerCase() === recipeInterval.cropName.toLowerCase()) &&
+            fitsInBed(c)
           );
-          source = 'recipe';
+          if (recipeMatch) {
+            found = recipeMatch;
+            source = 'recipe';
+          }
         }
       }
 
