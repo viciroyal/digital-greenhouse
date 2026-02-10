@@ -666,7 +666,7 @@ const CropOracle = () => {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {ENVIRONMENTS.map(env => (
+                {ENVIRONMENTS.filter(env => proMode || (env.id !== 'farm' && env.id !== 'high-tunnel')).map(env => (
                   <motion.button
                     key={env.id}
                     onClick={() => { setEnvironment(env.id); setStep(2); }}
