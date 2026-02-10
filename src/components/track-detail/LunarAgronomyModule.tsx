@@ -293,7 +293,7 @@ const LunarAgronomyModule = ({ track }: LunarAgronomyModuleProps) => {
 
           <div className="flex-1">
             <p 
-              className="font-mono text-[10px] tracking-[0.2em] uppercase mb-1"
+              className="font-body text-[10px] tracking-[0.2em] uppercase mb-1"
               style={{ color: 'hsl(220 20% 60%)' }}
             >
               LUNAR OPERATIONAL PROTOCOL
