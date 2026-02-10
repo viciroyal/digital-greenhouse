@@ -104,10 +104,16 @@ const Index = () => {
 
             {/* Title */}
             <motion.h1
-              className="text-5xl md:text-7xl lg:text-8xl font-bubble mb-2 select-none"
+              className="text-5xl md:text-7xl lg:text-8xl font-bubble mb-2 select-none cursor-pointer"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => {
+                const el = document.querySelector('[data-section="shop"]');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
               style={{
                 background: `url('/images/root-texture.png'), linear-gradient(180deg, hsl(20 30% 40%) 0%, hsl(20 40% 25%) 100%)`,
                 backgroundSize: 'cover',
@@ -177,7 +183,9 @@ const Index = () => {
         </section>
 
         {/* ═══ SHOP — The Source Formula ═══ */}
-        <ShopSection />
+        <section data-section="shop">
+          <ShopSection />
+        </section>
 
         {/* ═══ PRODUCTION CREDITS ═══ */}
         <section className="py-16 px-4 max-w-2xl mx-auto">
