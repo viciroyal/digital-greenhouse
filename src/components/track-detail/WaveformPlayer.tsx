@@ -142,7 +142,7 @@ const WaveformPlayer = ({
 
         {/* Time display */}
         <div className="absolute bottom-1 left-2 right-2 flex justify-between">
-          <span className="text-[9px] font-mono" style={{ color: 'hsl(40 30% 50%)' }}>
+          <span className="text-[9px] font-body" style={{ color: 'hsl(40 30% 50%)' }}>
             {formatTime(currentTime)}
           </span>
           <span className="text-[9px] font-mono" style={{ color: 'hsl(40 30% 50%)' }}>
