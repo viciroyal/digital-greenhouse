@@ -5,6 +5,10 @@ import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from '@/components/ui/sheet';
 import {
+  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
+} from '@/components/ui/alert-dialog';
+import {
   useGardenBeds, useAllBedPlantings, useAddPlanting, useRemovePlanting,
   type GardenBed, type BedPlanting, type ComplexityScore,
   calculateComplexityScore, type ChordInterval, CHORD_INTERVALS,
@@ -277,25 +281,35 @@ const ChordComposer = ({
     });
   };
 
+  const [showAutoConfirm, setShowAutoConfirm] = useState(false);
   const [autoComposing, setAutoComposing] = useState(false);
 
-  const handleAutoComposeAll = async () => {
-    if (!selectedBed || !isAdmin || seasonalSuggestions.length === 0) return;
-    setAutoComposing(true);
+  /** Compute plant counts for each suggestion (used in preview & execution) */
+  const suggestionPlantCounts = useMemo(() => {
+    if (!selectedBed) return [];
     const bedL = selectedBed.bed_length_ft || 60;
     const bedW = selectedBed.bed_width_ft || 4;
+    return seasonalSuggestions.map(s => {
+      const count = s.crop.spacing_inches
+        ? Math.floor((bedL * 12 * bedW * 12) / (parseFloat(s.crop.spacing_inches) ** 2 * 0.866)) || 1
+        : 1;
+      return { ...s, plantCount: count };
+    });
+  }, [seasonalSuggestions, selectedBed]);
+
+  const handleAutoComposeAll = async () => {
+    if (!selectedBed || !isAdmin || suggestionPlantCounts.length === 0) return;
+    setShowAutoConfirm(false);
+    setAutoComposing(true);
     let successCount = 0;
 
-    for (const suggestion of seasonalSuggestions) {
-      const plantCount = suggestion.crop.spacing_inches
-        ? Math.floor((bedL * 12 * bedW * 12) / (parseFloat(suggestion.crop.spacing_inches) ** 2 * 0.866)) || 1
-        : 1;
+    for (const item of suggestionPlantCounts) {
       try {
         await addPlanting.mutateAsync({
           bedId: selectedBed.id,
-          cropId: suggestion.crop.id,
-          guildRole: suggestion.crop.guild_role || 'Lead',
-          plantCount,
+          cropId: item.crop.id,
+          guildRole: item.crop.guild_role || 'Lead',
+          plantCount: item.plantCount,
         });
         successCount++;
       } catch {
@@ -309,6 +323,7 @@ const ChordComposer = ({
   };
 
   return (
+    <>
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
@@ -540,7 +555,7 @@ const ChordComposer = ({
                 {/* Auto-Compose All Button */}
                 {isAdmin && seasonalSuggestions.length > 1 && (
                   <motion.button
-                    onClick={handleAutoComposeAll}
+                    onClick={() => setShowAutoConfirm(true)}
                     disabled={autoComposing || addPlanting.isPending}
                     className="w-full mt-2.5 flex items-center justify-center gap-2 py-2 rounded-lg font-mono text-[10px] font-bold tracking-wider"
                     style={{
@@ -745,6 +760,82 @@ const ChordComposer = ({
         </div>
       </SheetContent>
     </Sheet>
+
+    {/* ─── Auto-Compose Confirmation Dialog ─── */}
+    <AlertDialog open={showAutoConfirm} onOpenChange={setShowAutoConfirm}>
+      <AlertDialogContent
+        className="max-w-sm rounded-2xl border-0 p-0 overflow-hidden"
+        style={{
+          background: 'hsl(0 0% 5%)',
+          border: `2px solid ${zoneColor}40`,
+          boxShadow: `0 0 40px ${zoneColor}15`,
+        }}
+      >
+        <AlertDialogHeader className="p-4 pb-2" style={{ borderBottom: `1px solid ${zoneColor}15` }}>
+          <div className="flex items-center gap-2">
+            <Wand2 className="w-5 h-5" style={{ color: zoneColor }} />
+            <AlertDialogTitle className="text-sm font-mono font-bold tracking-wider" style={{ color: zoneColor }}>
+              AUTO-COMPOSE ALL
+            </AlertDialogTitle>
+          </div>
+          <AlertDialogDescription className="text-[9px] font-mono mt-1" style={{ color: 'hsl(0 0% 45%)' }}>
+            The following crops will be planted into Bed {selectedBed?.bed_number}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <div className="p-4 space-y-1.5">
+          {suggestionPlantCounts.map((item) => {
+            const meta = INTERVAL_META[item.interval];
+            return (
+              <div
+                key={item.interval}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                style={{ background: `${meta.color}10`, border: `1px solid ${meta.color}20` }}
+              >
+                <span style={{ color: meta.color }}>{meta.icon}</span>
+                <span className="text-[9px] font-mono font-bold w-8" style={{ color: meta.color }}>
+                  {meta.shortLabel}
+                </span>
+                <span className="text-[10px] font-mono flex-1 truncate" style={{ color: 'hsl(0 0% 75%)' }}>
+                  {item.crop.common_name || item.crop.name}
+                </span>
+                <span className="text-[9px] font-mono font-bold" style={{ color: 'hsl(140 50% 55%)' }}>
+                  ×{item.plantCount}
+                </span>
+              </div>
+            );
+          })}
+          {selectedBed && (
+            <div className="pt-2 flex items-center justify-between">
+              <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
+                Bed: {selectedBed.bed_length_ft || 60}ft × {selectedBed.bed_width_ft || 4}ft
+              </span>
+              <span className="text-[8px] font-mono font-bold" style={{ color: 'hsl(0 0% 45%)' }}>
+                Total: {suggestionPlantCounts.reduce((s, i) => s + i.plantCount, 0)} plants
+              </span>
+            </div>
+          )}
+        </div>
+
+        <AlertDialogFooter className="p-4 pt-0 flex gap-2">
+          <AlertDialogCancel
+            className="flex-1 rounded-lg font-mono text-[10px] font-bold tracking-wider"
+            style={{ background: 'hsl(0 0% 10%)', color: 'hsl(0 0% 50%)', border: '1px solid hsl(0 0% 18%)' }}
+          >
+            CANCEL
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleAutoComposeAll}
+            className="flex-1 rounded-lg font-mono text-[10px] font-bold tracking-wider flex items-center justify-center gap-1.5"
+            style={{ background: zoneColor, color: 'hsl(0 0% 3%)' }}
+          >
+            <Wand2 className="w-3.5 h-3.5" />
+            COMPOSE {suggestionPlantCounts.length} SLOTS
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 };
 
