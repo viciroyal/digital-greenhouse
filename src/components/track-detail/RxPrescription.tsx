@@ -368,13 +368,12 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
             >
               TRACK {String(track.row).padStart(2, '0')}
             </p>
-            <p 
-              className="text-xs mt-0.5 font-semibold"
-              style={{ 
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
-                color: `hsl(${track.colorHsl})`,
-              }}
-            >
+              <p 
+                className="text-xs mt-0.5 font-semibold font-body"
+                style={{ 
+                  color: `hsl(${track.colorHsl})`,
+                }}
+              >
               {track.frequency}
             </p>
           </div>
