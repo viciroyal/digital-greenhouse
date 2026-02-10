@@ -128,6 +128,10 @@ export default {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(360deg)" },
         },
+        "oracle-pulse": {
+          "0%, 100%": { boxShadow: "0 0 8px hsl(120 50% 50% / 0.3)" },
+          "50%": { boxShadow: "0 0 20px hsl(120 50% 50% / 0.6), 0 0 40px hsl(120 50% 50% / 0.2)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
