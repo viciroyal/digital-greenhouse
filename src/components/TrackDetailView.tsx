@@ -243,7 +243,7 @@ const TrackDetailView = ({
                 transition={{ delay: 0.2 }}
               >
                 <p 
-                  className="font-mono text-xs tracking-[0.3em] uppercase mb-2"
+                  className="font-body text-xs tracking-[0.3em] uppercase mb-2"
                   style={{ color: `hsl(${theme.accentColor} / 0.9)` }}
                 >
                   FREQUENCY DASHBOARD
