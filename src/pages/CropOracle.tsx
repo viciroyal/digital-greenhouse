@@ -1053,8 +1053,8 @@ const CropOracle = () => {
                 </motion.div>
               )}
 
-              {/* ═══ Crop Search (Pro only) ═══ */}
-              {proMode && <motion.div
+              {/* ═══ Crop Search ═══ */}
+              {<motion.div
                 className="mt-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
