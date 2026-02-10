@@ -27,7 +27,7 @@ const Auth = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) navigate('/ancestral-path');
+      if (session) navigate('/crop-oracle');
     };
     checkAuth();
 
