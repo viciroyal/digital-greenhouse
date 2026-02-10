@@ -125,7 +125,7 @@ const MiniMusicPlayer = () => {
       {/* Floating Music Trigger */}
       {!isOpen && (
         <motion.button
-          className="fixed bottom-24 right-6 z-50 w-12 h-12 rounded-full flex items-center justify-center"
+          className="fixed bottom-32 right-6 z-50 w-12 h-12 rounded-full flex items-center justify-center"
           onClick={() => setIsOpen(true)}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
