@@ -82,7 +82,7 @@ interface CurrentMoon {
   illumination: number;
 }
 
-function getCurrentMoonPhase(): CurrentMoon {
+export function getCurrentMoonPhase(): CurrentMoon {
   const now = Date.now();
   const daysSinceRef = (now - KNOWN_NEW_MOON) / (1000 * 60 * 60 * 24);
   const age = ((daysSinceRef % SYNODIC_MONTH) + SYNODIC_MONTH) % SYNODIC_MONTH;
@@ -99,7 +99,7 @@ function getCurrentMoonPhase(): CurrentMoon {
 }
 
 /** Map crop category to a lunar phase group */
-function getLunarPhase(crop: MasterCrop): LunarPhase {
+export function getLunarPhase(crop: MasterCrop): LunarPhase {
   const cat = crop.category.toLowerCase();
   const name = crop.name.toLowerCase();
   const common = (crop.common_name || '').toLowerCase();
