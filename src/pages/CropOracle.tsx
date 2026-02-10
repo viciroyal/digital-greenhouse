@@ -31,13 +31,13 @@ const ENVIRONMENTS = [
 
 /* ─── Chord interval display order ─── */
 const INTERVAL_ORDER = [
-  { key: 'Root (Lead)', label: 'The Star', role: 'Root (1st)', emoji: '🌟' },
-  { key: '3rd (Triad)', label: 'The Companion', role: '3rd (Triad)', emoji: '🌿' },
-  { key: '5th (Stabilizer)', label: 'The Stabilizer', role: '5th', emoji: '⚓' },
-  { key: '7th (Signal)', label: 'The Signal', role: '7th', emoji: '🦋' },
-  { key: '9th (Sub-bass)', label: 'The Underground', role: '9th', emoji: '🥔' },
-  { key: '11th (Tension)', label: 'The Sentinel', role: '11th', emoji: '🍄' },
-  { key: '13th (Top Note)', label: 'The Aerial', role: '13th', emoji: '🌻' },
+  { key: 'Root (Lead)', label: 'The Star', role: 'Root (1st)', emoji: '🌟', hint: 'Your main crop — the headliner of the bed.' },
+  { key: '3rd (Triad)', label: 'The Companion', role: '3rd (Triad)', emoji: '🌿', hint: 'A helpful neighbor that keeps pests away or adds nutrients.' },
+  { key: '5th (Stabilizer)', label: 'The Stabilizer', role: '5th', emoji: '⚓', hint: 'A ground-cover or nitrogen-fixer that feeds the soil.' },
+  { key: '7th (Signal)', label: 'The Signal', role: '7th', emoji: '🦋', hint: 'Flowers & herbs that attract pollinators and beneficial insects.' },
+  { key: '9th (Sub-bass)', label: 'The Underground', role: '9th', emoji: '🥔', hint: 'Root vegetables growing beneath the surface.' },
+  { key: '11th (Tension)', label: 'The Sentinel', role: '11th', emoji: '🍄', hint: 'Fungi that build an underground nutrient network.' },
+  { key: '13th (Top Note)', label: 'The Aerial', role: '13th', emoji: '🌻', hint: 'Tall plants that create shade and wind protection above.' },
 ];
 
 /* ─── Spacing limits for containers ─── */
@@ -951,6 +951,11 @@ const CropOracle = () => {
                           ) : (
                             <p className="text-xs font-mono italic mt-0.5" style={{ color: 'hsl(0 0% 25%)' }}>
                               No match in registry
+                            </p>
+                          )}
+                          {!proMode && slot.hint && (
+                            <p className="text-[10px] mt-1 leading-snug" style={{ color: 'hsl(40 30% 50% / 0.6)' }}>
+                              💡 {slot.hint}
                             </p>
                           )}
                         </div>
