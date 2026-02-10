@@ -12,6 +12,7 @@ import CropOracle from "./pages/CropOracle";
 import Auth from "./pages/Auth";
 import UserGuide from "./pages/UserGuide";
 import DevGuide from "./pages/DevGuide";
+import TestingSuiteDocs from "./pages/TestingSuiteDocs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/user-guide" element={<UserGuide />} />
                 <Route path="/dev-guide" element={<DevGuide />} />
+                <Route path="/testing-docs" element={<TestingSuiteDocs />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

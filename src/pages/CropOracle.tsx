@@ -57,7 +57,6 @@ const CropOracle = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
   const [seasonalOverride, setSeasonalOverride] = useState(false);
   const [swapSlotIndex, setSwapSlotIndex] = useState<number | null>(null);
   const [manualOverrides, setManualOverrides] = useState<Record<number, MasterCrop>>({});
@@ -377,23 +376,47 @@ const CropOracle = () => {
       className="min-h-screen relative"
       style={{ background: 'linear-gradient(180deg, hsl(0 0% 4%) 0%, hsl(0 0% 2%) 100%)' }}
     >
-      {/* Back to Stage */}
-      <button
-        onClick={() => navigate('/')}
-        className="fixed top-4 left-4 z-50 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+      {/* Top Header Bar — unified to prevent mobile overlap */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-3 py-2 safe-area-top"
         style={{
-          background: 'hsl(0 0% 10%)',
-          border: '1px solid hsl(0 0% 20%)',
+          background: 'hsl(0 0% 3% / 0.85)',
+          backdropFilter: 'blur(12px)',
+          borderBottom: '1px solid hsl(0 0% 12%)',
         }}
       >
-        <ArrowLeft className="w-5 h-5" style={{ color: 'hsl(0 0% 60%)' }} />
-      </button>
+        <button
+          onClick={() => navigate('/')}
+          className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110 shrink-0"
+          style={{
+            background: 'hsl(0 0% 10%)',
+            border: '1px solid hsl(0 0% 20%)',
+          }}
+        >
+          <ArrowLeft className="w-4 h-4" style={{ color: 'hsl(0 0% 60%)' }} />
+        </button>
 
-      {/* Beginner / Pro Toggle */}
-      <div className="fixed top-4 right-4 z-50 flex items-center">
+        {/* Step indicators — inline in header on mobile */}
+        <div className="flex items-center gap-1.5">
+          {[1, 2, 3].map(s => (
+            <div
+              key={s}
+              className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold transition-all"
+              style={{
+                background: step >= s
+                  ? (s === 3 && selectedZone ? selectedZone.color + '30' : 'hsl(45 80% 55% / 0.2)')
+                  : 'hsl(0 0% 8%)',
+                border: `1.5px solid ${step >= s ? (s === 3 && selectedZone ? selectedZone.color : 'hsl(45 80% 55%)') : 'hsl(0 0% 15%)'}`,
+                color: step >= s ? 'hsl(45 80% 55%)' : 'hsl(0 0% 30%)',
+              }}
+            >
+              {s}
+            </div>
+          ))}
+        </div>
+
         <button
           onClick={() => setProMode(!proMode)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-full font-mono text-[10px] tracking-wider transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[10px] tracking-wider transition-all shrink-0"
           style={{
             background: proMode
               ? 'linear-gradient(135deg, hsl(270 40% 18%), hsl(270 30% 12%))'
@@ -410,7 +433,7 @@ const CropOracle = () => {
 
       {/* ═══ Celestial Banner ═══ */}
       <motion.div
-        className="mx-auto max-w-2xl px-4 pt-4"
+        className="mx-auto max-w-2xl px-4 pt-14"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
       >
@@ -602,31 +625,8 @@ const CropOracle = () => {
         ))}
       </AnimatePresence>
 
-      <div className="flex justify-center pt-4 pb-4 gap-3">
-        {[1, 2, 3].map(s => (
-          <div key={s} className="flex items-center gap-2">
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold transition-all"
-              style={{
-                background: step >= s
-                  ? (s === 3 && selectedZone ? selectedZone.color + '30' : 'hsl(45 80% 55% / 0.2)')
-                  : 'hsl(0 0% 8%)',
-                border: `2px solid ${step >= s ? (s === 3 && selectedZone ? selectedZone.color : 'hsl(45 80% 55%)') : 'hsl(0 0% 15%)'}`,
-                color: step >= s ? 'hsl(45 80% 55%)' : 'hsl(0 0% 30%)',
-                boxShadow: step === s ? `0 0 20px ${s === 3 && selectedZone ? selectedZone.color + '40' : 'hsl(45 80% 55% / 0.2)'}` : 'none',
-              }}
-            >
-              {s}
-            </div>
-            {s < 3 && (
-              <div
-                className="w-8 h-0.5 rounded-full"
-                style={{ background: step > s ? 'hsl(45 80% 55% / 0.4)' : 'hsl(0 0% 12%)' }}
-              />
-            )}
-          </div>
-        ))}
-      </div>
+      {/* Spacer for fixed header */}
+      <div className="h-2" />
 
       {/* Content Area */}
       <div className="max-w-2xl mx-auto px-4 pb-24">
@@ -1066,7 +1066,6 @@ const CropOracle = () => {
                             setSwapSlotIndex(null);
                           } else {
                             setSwapSlotIndex(i);
-                            setShowSearch(true);
                             setSearchQuery('');
                           }
                         }}
@@ -1279,140 +1278,114 @@ const CropOracle = () => {
                 </motion.div>
               )}
 
-              {/* ═══ Crop Search ═══ */}
-              {<motion.div
+              {/* ═══ Unified Crop Search (below Star Picker) ═══ */}
+              <motion.div
                 className="mt-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
               >
-                <button
-                  onClick={() => { setShowSearch(!showSearch); if (showSearch) setSwapSlotIndex(null); }}
-                  className="w-full py-3 rounded-xl font-mono text-xs tracking-wider flex items-center justify-center gap-2 transition-all"
+                <div
+                  className="flex items-center gap-2 px-4 py-3 rounded-xl"
                   style={{
-                    background: showSearch ? 'hsl(0 0% 8%)' : 'hsl(0 0% 6%)',
-                    border: `1px solid ${showSearch ? 'hsl(45 80% 55% / 0.3)' : 'hsl(0 0% 12%)'}`,
-                    color: showSearch ? 'hsl(45 80% 55%)' : 'hsl(0 0% 45%)',
+                    background: 'hsl(0 0% 6%)',
+                    border: `1px solid ${swapSlotIndex !== null ? selectedZone.color + '30' : 'hsl(0 0% 15%)'}`,
                   }}
                 >
-                  <Search className="w-3.5 h-3.5" />
-                  {showSearch ? 'CLOSE SEARCH' : swapSlotIndex !== null ? `SWAP ${INTERVAL_ORDER[swapSlotIndex].label.toUpperCase()}` : 'SEARCH CROP REGISTRY'}
-                </button>
-
-                <AnimatePresence>
-                  {showSearch && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="pt-3">
-                        <div
-                          className="flex items-center gap-2 px-4 py-3 rounded-xl"
-                          style={{
-                            background: 'hsl(0 0% 6%)',
-                            border: '1px solid hsl(0 0% 15%)',
-                          }}
-                        >
-                          <Search className="w-4 h-4 shrink-0" style={{ color: 'hsl(0 0% 35%)' }} />
-                          <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                            placeholder="Search 487 crops by name, category, or mineral..."
-                            className="bg-transparent flex-1 text-sm font-body outline-none"
-                            style={{ color: 'hsl(0 0% 80%)' }}
-                            autoFocus
-                          />
-                          {searchQuery && (
-                            <button onClick={() => setSearchQuery('')}>
-                              <X className="w-4 h-4" style={{ color: 'hsl(0 0% 35%)' }} />
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Search Results */}
-                        {searchResults.length > 0 && (
-                          <div
-                            className="mt-2 rounded-xl overflow-hidden divide-y"
-                            style={{
-                              background: 'hsl(0 0% 5%)',
-                              border: '1px solid hsl(0 0% 12%)',
-                              borderColor: 'hsl(0 0% 10%)',
-                            }}
-                          >
-                            {searchResults.map(crop => {
-                              const zoneData = ZONES.find(z => z.hz === crop.frequency_hz);
-                              const ready = isCropLunarReady(crop.category, crop.common_name || crop.name, lunar.plantingType);
-                              return (
-                                <button
-                                  key={crop.id}
-                                  className="px-4 py-3 flex items-center gap-3 w-full text-left transition-all"
-                                  style={{
-                                    borderColor: 'hsl(0 0% 10%)',
-                                    cursor: swapSlotIndex !== null ? 'pointer' : 'default',
-                                    background: swapSlotIndex !== null ? 'transparent' : 'transparent',
-                                  }}
-                                  onClick={() => swapSlotIndex !== null && handleSwapCrop(crop)}
-                                  onMouseEnter={e => {
-                                    if (swapSlotIndex !== null) e.currentTarget.style.background = 'hsl(45 80% 55% / 0.05)';
-                                  }}
-                                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
-                                >
-                                  <div
-                                    className="w-3 h-3 rounded-full shrink-0"
-                                    style={{ background: zoneData?.color || 'hsl(0 0% 30%)' }}
-                                  />
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                      <span className="text-sm font-body truncate" style={{ color: 'hsl(0 0% 80%)' }}>
-                                        {crop.common_name || crop.name}
-                                      </span>
-                                      {ready && (
-                                        <span className="text-[8px] font-mono px-1 py-0.5 rounded shrink-0" style={{
-                                          background: 'hsl(120 50% 25% / 0.3)',
-                                          color: 'hsl(120 60% 60%)',
-                                        }}>
-                                          {lunar.phaseEmoji} READY
-                                        </span>
-                                      )}
-                                      {swapSlotIndex !== null && (
-                                        <span className="text-[8px] font-mono px-1 py-0.5 rounded shrink-0" style={{
-                                          background: `${selectedZone?.color || 'hsl(45 80% 55%)'}20`,
-                                          color: selectedZone?.color || 'hsl(45 80% 55%)',
-                                        }}>
-                                          TAP TO SWAP
-                                        </span>
-                                      )}
-                                    </div>
-                                    <p className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
-                                      {crop.frequency_hz}Hz • {zoneData?.name || crop.zone_name} • {crop.category}
-                                      {crop.chord_interval && ` • ${crop.chord_interval}`}
-                                      {crop.dominant_mineral && ` • ${crop.dominant_mineral}`}
-                                    </p>
-                                  </div>
-                                  {crop.spacing_inches && (
-                                    <span className="text-[9px] font-mono shrink-0" style={{ color: 'hsl(0 0% 30%)' }}>
-                                      {crop.spacing_inches}"
-                                    </span>
-                                  )}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        )}
-
-                        {searchQuery.length >= 2 && searchResults.length === 0 && (
-                          <p className="text-center text-xs font-mono mt-3" style={{ color: 'hsl(0 0% 30%)' }}>
-                            No crops found for "{searchQuery}"
-                          </p>
-                        )}
-                      </div>
-                    </motion.div>
+                  <Search className="w-4 h-4 shrink-0" style={{ color: swapSlotIndex !== null ? selectedZone.color + '60' : 'hsl(0 0% 35%)' }} />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder={swapSlotIndex !== null
+                      ? `Search to swap ${INTERVAL_ORDER[swapSlotIndex].label}...`
+                      : 'Search crop registry by name, category, or mineral...'
+                    }
+                    className="bg-transparent flex-1 text-sm font-body outline-none"
+                    style={{ color: 'hsl(0 0% 80%)' }}
+                  />
+                  {searchQuery && (
+                    <button onClick={() => setSearchQuery('')}>
+                      <X className="w-4 h-4" style={{ color: 'hsl(0 0% 35%)' }} />
+                    </button>
                   )}
-                </AnimatePresence>
-              </motion.div>}
+                </div>
+
+                {/* Search Results */}
+                {searchResults.length > 0 && (
+                  <div
+                    className="mt-2 rounded-xl overflow-hidden divide-y max-h-64 overflow-y-auto"
+                    style={{
+                      background: 'hsl(0 0% 5%)',
+                      border: '1px solid hsl(0 0% 12%)',
+                    }}
+                  >
+                    {searchResults.map(crop => {
+                      const zoneData = ZONES.find(z => z.hz === crop.frequency_hz);
+                      const ready = isCropLunarReady(crop.category, crop.common_name || crop.name, lunar.plantingType);
+                      return (
+                        <button
+                          key={crop.id}
+                          className="px-4 py-3 flex items-center gap-3 w-full text-left transition-all"
+                          style={{
+                            borderColor: 'hsl(0 0% 10%)',
+                            cursor: swapSlotIndex !== null ? 'pointer' : 'default',
+                          }}
+                          onClick={() => swapSlotIndex !== null && handleSwapCrop(crop)}
+                          onMouseEnter={e => {
+                            if (swapSlotIndex !== null) e.currentTarget.style.background = 'hsl(45 80% 55% / 0.05)';
+                          }}
+                          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                        >
+                          <div
+                            className="w-3 h-3 rounded-full shrink-0"
+                            style={{ background: zoneData?.color || 'hsl(0 0% 30%)' }}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-body truncate" style={{ color: 'hsl(0 0% 80%)' }}>
+                                {crop.common_name || crop.name}
+                              </span>
+                              {ready && (
+                                <span className="text-[8px] font-mono px-1 py-0.5 rounded shrink-0" style={{
+                                  background: 'hsl(120 50% 25% / 0.3)',
+                                  color: 'hsl(120 60% 60%)',
+                                }}>
+                                  {lunar.phaseEmoji} READY
+                                </span>
+                              )}
+                              {swapSlotIndex !== null && (
+                                <span className="text-[8px] font-mono px-1 py-0.5 rounded shrink-0" style={{
+                                  background: `${selectedZone?.color || 'hsl(45 80% 55%)'}20`,
+                                  color: selectedZone?.color || 'hsl(45 80% 55%)',
+                                }}>
+                                  TAP TO SWAP
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                              {crop.frequency_hz}Hz • {zoneData?.name || crop.zone_name} • {crop.category}
+                              {crop.chord_interval && ` • ${crop.chord_interval}`}
+                              {crop.dominant_mineral && ` • ${crop.dominant_mineral}`}
+                            </p>
+                          </div>
+                          {crop.spacing_inches && (
+                            <span className="text-[9px] font-mono shrink-0" style={{ color: 'hsl(0 0% 30%)' }}>
+                              {crop.spacing_inches}"
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {searchQuery.length >= 2 && searchResults.length === 0 && (
+                  <p className="text-center text-xs font-mono mt-3" style={{ color: 'hsl(0 0% 30%)' }}>
+                    No crops found for "{searchQuery}"
+                  </p>
+                )}
+              </motion.div>
 
               {/* Save Recipe Button */}
               <motion.div
