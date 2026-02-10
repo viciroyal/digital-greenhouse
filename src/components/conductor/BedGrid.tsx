@@ -89,8 +89,9 @@ const BedGrid = ({ beds, selectedBedId, onSelectBed, isAdmin, isLoading, bedPlan
     if (isAdmin) {
       // Admin sees actual Brix value
       if (bed.internal_brix === null) return null;
+      const brixColor = bed.internal_brix >= 18 ? 'hsl(45 90% 60%)' : bed.internal_brix >= 12 ? 'hsl(120 50% 50%)' : 'hsl(0 60% 55%)';
       return (
-        <span className="text-[10px] font-mono font-bold" style={{ color: bed.internal_brix >= 15 ? 'hsl(45 90% 60%)' : 'hsl(0 60% 55%)' }}>
+        <span className="text-[10px] font-mono font-bold" style={{ color: brixColor }}>
           {bed.internal_brix}°
         </span>
       );

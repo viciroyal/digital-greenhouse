@@ -33,10 +33,9 @@ const BrixMeter = ({ value = 0, isLoading = true }: BrixMeterProps) => {
   
   // Determine quality zone
   const getQualityZone = (brix: number) => {
-    if (brix < 8) return { label: 'Low Density', color: 'hsl(0 60% 50%)' };
-    if (brix < 14) return { label: 'Moderate', color: 'hsl(45 80% 50%)' };
-    if (brix < 20) return { label: 'Good', color: 'hsl(120 50% 45%)' };
-    return { label: 'High Brix!', color: 'hsl(140 70% 40%)' };
+    if (brix < 12) return { label: 'Dissonant', color: 'hsl(0 60% 50%)' };
+    if (brix < 18) return { label: 'In Tune', color: 'hsl(120 50% 45%)' };
+    return { label: 'High Fidelity', color: 'hsl(45 90% 55%)' };
   };
   
   const quality = getQualityZone(brixValue);
