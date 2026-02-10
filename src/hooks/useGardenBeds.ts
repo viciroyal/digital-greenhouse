@@ -37,6 +37,8 @@ export interface GardenBed {
   vitality_status: 'pending' | 'thriving' | 'needs_attention';
   inoculant_type: InoculantType;
   aerial_crop_id: string | null; // 13th Interval - Aerial Signal overstory crop
+  bed_length_ft: number; // Customizable bed length (default 60)
+  bed_width_ft: number;  // Customizable bed width (default 4)
   created_at: string;
   updated_at: string;
 }
@@ -433,17 +435,43 @@ export const useTogglePillar = () => {
 };
 
 // Calculate plant count using hexagonal spacing formula
-export const calculatePlantCount = (spacingInches: string | null): number => {
+// Accepts optional bed dimensions; defaults to 60ft x 4ft
+export const calculatePlantCount = (
+  spacingInches: string | null,
+  bedLengthFt: number = 60,
+  bedWidthFt: number = 4,
+): number => {
   if (!spacingInches) return 0;
   
   const spacing = parseFloat(spacingInches);
   if (isNaN(spacing) || spacing <= 0) return 0;
   
-  // Formula: (60ft * 30in) / (SpacingInches^2 * 0.866)
-  // 60ft = 720 inches, 30in width
-  const bedLengthInches = 720; // 60 feet
-  const bedWidthInches = 30;   // 30 inches
+  // Convert feet to inches
+  const bedLengthInches = bedLengthFt * 12;
+  const bedWidthInches = bedWidthFt * 12;
   
   const plantCount = (bedLengthInches * bedWidthInches) / (spacing * spacing * 0.866);
   return Math.floor(plantCount);
+};
+
+// Update bed dimensions (Admin only)
+export const useUpdateBedDimensions = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ bedId, lengthFt, widthFt }: { bedId: string; lengthFt: number; widthFt: number }) => {
+      const { data, error } = await supabase
+        .from('garden_beds')
+        .update({ bed_length_ft: lengthFt, bed_width_ft: widthFt })
+        .eq('id', bedId)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['garden-beds'] });
+    },
+  });
 };

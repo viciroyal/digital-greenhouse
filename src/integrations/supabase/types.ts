@@ -112,7 +112,9 @@ export type Database = {
       garden_beds: {
         Row: {
           aerial_crop_id: string | null
+          bed_length_ft: number
           bed_number: number
+          bed_width_ft: number
           created_at: string
           frequency_hz: number
           id: string
@@ -126,7 +128,9 @@ export type Database = {
         }
         Insert: {
           aerial_crop_id?: string | null
+          bed_length_ft?: number
           bed_number: number
+          bed_width_ft?: number
           created_at?: string
           frequency_hz: number
           id?: string
@@ -140,7 +144,9 @@ export type Database = {
         }
         Update: {
           aerial_crop_id?: string | null
+          bed_length_ft?: number
           bed_number?: number
+          bed_width_ft?: number
           created_at?: string
           frequency_hz?: number
           id?: string
