@@ -2,7 +2,7 @@ import { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, ArrowLeft, Music, Leaf, Shield, Pickaxe, Sparkles, Zap,
-  AlertTriangle, Clock, Users, Layers, Disc,
+  AlertTriangle, Clock, Users, Layers, Disc, ToggleLeft, ToggleRight,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -37,7 +37,18 @@ const CropOracle = () => {
   const [query, setQuery] = useState('');
   const [selectedCrop, setSelectedCrop] = useState<MasterCrop | null>(null);
   const [hoveredCrop, setHoveredCrop] = useState<MasterCrop | null>(null);
+  const [proMode, setProMode] = useState(() => {
+    try { return localStorage.getItem('oracle-pro-mode') === 'true'; } catch { return false; }
+  });
   const hoverTimeout = useRef<ReturnType<typeof setTimeout>>();
+
+  const toggleProMode = () => {
+    setProMode(prev => {
+      const next = !prev;
+      localStorage.setItem('oracle-pro-mode', String(next));
+      return next;
+    });
+  };
 
   /* ─── Search results (auto-populate when empty) ─── */
   const results = useMemo(() => {
@@ -131,9 +142,26 @@ const CropOracle = () => {
           <ArrowLeft className="w-4 h-4" style={{ color: 'hsl(0 0% 50%)' }} />
         </button>
         <Disc className="w-5 h-5" style={{ color: 'hsl(45 80% 55%)' }} />
-        <h1 className="text-sm font-mono font-bold tracking-wider" style={{ color: 'hsl(45 80% 55%)' }}>
+        <h1 className="text-sm font-mono font-bold tracking-wider flex-1" style={{ color: 'hsl(45 80% 55%)' }}>
           CROP ORACLE
         </h1>
+        {/* Easy / Pro Toggle */}
+        <button
+          onClick={toggleProMode}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all"
+          style={{
+            background: proMode ? 'hsl(45 80% 55% / 0.15)' : 'hsl(120 50% 50% / 0.12)',
+            border: `1px solid ${proMode ? 'hsl(45 80% 55% / 0.4)' : 'hsl(120 50% 50% / 0.3)'}`,
+          }}
+        >
+          {proMode
+            ? <ToggleRight className="w-4 h-4" style={{ color: 'hsl(45 80% 55%)' }} />
+            : <ToggleLeft className="w-4 h-4" style={{ color: 'hsl(120 50% 50%)' }} />
+          }
+          <span className="text-[9px] font-mono font-bold" style={{ color: proMode ? 'hsl(45 80% 55%)' : 'hsl(120 50% 50%)' }}>
+            {proMode ? 'PRO' : 'EASY'}
+          </span>
+        </button>
       </div>
 
       {/* Search Bar */}
@@ -226,7 +254,10 @@ const CropOracle = () => {
                         {crop.common_name || crop.name}
                       </span>
                       <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
-                        {crop.zone_name} • {crop.frequency_hz}Hz • {crop.chord_interval || '—'}
+                        {proMode
+                          ? `${crop.zone_name} • ${crop.frequency_hz}Hz • ${crop.chord_interval || '—'}`
+                          : `${crop.zone_name} • ${crop.category}`
+                        }
                       </span>
                     </div>
                     <span className="text-sm shrink-0">{inst?.icon || '🌱'}</span>
@@ -324,9 +355,11 @@ const CropOracle = () => {
                     <h2 className="text-lg font-bold" style={{ color: 'hsl(0 0% 85%)' }}>
                       {selectedCrop.common_name || selectedCrop.name}
                     </h2>
-                    <p className="text-[10px] font-mono italic" style={{ color: 'hsl(0 0% 40%)' }}>
-                      {selectedCrop.name}
-                    </p>
+                    {proMode && (
+                      <p className="text-[10px] font-mono italic" style={{ color: 'hsl(0 0% 40%)' }}>
+                        {selectedCrop.name}
+                      </p>
+                    )}
                   </div>
                   <div className="text-right">
                     <span className="text-2xl">
@@ -334,9 +367,11 @@ const CropOracle = () => {
                         ? INSTRUMENT_ICONS[selectedCrop.instrument_type as InstrumentType]?.icon || '🌱'
                         : '🌱'}
                     </span>
-                    <p className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
-                      {selectedCrop.instrument_type || 'Unassigned'}
-                    </p>
+                    {proMode && (
+                      <p className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                        {selectedCrop.instrument_type || 'Unassigned'}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -347,48 +382,62 @@ const CropOracle = () => {
                 )}
               </div>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-3 divide-x" style={{ borderColor: `${zoneColor}20` }}>
-                <StatCell label="ZONE" value={`${note} • ${selectedCrop.frequency_hz}Hz`} subtext={selectedCrop.zone_name} color={zoneColor} />
-                <StatCell
-                  label="CHORD INTERVAL"
-                  value={selectedCrop.chord_interval ? INTERVAL_LABELS[selectedCrop.chord_interval]?.label || selectedCrop.chord_interval : '—'}
-                  subtext={selectedCrop.category}
-                  color={selectedCrop.chord_interval ? INTERVAL_LABELS[selectedCrop.chord_interval]?.color || 'hsl(0 0% 50%)' : 'hsl(0 0% 50%)'}
+              {/* Stats Grid — Easy: zone name + harvest days; Pro: full stats */}
+              {proMode ? (
+                <div className="grid grid-cols-3 divide-x" style={{ borderColor: `${zoneColor}20` }}>
+                  <StatCell label="ZONE" value={`${note} • ${selectedCrop.frequency_hz}Hz`} subtext={selectedCrop.zone_name} color={zoneColor} />
+                  <StatCell
+                    label="CHORD INTERVAL"
+                    value={selectedCrop.chord_interval ? INTERVAL_LABELS[selectedCrop.chord_interval]?.label || selectedCrop.chord_interval : '—'}
+                    subtext={selectedCrop.category}
+                    color={selectedCrop.chord_interval ? INTERVAL_LABELS[selectedCrop.chord_interval]?.color || 'hsl(0 0% 50%)' : 'hsl(0 0% 50%)'}
+                  />
+                  <StatCell
+                    label="MINERAL"
+                    value={selectedCrop.dominant_mineral || '—'}
+                    subtext={mixSetting?.mixFocus || ''}
+                    color="hsl(45 70% 55%)"
+                  />
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 divide-x" style={{ borderColor: `${zoneColor}20` }}>
+                  <StatCell label="ZONE" value={selectedCrop.zone_name} subtext={selectedCrop.category} color={zoneColor} />
+                  <StatCell
+                    label="HARVEST"
+                    value={selectedCrop.harvest_days ? `${selectedCrop.harvest_days} days` : 'Not set'}
+                    subtext={selectedCrop.planting_season?.join(', ') || ''}
+                    color="hsl(35 70% 55%)"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Brix + Timing Row — Pro only */}
+            {proMode && (
+              <div className="grid grid-cols-2 gap-3">
+                <InfoCard
+                  icon={<Zap className="w-4 h-4" />}
+                  label="NIR / BRIX TARGET"
+                  value={selectedCrop.brix_target_min && selectedCrop.brix_target_max
+                    ? `${selectedCrop.brix_target_min}° – ${selectedCrop.brix_target_max}°`
+                    : '12° – 24°'}
+                  accent="hsl(120 50% 50%)"
                 />
-                <StatCell
-                  label="MINERAL"
-                  value={selectedCrop.dominant_mineral || '—'}
-                  subtext={mixSetting?.mixFocus || ''}
-                  color="hsl(45 70% 55%)"
+                <InfoCard
+                  icon={<Clock className="w-4 h-4" />}
+                  label="HARVEST DAYS"
+                  value={selectedCrop.harvest_days ? `${selectedCrop.harvest_days} days` : 'Not set'}
+                  accent="hsl(35 70% 55%)"
                 />
               </div>
-            </div>
+            )}
 
-            {/* Brix + Timing Row */}
-            <div className="grid grid-cols-2 gap-3">
-              <InfoCard
-                icon={<Zap className="w-4 h-4" />}
-                label="NIR / BRIX TARGET"
-                value={selectedCrop.brix_target_min && selectedCrop.brix_target_max
-                  ? `${selectedCrop.brix_target_min}° – ${selectedCrop.brix_target_max}°`
-                  : '12° – 24°'}
-                accent="hsl(120 50% 50%)"
-              />
-              <InfoCard
-                icon={<Clock className="w-4 h-4" />}
-                label="HARVEST DAYS"
-                value={selectedCrop.harvest_days ? `${selectedCrop.harvest_days} days` : 'Not set'}
-                accent="hsl(35 70% 55%)"
-              />
-            </div>
+            {/* Lunar Gate Timing — Pro only */}
+            {proMode && <LunarGateCard crop={selectedCrop} zoneColor={zoneColor} />}
+            {/* Seasonal Movement — Pro only */}
+            {proMode && <SeasonalMovementCard crop={selectedCrop} />}
 
-            {/* Lunar Gate Timing */}
-            <LunarGateCard crop={selectedCrop} zoneColor={zoneColor} />
-            {/* Seasonal Movement */}
-            <SeasonalMovementCard crop={selectedCrop} />
-
-            {/* Companion Guild */}
+            {/* Companion Guild — Always shown, simplified in Easy */}
             <div
               className="rounded-xl p-3"
               style={{
@@ -399,7 +448,7 @@ const CropOracle = () => {
               <div className="flex items-center gap-2 mb-2.5">
                 <Users className="w-4 h-4" style={{ color: 'hsl(120 50% 50%)' }} />
                 <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: 'hsl(120 50% 50%)' }}>
-                  COMPANION GUILD ({companionCrops.length})
+                  {proMode ? `COMPANION GUILD (${companionCrops.length})` : `PLANT WITH (${companionCrops.length})`}
                 </span>
               </div>
               {companionCrops.length > 0 ? (
@@ -428,7 +477,7 @@ const CropOracle = () => {
                       <span className="text-xs font-mono flex-1" style={{ color: crop ? 'hsl(0 0% 70%)' : 'hsl(0 0% 35%)' }}>
                         {name}
                       </span>
-                      {crop && (
+                      {proMode && crop && (
                         <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
                           {crop.frequency_hz}Hz • {crop.chord_interval || '—'}
                         </span>
@@ -448,8 +497,8 @@ const CropOracle = () => {
               )}
             </div>
 
-            {/* Chord Recipe Match */}
-            {chordRecipe && (
+            {/* Chord Recipe Match — Pro only */}
+            {proMode && chordRecipe && (
               <div
                 className="rounded-xl p-3"
                 style={{
@@ -490,11 +539,11 @@ const CropOracle = () => {
               </div>
             )}
 
-            {/* Harmonic Dependencies */}
-            <HarmonicWarningsCard crop={selectedCrop} />
+            {/* Harmonic Dependencies — Pro only */}
+            {proMode && <HarmonicWarningsCard crop={selectedCrop} />}
 
-            {/* Conflicts */}
-            {conflicts.length > 0 && (
+            {/* Conflicts — Pro only */}
+            {proMode && conflicts.length > 0 && (
               <div
                 className="rounded-xl p-3"
                 style={{
@@ -533,39 +582,41 @@ const CropOracle = () => {
               </div>
             )}
 
-            {/* Bed Organization & Spacing */}
+            {/* Bed Organization & Spacing — Always shown */}
             <BedOrganizationCard crop={selectedCrop} zoneColor={zoneColor} />
 
-            {/* Bed Strum — Placement Guide (inline) */}
-            <BedStrumEmbed frequencyHz={selectedCrop.frequency_hz} zoneColor={zoneColor} />
+            {/* Bed Strum — Placement Guide — Pro only */}
+            {proMode && <BedStrumEmbed frequencyHz={selectedCrop.frequency_hz} zoneColor={zoneColor} />}
 
-            {/* Metadata Footer */}
-            <div
-              className="rounded-xl p-3 grid grid-cols-2 gap-2"
-              style={{
-                background: 'hsl(0 0% 4%)',
-                border: '1px solid hsl(0 0% 10%)',
-              }}
-            >
-              {selectedCrop.spacing_inches && (
-                <MetaItem label="SPACING" value={`${selectedCrop.spacing_inches}"`} />
-              )}
-              {selectedCrop.planting_season && selectedCrop.planting_season.length > 0 && (
-                <MetaItem label="SEASON" value={selectedCrop.planting_season.join(', ')} />
-              )}
-              {selectedCrop.focus_tag && (
-                <MetaItem label="FOCUS TAG" value={selectedCrop.focus_tag.replace('_', ' ')} />
-              )}
-              {selectedCrop.cultural_role && (
-                <MetaItem label="CULTURAL ROLE" value={selectedCrop.cultural_role} />
-              )}
-              {selectedCrop.soil_protocol_focus && (
-                <MetaItem label="SOIL PROTOCOL" value={selectedCrop.soil_protocol_focus} />
-              )}
-              {selectedCrop.guild_role && (
-                <MetaItem label="GUILD ROLE" value={selectedCrop.guild_role} />
-              )}
-            </div>
+            {/* Metadata Footer — Pro only */}
+            {proMode && (
+              <div
+                className="rounded-xl p-3 grid grid-cols-2 gap-2"
+                style={{
+                  background: 'hsl(0 0% 4%)',
+                  border: '1px solid hsl(0 0% 10%)',
+                }}
+              >
+                {selectedCrop.spacing_inches && (
+                  <MetaItem label="SPACING" value={`${selectedCrop.spacing_inches}"`} />
+                )}
+                {selectedCrop.planting_season && selectedCrop.planting_season.length > 0 && (
+                  <MetaItem label="SEASON" value={selectedCrop.planting_season.join(', ')} />
+                )}
+                {selectedCrop.focus_tag && (
+                  <MetaItem label="FOCUS TAG" value={selectedCrop.focus_tag.replace('_', ' ')} />
+                )}
+                {selectedCrop.cultural_role && (
+                  <MetaItem label="CULTURAL ROLE" value={selectedCrop.cultural_role} />
+                )}
+                {selectedCrop.soil_protocol_focus && (
+                  <MetaItem label="SOIL PROTOCOL" value={selectedCrop.soil_protocol_focus} />
+                )}
+                {selectedCrop.guild_role && (
+                  <MetaItem label="GUILD ROLE" value={selectedCrop.guild_role} />
+                )}
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
