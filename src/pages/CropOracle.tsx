@@ -64,6 +64,7 @@ const CropOracle = () => {
   const [starSearchQuery, setStarSearchQuery] = useState('');
   const [showSavedRecipes, setShowSavedRecipes] = useState(false);
   const [deletingRecipeId, setDeletingRecipeId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [proMode, setProMode] = useState(false);
 
   // Fetch saved recipes
@@ -1351,27 +1352,48 @@ const CropOracle = () => {
                                 {new Date(recipe.created_at).toLocaleDateString()}
                               </p>
                             </div>
-                            <button
-                              onClick={() => handleDeleteRecipe(recipe.id)}
-                              disabled={deletingRecipeId === recipe.id}
-                              className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all hover:scale-110"
-                              style={{
-                                background: 'hsl(0 0% 10%)',
-                                border: '1px solid hsl(0 0% 18%)',
-                              }}
-                              title="Delete recipe"
-                            >
-                              {deletingRecipeId === recipe.id ? (
-                                <motion.div
-                                  className="w-3 h-3 border rounded-full"
-                                  style={{ borderColor: 'hsl(0 0% 30%)', borderTopColor: 'hsl(0 0% 60%)' }}
-                                  animate={{ rotate: 360 }}
-                                  transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
-                                />
-                              ) : (
+                            {confirmDeleteId === recipe.id ? (
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  onClick={() => {
+                                    handleDeleteRecipe(recipe.id);
+                                    setConfirmDeleteId(null);
+                                  }}
+                                  disabled={deletingRecipeId === recipe.id}
+                                  className="px-2 py-1 rounded-lg text-[9px] font-mono font-bold transition-all hover:scale-105"
+                                  style={{
+                                    background: 'hsl(0 50% 20%)',
+                                    color: 'hsl(0 60% 70%)',
+                                    border: '1px solid hsl(0 40% 30%)',
+                                  }}
+                                >
+                                  {deletingRecipeId === recipe.id ? '...' : 'DELETE'}
+                                </button>
+                                <button
+                                  onClick={() => setConfirmDeleteId(null)}
+                                  className="px-2 py-1 rounded-lg text-[9px] font-mono transition-all hover:scale-105"
+                                  style={{
+                                    background: 'hsl(0 0% 12%)',
+                                    color: 'hsl(0 0% 45%)',
+                                    border: '1px solid hsl(0 0% 18%)',
+                                  }}
+                                >
+                                  KEEP
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => setConfirmDeleteId(recipe.id)}
+                                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all hover:scale-110"
+                                style={{
+                                  background: 'hsl(0 0% 10%)',
+                                  border: '1px solid hsl(0 0% 18%)',
+                                }}
+                                title="Delete recipe"
+                              >
                                 <Trash2 className="w-3 h-3" style={{ color: 'hsl(0 40% 50%)' }} />
-                              )}
-                            </button>
+                              </button>
+                            )}
                           </div>
 
                           {/* Crop slots */}
