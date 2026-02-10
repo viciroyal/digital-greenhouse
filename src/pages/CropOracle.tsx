@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, ArrowLeft, Music, Leaf, Shield, Pickaxe, Sparkles, Zap,
   AlertTriangle, Clock, Users, Layers, Disc, ToggleLeft, ToggleRight, X, Info, Plus,
+  Moon, Sprout, Ruler,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -41,6 +42,7 @@ const CropOracle = () => {
   const [query, setQuery] = useState('');
   const [selectedCrop, setSelectedCrop] = useState<MasterCrop | null>(null);
   const [hoveredCrop, setHoveredCrop] = useState<MasterCrop | null>(null);
+  const [activeSection, setActiveSection] = useState<'profile' | 'guild' | 'harmony' | 'timing' | 'planting'>('profile');
   const [composerOpen, setComposerOpen] = useState(false);
   const [pendingCrop, setPendingCrop] = useState<MasterCrop | null>(null);
   const [proMode, setProMode] = useState(() => {
@@ -424,7 +426,7 @@ const CropOracle = () => {
             exit={{ opacity: 0, y: 16 }}
             className="px-4 pb-8 space-y-3"
           >
-            {/* Zone + Identity */}
+            {/* Zone + Identity — always visible */}
             <div
               className="rounded-2xl overflow-hidden"
               style={{
@@ -433,10 +435,7 @@ const CropOracle = () => {
                 boxShadow: `0 0 30px ${zoneColor}15`,
               }}
             >
-              <div
-                className="p-4"
-                style={{ borderBottom: `1px solid ${zoneColor}25` }}
-              >
+              <div className="p-4" style={{ borderBottom: `1px solid ${zoneColor}25` }}>
                 <div className="flex items-start justify-between">
                   <div>
                     <h2 className="text-lg font-bold" style={{ color: 'hsl(0 0% 85%)' }}>
@@ -468,7 +467,6 @@ const CropOracle = () => {
                   </p>
                 )}
 
-                {/* Add to Chord button (admin only, when composer is open) */}
                 {isAdmin && selectedCrop.chord_interval && (
                   <button
                     onClick={() => handleAddToChord(selectedCrop)}
@@ -485,241 +483,196 @@ const CropOracle = () => {
                 )}
               </div>
 
-              {/* Stats Grid — Easy: zone name + harvest days; Pro: full stats */}
-              {proMode ? (
-                <div className="grid grid-cols-3 divide-x" style={{ borderColor: `${zoneColor}20` }}>
-                  <StatCell label="ZONE" value={`${note} • ${selectedCrop.frequency_hz}Hz`} subtext={selectedCrop.zone_name} color={zoneColor} />
-                  <StatCell
-                    label="CHORD INTERVAL"
-                    value={selectedCrop.chord_interval ? INTERVAL_LABELS[selectedCrop.chord_interval]?.label || selectedCrop.chord_interval : '—'}
-                    subtext={selectedCrop.category}
-                    color={selectedCrop.chord_interval ? INTERVAL_LABELS[selectedCrop.chord_interval]?.color || 'hsl(0 0% 50%)' : 'hsl(0 0% 50%)'}
-                  />
-                  <StatCell
-                    label="MINERAL"
-                    value={selectedCrop.dominant_mineral || '—'}
-                    subtext={mixSetting?.mixFocus || ''}
-                    color="hsl(45 70% 55%)"
-                  />
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 divide-x" style={{ borderColor: `${zoneColor}20` }}>
-                  <StatCell label="ZONE" value={selectedCrop.zone_name} subtext={selectedCrop.category} color={zoneColor} />
-                  <StatCell
-                    label="HARVEST"
-                    value={selectedCrop.harvest_days ? `${selectedCrop.harvest_days} days` : 'Not set'}
-                    subtext={selectedCrop.planting_season?.join(', ') || ''}
-                    color="hsl(35 70% 55%)"
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Brix + Timing Row — Pro only */}
-            {proMode && (
-              <div className="grid grid-cols-2 gap-3">
-                <InfoCard
-                  icon={<Zap className="w-4 h-4" />}
-                  label="NIR / BRIX TARGET"
-                  value={selectedCrop.brix_target_min && selectedCrop.brix_target_max
-                    ? `${selectedCrop.brix_target_min}° – ${selectedCrop.brix_target_max}°`
-                    : '12° – 24°'}
-                  accent="hsl(120 50% 50%)"
-                />
-                <InfoCard
-                  icon={<Clock className="w-4 h-4" />}
-                  label="HARVEST DAYS"
-                  value={selectedCrop.harvest_days ? `${selectedCrop.harvest_days} days` : 'Not set'}
-                  accent="hsl(35 70% 55%)"
-                />
-              </div>
-            )}
-
-            {/* Lunar Gate Timing — Pro only */}
-            {proMode && <LunarGateCard crop={selectedCrop} zoneColor={zoneColor} />}
-            {/* Seasonal Movement — Pro only */}
-            {proMode && <SeasonalMovementCard crop={selectedCrop} />}
-
-            {/* Companion Guild — Always shown, simplified in Easy */}
-            <div
-              className="rounded-xl p-3"
-              style={{
-                background: 'hsl(0 0% 5%)',
-                border: '1px solid hsl(0 0% 12%)',
-              }}
-            >
-              <div className="flex items-center gap-2 mb-2.5">
-                <Users className="w-4 h-4" style={{ color: 'hsl(120 50% 50%)' }} />
-                <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: 'hsl(120 50% 50%)' }}>
-                  {proMode ? `COMPANION GUILD (${companionCrops.length})` : `PLANT WITH (${companionCrops.length})`}
-                </span>
-              </div>
-              {companionCrops.length > 0 ? (
-                <div className="space-y-1.5">
-                  {companionCrops.map(({ name, crop }) => (
+              {/* ─── Icon Toolbar ─── */}
+              <div className="flex items-center justify-around py-2 px-2" style={{ background: 'hsl(0 0% 3%)' }}>
+                {([
+                  { id: 'profile' as const, icon: <Leaf className="w-4 h-4" />, label: 'Profile' },
+                  { id: 'guild' as const, icon: <Users className="w-4 h-4" />, label: 'Guild' },
+                  ...(proMode ? [
+                    { id: 'harmony' as const, icon: <Music className="w-4 h-4" />, label: 'Harmony' },
+                    { id: 'timing' as const, icon: <Moon className="w-4 h-4" />, label: 'Timing' },
+                  ] : []),
+                  { id: 'planting' as const, icon: <Ruler className="w-4 h-4" />, label: 'Planting' },
+                ]).map(tab => {
+                  const isActive = activeSection === tab.id;
+                  return (
                     <button
-                      key={name}
-                      className="w-full flex items-center gap-2 p-2 rounded-lg text-left transition-colors"
+                      key={tab.id}
+                      onClick={() => setActiveSection(tab.id)}
+                      className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-all"
                       style={{
-                        background: crop ? `${ZONE_COLORS[crop.frequency_hz] || '#888'}08` : 'hsl(0 0% 7%)',
-                        border: `1px solid ${crop ? `${ZONE_COLORS[crop.frequency_hz] || '#888'}20` : 'hsl(0 0% 10%)'}`,
-                      }}
-                      onClick={() => {
-                        if (crop) {
-                          setSelectedCrop(crop);
-                          setQuery(crop.common_name || crop.name);
-                        }
+                        background: isActive ? `${zoneColor}18` : 'transparent',
+                        color: isActive ? zoneColor : 'hsl(0 0% 40%)',
                       }}
                     >
-                      <div
-                        className="w-2 h-2 rounded-full shrink-0"
-                        style={{
-                          background: crop ? ZONE_COLORS[crop.frequency_hz] || '#888' : 'hsl(0 0% 25%)',
-                        }}
-                      />
-                      <span className="text-xs font-mono flex-1" style={{ color: crop ? 'hsl(0 0% 70%)' : 'hsl(0 0% 35%)' }}>
-                        {name}
+                      {tab.icon}
+                      <span className="text-[7px] font-mono font-bold tracking-wider">
+                        {tab.label.toUpperCase()}
                       </span>
-                      {proMode && crop && (
-                        <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
-                          {crop.frequency_hz}Hz • {crop.chord_interval || '—'}
-                        </span>
-                      )}
-                      {!crop && (
-                        <span className="text-[8px] font-mono" style={{ color: 'hsl(0 60% 45%)' }}>
-                          NOT IN REGISTRY
-                        </span>
+                      {isActive && (
+                        <motion.div
+                          layoutId="section-indicator"
+                          className="w-4 h-0.5 rounded-full"
+                          style={{ background: zoneColor }}
+                        />
                       )}
                     </button>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>
-                  No companions assigned yet.
-                </p>
-              )}
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Chord Recipe Match — Pro only */}
-            {proMode && chordRecipe && (
-              <div
-                className="rounded-xl p-3"
-                style={{
-                  background: 'hsl(45 30% 6%)',
-                  border: '1px solid hsl(45 50% 25%)',
-                }}
+            {/* ─── Section Content ─── */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeSection}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-3"
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <Music className="w-4 h-4" style={{ color: 'hsl(45 80% 55%)' }} />
-                  <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: 'hsl(45 80% 55%)' }}>
-                    JAZZ 13TH RECIPE MATCH
-                  </span>
-                </div>
-                <p className="text-xs font-mono" style={{ color: 'hsl(45 60% 50%)' }}>
-                  Part of <strong>{chordRecipe.chordName}</strong> ({chordRecipe.zoneName} • {chordRecipe.frequencyHz}Hz)
-                </p>
-                <div className="flex gap-1 mt-2">
-                  {chordRecipe.intervals.map(iv => (
-                    <div
-                      key={iv.interval}
-                      className="px-1.5 py-1 rounded text-center"
-                      style={{
-                        background: iv.cropName === (selectedCrop.common_name || selectedCrop.name)
-                          ? `${zoneColor}30`
-                          : 'hsl(0 0% 8%)',
-                        border: iv.cropName === (selectedCrop.common_name || selectedCrop.name)
-                          ? `1px solid ${zoneColor}60`
-                          : '1px solid hsl(0 0% 12%)',
-                      }}
-                    >
-                      <span className="text-[8px] font-mono block" style={{ color: 'hsl(0 0% 40%)' }}>
-                        {iv.interval}
+                {/* PROFILE */}
+                {activeSection === 'profile' && (
+                  <>
+                    {proMode ? (
+                      <div className="grid grid-cols-3 divide-x rounded-xl overflow-hidden" style={{ borderColor: `${zoneColor}20`, background: 'hsl(0 0% 5%)', border: `1px solid ${zoneColor}20` }}>
+                        <StatCell label="ZONE" value={`${note} • ${selectedCrop.frequency_hz}Hz`} subtext={selectedCrop.zone_name} color={zoneColor} />
+                        <StatCell
+                          label="CHORD INTERVAL"
+                          value={selectedCrop.chord_interval ? INTERVAL_LABELS[selectedCrop.chord_interval]?.label || selectedCrop.chord_interval : '—'}
+                          subtext={selectedCrop.category}
+                          color={selectedCrop.chord_interval ? INTERVAL_LABELS[selectedCrop.chord_interval]?.color || 'hsl(0 0% 50%)' : 'hsl(0 0% 50%)'}
+                        />
+                        <StatCell label="MINERAL" value={selectedCrop.dominant_mineral || '—'} subtext={mixSetting?.mixFocus || ''} color="hsl(45 70% 55%)" />
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 divide-x rounded-xl overflow-hidden" style={{ borderColor: `${zoneColor}20`, background: 'hsl(0 0% 5%)', border: `1px solid ${zoneColor}20` }}>
+                        <StatCell label="ZONE" value={selectedCrop.zone_name} subtext={selectedCrop.category} color={zoneColor} />
+                        <StatCell label="HARVEST" value={selectedCrop.harvest_days ? `${selectedCrop.harvest_days} days` : 'Not set'} subtext={selectedCrop.planting_season?.join(', ') || ''} color="hsl(35 70% 55%)" />
+                      </div>
+                    )}
+                    {proMode && (
+                      <div className="grid grid-cols-2 gap-3">
+                        <InfoCard icon={<Zap className="w-4 h-4" />} label="NIR / BRIX TARGET" value={selectedCrop.brix_target_min && selectedCrop.brix_target_max ? `${selectedCrop.brix_target_min}° – ${selectedCrop.brix_target_max}°` : '12° – 24°'} accent="hsl(120 50% 50%)" />
+                        <InfoCard icon={<Clock className="w-4 h-4" />} label="HARVEST DAYS" value={selectedCrop.harvest_days ? `${selectedCrop.harvest_days} days` : 'Not set'} accent="hsl(35 70% 55%)" />
+                      </div>
+                    )}
+                    {proMode && (
+                      <div className="rounded-xl p-3 grid grid-cols-2 gap-2" style={{ background: 'hsl(0 0% 4%)', border: '1px solid hsl(0 0% 10%)' }}>
+                        {selectedCrop.spacing_inches && <MetaItem label="SPACING" value={`${selectedCrop.spacing_inches}"`} />}
+                        {selectedCrop.planting_season && selectedCrop.planting_season.length > 0 && <MetaItem label="SEASON" value={selectedCrop.planting_season.join(', ')} />}
+                        {selectedCrop.focus_tag && <MetaItem label="FOCUS TAG" value={selectedCrop.focus_tag.replace('_', ' ')} />}
+                        {selectedCrop.cultural_role && <MetaItem label="CULTURAL ROLE" value={selectedCrop.cultural_role} />}
+                        {selectedCrop.soil_protocol_focus && <MetaItem label="SOIL PROTOCOL" value={selectedCrop.soil_protocol_focus} />}
+                        {selectedCrop.guild_role && <MetaItem label="GUILD ROLE" value={selectedCrop.guild_role} />}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* GUILD */}
+                {activeSection === 'guild' && (
+                  <div className="rounded-xl p-3" style={{ background: 'hsl(0 0% 5%)', border: '1px solid hsl(0 0% 12%)' }}>
+                    <div className="flex items-center gap-2 mb-2.5">
+                      <Users className="w-4 h-4" style={{ color: 'hsl(120 50% 50%)' }} />
+                      <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: 'hsl(120 50% 50%)' }}>
+                        {proMode ? `COMPANION GUILD (${companionCrops.length})` : `PLANT WITH (${companionCrops.length})`}
                       </span>
-                      <span className="text-[10px]">{iv.emoji}</span>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                    {companionCrops.length > 0 ? (
+                      <div className="space-y-1.5">
+                        {companionCrops.map(({ name, crop }) => (
+                          <button
+                            key={name}
+                            className="w-full flex items-center gap-2 p-2 rounded-lg text-left transition-colors"
+                            style={{
+                              background: crop ? `${ZONE_COLORS[crop.frequency_hz] || '#888'}08` : 'hsl(0 0% 7%)',
+                              border: `1px solid ${crop ? `${ZONE_COLORS[crop.frequency_hz] || '#888'}20` : 'hsl(0 0% 10%)'}`,
+                            }}
+                            onClick={() => {
+                              if (crop) { setSelectedCrop(crop); setQuery(crop.common_name || crop.name); }
+                            }}
+                          >
+                            <div className="w-2 h-2 rounded-full shrink-0" style={{ background: crop ? ZONE_COLORS[crop.frequency_hz] || '#888' : 'hsl(0 0% 25%)' }} />
+                            <span className="text-xs font-mono flex-1" style={{ color: crop ? 'hsl(0 0% 70%)' : 'hsl(0 0% 35%)' }}>{name}</span>
+                            {proMode && crop && (
+                              <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
+                                {crop.frequency_hz}Hz • {crop.chord_interval || '—'}
+                              </span>
+                            )}
+                            {!crop && <span className="text-[8px] font-mono" style={{ color: 'hsl(0 60% 45%)' }}>NOT IN REGISTRY</span>}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>No companions assigned yet.</p>
+                    )}
+                  </div>
+                )}
 
-            {/* Harmonic Dependencies — Pro only */}
-            {proMode && <HarmonicWarningsCard crop={selectedCrop} />}
+                {/* HARMONY (Pro only) */}
+                {activeSection === 'harmony' && proMode && (
+                  <>
+                    {chordRecipe && (
+                      <div className="rounded-xl p-3" style={{ background: 'hsl(45 30% 6%)', border: '1px solid hsl(45 50% 25%)' }}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <Music className="w-4 h-4" style={{ color: 'hsl(45 80% 55%)' }} />
+                          <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: 'hsl(45 80% 55%)' }}>JAZZ 13TH RECIPE MATCH</span>
+                        </div>
+                        <p className="text-xs font-mono" style={{ color: 'hsl(45 60% 50%)' }}>
+                          Part of <strong>{chordRecipe.chordName}</strong> ({chordRecipe.zoneName} • {chordRecipe.frequencyHz}Hz)
+                        </p>
+                        <div className="flex gap-1 mt-2">
+                          {chordRecipe.intervals.map(iv => (
+                            <div key={iv.interval} className="px-1.5 py-1 rounded text-center" style={{
+                              background: iv.cropName === (selectedCrop.common_name || selectedCrop.name) ? `${zoneColor}30` : 'hsl(0 0% 8%)',
+                              border: iv.cropName === (selectedCrop.common_name || selectedCrop.name) ? `1px solid ${zoneColor}60` : '1px solid hsl(0 0% 12%)',
+                            }}>
+                              <span className="text-[8px] font-mono block" style={{ color: 'hsl(0 0% 40%)' }}>{iv.interval}</span>
+                              <span className="text-[10px]">{iv.emoji}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <HarmonicWarningsCard crop={selectedCrop} />
+                    {conflicts.length > 0 && (
+                      <div className="rounded-xl p-3" style={{ background: 'hsl(0 30% 6%)', border: '1px solid hsl(0 40% 25%)' }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <AlertTriangle className="w-4 h-4" style={{ color: 'hsl(0 60% 55%)' }} />
+                          <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: 'hsl(0 60% 55%)' }}>SLOT COMPETITORS ({conflicts.length})</span>
+                        </div>
+                        <p className="text-[9px] font-mono mb-2" style={{ color: 'hsl(0 0% 40%)' }}>Same zone + interval + instrument — only one can occupy this slot per bed.</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {conflicts.map(c => (
+                            <button key={c.id} className="px-2 py-1 rounded-lg text-[10px] font-mono" style={{ background: 'hsl(0 0% 8%)', border: '1px solid hsl(0 0% 14%)', color: 'hsl(0 0% 60%)' }}
+                              onClick={() => { setSelectedCrop(c); setQuery(c.common_name || c.name); }}
+                            >{c.common_name || c.name}</button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
 
-            {/* Conflicts — Pro only */}
-            {proMode && conflicts.length > 0 && (
-              <div
-                className="rounded-xl p-3"
-                style={{
-                  background: 'hsl(0 30% 6%)',
-                  border: '1px solid hsl(0 40% 25%)',
-                }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="w-4 h-4" style={{ color: 'hsl(0 60% 55%)' }} />
-                  <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: 'hsl(0 60% 55%)' }}>
-                    SLOT COMPETITORS ({conflicts.length})
-                  </span>
-                </div>
-                <p className="text-[9px] font-mono mb-2" style={{ color: 'hsl(0 0% 40%)' }}>
-                  Same zone + interval + instrument — only one can occupy this slot per bed.
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {conflicts.map(c => (
-                    <button
-                      key={c.id}
-                      className="px-2 py-1 rounded-lg text-[10px] font-mono"
-                      style={{
-                        background: 'hsl(0 0% 8%)',
-                        border: '1px solid hsl(0 0% 14%)',
-                        color: 'hsl(0 0% 60%)',
-                      }}
-                      onClick={() => {
-                        setSelectedCrop(c);
-                        setQuery(c.common_name || c.name);
-                      }}
-                    >
-                      {c.common_name || c.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+                {/* TIMING (Pro only) */}
+                {activeSection === 'timing' && proMode && (
+                  <>
+                    <LunarGateCard crop={selectedCrop} zoneColor={zoneColor} />
+                    <SeasonalMovementCard crop={selectedCrop} />
+                  </>
+                )}
 
-            {/* Bed Organization & Spacing — Always shown */}
-            <BedOrganizationCard crop={selectedCrop} zoneColor={zoneColor} />
-
-            {/* Bed Strum — Placement Guide — Pro only */}
-            {proMode && <BedStrumEmbed frequencyHz={selectedCrop.frequency_hz} zoneColor={zoneColor} />}
-
-            {/* Metadata Footer — Pro only */}
-            {proMode && (
-              <div
-                className="rounded-xl p-3 grid grid-cols-2 gap-2"
-                style={{
-                  background: 'hsl(0 0% 4%)',
-                  border: '1px solid hsl(0 0% 10%)',
-                }}
-              >
-                {selectedCrop.spacing_inches && (
-                  <MetaItem label="SPACING" value={`${selectedCrop.spacing_inches}"`} />
+                {/* PLANTING */}
+                {activeSection === 'planting' && (
+                  <>
+                    <BedOrganizationCard crop={selectedCrop} zoneColor={zoneColor} />
+                    {proMode && <BedStrumEmbed frequencyHz={selectedCrop.frequency_hz} zoneColor={zoneColor} />}
+                  </>
                 )}
-                {selectedCrop.planting_season && selectedCrop.planting_season.length > 0 && (
-                  <MetaItem label="SEASON" value={selectedCrop.planting_season.join(', ')} />
-                )}
-                {selectedCrop.focus_tag && (
-                  <MetaItem label="FOCUS TAG" value={selectedCrop.focus_tag.replace('_', ' ')} />
-                )}
-                {selectedCrop.cultural_role && (
-                  <MetaItem label="CULTURAL ROLE" value={selectedCrop.cultural_role} />
-                )}
-                {selectedCrop.soil_protocol_focus && (
-                  <MetaItem label="SOIL PROTOCOL" value={selectedCrop.soil_protocol_focus} />
-                )}
-                {selectedCrop.guild_role && (
-                  <MetaItem label="GUILD ROLE" value={selectedCrop.guild_role} />
-                )}
-              </div>
-            )}
+              </motion.div>
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
