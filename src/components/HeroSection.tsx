@@ -303,7 +303,7 @@ const HeroSection = ({ onLogoClick }: HeroSectionProps) => {
               <img 
                 src={albumArt} 
                 alt="PHARMBOI Album Artwork" 
-                className="relative w-48 md:w-64 lg:w-72 rounded-3xl shadow-2xl"
+                className="relative w-56 md:w-72 lg:w-80 aspect-[3/4] object-cover object-top rounded-3xl shadow-2xl"
                 style={{
                   border: '4px solid hsl(20 40% 25%)',
                   boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 60px hsl(350 75% 50% / 0.3)',
