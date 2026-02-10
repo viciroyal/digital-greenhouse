@@ -269,7 +269,7 @@ const TrackDetailView = ({
                   </p>
                 )}
                 <p 
-                  className="font-mono text-sm"
+                  className="font-body text-sm"
                   style={{ color: 'hsl(40 40% 65%)' }}
                 >
                   Lab Report #{String(track.row).padStart(2, '0')}
