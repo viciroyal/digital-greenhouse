@@ -10,6 +10,7 @@ import { INSTRUMENT_ICONS, InstrumentType, checkDissonance, getMasterMixSetting 
 import { CHORD_RECIPES } from '@/data/chordRecipes';
 import LunarGateCard from '@/components/crop-oracle/LunarGateCard';
 import SeasonalMovementCard from '@/components/crop-oracle/SeasonalMovementCard';
+import HarmonicWarningsCard from '@/components/crop-oracle/HarmonicWarningsCard';
 
 /* ─── Zone color helper ─── */
 const ZONE_COLORS: Record<number, string> = {
@@ -400,6 +401,9 @@ const CropOracle = () => {
                 </div>
               </div>
             )}
+
+            {/* Harmonic Dependencies */}
+            <HarmonicWarningsCard crop={selectedCrop} />
 
             {/* Conflicts */}
             {conflicts.length > 0 && (
