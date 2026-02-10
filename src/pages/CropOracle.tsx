@@ -1032,8 +1032,8 @@ const CropOracle = () => {
                 </div>
               </div>
 
-              {/* Companion Notes */}
-              {chordCard[0]?.crop?.companion_crops && chordCard[0].crop.companion_crops.length > 0 && (
+              {/* Companion Notes — clickable to swap into chord slots */}
+              {starCrop?.companion_crops && starCrop.companion_crops.length > 0 && (
                 <motion.div
                   className="mt-4 p-4 rounded-xl"
                   style={{
@@ -1045,11 +1045,57 @@ const CropOracle = () => {
                   transition={{ delay: 0.6 }}
                 >
                   <p className="text-[9px] font-mono tracking-wider mb-2" style={{ color: 'hsl(45 80% 55% / 0.6)' }}>
-                    ★ STAR COMPANIONS
+                    ★ STAR COMPANIONS — {swapSlotIndex !== null ? 'TAP TO SWAP' : 'TAP A SLOT FIRST, THEN TAP A NAME'}
                   </p>
-                  <p className="text-xs font-body" style={{ color: 'hsl(0 0% 55%)' }}>
-                    {chordCard[0].crop.companion_crops.join(' • ')}
-                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {starCrop.companion_crops.map((name, ci) => {
+                      // Find matching crop in registry
+                      const matchedCrop = allCrops?.find(c => {
+                        const cn = (c.common_name || c.name).toLowerCase();
+                        const target = name.toLowerCase();
+                        return cn.includes(target) || target.includes(cn.split('(')[0].trim());
+                      });
+                      const isSwappable = swapSlotIndex !== null && !!matchedCrop;
+                      return (
+                        <button
+                          key={ci}
+                          onClick={() => {
+                            if (!matchedCrop) {
+                              toast({ title: `"${name}" not found`, description: 'No match in the crop registry.' });
+                              return;
+                            }
+                            if (swapSlotIndex !== null) {
+                              handleSwapCrop(matchedCrop);
+                            } else {
+                              // Auto-pick the best non-root slot to swap
+                              const bestSlot = chordCard.findIndex((s, idx) => idx > 0 && s.crop?.id !== matchedCrop.id);
+                              if (bestSlot > 0) {
+                                setManualOverrides(prev => ({ ...prev, [bestSlot]: matchedCrop }));
+                                setIsSaved(false);
+                                toast({
+                                  title: `${INTERVAL_ORDER[bestSlot].label} swapped`,
+                                  description: `Now: ${matchedCrop.common_name || matchedCrop.name}`,
+                                });
+                              }
+                            }
+                          }}
+                          className="px-2.5 py-1 rounded-lg text-[10px] font-body transition-all"
+                          style={{
+                            background: isSwappable
+                              ? 'hsl(45 80% 40% / 0.15)'
+                              : matchedCrop ? 'hsl(0 0% 8%)' : 'hsl(0 0% 6%)',
+                            border: `1px solid ${isSwappable ? 'hsl(45 80% 40% / 0.3)' : matchedCrop ? 'hsl(0 0% 16%)' : 'hsl(0 0% 10%)'}`,
+                            color: isSwappable
+                              ? 'hsl(45 80% 65%)'
+                              : matchedCrop ? 'hsl(0 0% 60%)' : 'hsl(0 0% 30%)',
+                            cursor: matchedCrop ? 'pointer' : 'not-allowed',
+                          }}
+                        >
+                          {name}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </motion.div>
               )}
 
