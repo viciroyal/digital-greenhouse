@@ -38,7 +38,7 @@ export interface GardenBed {
   inoculant_type: InoculantType;
   aerial_crop_id: string | null; // 13th Interval - Aerial Signal overstory crop
   bed_length_ft: number; // Customizable bed length (default 60)
-  bed_width_ft: number;  // Customizable bed width (default 4)
+  bed_width_ft: number;  // Customizable bed width (default 2.5 = 30")
   created_at: string;
   updated_at: string;
 }

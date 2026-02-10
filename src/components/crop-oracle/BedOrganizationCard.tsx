@@ -9,7 +9,7 @@ import type { MasterCrop } from '@/hooks/useMasterCrops';
 
 // Dimensions now come from props (defaults preserved for standalone use)
 const DEFAULT_BED_LENGTH_FT = 60;
-const DEFAULT_BED_WIDTH_FT = 4;
+const DEFAULT_BED_WIDTH_FT = 2.5;
 
 interface PlantingLayout {
   plantsPerRow: number;

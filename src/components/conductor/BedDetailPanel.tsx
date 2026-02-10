@@ -114,10 +114,10 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: 
   const [dissonanceCheck, setDissonanceCheck] = useState<{ crop: MasterCrop; interval: ChordInterval } | null>(null);
   const [pendingCrop, setPendingCrop] = useState<MasterCrop | null>(null);
   const [bedLengthInput, setBedLengthInput] = useState(String(bed.bed_length_ft || 60));
-  const [bedWidthInput, setBedWidthInput] = useState(String(bed.bed_width_ft || 4));
+  const [bedWidthInput, setBedWidthInput] = useState(String(bed.bed_width_ft || 2.5));
   
   const bedL = parseFloat(bedLengthInput) || 60;
-  const bedW = parseFloat(bedWidthInput) || 4;
+  const bedW = parseFloat(bedWidthInput) || 2.5;
   
   const { data: allCrops = [], isLoading: cropsLoading } = useMasterCrops();
   const addPlanting = useAddPlanting();
