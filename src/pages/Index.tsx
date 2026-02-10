@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ShopSection from '@/components/ShopSection';
 import { motion, AnimatePresence } from 'framer-motion';
 import GrandCosmogram from '@/components/cosmogram/GrandCosmogram';
 import RespiratorySystem from '@/components/bio-digital/RespiratorySystem';
@@ -14,10 +15,10 @@ import albumArt from '@/assets/pharmboi-artwork.png';
 const CREDITS = [
   { role: 'Artist', name: 'Vici Royàl' },
   { role: 'Produced by', name: 'Vici Royàl & Èks' },
-  { role: 'Mixed by', name: 'Vici Royàl' },
-  { role: 'Mastered by', name: 'Vici Royàl' },
+  { role: 'Mixed by', name: 'Vici Royàl at Atlanta Sound Factory' },
+  { role: 'Mastered by', name: 'Kristofer Sampson at Sampson Sound Studios' },
   { role: 'Album Artwork', name: 'Vici Royàl' },
-  { role: 'Featuring', name: 'Sistah Moon, Yamau, Briar Blakley, Sarafina Ethereal, James Cambridge IV, Shellie Sweets, Nichollé McKoy, Victoria, Dara Carter' },
+  { role: 'Featuring', name: 'Sistah Moon, Yamau, Briar Blakley, Sarafina Ethereal, James Cambridge IV, Shellie Sweets, Nichollé McKoy, Victoria, Dara Carter, Benjamin J. Davidow' },
 ];
 
 const Index = () => {
@@ -168,6 +169,9 @@ const Index = () => {
         <section className="py-16 px-4 md:px-8 max-w-7xl mx-auto">
           <AutomajicSoundSystem />
         </section>
+
+        {/* ═══ SHOP — The Source Formula ═══ */}
+        <ShopSection />
 
         {/* ═══ PRODUCTION CREDITS ═══ */}
         <section className="py-16 px-4 max-w-2xl mx-auto">
