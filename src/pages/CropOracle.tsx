@@ -77,18 +77,82 @@ const CropOracle = () => {
   const chordCard = useMemo(() => {
     if (recipeCrops.length === 0) return [];
 
-    return INTERVAL_ORDER.map(interval => {
-      const match = recipeCrops.find(c => c.chord_interval === interval.key);
-      // Fallback: find any crop in the zone for this interval
-      const fallback = !match ? recipeCrops.find(c =>
-        c.guild_role?.toLowerCase().includes(interval.role.split(' ')[0].toLowerCase())
-      ) : null;
-      const crop = match || fallback;
+    const usedIds = new Set<string>();
 
-      return {
-        ...interval,
-        crop: crop || null,
-      };
+    const pickCrop = (
+      primary: MasterCrop | undefined,
+      fallbackFn?: (c: MasterCrop) => boolean
+    ): MasterCrop | null => {
+      if (primary && !usedIds.has(primary.id)) {
+        usedIds.add(primary.id);
+        return primary;
+      }
+      if (fallbackFn) {
+        const fb = recipeCrops.find(c => !usedIds.has(c.id) && fallbackFn(c));
+        if (fb) { usedIds.add(fb.id); return fb; }
+      }
+      return null;
+    };
+
+    return INTERVAL_ORDER.map(interval => {
+      let crop: MasterCrop | null = null;
+
+      // Direct chord_interval match first
+      const directMatch = recipeCrops.find(c => !usedIds.has(c.id) && c.chord_interval === interval.key);
+
+      switch (interval.key) {
+        case 'Root (Lead)':
+          crop = pickCrop(directMatch, c => c.chord_interval === 'Root (Lead)');
+          break;
+        case '3rd (Triad)':
+          crop = pickCrop(directMatch, c => c.chord_interval === '3rd (Triad)');
+          break;
+        case '5th (Stabilizer)':
+          crop = pickCrop(directMatch, c => c.chord_interval === '5th (Stabilizer)');
+          break;
+        case '7th (Signal)':
+          crop = pickCrop(directMatch, c => c.chord_interval === '7th (Signal)');
+          break;
+        case '9th (Sub-bass)':
+          // Subterranean: Bass instruments, root vegetables, tubers
+          crop = pickCrop(undefined, c =>
+            c.instrument_type === 'Bass' ||
+            c.name.toLowerCase().includes('potato') ||
+            c.name.toLowerCase().includes('carrot') ||
+            c.name.toLowerCase().includes('beet') ||
+            c.name.toLowerCase().includes('radish') ||
+            c.name.toLowerCase().includes('turmeric') ||
+            c.name.toLowerCase().includes('ginger') ||
+            c.name.toLowerCase().includes('burdock')
+          );
+          break;
+        case '11th (Tension)':
+          // Sentinel alliums, fungi, protectors
+          crop = pickCrop(undefined, c =>
+            c.guild_role?.toLowerCase().includes('sentinel') ||
+            c.name.toLowerCase().includes('garlic') ||
+            c.name.toLowerCase().includes('onion') ||
+            c.name.toLowerCase().includes('chive') ||
+            c.name.toLowerCase().includes('leek') ||
+            c.name.toLowerCase().includes('shallot') ||
+            c.category === 'Fungi'
+          );
+          break;
+        case '13th (Top Note)':
+          // Aerial: vines, climbers, tall flowers, dye/fiber crops
+          crop = pickCrop(undefined, c =>
+            c.name.toLowerCase().includes('sunflower') ||
+            c.name.toLowerCase().includes('morning glory') ||
+            c.name.toLowerCase().includes('moonflower') ||
+            c.name.toLowerCase().includes('passion') ||
+            c.name.toLowerCase().includes('nasturtium') ||
+            c.name.toLowerCase().includes('cosmos') ||
+            (c.category === 'Dye/Fiber/Aromatic' && c.instrument_type === 'Synthesizers')
+          );
+          break;
+      }
+
+      return { ...interval, crop };
     });
   }, [recipeCrops]);
 
