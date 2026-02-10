@@ -497,7 +497,7 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
         <motion.button
           className="w-full py-3.5 rounded-lg font-bold text-sm tracking-wider uppercase transition-all duration-300 relative overflow-hidden"
           style={{
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontFamily: "'Staatliches', sans-serif",
             background: isActivated 
               ? `linear-gradient(135deg, hsl(${track.colorHsl}), hsl(${track.colorHsl} / 0.7))`
               : `linear-gradient(180deg, ${DOGON_COLORS.mudBrown} 0%, ${DOGON_COLORS.ebonyBlack} 100%)`,
