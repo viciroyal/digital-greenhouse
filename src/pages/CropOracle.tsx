@@ -648,8 +648,8 @@ const CropOracle = () => {
                 ZONE {ZONES.indexOf(selectedZone) + 1} • {selectedZone.name.toUpperCase()} • {selectedZone.hz}Hz • KEY OF {selectedZone.note}
               </p>
 
-              {/* ═══ Star Picker (Pro only) ═══ */}
-              {proMode && <motion.div
+              {/* ═══ Star Picker ═══ */}
+              {<motion.div
                 className="mb-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
