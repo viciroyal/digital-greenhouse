@@ -109,14 +109,8 @@ export interface AutoGenerationResult {
 }
 
 /**
- * Check if a crop matches a frequency zone
- */
-export const isFrequencyMatch = (crop: MasterCrop, frequencyHz: number): boolean => {
-  return crop.frequency_hz === frequencyHz;
-};
-
-/**
  * Check for dissonance - frequency mismatch warning
+ * Jazz Mode: allows inter-zone planting if crops share the same guild/category
  */
 export interface DissonanceCheck {
   isDissonant: boolean;
@@ -127,13 +121,29 @@ export interface DissonanceCheck {
 export const checkDissonance = (
   crop: MasterCrop,
   bedFrequencyHz: number,
-  interval: ChordInterval
+  interval: ChordInterval,
+  jazzMode: boolean = false
 ): DissonanceCheck => {
   if (crop.frequency_hz !== bedFrequencyHz) {
+    // Jazz Mode: allow inter-zone if crop has a structural/support role
+    if (jazzMode) {
+      const supportRoles = ['Enhancer', 'Builder', 'Sentinel', 'Miner'];
+      const isSupportRole = crop.guild_role && supportRoles.includes(crop.guild_role);
+      const isStructuralInterval = interval === '3rd (Triad)' || interval === '5th (Stabilizer)' || interval === '7th (Signal)';
+      
+      if (isSupportRole || isStructuralInterval) {
+        return {
+          isDissonant: false,
+          message: `♪ Jazz Mode: "${crop.name}" (${crop.frequency_hz}Hz) permitted as inter-zone voicing in this bed (${bedFrequencyHz}Hz).`,
+          severity: 'warning',
+        };
+      }
+    }
+    
     return {
       isDissonant: true,
       message: `⚠️ DISSONANCE WARNING: "${crop.name}" (${crop.frequency_hz}Hz) is out of tune with this bed (${bedFrequencyHz}Hz). This ${interval} may cause harmonic interference.`,
-      severity: 'warning',
+      severity: jazzMode ? 'warning' : 'warning',
     };
   }
   return {

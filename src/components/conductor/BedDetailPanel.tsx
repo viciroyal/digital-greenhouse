@@ -32,6 +32,7 @@ interface BedDetailPanelProps {
   bed: BedWithAerial;
   plantings: BedPlanting[];
   isAdmin: boolean;
+  jazzMode?: boolean;
   onClose: () => void;
 }
 
@@ -104,7 +105,7 @@ const getVitalityNote = (isCompleteChord: boolean, has5th: boolean, brix: number
   return { text: 'In Progress', color: 'hsl(0 0% 50%)' };
 };
 
-const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProps) => {
+const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: BedDetailPanelProps) => {
   const [isAddingCrop, setIsAddingCrop] = useState(false);
   const [selectedInterval, setSelectedInterval] = useState<ChordInterval>('Root (Lead)');
   const [brixInput, setBrixInput] = useState(bed.internal_brix?.toString() || '');
@@ -230,7 +231,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
 
     // Check for dissonance (frequency mismatch)
     if (!skipDissonanceCheck) {
-      const dissonance = checkDissonance(crop, bed.frequency_hz, selectedInterval);
+      const dissonance = checkDissonance(crop, bed.frequency_hz, selectedInterval, jazzMode);
       if (dissonance.isDissonant) {
         setDissonanceCheck({ crop, interval: selectedInterval });
         setPendingCrop(crop);
@@ -619,7 +620,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
         {dissonanceCheck && pendingCrop && (
           <div className="p-4">
             <DissonanceWarning
-              check={checkDissonance(pendingCrop, bed.frequency_hz, dissonanceCheck.interval)}
+              check={checkDissonance(pendingCrop, bed.frequency_hz, dissonanceCheck.interval, jazzMode)}
               onDismiss={handleDismissDissonance}
               onProceed={handleProceedWithDissonance}
             />

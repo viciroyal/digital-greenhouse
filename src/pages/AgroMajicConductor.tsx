@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Music, Shield, Eye, Settings, Loader2 } from 'lucide-react';
+import { ArrowLeft, Music, Shield, Eye, Settings, Loader2, Zap } from 'lucide-react';
 import { BedGrid, BedDetailPanel, SevenPillarsSidebar, LiveFeed } from '@/components/conductor';
 import { SovereigntyFooter } from '@/components/almanac';
 import { 
@@ -22,6 +22,7 @@ const AgroMajicConductor = () => {
   const navigate = useNavigate();
   const [selectedBed, setSelectedBed] = useState<GardenBed | null>(null);
   const [showPillars, setShowPillars] = useState(true);
+  const [jazzMode, setJazzMode] = useState(false);
   
   const { data: beds = [], isLoading: bedsLoading } = useGardenBeds();
   const { data: plantings = [], isLoading: plantingsLoading } = useBedPlantings(selectedBed?.id || null);
@@ -107,6 +108,24 @@ const AgroMajicConductor = () => {
               </>
             )}
           </div>
+
+          {/* Jazz Mode Toggle */}
+          <motion.button
+            onClick={() => setJazzMode(!jazzMode)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-full"
+            style={{
+              background: jazzMode ? 'hsl(45 70% 20%)' : 'hsl(0 0% 12%)',
+              border: `2px solid ${jazzMode ? 'hsl(45 80% 55%)' : 'hsl(0 0% 25%)'}`,
+              boxShadow: jazzMode ? '0 0 15px hsl(45 80% 50% / 0.3)' : 'none',
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Zap className="w-4 h-4" style={{ color: jazzMode ? 'hsl(45 90% 65%)' : 'hsl(0 0% 45%)' }} />
+            <span className="text-[10px] font-mono tracking-wider" style={{ color: jazzMode ? 'hsl(45 90% 65%)' : 'hsl(0 0% 50%)' }}>
+              JAZZ
+            </span>
+          </motion.button>
 
           {/* Toggle Pillars */}
           <button
@@ -216,6 +235,7 @@ const AgroMajicConductor = () => {
                     bed={selectedBed}
                     plantings={plantings}
                     isAdmin={isAdmin}
+                    jazzMode={jazzMode}
                     onClose={handleCloseBedDetail}
                   />
                 )}
