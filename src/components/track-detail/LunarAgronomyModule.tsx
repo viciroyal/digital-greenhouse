@@ -308,7 +308,7 @@ const LunarAgronomyModule = ({ track }: LunarAgronomyModuleProps) => {
               {lunarData.phase}
             </h3>
             <p 
-              className="font-mono text-xs italic"
+              className="font-body text-xs italic"
               style={{ color: 'hsl(40 50% 80%)' }}
             >
               "{lunarData.phaseName}"
