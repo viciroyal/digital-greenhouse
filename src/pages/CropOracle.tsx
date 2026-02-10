@@ -101,9 +101,14 @@ const CropOracle = () => {
   const companionCrops = useMemo(() => {
     if (!selectedCrop?.companion_crops || !allCrops) return [];
     return selectedCrop.companion_crops.map(name => {
+      const lowerName = name.toLowerCase();
+      // Exact match first, then partial (handles generic names like "Tomato" → "Tomato (Roma)")
       const match = allCrops.find(c =>
-        c.common_name?.toLowerCase() === name.toLowerCase() ||
-        c.name.toLowerCase() === name.toLowerCase()
+        c.common_name?.toLowerCase() === lowerName ||
+        c.name.toLowerCase() === lowerName
+      ) || allCrops.find(c =>
+        c.common_name?.toLowerCase().includes(lowerName) ||
+        lowerName.includes(c.common_name?.toLowerCase() ?? '')
       );
       return { name, crop: match || null };
     });
