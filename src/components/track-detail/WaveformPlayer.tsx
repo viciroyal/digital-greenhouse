@@ -79,7 +79,7 @@ const WaveformPlayer = ({
             {isPlaying ? 'NOW PLAYING' : hasAudio ? 'VIBRATIONAL PLAYER' : 'NO AUDIO'}
           </span>
         </div>
-        <span className="font-mono text-[10px]" style={{ color: 'hsl(40 30% 55%)' }}>
+        <span className="font-body text-[10px]" style={{ color: 'hsl(40 30% 55%)' }}>
           {track.frequency}
         </span>
       </div>
