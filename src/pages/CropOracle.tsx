@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { getLunarPhase, isCropLunarReady, isZoneInSeason, getSeasonalGateMessage } from '@/hooks/useLunarPhase';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,6 +46,7 @@ const POT_MAX_SPACING = 12;
 const CropOracle = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { data: allCrops, isLoading } = useMasterCrops();
   const [step, setStep] = useState(1);
   const [environment, setEnvironment] = useState<string | null>(null);
@@ -60,7 +62,38 @@ const CropOracle = () => {
   const [starCrop, setStarCrop] = useState<MasterCrop | null>(null);
   const [showStarPicker, setShowStarPicker] = useState(false);
   const [starSearchQuery, setStarSearchQuery] = useState('');
+  const [showSavedRecipes, setShowSavedRecipes] = useState(false);
+  const [deletingRecipeId, setDeletingRecipeId] = useState<string | null>(null);
 
+  // Fetch saved recipes
+  const { data: savedRecipes } = useQuery({
+    queryKey: ['saved-recipes', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('saved_recipes')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!userId,
+  });
+
+  const handleDeleteRecipe = async (id: string) => {
+    setDeletingRecipeId(id);
+    try {
+      const { error } = await supabase.from('saved_recipes').delete().eq('id', id);
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ['saved-recipes', userId] });
+      toast({ title: 'Recipe removed', description: 'Deleted from your collection.' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    } finally {
+      setDeletingRecipeId(null);
+    }
+  };
   // Real-time celestial data
   const lunar = useMemo(() => getLunarPhase(), []);
 
@@ -110,6 +143,7 @@ const CropOracle = () => {
       if (error) throw error;
 
       setIsSaved(true);
+      queryClient.invalidateQueries({ queryKey: ['saved-recipes', userId] });
       toast({
         title: "Recipe Saved 🌱",
         description: `Your ${selectedZone.vibe} chord has been stored.`,
@@ -1181,7 +1215,143 @@ const CropOracle = () => {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* ═══ Saved Recipes ═══ */}
+        {userId && savedRecipes && savedRecipes.length > 0 && (
+          <motion.div
+            className="mt-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <button
+              onClick={() => setShowSavedRecipes(!showSavedRecipes)}
+              className="w-full py-3 rounded-xl font-mono text-xs tracking-wider flex items-center justify-center gap-2 transition-all"
+              style={{
+                background: 'hsl(0 0% 6%)',
+                border: '1px solid hsl(45 80% 55% / 0.15)',
+                color: 'hsl(45 80% 55% / 0.7)',
+              }}
+            >
+              <Leaf className="w-3.5 h-3.5" />
+              MY RECIPES ({savedRecipes.length})
+              {showSavedRecipes ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+
+            <AnimatePresence>
+              {showSavedRecipes && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="pt-3 space-y-3">
+                    {savedRecipes.map(recipe => {
+                      const zone = ZONES.find(z => z.hz === recipe.zone_hz);
+                      const chordSlots = Array.isArray(recipe.chord_data) ? recipe.chord_data as Array<{ label?: string; crop_name?: string | null; role?: string }> : [];
+                      const filledCount = chordSlots.filter(s => s.crop_name).length;
+                      const envLabel = recipe.environment === 'pot' ? '🪴' : recipe.environment === 'farm' ? '🚜' : recipe.environment === 'high-tunnel' ? '🏠' : '🌱';
+
+                      return (
+                        <motion.div
+                          key={recipe.id}
+                          className="rounded-xl overflow-hidden"
+                          style={{
+                            background: 'hsl(0 0% 5%)',
+                            border: `1px solid ${zone?.color || 'hsl(0 0% 15%)'}20`,
+                          }}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                        >
+                          {/* Recipe header */}
+                          <div
+                            className="px-4 py-3 flex items-center gap-3"
+                            style={{
+                              background: `linear-gradient(90deg, ${zone?.color || 'hsl(0 0% 30%)'}10, transparent)`,
+                              borderBottom: `1px solid ${zone?.color || 'hsl(0 0% 15%)'}15`,
+                            }}
+                          >
+                            <div
+                              className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                              style={{
+                                background: `${zone?.color || 'hsl(0 0% 30%)'}20`,
+                                border: `1px solid ${zone?.color || 'hsl(0 0% 30%)'}40`,
+                              }}
+                            >
+                              <span className="text-[10px] font-mono font-bold" style={{ color: zone?.color || 'hsl(0 0% 60%)' }}>
+                                {zone?.note || '?'}
+                              </span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-bubble text-sm" style={{ color: zone?.color || 'hsl(0 0% 70%)' }}>
+                                  {recipe.zone_vibe}
+                                </span>
+                                <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{
+                                  background: 'hsl(0 0% 10%)',
+                                  color: 'hsl(0 0% 45%)',
+                                }}>
+                                  {envLabel} {recipe.environment?.toUpperCase()}
+                                </span>
+                                <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>
+                                  {filledCount}/7 voices
+                                </span>
+                              </div>
+                              <p className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>
+                                {new Date(recipe.created_at).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => handleDeleteRecipe(recipe.id)}
+                              disabled={deletingRecipeId === recipe.id}
+                              className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all hover:scale-110"
+                              style={{
+                                background: 'hsl(0 0% 10%)',
+                                border: '1px solid hsl(0 0% 18%)',
+                              }}
+                              title="Delete recipe"
+                            >
+                              {deletingRecipeId === recipe.id ? (
+                                <motion.div
+                                  className="w-3 h-3 border rounded-full"
+                                  style={{ borderColor: 'hsl(0 0% 30%)', borderTopColor: 'hsl(0 0% 60%)' }}
+                                  animate={{ rotate: 360 }}
+                                  transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
+                                />
+                              ) : (
+                                <Trash2 className="w-3 h-3" style={{ color: 'hsl(0 40% 50%)' }} />
+                              )}
+                            </button>
+                          </div>
+
+                          {/* Crop slots */}
+                          <div className="px-4 py-2 space-y-1">
+                            {chordSlots.map((slot, j) => (
+                              <div key={j} className="flex items-center gap-2">
+                                <span className="text-[9px] font-mono w-20 shrink-0" style={{ color: 'hsl(0 0% 30%)' }}>
+                                  {slot.role || slot.label}
+                                </span>
+                                <span className="text-[10px] font-body truncate" style={{
+                                  color: slot.crop_name ? 'hsl(0 0% 60%)' : 'hsl(0 0% 20%)',
+                                  fontStyle: slot.crop_name ? 'normal' : 'italic',
+                                }}>
+                                  {slot.crop_name || '—'}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        )}
       </div>
+
 
       {/* Griot Oracle — Floating Help */}
       <GriotOracle />
