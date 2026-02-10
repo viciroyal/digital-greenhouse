@@ -1,416 +1,162 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Music, Radio, Sprout, Leaf } from 'lucide-react';
-import { CHORD_RECIPES, type ChordRecipe } from '@/data/chordRecipes';
-import { CSA_PHASES, getCurrentPhase } from '@/components/master-build/SeasonalMovements';
+import { Music } from 'lucide-react';
+import { CHORD_RECIPES } from '@/data/chordRecipes';
+import { HARMONIC_ZONES } from '@/data/harmonicZoneProtocol';
 
-/* ─── Constants ─── */
-const PAGE_SIZE = 3;
+/* ─── Group recipes by frequency ─── */
+const ZONE_FREQUENCIES = [396, 417, 528, 639, 741, 852, 963] as const;
 
-const NOTE_MAP: Record<number, string> = {
-  396: 'C', 417: 'D', 528: 'E', 639: 'F', 741: 'G', 852: 'A', 963: 'B',
-};
+const ZONE_META: Record<number, { note: string; name: string; color: string }> = {};
+for (const z of HARMONIC_ZONES) {
+  ZONE_META[z.frequencyHz] = { note: z.note, name: z.agroIdentity, color: z.colorHex };
+}
 
-const FREQ_TO_ZONE: Record<number, number> = {
-  396: 1, 417: 2, 528: 3, 639: 4, 741: 5, 852: 6, 963: 7,
-};
-
-const INTERVAL_ROLE_ICONS: Record<string, string> = {
-  '1st': '🌱', '3rd': '🌿', '5th': '🫘', '7th': '🌼',
-  '9th': '🥕', '11th': '🍄', '13th': '🌺',
-};
-
-/* ─── Component ─── */
 const HarmonicCarousel = () => {
-  const [page, setPage] = useState(0);
-  const [filterSeason, setFilterSeason] = useState(true);
-  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [expandedZone, setExpandedZone] = useState<number | null>(null);
 
-  const activePhase = getCurrentPhase();
-
-  const sortedRecipes = useMemo(() => {
-    if (!filterSeason || !activePhase) return CHORD_RECIPES;
-
-    const inSeason: ChordRecipe[] = [];
-    const outSeason: ChordRecipe[] = [];
-
-    for (const recipe of CHORD_RECIPES) {
-      const zone = FREQ_TO_ZONE[recipe.frequencyHz];
-      if (zone && activePhase.zones.includes(zone)) {
-        inSeason.push(recipe);
-      } else {
-        outSeason.push(recipe);
-      }
+  const recipesByZone = useMemo(() => {
+    const map: Record<number, typeof CHORD_RECIPES> = {};
+    for (const freq of ZONE_FREQUENCIES) map[freq] = [];
+    for (const r of CHORD_RECIPES) {
+      if (map[r.frequencyHz]) map[r.frequencyHz].push(r);
     }
-
-    return [...inSeason, ...outSeason];
-  }, [filterSeason, activePhase]);
-
-  const totalPages = Math.ceil(sortedRecipes.length / PAGE_SIZE);
-  const pageRecipes = useMemo(
-    () => sortedRecipes.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE),
-    [sortedRecipes, page]
-  );
-
-  const goPage = (dir: -1 | 1) =>
-    setPage((p) => Math.max(0, Math.min(totalPages - 1, p + dir)));
-
-  const isInSeason = (recipe: ChordRecipe): boolean => {
-    if (!activePhase) return false;
-    const zone = FREQ_TO_ZONE[recipe.frequencyHz];
-    return zone ? activePhase.zones.includes(zone) : false;
-  };
+    return map;
+  }, []);
 
   return (
     <div
-      className="mx-4 mb-4 rounded-2xl overflow-hidden"
+      className="mx-4 mb-4 rounded-xl overflow-hidden"
       style={{
-        background: 'rgba(0, 0, 0, 0.7)',
-        backdropFilter: 'blur(20px)',
+        background: 'linear-gradient(180deg, hsl(0 0% 6%), hsl(0 0% 4%))',
         border: '1px solid hsl(0 0% 12%)',
+        boxShadow: 'inset 0 1px 0 hsl(0 0% 10%), 0 4px 12px rgba(0,0,0,0.4)',
       }}
     >
       {/* Header */}
-      <div className="px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Music className="w-4 h-4" style={{ color: 'hsl(45 80% 55%)' }} />
-          <span
-            className="text-[10px] font-mono font-bold tracking-[0.2em]"
-            style={{ color: 'hsl(45 80% 55%)' }}
-          >
-            HARMONIC MATRIX
-          </span>
-          <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
-            {sortedRecipes.length} chords
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => goPage(-1)}
-            disabled={page === 0}
-            className="w-7 h-7 rounded-lg flex items-center justify-center transition-opacity"
-            style={{
-              background: 'hsl(0 0% 8%)',
-              opacity: page === 0 ? 0.3 : 0.7,
-            }}
-          >
-            <ChevronLeft className="w-3.5 h-3.5" style={{ color: 'hsl(0 0% 60%)' }} />
-          </button>
-          <span
-            className="text-[9px] font-mono tabular-nums w-14 text-center"
-            style={{ color: 'hsl(0 0% 40%)' }}
-          >
-            {page * PAGE_SIZE + 1}–
-            {Math.min((page + 1) * PAGE_SIZE, sortedRecipes.length)}
-          </span>
-          <button
-            onClick={() => goPage(1)}
-            disabled={page === totalPages - 1}
-            className="w-7 h-7 rounded-lg flex items-center justify-center transition-opacity"
-            style={{
-              background: 'hsl(0 0% 8%)',
-              opacity: page === totalPages - 1 ? 0.3 : 0.7,
-            }}
-          >
-            <ChevronRight className="w-3.5 h-3.5" style={{ color: 'hsl(0 0% 60%)' }} />
-          </button>
-        </div>
+      <div className="px-3 py-2 flex items-center gap-2" style={{ borderBottom: '1px solid hsl(0 0% 10%)' }}>
+        <Music className="w-3.5 h-3.5" style={{ color: 'hsl(45 80% 55%)' }} />
+        <span className="text-[9px] font-mono font-bold tracking-[0.2em]" style={{ color: 'hsl(45 80% 55%)' }}>
+          HARMONIC MATRIX
+        </span>
+        <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>
+          7 ZONES • {CHORD_RECIPES.length} CHORDS
+        </span>
       </div>
 
-      {/* Seasonal Phase Banner */}
-      {activePhase && (
-        <div
-          className="mx-4 mb-2 rounded-lg px-3 py-2 flex items-center justify-between"
-          style={{
-            background: activePhase.gradient,
-            border: `1px solid ${activePhase.borderColor}40`,
-          }}
-        >
-          <div className="flex items-center gap-2">
-            <Radio className="w-3.5 h-3.5" style={{ color: activePhase.borderColor }} />
-            <span
-              className="text-[9px] font-mono font-bold tracking-wider"
-              style={{ color: activePhase.borderColor }}
-            >
-              {activePhase.name}
-            </span>
-            <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>
-              {activePhase.dateRange} • {activePhase.frequencyRange}
-            </span>
-          </div>
-          <button
-            onClick={() => {
-              setFilterSeason((f) => !f);
-              setPage(0);
-            }}
-            className="text-[8px] font-mono px-2 py-0.5 rounded-full transition-all"
-            style={{
-              background: filterSeason
-                ? `${activePhase.borderColor}20`
-                : 'hsl(0 0% 8%)',
-              border: `1px solid ${
-                filterSeason ? activePhase.borderColor + '50' : 'hsl(0 0% 15%)'
-              }`,
-              color: filterSeason ? activePhase.borderColor : 'hsl(0 0% 40%)',
-            }}
-          >
-            {filterSeason ? '● IN SEASON' : '○ ALL'}
-          </button>
-        </div>
-      )}
+      {/* 7 Zone Key Blocks */}
+      <div className="grid grid-cols-7 gap-px p-1.5" style={{ background: 'hsl(0 0% 4%)' }}>
+        {ZONE_FREQUENCIES.map((freq) => {
+          const meta = ZONE_META[freq];
+          const recipes = recipesByZone[freq];
+          const isExpanded = expandedZone === freq;
 
-      {/* Zone color strip */}
-      <div className="flex h-1 mx-4 rounded-full overflow-hidden">
-        {pageRecipes.map((recipe, i) => (
-          <div
-            key={i}
-            className="flex-1"
-            style={{
-              background: recipe.zoneColor,
-              opacity: isInSeason(recipe) ? 1 : 0.3,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Chord Cards — expanded with crop slots */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={page}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.25 }}
-          className="space-y-2 p-3"
-        >
-          {pageRecipes.map((recipe) => {
-            const note = NOTE_MAP[recipe.frequencyHz] || '?';
-            const inSeason = isInSeason(recipe);
-            const isExpanded = expandedCard === recipe.chordName;
-
-            return (
-              <motion.div
-                key={recipe.chordName}
-                className="rounded-xl overflow-hidden cursor-pointer"
-                style={{
-                  background: inSeason
-                    ? `${recipe.zoneColor}10`
-                    : `${recipe.zoneColor}05`,
-                  border: `1px solid ${
-                    inSeason ? `${recipe.zoneColor}40` : `${recipe.zoneColor}15`
-                  }`,
-                  opacity: inSeason ? 1 : 0.5,
-                }}
-                onClick={() =>
-                  setExpandedCard(isExpanded ? null : recipe.chordName)
-                }
-                whileHover={{ opacity: 1 }}
-              >
-                {/* Card Header */}
-                <div className="flex items-center gap-3 px-3 py-2.5">
-                  {/* In-season glow */}
-                  {inSeason && activePhase && (
-                    <motion.div
-                      className="w-2.5 h-2.5 rounded-full shrink-0"
-                      style={{ background: activePhase.borderColor }}
-                      animate={{ opacity: [0.4, 1, 0.4] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  )}
-                  {!inSeason && (
-                    <div
-                      className="w-2.5 h-2.5 rounded-full shrink-0"
-                      style={{ background: recipe.zoneColor, opacity: 0.3 }}
-                    />
-                  )}
-
-                  {/* Note */}
-                  <span
-                    className="text-lg font-mono font-bold shrink-0"
-                    style={{ color: recipe.zoneColor }}
-                  >
-                    {note}
-                  </span>
-
-                  {/* Name & Hz */}
-                  <div className="flex-1 min-w-0">
-                    <span
-                      className="text-[10px] font-mono font-bold block truncate"
-                      style={{ color: 'hsl(0 0% 70%)' }}
-                    >
-                      {recipe.chordName}
-                    </span>
-                    <span
-                      className="text-[8px] font-mono"
-                      style={{ color: 'hsl(0 0% 40%)' }}
-                    >
-                      {recipe.frequencyHz}Hz • {recipe.zoneName} •{' '}
-                      {recipe.intervals.length}v
-                    </span>
-                  </div>
-
-                  {/* Season badge */}
-                  {inSeason && (
-                    <span
-                      className="text-[7px] font-mono font-bold px-1.5 py-0.5 rounded-full shrink-0"
-                      style={{
-                        background: `${recipe.zoneColor}20`,
-                        color: recipe.zoneColor,
-                        border: `1px solid ${recipe.zoneColor}40`,
-                      }}
-                    >
-                      IN SEASON
-                    </span>
-                  )}
-
-                  {/* Interval dots summary */}
-                  <div className="flex gap-0.5 shrink-0">
-                    {recipe.intervals.map((iv, idx) => (
-                      <div
-                        key={idx}
-                        className="w-1.5 h-1.5 rounded-full"
-                        style={{
-                          background: recipe.zoneColor,
-                          opacity: 0.3 + idx * 0.1,
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Expanded: Auto Crop Slots */}
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
-                    >
-                      <div
-                        className="px-3 pb-3 pt-1"
-                        style={{
-                          borderTop: `1px solid ${recipe.zoneColor}15`,
-                        }}
-                      >
-                        {/* Auto-tuned label */}
-                        <div className="flex items-center gap-2 mb-2">
-                          <Sprout
-                            className="w-3 h-3"
-                            style={{
-                              color: inSeason
-                                ? 'hsl(120 50% 50%)'
-                                : 'hsl(0 0% 35%)',
-                            }}
-                          />
-                          <span
-                            className="text-[8px] font-mono tracking-wider"
-                            style={{
-                              color: inSeason
-                                ? 'hsl(120 50% 50%)'
-                                : 'hsl(0 0% 35%)',
-                            }}
-                          >
-                            {inSeason
-                              ? '● AUTO CROPS — TUNED TO SEASON'
-                              : '○ CROP SLOTS — OFF SEASON'}
-                          </span>
-                        </div>
-
-                        {/* 7 interval slots */}
-                        <div className="space-y-1">
-                          {recipe.intervals.map((iv, idx) => (
-                            <div
-                              key={iv.interval}
-                              className="flex items-center gap-2 px-2 py-1.5 rounded-lg"
-                              style={{
-                                background: inSeason
-                                  ? `${recipe.zoneColor}08`
-                                  : 'hsl(0 0% 4%)',
-                                border: `1px solid ${
-                                  inSeason
-                                    ? `${recipe.zoneColor}20`
-                                    : 'hsl(0 0% 8%)'
-                                }`,
-                              }}
-                            >
-                              {/* Interval badge */}
-                              <span
-                                className="text-[8px] font-mono font-bold w-8 shrink-0 text-center"
-                                style={{ color: recipe.zoneColor }}
-                              >
-                                {iv.interval}
-                              </span>
-
-                              {/* Emoji */}
-                              <span className="text-sm shrink-0">
-                                {iv.emoji ||
-                                  INTERVAL_ROLE_ICONS[iv.interval] ||
-                                  '🌱'}
-                              </span>
-
-                              {/* Crop name */}
-                              <div className="flex-1 min-w-0">
-                                <span
-                                  className="text-[10px] font-mono font-bold block truncate"
-                                  style={{
-                                    color: inSeason
-                                      ? 'hsl(0 0% 80%)'
-                                      : 'hsl(0 0% 45%)',
-                                  }}
-                                >
-                                  {iv.cropName}
-                                </span>
-                                <span
-                                  className="text-[7px] font-mono"
-                                  style={{ color: 'hsl(0 0% 35%)' }}
-                                >
-                                  {iv.role}
-                                </span>
-                              </div>
-
-                              {/* Season indicator */}
-                              {inSeason && (
-                                <Leaf
-                                  className="w-3 h-3 shrink-0"
-                                  style={{ color: 'hsl(120 50% 50%)' }}
-                                />
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Page dots */}
-      <div className="flex items-center justify-center gap-1 pb-3">
-        {Array.from({ length: totalPages }).map((_, i) => {
-          const firstRecipe = sortedRecipes[i * PAGE_SIZE];
-          const c = firstRecipe?.zoneColor || 'hsl(0 0% 15%)';
           return (
             <button
-              key={i}
-              onClick={() => setPage(i)}
-              className="rounded-full transition-all"
+              key={freq}
+              onClick={() => setExpandedZone(isExpanded ? null : freq)}
+              className="rounded-lg flex flex-col items-center py-1.5 px-0.5 transition-all relative"
               style={{
-                width: page === i ? 14 : 4,
-                height: 4,
-                background: page === i ? c : 'hsl(0 0% 12%)',
+                background: isExpanded
+                  ? `${meta.color}18`
+                  : `${meta.color}08`,
+                border: `1px solid ${isExpanded ? `${meta.color}50` : `${meta.color}15`}`,
+                boxShadow: isExpanded ? `0 0 12px ${meta.color}20, inset 0 0 8px ${meta.color}08` : 'none',
               }}
-            />
+            >
+              {/* Note */}
+              <span
+                className="text-sm font-mono font-bold leading-none"
+                style={{ color: meta.color, textShadow: isExpanded ? `0 0 8px ${meta.color}60` : 'none' }}
+              >
+                {meta.note}
+              </span>
+              {/* Hz */}
+              <span className="text-[7px] font-mono mt-0.5" style={{ color: `${meta.color}90` }}>
+                {freq}
+              </span>
+              {/* Zone name */}
+              <span className="text-[6px] font-mono mt-0.5 truncate w-full text-center" style={{ color: 'hsl(0 0% 40%)' }}>
+                {meta.name}
+              </span>
+              {/* Recipe count dots */}
+              <div className="flex gap-0.5 mt-1">
+                {recipes.map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-1 h-1 rounded-full"
+                    style={{ background: meta.color, opacity: 0.6 }}
+                  />
+                ))}
+              </div>
+              {/* Active indicator */}
+              {isExpanded && (
+                <motion.div
+                  layoutId="zone-indicator"
+                  className="absolute -bottom-px left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full"
+                  style={{ background: meta.color }}
+                />
+              )}
+            </button>
           );
         })}
       </div>
+
+      {/* Expanded Zone: Crop Cards */}
+      <AnimatePresence mode="wait">
+        {expandedZone && (
+          <motion.div
+            key={expandedZone}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="px-2 pb-2 pt-1 space-y-1.5" style={{ borderTop: `1px solid ${ZONE_META[expandedZone].color}20` }}>
+              {recipesByZone[expandedZone].map((recipe) => (
+                <ZoneRecipeCard key={recipe.chordName} recipe={recipe} color={ZONE_META[expandedZone].color} />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
+
+/* ─── Compact Recipe Card ─── */
+const ZoneRecipeCard = ({ recipe, color }: { recipe: typeof CHORD_RECIPES[0]; color: string }) => (
+  <div
+    className="rounded-lg px-2 py-1.5"
+    style={{
+      background: `${color}06`,
+      border: `1px solid ${color}15`,
+    }}
+  >
+    <div className="flex items-center gap-1.5 mb-1">
+      <span className="text-[8px] font-mono font-bold tracking-wider" style={{ color }}>
+        {recipe.chordName}
+      </span>
+    </div>
+    <div className="grid grid-cols-7 gap-0.5">
+      {recipe.intervals.map((iv) => (
+        <div
+          key={iv.interval}
+          className="flex flex-col items-center py-0.5 rounded"
+          style={{ background: `${color}08` }}
+        >
+          <span className="text-[10px] leading-none">{iv.emoji}</span>
+          <span className="text-[5px] font-mono mt-0.5 truncate w-full text-center" style={{ color: 'hsl(0 0% 55%)' }}>
+            {iv.cropName.split(' ')[0]}
+          </span>
+          <span className="text-[5px] font-mono" style={{ color: `${color}80` }}>
+            {iv.interval}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 export default HarmonicCarousel;
