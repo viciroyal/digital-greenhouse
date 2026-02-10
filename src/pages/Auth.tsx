@@ -32,7 +32,7 @@ const Auth = () => {
     checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      if (session) navigate('/ancestral-path');
+      if (session) navigate('/crop-oracle');
     });
     return () => subscription.unsubscribe();
   }, [navigate]);
