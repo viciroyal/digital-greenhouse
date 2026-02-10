@@ -95,7 +95,7 @@ const WaveformPlayer = ({
         >
           {track.track}
         </h4>
-        <p className="font-mono text-xs" style={{ color: 'hsl(40 40% 60%)' }}>
+        <p className="font-body text-xs" style={{ color: 'hsl(40 40% 60%)' }}>
           {track.featuring ? `ft. ${track.featuring}` : 'Vici Royàl'}
         </p>
       </div>
