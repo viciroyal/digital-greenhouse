@@ -417,9 +417,8 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
               ◆ SACRED ACTION
             </p>
             <p 
-              className="text-base font-bold"
+              className="text-base font-bold font-display"
               style={{ 
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
                 color: DOGON_COLORS.paleStraw,
                 textShadow: '1px 1px 2px rgba(0,0,0,0.4)',
               }}
