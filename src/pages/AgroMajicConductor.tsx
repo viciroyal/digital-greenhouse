@@ -274,10 +274,10 @@ const AgroMajicConductor = () => {
             📐 YIELD CALCULATOR FORMULA
           </h4>
           <p className="text-[11px] font-mono" style={{ color: 'hsl(45 40% 50%)' }}>
-            Plant Count = (60ft × 30in) ÷ (Spacing² × 0.866)
+            Plant Count = (Length × Width) ÷ (Spacing² × 0.866)
           </p>
           <p className="text-[10px] font-mono mt-1" style={{ color: 'hsl(0 0% 45%)' }}>
-            Hexagonal spacing optimization for maximum density
+            Hexagonal spacing optimization • Custom bed dimensions supported
           </p>
         </div>
       </div>

@@ -7,8 +7,9 @@ import type { MasterCrop } from '@/hooks/useMasterCrops';
    based on spacing, companion guild, and chord interval role.
 ─── */
 
-const BED_LENGTH_FT = 60;
-const BED_WIDTH_FT = 4; // standard raised bed width
+// Dimensions now come from props (defaults preserved for standalone use)
+const DEFAULT_BED_LENGTH_FT = 60;
+const DEFAULT_BED_WIDTH_FT = 4;
 
 interface PlantingLayout {
   plantsPerRow: number;
@@ -21,7 +22,7 @@ interface PlantingLayout {
   tip: string;
 }
 
-function calculateLayout(crop: MasterCrop): PlantingLayout {
+function calculateLayout(crop: MasterCrop, bedLengthFt: number, bedWidthFt: number): PlantingLayout {
   const spacingStr = crop.spacing_inches || '12';
   const spacing = parseInt(spacingStr) || 12;
   const interval = crop.chord_interval || '';
@@ -33,15 +34,14 @@ function calculateLayout(crop: MasterCrop): PlantingLayout {
   let tip = '';
 
   if (spacing <= 4) {
-    // Very tight spacing (herbs, greens) — broadcast or triple-row
     pattern = 'broadcast';
     density = 'high';
     const plantsPerSqFt = Math.floor(144 / (spacing * spacing));
-    const totalSqFt = BED_LENGTH_FT * BED_WIDTH_FT;
+    const totalSqFt = bedLengthFt * bedWidthFt;
     tip = `Scatter-sow across full bed surface. Thin to ${spacing}" apart as seedlings emerge for maximum canopy coverage.`;
     return {
       plantsPerRow: plantsPerSqFt,
-      rows: BED_WIDTH_FT,
+      rows: Math.round(bedWidthFt),
       totalPlants: plantsPerSqFt * totalSqFt,
       inRowSpacing: `${spacing}"`,
       betweenRowSpacing: `${spacing}"`,
@@ -54,18 +54,19 @@ function calculateLayout(crop: MasterCrop): PlantingLayout {
   if (spacing <= 8) {
     pattern = 'triple-row';
     density = 'high';
-    rowMultiplier = 3;
-    tip = `Plant 3 staggered rows across the 4ft bed width. Offset every other plant by ${Math.floor(spacing/2)}" for light penetration and airflow.`;
+    rowMultiplier = Math.min(3, Math.floor((bedWidthFt * 12) / spacing));
+    tip = `Plant ${rowMultiplier} staggered rows across the ${bedWidthFt}ft bed width. Offset every other plant by ${Math.floor(spacing/2)}" for light penetration and airflow.`;
   } else if (spacing <= 14) {
     pattern = 'staggered';
     density = 'standard';
-    rowMultiplier = 2;
-    tip = `Plant 2 offset rows. Stagger plants in a zigzag pattern to maximize canopy fill and root zone coverage.`;
+    rowMultiplier = Math.min(2, Math.floor((bedWidthFt * 12) / spacing));
+    tip = `Plant ${rowMultiplier} offset rows. Stagger plants in a zigzag pattern to maximize canopy fill and root zone coverage.`;
   } else if (spacing <= 24) {
     pattern = 'double-row';
     density = 'standard';
-    rowMultiplier = 2;
-    tip = `Use double rows with ${spacing}" between plants. Leave center path clear for airflow and harvest access.`;
+    rowMultiplier = Math.min(2, Math.floor((bedWidthFt * 12) / spacing));
+    if (rowMultiplier < 1) rowMultiplier = 1;
+    tip = `Use ${rowMultiplier === 1 ? 'single' : 'double'} rows with ${spacing}" between plants. Leave center path clear for airflow and harvest access.`;
   } else {
     pattern = 'single-row';
     density = 'wide';
@@ -83,10 +84,10 @@ function calculateLayout(crop: MasterCrop): PlantingLayout {
     tip += ` As a Stabilizer, interplant between Root crops to fix nitrogen and build biomass.`;
   }
 
-  const plantsPerRow = Math.floor((BED_LENGTH_FT * 12) / spacing);
+  const plantsPerRow = Math.floor((bedLengthFt * 12) / spacing);
   const rows = rowMultiplier;
   const totalPlants = plantsPerRow * rows;
-  const betweenRow = Math.floor((BED_WIDTH_FT * 12) / (rows + 1));
+  const betweenRow = Math.floor((bedWidthFt * 12) / (rows + 1));
 
   return {
     plantsPerRow,
@@ -117,10 +118,12 @@ const DENSITY_COLORS = {
 interface BedOrganizationCardProps {
   crop: MasterCrop;
   zoneColor: string;
+  bedLengthFt?: number;
+  bedWidthFt?: number;
 }
 
-const BedOrganizationCard = ({ crop, zoneColor }: BedOrganizationCardProps) => {
-  const layout = calculateLayout(crop);
+const BedOrganizationCard = ({ crop, zoneColor, bedLengthFt = DEFAULT_BED_LENGTH_FT, bedWidthFt = DEFAULT_BED_WIDTH_FT }: BedOrganizationCardProps) => {
+  const layout = calculateLayout(crop, bedLengthFt, bedWidthFt);
   const patternInfo = PATTERN_LABELS[layout.pattern];
   const densityStyle = DENSITY_COLORS[layout.density];
 
@@ -143,7 +146,7 @@ const BedOrganizationCard = ({ crop, zoneColor }: BedOrganizationCardProps) => {
               className="text-[10px] font-mono font-bold tracking-wider"
               style={{ color: zoneColor }}
             >
-              BED ORGANIZATION — 60ft × 4ft
+              BED ORGANIZATION — {bedLengthFt}ft × {bedWidthFt}ft
             </span>
           </div>
           <span
@@ -199,7 +202,7 @@ const BedOrganizationCard = ({ crop, zoneColor }: BedOrganizationCardProps) => {
               PATTERN: {patternInfo.label.toUpperCase()}
             </span>
             <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>
-              ↕ 4ft width
+              ↕ {bedWidthFt}ft width
             </span>
           </div>
           {/* Bed cross-section visualization */}
@@ -258,7 +261,7 @@ const BedOrganizationCard = ({ crop, zoneColor }: BedOrganizationCardProps) => {
               className="absolute bottom-0.5 right-1 text-[7px] font-mono"
               style={{ color: 'hsl(0 0% 25%)' }}
             >
-              → 60ft
+              → {bedLengthFt}ft
             </span>
           </div>
         </div>

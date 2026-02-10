@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { 
   GardenBed, BedPlanting, calculatePlantCount, useAddPlanting, useRemovePlanting, 
-  useUpdateBedBrix, useUpdateBedInoculant, useUpdateBedAerialCrop, calculateWaterReduction,
+  useUpdateBedBrix, useUpdateBedInoculant, useUpdateBedAerialCrop, useUpdateBedDimensions, calculateWaterReduction,
   calculateComplexityScore, ChordInterval, CHORD_INTERVALS, InoculantType, INOCULANT_OPTIONS, AERIAL_PLANT_COUNT 
 } from '@/hooks/useGardenBeds';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -113,6 +113,11 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: 
   const [whiteRefCalibrated, setWhiteRefCalibrated] = useState(false);
   const [dissonanceCheck, setDissonanceCheck] = useState<{ crop: MasterCrop; interval: ChordInterval } | null>(null);
   const [pendingCrop, setPendingCrop] = useState<MasterCrop | null>(null);
+  const [bedLengthInput, setBedLengthInput] = useState(String(bed.bed_length_ft || 60));
+  const [bedWidthInput, setBedWidthInput] = useState(String(bed.bed_width_ft || 4));
+  
+  const bedL = parseFloat(bedLengthInput) || 60;
+  const bedW = parseFloat(bedWidthInput) || 4;
   
   const { data: allCrops = [], isLoading: cropsLoading } = useMasterCrops();
   const addPlanting = useAddPlanting();
@@ -120,6 +125,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: 
   const updateBrix = useUpdateBedBrix();
   const updateInoculant = useUpdateBedInoculant();
   const updateAerialCrop = useUpdateBedAerialCrop();
+  const updateDimensions = useUpdateBedDimensions();
 
   // Get the Root crop from current plantings
   const rootPlanting = plantings.find(p => p.crop?.chord_interval === 'Root (Lead)');
@@ -258,7 +264,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: 
       }
     }
 
-    const plantCount = calculatePlantCount(crop.spacing_inches);
+    const plantCount = calculatePlantCount(crop.spacing_inches, bedL, bedW);
     
     try {
       await addPlanting.mutateAsync({
@@ -299,7 +305,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: 
     try {
       // Add 3rd
       if (generatedChord.third && !chordStatus['3rd (Triad)']) {
-        const plantCount = calculatePlantCount(generatedChord.third.spacing_inches);
+        const plantCount = calculatePlantCount(generatedChord.third.spacing_inches, bedL, bedW);
         await addPlanting.mutateAsync({
           bedId: bed.id,
           cropId: generatedChord.third.id,
@@ -310,7 +316,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: 
 
       // Add 5th
       if (generatedChord.fifth && !chordStatus['5th (Stabilizer)']) {
-        const plantCount = calculatePlantCount(generatedChord.fifth.spacing_inches);
+        const plantCount = calculatePlantCount(generatedChord.fifth.spacing_inches, bedL, bedW);
         await addPlanting.mutateAsync({
           bedId: bed.id,
           cropId: generatedChord.fifth.id,
@@ -321,7 +327,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: 
 
       // Add 7th
       if (generatedChord.seventh && !chordStatus['7th (Signal)']) {
-        const plantCount = calculatePlantCount(generatedChord.seventh.spacing_inches);
+        const plantCount = calculatePlantCount(generatedChord.seventh.spacing_inches, bedL, bedW);
         await addPlanting.mutateAsync({
           bedId: bed.id,
           cropId: generatedChord.seventh.id,
@@ -370,6 +376,18 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: 
       toast.success('Brix updated');
     } catch (error) {
       toast.error('Failed to update Brix');
+    }
+  };
+
+  const handleUpdateDimensions = async () => {
+    if (!isAdmin) return;
+    const l = parseFloat(bedLengthInput) || 60;
+    const w = parseFloat(bedWidthInput) || 4;
+    try {
+      await updateDimensions.mutateAsync({ bedId: bed.id, lengthFt: l, widthFt: w });
+      toast.success(`Bed dimensions updated to ${l}ft × ${w}ft`);
+    } catch (error) {
+      toast.error('Failed to update dimensions');
     }
   };
 
@@ -431,7 +449,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: 
               <div className="flex items-center gap-1">
                 <Music className="w-3 h-3" style={{ color: 'hsl(0 0% 50%)' }} />
                 <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>
-                  {bed.frequency_hz}Hz
+                  {bed.frequency_hz}Hz • {bedL}×{bedW}ft
                 </span>
               </div>
             ) : (
@@ -1230,6 +1248,66 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: 
                   </span>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Bed Dimensions (Admin editable) */}
+          {isAdmin && (
+            <div className="px-4 pb-2">
+              <div
+                className="rounded-xl p-3 space-y-2"
+                style={{ background: 'hsl(0 0% 6%)', border: '1px solid hsl(0 0% 12%)' }}
+              >
+                <span className="text-[9px] font-mono tracking-wider block" style={{ color: 'hsl(0 0% 40%)' }}>
+                  📐 BED DIMENSIONS
+                </span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>L</span>
+                    <Input
+                      type="number"
+                      value={bedLengthInput}
+                      onChange={(e) => setBedLengthInput(e.target.value)}
+                      className="w-16 h-7 text-center font-mono text-xs rounded-lg"
+                      style={{ background: 'hsl(0 0% 8%)', border: '1px solid hsl(0 0% 18%)', color: 'hsl(0 0% 75%)' }}
+                      min={5}
+                      max={200}
+                    />
+                    <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>ft</span>
+                  </div>
+                  <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 25%)' }}>×</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 50%)' }}>W</span>
+                    <Input
+                      type="number"
+                      value={bedWidthInput}
+                      onChange={(e) => setBedWidthInput(e.target.value)}
+                      className="w-16 h-7 text-center font-mono text-xs rounded-lg"
+                      style={{ background: 'hsl(0 0% 8%)', border: '1px solid hsl(0 0% 18%)', color: 'hsl(0 0% 75%)' }}
+                      min={1}
+                      max={20}
+                    />
+                    <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>ft</span>
+                  </div>
+                  <motion.button
+                    onClick={handleUpdateDimensions}
+                    disabled={updateDimensions.isPending}
+                    className="ml-auto px-3 py-1.5 rounded-lg text-[9px] font-mono font-bold"
+                    style={{
+                      background: `${bed.zone_color}20`,
+                      border: `1px solid ${bed.zone_color}40`,
+                      color: bed.zone_color,
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {updateDimensions.isPending ? '...' : 'SAVE'}
+                  </motion.button>
+                </div>
+                <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>
+                  Area: {Math.round(bedL * bedW)} sq ft • Plant counts auto-adjust
+                </span>
+              </div>
             </div>
           )}
 

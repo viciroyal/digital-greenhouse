@@ -218,8 +218,10 @@ const ChordComposer = ({
       return;
     }
 
+    const bedL = selectedBed.bed_length_ft || 60;
+    const bedW = selectedBed.bed_width_ft || 4;
     const plantCount = pendingCrop.spacing_inches
-      ? Math.floor((720 * 30) / (parseFloat(pendingCrop.spacing_inches) ** 2 * 0.866)) || 1
+      ? Math.floor((bedL * 12 * bedW * 12) / (parseFloat(pendingCrop.spacing_inches) ** 2 * 0.866)) || 1
       : 1;
 
     addPlanting.mutate({
@@ -247,8 +249,10 @@ const ChordComposer = ({
 
   const handleSuggestionAssign = (suggestion: SeasonalSuggestion) => {
     if (!selectedBed || !isAdmin) return;
+    const bedL = selectedBed.bed_length_ft || 60;
+    const bedW = selectedBed.bed_width_ft || 4;
     const plantCount = suggestion.crop.spacing_inches
-      ? Math.floor((720 * 30) / (parseFloat(suggestion.crop.spacing_inches) ** 2 * 0.866)) || 1
+      ? Math.floor((bedL * 12 * bedW * 12) / (parseFloat(suggestion.crop.spacing_inches) ** 2 * 0.866)) || 1
       : 1;
     addPlanting.mutate({
       bedId: selectedBed.id,
@@ -309,11 +313,11 @@ const ChordComposer = ({
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-sm" style={{ background: zoneColor, boxShadow: `0 0 6px ${zoneColor}60` }} />
                 <span className="text-xs font-mono font-bold" style={{ color: 'hsl(0 0% 80%)' }}>
-                  {selectedBed ? `Bed ${selectedBed.bed_number}` : 'No beds in zone'}
+                {selectedBed ? `Bed ${selectedBed.bed_number}` : 'No beds in zone'}
                 </span>
                 {selectedBed && (
                   <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
-                    {selectedBed.zone_name}
+                    {selectedBed.zone_name} • {selectedBed.bed_length_ft || 60}×{selectedBed.bed_width_ft || 4}ft
                   </span>
                 )}
               </div>
