@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { getLunarPhase, isCropLunarReady, isZoneInSeason, getSeasonalGateMessage } from '@/hooks/useLunarPhase';
@@ -857,7 +857,29 @@ const CropOracle = () => {
                             </p>
                           )}
                         </div>
-                        {slot.crop && (
+                        {manualOverrides[i] && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setManualOverrides(prev => {
+                                const next = { ...prev };
+                                delete next[i];
+                                return next;
+                              });
+                              setIsSaved(false);
+                              toast({ title: `${slot.label} restored`, description: 'Reverted to auto-selected crop.' });
+                            }}
+                            className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all hover:scale-110"
+                            style={{
+                              background: 'hsl(0 0% 12%)',
+                              border: '1px solid hsl(0 0% 20%)',
+                            }}
+                            title="Undo swap"
+                          >
+                            <Undo2 className="w-3.5 h-3.5" style={{ color: 'hsl(0 0% 55%)' }} />
+                          </button>
+                        )}
+                        {slot.crop && !manualOverrides[i] && (
                           <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
                             {slot.crop.frequency_hz}Hz
                           </span>
