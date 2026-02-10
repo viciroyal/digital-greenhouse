@@ -10,6 +10,7 @@ import { FieldModeProvider } from "@/contexts/FieldModeContext";
 import Index from "./pages/Index";
 import CropOracle from "./pages/CropOracle";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 import UserGuide from "./pages/UserGuide";
 import DevGuide from "./pages/DevGuide";
 import TestingSuiteDocs from "./pages/TestingSuiteDocs";
