@@ -402,6 +402,7 @@ export const trackData: TrackData[] = [
   {
     row: 12,
     track: 'Lie To Me',
+    featuring: 'Benjamin J. Davidow',
     chakra: 'Source',
     frequency: '963Hz',
     mineral: 'Gold',
