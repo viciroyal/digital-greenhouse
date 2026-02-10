@@ -99,6 +99,26 @@ const MANUAL_CSV_ROWS = [
   ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Sovereignty Map', 'Visual ecosystem with 5 layers (Root/Flow/Fire/Gold/Seed) that light up as you log observations.'],
   ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Stewards Utility Belt', '5 tools: Compass (calendars), Shield (pest defense), Kora (storytelling), Mortar (recipes), Kiva (seed inventory).'],
   ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Scale Toggle', 'Seed = Beginner, Sprout = Intermediate, Canopy = Advanced (full technical detail).'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Junior Guardians (Kids Mode)', 'Kid-friendly interface with simplified missions, colorful visuals, and age-appropriate garden tasks.'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Agro-Sonic Radio (432Hz)', 'Toggle button that activates 432Hz frequency playback for vibrational alignment during garden work.'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Banneker Almanac (Weather)', 'Live weather display in the header showing current conditions for farm planning.'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Sky Watcher Header', 'Lunar rhythm display showing current moon phase and optimal planting guidance.'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Emergency SOS Button', 'Always-visible safety feature for quick access to emergency plant care protocols.'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Chain Breaking Celebration', 'Animated celebration triggered when a new curriculum level is unlocked.'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Orisha Blessing Ceremony', 'Cultural ceremony animation that plays when a curriculum level is completed.'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Golden Ticket Celebration', 'Special celebration animation triggered when Level 4 is completed and Level 5 unlocks.'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Frequency Visualizer', 'Animated audio wave inside lesson drawers corresponding to each levels Solfeggio frequency.'],
+  ['Global', 'All Pages', '-', 'Field Mode (Sun Toggle)', 'High-contrast desaturated reading mode for outdoor use in bright sunlight.'],
+  ['Global', 'All Pages', '-', 'Circadian Rhythm System', 'Visual theme transitions between Solar (Gold/Red) and Lunar (Indigo/Blue) based on time of day.'],
+  ['Global', 'All Pages', '-', 'Living Pulse Animation', 'Global 6-second breathing animation (4-7-8 rhythm) that pulses across the interface.'],
+  ['Global', 'All Pages', '-', 'Mycelial Cursor', 'Custom cursor effect with root-like trails representing underground fungal networks.'],
+  ['Global', 'All Pages', '-', 'Sovereignty Footer', 'Mission statement footer: Data and seeds are sovereign property of the Steward under the Charles Legend.'],
+  ['Home', 'Home Page', '/', 'Griot Oracle (AI Chat)', 'AI-powered chat assistant (Consult the Griot) for answering questions about crops, soil, and protocols.'],
+  ['Home', 'Home Page', '/', 'Cassette Player', 'Retro cassette tape UI for audio playback of tracks and ambient garden sounds.'],
+  ['Home', 'Home Page', '/', 'Cosmic Resonance Button', 'Gateway button linking to Star Mapping for personalized cosmic garden alignment.'],
+  ['Home', 'Home Page', '/', 'Grand Cosmogram', 'Multi-layered visual cosmogram with Alchemical Spine, Cosmic Vision, and Roots Resistance layers.'],
+  ['Home', 'Home Page', '/', 'Eshu Loader', 'Trickster-themed loading animation that appears during page transitions and data fetching.'],
+  ['Home', 'Home Page', '/', 'Scrollytelling Stratigraphy', 'Scroll-reactive dig through vertical horizons (Present/Ancestral/Origin) with Sediment Ruler and Ghost Artifacts.'],
   ['Field Almanac', 'The Field Almanac', '/field-almanac', 'Master Mix', '5 quarts per 60ft bed. Resets soil to Middle C (396Hz). Worm castings, compost, kelp, minerals.'],
   ['Field Almanac', 'The Field Almanac', '/field-almanac', 'Brix Validator', 'Refractometer reading: <12 = Dissonant (red), 12-17 = In Tune (green), 18-24 = High Fidelity (gold). Must calibrate first.'],
   ['Field Almanac', 'The Field Almanac', '/field-almanac', 'Beginners Field Guide', 'Simplified version for new users with plain-language explanations.'],
@@ -259,7 +279,25 @@ const SiteGuide = () => {
 
           <Accordion type="multiple" className="space-y-0">
             <Section icon={<Home className="w-4 h-4" style={{ color: 'hsl(45 60% 55%)' }} />} route="/" title="HOME PAGE" subtitle="/">
-              <p>The front door — like a record album cover. You'll see the PharmBoi artwork, branding, and navigation links to every part of the site. Start here to explore.</p>
+              <p>The front door — like a record album cover. You'll see the PharmBoi artwork, branding, and navigation links to every part of the site.</p>
+
+              <SubHead>🎙️ GRIOT ORACLE (AI CHAT)</SubHead>
+              <p>"Consult the Griot" — an AI-powered chat assistant that answers questions about crops, soil protocols, frequencies, and companion planting. Ask anything in plain language.</p>
+
+              <SubHead>📼 CASSETTE PLAYER</SubHead>
+              <p>Retro cassette tape interface for audio playback. Browse and play tracks tied to each frequency zone with vintage tape-deck controls.</p>
+
+              <SubHead>🌀 COSMIC RESONANCE BUTTON</SubHead>
+              <p>Gateway to Star Mapping — click to begin your personalized cosmic garden alignment journey.</p>
+
+              <SubHead>🔮 GRAND COSMOGRAM</SubHead>
+              <p>Multi-layered visual cosmogram with three layers: Alchemical Spine (botanical/spiritual axis), Cosmic Vision (celestial alignment), and Roots Resistance (ancestral foundation).</p>
+
+              <SubHead>🎭 ESHU LOADER</SubHead>
+              <p>Trickster-themed loading animation inspired by the Yoruba orisha Eshu. Appears during page transitions and data fetching.</p>
+
+              <SubHead>📜 SCROLLYTELLING</SubHead>
+              <p>Scroll down to "dig" through vertical soil horizons — Present → Ancestral → Origin. A Sediment Ruler tracks your depth, and Ghost Artifacts appear as you descend.</p>
             </Section>
 
             <Section icon={<LogIn className="w-4 h-4" style={{ color: 'hsl(45 60% 55%)' }} />} route="/auth" title="SIGN IN" subtitle="/auth">
@@ -309,6 +347,32 @@ const SiteGuide = () => {
 
               <SubHead>🔄 SCALE TOGGLE</SubHead>
               <p><Highlight>Seed</Highlight> = Beginner (simplest) | <Highlight>Sprout</Highlight> = Intermediate | <Highlight>Canopy</Highlight> = Advanced (full technical detail)</p>
+
+              <SubHead>👶 JUNIOR GUARDIANS (KIDS MODE)</SubHead>
+              <p>Kid-friendly interface with simplified missions, colorful visuals, and age-appropriate garden tasks. Accessed via the big green "Junior Guardians" button. Kids can explore zones and open the almanac for guided activities.</p>
+
+              <SubHead>📻 AGRO-SONIC RADIO</SubHead>
+              <p>432Hz frequency toggle in the top-right corner. Activates vibrational alignment audio during garden work. Available to all users, logged in or not.</p>
+
+              <SubHead>🌤️ BANNEKER ALMANAC</SubHead>
+              <p>Live weather display next to the back button. Named after Benjamin Banneker — shows current conditions for daily farm planning decisions.</p>
+
+              <SubHead>🌙 SKY WATCHER HEADER</SubHead>
+              <p>Lunar rhythm display at the top of the page. Shows current moon phase and optimal planting guidance — Waxing for Leaf crops, Full for Fruit, Waning for Root.</p>
+
+              <SubHead>🆘 EMERGENCY SOS BUTTON</SubHead>
+              <p>Always-visible safety feature (bottom of screen). Quick access to emergency plant care protocols when something goes wrong in the garden.</p>
+
+              <SubHead>🎊 CELEBRATIONS</SubHead>
+              <p>Three animated ceremonies reward your progress:</p>
+              <ul className="list-disc list-inside space-y-1 ml-2">
+                <li><Highlight>Chain Breaking</Highlight> — Plays when you unlock a new level</li>
+                <li><Highlight>Orisha Blessing</Highlight> — Cultural ceremony when you complete a level (Ogun, Babalu Aye, Shango, Oshun, or The Sovereign)</li>
+                <li><Highlight>Golden Ticket</Highlight> — Special celebration when Level 4 is completed and Level 5 (The Maroon Braid) unlocks</li>
+              </ul>
+
+              <SubHead>🔊 FREQUENCY VISUALIZER</SubHead>
+              <p>Inside each lesson drawer, an animated audio wave matches the level's Solfeggio frequency: 396Hz (Root), 417Hz (Stone), 528Hz (Songline), 639Hz (Gold), 963Hz (Source).</p>
             </Section>
 
             <Section icon={<Beaker className="w-4 h-4" style={{ color: 'hsl(45 60% 55%)' }} />} route="/field-almanac" title="THE FIELD ALMANAC" subtitle="/field-almanac — Action / Utility">
@@ -418,6 +482,23 @@ const SiteGuide = () => {
 
             <Section icon={<Mountain className="w-4 h-4" style={{ color: 'hsl(45 60% 55%)' }} />} route="/ascension-map" title="ASCENSION MAP" subtitle="/ascension-map — Curriculum Journey">
               <p>Visual demo of the full curriculum journey as a climbing path through the levels.</p>
+            </Section>
+
+            <Section icon={<SunIcon className="w-4 h-4" style={{ color: 'hsl(45 60% 55%)' }} />} route="-" title="GLOBAL FEATURES" subtitle="Available on all pages">
+              <SubHead>☀️ FIELD MODE (SUN TOGGLE)</SubHead>
+              <p>High-contrast, desaturated reading mode for outdoor use. Toggle the sun icon to switch — makes the screen readable in bright sunlight during fieldwork.</p>
+
+              <SubHead>🌗 CIRCADIAN RHYTHM SYSTEM</SubHead>
+              <p>The site's visual theme shifts automatically: <Highlight>Solar mode</Highlight> (Gold/Red tones during the day) and <Highlight>Lunar mode</Highlight> (Indigo/Blue at night). Sounds and ambient textures change too.</p>
+
+              <SubHead>💫 LIVING PULSE ANIMATION</SubHead>
+              <p>A subtle 6-second breathing animation (4-7-8 rhythm) pulses across the interface. Designed to encourage calm, mindful interaction.</p>
+
+              <SubHead>🍄 MYCELIAL CURSOR</SubHead>
+              <p>Custom cursor with root-like particle trails representing the underground fungal networks connecting all life in the garden.</p>
+
+              <SubHead>🏛️ SOVEREIGNTY FOOTER</SubHead>
+              <p>Present on every page: "Data and seeds are the sovereign property of the Steward under the Charles Legend."</p>
             </Section>
           </Accordion>
         </div>
