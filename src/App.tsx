@@ -31,6 +31,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/crop-oracle" element={<CropOracle />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/user-guide" element={<UserGuide />} />
                 <Route path="/dev-guide" element={<DevGuide />} />
                 <Route path="/testing-docs" element={<TestingSuiteDocs />} />
