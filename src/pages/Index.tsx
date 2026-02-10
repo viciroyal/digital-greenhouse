@@ -166,7 +166,7 @@ const Index = () => {
         </section>
 
         {/* ═══ SOUND SYSTEM — Track Listings + Player ═══ */}
-        <section className="py-16 px-4 md:px-8 max-w-7xl mx-auto">
+        <section data-section="sound-system" className="py-16 px-4 md:px-8 max-w-7xl mx-auto">
           <AutomajicSoundSystem />
         </section>
 
