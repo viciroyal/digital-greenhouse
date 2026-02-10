@@ -332,6 +332,42 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_recipes: {
+        Row: {
+          chord_data: Json
+          created_at: string
+          environment: string
+          id: string
+          name: string | null
+          user_id: string
+          zone_hz: number
+          zone_name: string
+          zone_vibe: string
+        }
+        Insert: {
+          chord_data: Json
+          created_at?: string
+          environment: string
+          id?: string
+          name?: string | null
+          user_id: string
+          zone_hz: number
+          zone_name: string
+          zone_vibe: string
+        }
+        Update: {
+          chord_data?: Json
+          created_at?: string
+          environment?: string
+          id?: string
+          name?: string | null
+          user_id?: string
+          zone_hz?: number
+          zone_name?: string
+          zone_vibe?: string
+        }
+        Relationships: []
+      }
       seven_pillars_status: {
         Row: {
           created_at: string
