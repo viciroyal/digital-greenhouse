@@ -252,53 +252,58 @@ const CropOracle = () => {
     const pickCrop = (
       primary: MasterCrop | undefined,
       fallbackFn?: (c: MasterCrop) => boolean
-    ): MasterCrop | null => {
+    ): { crop: MasterCrop; companionMatch: boolean } | null => {
       // If star crop has companions, prefer companions that match the role
       if (companionNames.length > 0 && fallbackFn) {
         const companionMatch = pool.find(c => !usedIds.has(c.id) && isCompanion(c) && fallbackFn(c));
-        if (companionMatch) { usedIds.add(companionMatch.id); return companionMatch; }
+        if (companionMatch) { usedIds.add(companionMatch.id); return { crop: companionMatch, companionMatch: true }; }
       }
       if (primary && !usedIds.has(primary.id)) {
         usedIds.add(primary.id);
-        return primary;
+        return { crop: primary, companionMatch: isCompanion(primary) };
       }
       // Companion fallback (any role)
       if (companionNames.length > 0) {
         const anyCompanion = pool.find(c => !usedIds.has(c.id) && isCompanion(c));
-        if (anyCompanion) { usedIds.add(anyCompanion.id); return anyCompanion; }
+        if (anyCompanion) { usedIds.add(anyCompanion.id); return { crop: anyCompanion, companionMatch: true }; }
       }
       if (fallbackFn) {
         const fb = pool.find(c => !usedIds.has(c.id) && fallbackFn(c));
-        if (fb) { usedIds.add(fb.id); return fb; }
+        if (fb) { usedIds.add(fb.id); return { crop: fb, companionMatch: false }; }
       }
       return null;
     };
 
     return INTERVAL_ORDER.map(interval => {
       let crop: MasterCrop | null = null;
+      let isCompanionFill = false;
       const directMatch = pool.find(c => !usedIds.has(c.id) && c.chord_interval === interval.key);
+
+      const assign = (result: { crop: MasterCrop; companionMatch: boolean } | null) => {
+        if (result) { crop = result.crop; isCompanionFill = result.companionMatch; }
+      };
 
       switch (interval.key) {
         case 'Root (Lead)':
-          // Star crop always takes this slot
           if (starCrop && !usedIds.has(starCrop.id)) {
             usedIds.add(starCrop.id);
             crop = starCrop;
+            isCompanionFill = false; // Star itself, not a companion
           } else {
-            crop = pickCrop(directMatch, c => c.chord_interval === 'Root (Lead)');
+            assign(pickCrop(directMatch, c => c.chord_interval === 'Root (Lead)'));
           }
           break;
         case '3rd (Triad)':
-          crop = pickCrop(directMatch, c => c.chord_interval === '3rd (Triad)');
+          assign(pickCrop(directMatch, c => c.chord_interval === '3rd (Triad)'));
           break;
         case '5th (Stabilizer)':
-          crop = pickCrop(directMatch, c => c.chord_interval === '5th (Stabilizer)');
+          assign(pickCrop(directMatch, c => c.chord_interval === '5th (Stabilizer)'));
           break;
         case '7th (Signal)':
-          crop = pickCrop(directMatch, c => c.chord_interval === '7th (Signal)');
+          assign(pickCrop(directMatch, c => c.chord_interval === '7th (Signal)'));
           break;
         case '9th (Sub-bass)':
-          crop = pickCrop(undefined, c =>
+          assign(pickCrop(undefined, c =>
             c.instrument_type === 'Bass' ||
             c.name.toLowerCase().includes('potato') ||
             c.name.toLowerCase().includes('carrot') ||
@@ -307,10 +312,10 @@ const CropOracle = () => {
             c.name.toLowerCase().includes('turmeric') ||
             c.name.toLowerCase().includes('ginger') ||
             c.name.toLowerCase().includes('burdock')
-          );
+          ));
           break;
         case '11th (Tension)':
-          crop = pickCrop(undefined, c =>
+          assign(pickCrop(undefined, c =>
             c.guild_role?.toLowerCase().includes('sentinel') ||
             c.name.toLowerCase().includes('garlic') ||
             c.name.toLowerCase().includes('onion') ||
@@ -318,10 +323,10 @@ const CropOracle = () => {
             c.name.toLowerCase().includes('leek') ||
             c.name.toLowerCase().includes('shallot') ||
             c.category === 'Fungi'
-          );
+          ));
           break;
         case '13th (Top Note)':
-          crop = pickCrop(undefined, c =>
+          assign(pickCrop(undefined, c =>
             c.name.toLowerCase().includes('sunflower') ||
             c.name.toLowerCase().includes('morning glory') ||
             c.name.toLowerCase().includes('moonflower') ||
@@ -329,12 +334,12 @@ const CropOracle = () => {
             c.name.toLowerCase().includes('nasturtium') ||
             c.name.toLowerCase().includes('cosmos') ||
             (c.category === 'Dye/Fiber/Aromatic' && c.instrument_type === 'Synthesizers')
-          );
+          ));
           break;
       }
 
-      return { ...interval, crop };
-    }).map((slot, i) => manualOverrides[i] ? { ...slot, crop: manualOverrides[i] } : slot);
+      return { ...interval, crop, isCompanionFill };
+    }).map((slot, i) => manualOverrides[i] ? { ...slot, crop: manualOverrides[i], isCompanionFill: false } : slot);
   }, [recipeCrops, manualOverrides, starCrop, allCrops, selectedZone, environment]);
 
   const handleSwapCrop = (crop: MasterCrop) => {
@@ -908,6 +913,23 @@ const CropOracle = () => {
                                 border: '1px solid hsl(120 50% 40% / 0.3)',
                               }}>
                                 {lunar.phaseEmoji} READY NOW
+                              </span>
+                            )}
+                            {starCrop && slot.isCompanionFill && !manualOverrides[i] && (
+                              <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{
+                                background: 'hsl(45 80% 40% / 0.15)',
+                                color: 'hsl(45 80% 55%)',
+                                border: '1px solid hsl(45 80% 40% / 0.25)',
+                              }}>
+                                🤝 COMPANION
+                              </span>
+                            )}
+                            {starCrop && slot.crop && !slot.isCompanionFill && i > 0 && !manualOverrides[i] && (
+                              <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{
+                                background: 'hsl(0 0% 15% / 0.5)',
+                                color: 'hsl(0 0% 40%)',
+                              }}>
+                                AUTO
                               </span>
                             )}
                             {swapSlotIndex === i && (
