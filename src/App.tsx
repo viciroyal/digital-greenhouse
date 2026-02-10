@@ -24,6 +24,7 @@ import MasterBuild from "./pages/MasterBuild";
 import Auth from "./pages/Auth";
 import CropExport from "./pages/CropExport";
 import ChordRecipeGallery from "./pages/ChordRecipeGallery";
+import CropOracle from "./pages/CropOracle";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,7 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/crop-export" element={<CropExport />} />
                 <Route path="/chord-recipes" element={<ChordRecipeGallery />} />
+                <Route path="/crop-oracle" element={<CropOracle />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
