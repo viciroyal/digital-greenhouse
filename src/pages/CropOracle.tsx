@@ -1388,6 +1388,26 @@ const CropOracle = () => {
                         </motion.div>
                       );
                     })}
+
+                    {/* Add New Recipe shortcut */}
+                    <button
+                      onClick={() => {
+                        setStep(1);
+                        setEnvironment(null);
+                        setSelectedZone(null);
+                        setShowSavedRecipes(false);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="w-full py-3 rounded-xl font-mono text-[10px] tracking-wider flex items-center justify-center gap-2 transition-all"
+                      style={{
+                        background: 'hsl(0 0% 6%)',
+                        border: '1px dashed hsl(45 80% 55% / 0.2)',
+                        color: 'hsl(45 80% 55% / 0.5)',
+                      }}
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      CREATE NEW RECIPE
+                    </button>
                   </div>
                 </motion.div>
               )}
