@@ -1,8 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import GriotOracle from '@/components/GriotOracle';
 import EshuLoader from '@/components/EshuLoader';
 
@@ -41,10 +43,70 @@ const POT_MAX_SPACING = 12; // inches — exclude crops needing more
 
 const CropOracle = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { data: allCrops, isLoading } = useMasterCrops();
   const [step, setStep] = useState(1);
   const [environment, setEnvironment] = useState<string | null>(null);
   const [selectedZone, setSelectedZone] = useState<typeof ZONES[0] | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+
+  // Check auth state
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUserId(session?.user?.id ?? null);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Reset saved state when recipe changes
+  useEffect(() => {
+    setIsSaved(false);
+  }, [selectedZone, environment]);
+
+  const handleSaveRecipe = async () => {
+    if (!userId || !selectedZone || !environment) return;
+    setIsSaving(true);
+    try {
+      const chordData = chordCard.map(slot => ({
+        interval: slot.key,
+        label: slot.label,
+        role: slot.role,
+        crop_name: slot.crop?.common_name || slot.crop?.name || null,
+        crop_id: slot.crop?.id || null,
+      }));
+
+      const { error } = await supabase.from('saved_recipes').insert({
+        user_id: userId,
+        environment: environment,
+        zone_hz: selectedZone.hz,
+        zone_name: selectedZone.name,
+        zone_vibe: selectedZone.vibe,
+        chord_data: chordData,
+        name: `${selectedZone.vibe} ${environment} Recipe`,
+      });
+
+      if (error) throw error;
+
+      setIsSaved(true);
+      toast({
+        title: "Recipe Saved 🌱",
+        description: `Your ${selectedZone.vibe} chord has been stored.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Could not save",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   /* ─── Filter crops by zone + environment ─── */
   const recipeCrops = useMemo(() => {
@@ -472,6 +534,59 @@ const CropOracle = () => {
                   </p>
                 </motion.div>
               )}
+
+              {/* Save Recipe Button */}
+              <motion.div
+                className="mt-6"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+              >
+                {userId ? (
+                  <motion.button
+                    onClick={handleSaveRecipe}
+                    disabled={isSaving || isSaved}
+                    className="w-full py-4 rounded-xl font-mono text-sm tracking-wider flex items-center justify-center gap-2 transition-all"
+                    style={{
+                      background: isSaved
+                        ? `linear-gradient(135deg, hsl(120 40% 25%), hsl(120 30% 18%))`
+                        : `linear-gradient(135deg, ${selectedZone.color}25, hsl(0 0% 8%))`,
+                      border: `2px solid ${isSaved ? 'hsl(120 50% 40%)' : selectedZone.color + '50'}`,
+                      color: isSaved ? 'hsl(120 50% 70%)' : selectedZone.color,
+                      boxShadow: isSaved ? '0 0 20px hsl(120 50% 30% / 0.2)' : `0 0 20px ${selectedZone.color}15`,
+                    }}
+                    whileHover={!isSaved ? { scale: 1.02, boxShadow: `0 0 30px ${selectedZone.color}30` } : {}}
+                    whileTap={!isSaved ? { scale: 0.98 } : {}}
+                  >
+                    {isSaving ? (
+                      <motion.div
+                        className="w-4 h-4 border-2 rounded-full"
+                        style={{ borderColor: `${selectedZone.color}40`, borderTopColor: selectedZone.color }}
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      />
+                    ) : isSaved ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <Save className="w-4 h-4" />
+                    )}
+                    {isSaving ? 'SAVING...' : isSaved ? 'RECIPE SAVED' : 'SAVE MY RECIPE'}
+                  </motion.button>
+                ) : (
+                  <button
+                    onClick={() => navigate('/auth')}
+                    className="w-full py-4 rounded-xl font-mono text-sm tracking-wider flex items-center justify-center gap-2"
+                    style={{
+                      background: 'hsl(0 0% 8%)',
+                      border: '2px solid hsl(0 0% 20%)',
+                      color: 'hsl(0 0% 50%)',
+                    }}
+                  >
+                    <LogIn className="w-4 h-4" />
+                    SIGN IN TO SAVE RECIPE
+                  </button>
+                )}
+              </motion.div>
 
               {/* Navigation */}
               <div className="flex items-center justify-between mt-8">
