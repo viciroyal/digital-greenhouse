@@ -368,6 +368,45 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_soil_configs: {
+        Row: {
+          bed_length: number | null
+          bed_width: number | null
+          container_size: string | null
+          created_at: string
+          custom_gallons: number | null
+          environment: string
+          frequency_hz: number | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          bed_length?: number | null
+          bed_width?: number | null
+          container_size?: string | null
+          created_at?: string
+          custom_gallons?: number | null
+          environment: string
+          frequency_hz?: number | null
+          id?: string
+          name?: string
+          user_id: string
+        }
+        Update: {
+          bed_length?: number | null
+          bed_width?: number | null
+          container_size?: string | null
+          created_at?: string
+          custom_gallons?: number | null
+          environment?: string
+          frequency_hz?: number | null
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       seven_pillars_status: {
         Row: {
           created_at: string
