@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import GriotOracle from '@/components/GriotOracle';
 import EshuLoader from '@/components/EshuLoader';
+import { useWeatherAlert } from '@/hooks/useWeatherAlert';
 
 /* ─── Zone Data ─── */
 const ZONES = [
@@ -98,6 +99,7 @@ const CropOracle = () => {
   };
   // Real-time celestial data
   const lunar = useMemo(() => getLunarPhase(), []);
+  const weather = useWeatherAlert();
 
   // Check auth state
   useEffect(() => {
@@ -419,6 +421,7 @@ const CropOracle = () => {
             boxShadow: '0 0 20px hsl(270 40% 15% / 0.15)',
           }}
         >
+          {/* Moon Phase — left */}
           <span className="text-xl">{lunar.phaseEmoji}</span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -454,12 +457,86 @@ const CropOracle = () => {
               {lunar.plantingLabel}
             </p>
           </div>
-          {lunar.seasonalMovement.active && (
-            <div className="text-[8px] font-mono text-right" style={{ color: 'hsl(270 30% 50%)' }}>
-              <div>{lunar.seasonalMovement.name}</div>
-              <div>{lunar.seasonalMovement.frequencyRange}</div>
-            </div>
-          )}
+
+          {/* Weather & Water — right */}
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Temperature */}
+            {!weather.isLoading && !weather.error && (
+              <div
+                className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg"
+                style={{
+                  background: weather.currentTempF >= 90
+                    ? 'hsl(0 60% 20% / 0.3)'
+                    : weather.currentTempF <= 34
+                      ? 'hsl(200 60% 20% / 0.3)'
+                      : 'hsl(120 30% 15% / 0.2)',
+                  border: `1px solid ${weather.currentTempF >= 90
+                    ? 'hsl(0 50% 35% / 0.4)'
+                    : weather.currentTempF <= 34
+                      ? 'hsl(200 50% 40% / 0.4)'
+                      : 'hsl(120 30% 25% / 0.3)'}`,
+                }}
+              >
+                <div className="flex items-center gap-1">
+                  <Thermometer className="w-3 h-3" style={{
+                    color: weather.currentTempF >= 90
+                      ? 'hsl(0 70% 60%)'
+                      : weather.currentTempF <= 34
+                        ? 'hsl(200 70% 65%)'
+                        : 'hsl(120 50% 55%)',
+                  }} />
+                  <span className="text-sm font-mono font-bold" style={{
+                    color: weather.currentTempF >= 90
+                      ? 'hsl(0 70% 65%)'
+                      : weather.currentTempF <= 34
+                        ? 'hsl(200 70% 70%)'
+                        : 'hsl(40 50% 85%)',
+                  }}>
+                    {weather.currentTempF}°F
+                  </span>
+                </div>
+                <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                  {weather.minTempF}° / {weather.maxTempF}°
+                </span>
+              </div>
+            )}
+
+            {/* Water Recommendation */}
+            {!weather.isLoading && !weather.error && (
+              <div
+                className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg"
+                style={{
+                  background: weather.waterRec.level === 'high'
+                    ? 'hsl(200 60% 18% / 0.3)'
+                    : weather.waterRec.level === 'none'
+                      ? 'hsl(0 0% 12% / 0.3)'
+                      : 'hsl(200 40% 15% / 0.2)',
+                  border: `1px solid ${weather.waterRec.level === 'high'
+                    ? 'hsl(200 60% 40% / 0.4)'
+                    : 'hsl(200 30% 25% / 0.3)'}`,
+                }}
+              >
+                <span className="text-sm">{weather.waterRec.icon}</span>
+                <span className="text-[8px] font-mono text-center leading-tight max-w-[80px]" style={{
+                  color: weather.waterRec.level === 'high'
+                    ? 'hsl(200 70% 65%)'
+                    : weather.waterRec.level === 'none'
+                      ? 'hsl(0 0% 50%)'
+                      : 'hsl(200 50% 60%)',
+                }}>
+                  {weather.waterRec.message}
+                </span>
+              </div>
+            )}
+
+            {/* Seasonal Movement */}
+            {lunar.seasonalMovement.active && (
+              <div className="text-[8px] font-mono text-right" style={{ color: 'hsl(270 30% 50%)' }}>
+                <div>{lunar.seasonalMovement.name}</div>
+                <div>{lunar.seasonalMovement.frequencyRange}</div>
+              </div>
+            )}
+          </div>
         </div>
       </motion.div>
 
