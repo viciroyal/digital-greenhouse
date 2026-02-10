@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 
 type CircadianMode = 'solar' | 'lunar';
 
@@ -24,9 +24,9 @@ interface CircadianProviderProps {
 }
 
 export const CircadianProvider = ({ children }: CircadianProviderProps) => {
-  const [hour, setHour] = useState(() => new Date().getHours());
+  const [hour, setHour] = React.useState(() => new Date().getHours());
   
-  useEffect(() => {
+  React.useEffect(() => {
     // Update hour every minute
     const interval = setInterval(() => {
       setHour(new Date().getHours());
