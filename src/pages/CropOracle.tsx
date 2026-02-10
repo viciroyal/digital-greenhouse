@@ -725,6 +725,7 @@ const CropOracle = () => {
         activeFrequency={activeFrequency}
         pendingCrop={pendingCrop}
         onClearPending={() => setPendingCrop(null)}
+        allCrops={allCrops || []}
       />
     </div>
   );
