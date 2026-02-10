@@ -352,9 +352,8 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
                 SPIRIT INSTRUCTION
               </p>
               <p 
-                className="text-xs tracking-wider uppercase mt-0.5"
+                className="text-xs tracking-wider uppercase mt-0.5 font-body"
                 style={{ 
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
                   color: DOGON_COLORS.rustClay,
                 }}
               >
