@@ -46,3 +46,21 @@ describe('Jazz Voicing Fungi → InoculantType mapping', () => {
     expect(mapToInoculant(999)).toBeNull();
   });
 });
+
+describe('Jazz Voicing 13th Aerial Recommendations', () => {
+  const expected13th: [number, string, string][] = [
+    [396, 'Root',   'Tall Red Amaranth'],
+    [417, 'Flow',   'Orange Mexican Sunflower'],
+    [528, 'Solar',  'Golden Fennel'],
+    [639, 'Heart',  'Dill (Mammoth Long Island)'],
+    [741, 'Voice',  "Bachelor's Buttons"],
+    [852, 'Vision', 'Purple Verbena Bonariensis'],
+    [963, 'Shield', 'White Moonflower'],
+  ];
+
+  it.each(expected13th)('%iHz (%s) recommends %s', (hz, _zone, expectedAerial) => {
+    const rec = getZoneRecommendation(hz);
+    expect(rec).toBeDefined();
+    expect(rec!.thirteenth.name).toBe(expectedAerial);
+  });
+});
