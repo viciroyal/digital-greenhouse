@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { getLunarPhase, isCropLunarReady, isZoneInSeason, getSeasonalGateMessage } from '@/hooks/useLunarPhase';
@@ -150,10 +150,10 @@ const CropOracle = () => {
     return filtered;
   }, [allCrops, selectedZone, environment]);
 
-  /* ─── Star crop candidates (all crops in zone that could lead) ─── */
+  /* ─── Star crop candidates (ANY crop from ANY zone can be the Star) ─── */
   const starCandidates = useMemo(() => {
-    if (!allCrops || !selectedZone) return [];
-    let candidates = allCrops.filter(c => c.frequency_hz === selectedZone.hz);
+    if (!allCrops) return [];
+    let candidates = [...allCrops];
     if (environment === 'pot') {
       candidates = candidates.filter(c => {
         const spacing = c.spacing_inches ? parseInt(c.spacing_inches) : 6;
@@ -161,7 +161,7 @@ const CropOracle = () => {
       });
     }
     return candidates.sort((a, b) => (a.common_name || a.name).localeCompare(b.common_name || b.name));
-  }, [allCrops, selectedZone, environment]);
+  }, [allCrops, environment]);
 
   /* ─── Filtered star search ─── */
   const filteredStarCandidates = useMemo(() => {
@@ -191,9 +191,17 @@ const CropOracle = () => {
   const chordCard = useMemo(() => {
     if (recipeCrops.length === 0 && !starCrop) return [];
 
-    // Use all zone crops (not just environment-filtered) for companion lookup
-    const zoneCrops = allCrops?.filter(c => selectedZone && c.frequency_hz === selectedZone.hz) || [];
-    const pool = recipeCrops.length > 0 ? recipeCrops : zoneCrops;
+    // When a Star is from a different zone, use the Star's zone as the pool
+    const effectiveHz = starCrop ? starCrop.frequency_hz : selectedZone?.hz;
+    const zoneCrops = allCrops?.filter(c => effectiveHz && c.frequency_hz === effectiveHz) || [];
+    let pool = starCrop && starCrop.frequency_hz !== selectedZone?.hz ? zoneCrops : (recipeCrops.length > 0 ? recipeCrops : zoneCrops);
+    // For pot mode, also filter the pool
+    if (environment === 'pot') {
+      pool = pool.filter(c => {
+        const spacing = c.spacing_inches ? parseInt(c.spacing_inches) : 6;
+        return spacing <= POT_MAX_SPACING;
+      });
+    }
     
     const usedIds = new Set<string>();
 
@@ -292,7 +300,7 @@ const CropOracle = () => {
 
       return { ...interval, crop };
     }).map((slot, i) => manualOverrides[i] ? { ...slot, crop: manualOverrides[i] } : slot);
-  }, [recipeCrops, manualOverrides, starCrop, allCrops, selectedZone]);
+  }, [recipeCrops, manualOverrides, starCrop, allCrops, selectedZone, environment]);
 
   const handleSwapCrop = (crop: MasterCrop) => {
     if (swapSlotIndex === null) return;
@@ -625,7 +633,7 @@ const CropOracle = () => {
                             type="text"
                             value={starSearchQuery}
                             onChange={e => setStarSearchQuery(e.target.value)}
-                            placeholder={`Search ${starCandidates.length} crops in ${selectedZone.name}...`}
+                            placeholder={`Search ${starCandidates.length} crops across all zones...`}
                             className="bg-transparent flex-1 text-sm font-body outline-none"
                             style={{ color: 'hsl(0 0% 80%)' }}
                             autoFocus
@@ -668,13 +676,14 @@ const CropOracle = () => {
                           {filteredStarCandidates.map(crop => {
                             const isSelected = starCrop?.id === crop.id;
                             const ready = isCropLunarReady(crop.category, crop.common_name || crop.name, lunar.plantingType);
+                            const cropZone = ZONES.find(z => z.hz === crop.frequency_hz);
                             return (
                               <button
                                 key={crop.id}
                                 className="px-4 py-3 w-full text-left flex items-center gap-3 transition-all"
                                 style={{
                                   borderColor: 'hsl(0 0% 10%)',
-                                  background: isSelected ? `${selectedZone.color}10` : 'transparent',
+                                  background: isSelected ? `${(cropZone?.color || selectedZone.color)}10` : 'transparent',
                                 }}
                                 onClick={() => {
                                   setStarCrop(crop);
@@ -683,22 +692,32 @@ const CropOracle = () => {
                                   setIsSaved(false);
                                   toast({
                                     title: `🌟 ${crop.common_name || crop.name}`,
-                                    description: 'Chord rebuilt around your Star.',
+                                    description: crop.frequency_hz === selectedZone.hz
+                                      ? 'Chord rebuilt around your Star.'
+                                      : `Cross-zone Star! Chord now tuned to ${crop.frequency_hz}Hz (${cropZone?.name || crop.zone_name}).`,
                                   });
                                 }}
-                                onMouseEnter={e => { e.currentTarget.style.background = `${selectedZone.color}08`; }}
-                                onMouseLeave={e => { e.currentTarget.style.background = isSelected ? `${selectedZone.color}10` : 'transparent'; }}
+                                onMouseEnter={e => { e.currentTarget.style.background = `${(cropZone?.color || selectedZone.color)}08`; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = isSelected ? `${(cropZone?.color || selectedZone.color)}10` : 'transparent'; }}
                               >
                                 <div
                                   className="w-3 h-3 rounded-full shrink-0"
-                                  style={{ background: isSelected ? selectedZone.color : `${selectedZone.color}50` }}
+                                  style={{ background: isSelected ? (cropZone?.color || selectedZone.color) : `${(cropZone?.color || selectedZone.color)}50` }}
                                 />
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="text-sm font-body truncate" style={{ color: isSelected ? selectedZone.color : 'hsl(0 0% 80%)' }}>
+                                    <span className="text-sm font-body truncate" style={{ color: isSelected ? (cropZone?.color || selectedZone.color) : 'hsl(0 0% 80%)' }}>
                                       {crop.common_name || crop.name}
                                     </span>
                                     {isSelected && <span className="text-[8px]">🌟</span>}
+                                    {crop.frequency_hz !== selectedZone.hz && (
+                                      <span className="text-[8px] font-mono px-1 py-0.5 rounded shrink-0" style={{
+                                        background: `${cropZone?.color || 'hsl(0 0% 50%)'}15`,
+                                        color: cropZone?.color || 'hsl(0 0% 60%)',
+                                      }}>
+                                        {crop.frequency_hz}Hz
+                                      </span>
+                                    )}
                                     {ready && (
                                       <span className="text-[8px] font-mono px-1 py-0.5 rounded shrink-0" style={{
                                         background: 'hsl(120 50% 25% / 0.3)',
@@ -709,7 +728,7 @@ const CropOracle = () => {
                                     )}
                                   </div>
                                   <p className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
-                                    {crop.category}{crop.chord_interval ? ` • ${crop.chord_interval}` : ''}
+                                    {cropZone?.name || crop.zone_name} • {crop.category}{crop.chord_interval ? ` • ${crop.chord_interval}` : ''}
                                     {crop.companion_crops?.length ? ` • ${crop.companion_crops.length} companions` : ''}
                                   </p>
                                 </div>
@@ -900,9 +919,32 @@ const CropOracle = () => {
                   <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>
                     {environment === 'pot' ? '🪴 CONTAINER' : environment === 'farm' ? '🚜 FARM' : environment === 'high-tunnel' ? '🏠 HIGH TUNNEL' : '🌱 RAISED BED'} MODE
                   </span>
-                  <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>
-                    {recipeCrops.length} CROPS IN ZONE
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex items-center gap-1.5 px-2 py-1 rounded-md"
+                      style={{
+                        background: 'hsl(200 50% 25% / 0.15)',
+                        border: '1px solid hsl(200 40% 35% / 0.2)',
+                      }}
+                      title={
+                        environment === 'pot' ? 'Bottom watering or hand-water daily'
+                          : environment === 'farm' ? 'Center-pivot or flood irrigation'
+                          : environment === 'high-tunnel' ? 'Inline drip tape, 12" emitter spacing'
+                          : 'Drip irrigation, 6-8" emitter spacing'
+                      }
+                    >
+                      <Droplets className="w-3 h-3" style={{ color: 'hsl(200 60% 55%)' }} />
+                      <span className="text-[8px] font-mono" style={{ color: 'hsl(200 40% 55%)' }}>
+                        {environment === 'pot' ? 'HAND WATER'
+                          : environment === 'farm' ? 'FLOOD / PIVOT'
+                          : environment === 'high-tunnel' ? 'DRIP TAPE 12"'
+                          : 'DRIP LINE 6-8"'}
+                      </span>
+                    </div>
+                    <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>
+                      {recipeCrops.length} CROPS IN ZONE
+                    </span>
+                  </div>
                 </div>
               </div>
 
