@@ -721,6 +721,10 @@ const AutomajicSoundSystem = () => {
         track={selectedTrack}
         isOpen={isDetailOpen}
         onClose={handleCloseDetail}
+        onSwitchTrack={(track) => {
+          setSelectedTrack(track);
+          handlePlayTrack(track);
+        }}
         isPlaying={isPlaying && currentTrack?.row === selectedTrack?.row}
         onTogglePlay={handleTogglePlay}
         currentTime={currentTime}

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Volume2, VolumeX, RotateCcw } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, RotateCcw, SkipBack, SkipForward } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 
 interface VibrationalAudioPlayerProps {
@@ -9,6 +9,8 @@ interface VibrationalAudioPlayerProps {
   artist?: string;
   frequency?: string;
   colorHsl?: string;
+  onPrevTrack?: () => void;
+  onNextTrack?: () => void;
 }
 
 const VibrationalAudioPlayer = ({ 
@@ -16,7 +18,9 @@ const VibrationalAudioPlayer = ({
   title = "Pulling Weeds",
   artist = "Vici Royàl",
   frequency = "396Hz",
-  colorHsl = "0 70% 50%"
+  colorHsl = "0 70% 50%",
+  onPrevTrack,
+  onNextTrack,
 }: VibrationalAudioPlayerProps) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -294,16 +298,18 @@ const VibrationalAudioPlayer = ({
           </div>
 
           {/* Center: Play controls */}
-          <div className="flex items-center gap-4">
-            <motion.button
-              className="p-2 rounded-full transition-colors"
-              style={{ color: 'hsl(40 30% 55%)' }}
-              whileHover={{ scale: 1.1, color: `hsl(${colorHsl})` }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleRestart}
-            >
-              <RotateCcw size={20} />
-            </motion.button>
+          <div className="flex items-center gap-3">
+            {onPrevTrack && (
+              <motion.button
+                className="p-2 rounded-full transition-colors"
+                style={{ color: 'hsl(40 30% 55%)' }}
+                whileHover={{ scale: 1.1, color: `hsl(${colorHsl})` }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onPrevTrack}
+              >
+                <SkipBack size={20} />
+              </motion.button>
+            )}
 
             <motion.button
               className="w-16 h-16 rounded-full flex items-center justify-center"
@@ -323,8 +329,17 @@ const VibrationalAudioPlayer = ({
               )}
             </motion.button>
 
-            {/* Placeholder for symmetry */}
-            <div className="w-9" />
+            {onNextTrack && (
+              <motion.button
+                className="p-2 rounded-full transition-colors"
+                style={{ color: 'hsl(40 30% 55%)' }}
+                whileHover={{ scale: 1.1, color: `hsl(${colorHsl})` }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onNextTrack}
+              >
+                <SkipForward size={20} />
+              </motion.button>
+            )}
           </div>
 
           {/* Right: Frequency badge */}

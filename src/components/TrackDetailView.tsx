@@ -1,5 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { trackData } from '@/data/trackData';
 import type { TrackData } from '@/data/trackData';
 import FunctionSeal from './track-detail/FunctionSeal';
 import WaveformPlayer from './track-detail/WaveformPlayer';
@@ -25,6 +27,7 @@ interface TrackDetailViewProps {
   track: TrackData | null;
   isOpen: boolean;
   onClose: () => void;
+  onSwitchTrack?: (track: TrackData) => void;
   // Audio player props
   isPlaying?: boolean;
   onTogglePlay?: () => void;
@@ -93,6 +96,7 @@ const TrackDetailView = ({
   track, 
   isOpen, 
   onClose,
+  onSwitchTrack,
   isPlaying = false,
   onTogglePlay,
   currentTime = 0,
@@ -104,6 +108,9 @@ const TrackDetailView = ({
   const [isSpectralVaultOpen, setIsSpectralVaultOpen] = useState(false);
   
   if (!track) return null;
+
+  const prevTrack = trackData.find(t => t.row === (track.row > 1 ? track.row - 1 : 12));
+  const nextTrack = trackData.find(t => t.row === (track.row < 12 ? track.row + 1 : 1));
 
   // Get civilization theme based on track number
   const theme = getCivilizationTheme(track.row);
@@ -235,9 +242,9 @@ const TrackDetailView = ({
                 </p>
               </motion.div>
 
-              {/* Lab Report Header with Song Title */}
+              {/* Lab Report Header with Song Title + Track Navigation */}
               <motion.div
-                className="text-center mb-8"
+                className="text-center mb-8 relative"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -248,32 +255,84 @@ const TrackDetailView = ({
                 >
                   FREQUENCY DASHBOARD
                 </p>
-                {/* Song Title - Staatliches Header Font */}
-                <h1 
-                  className="text-3xl md:text-4xl mb-2"
-                  style={{ 
-                    fontFamily: "'Staatliches', sans-serif",
-                    color: 'hsl(40 50% 95%)',
-                    textShadow: `0 0 30px hsl(${theme.accentColor} / 0.4)`,
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  {track.track}
-                </h1>
-                {track.featuring && (
-                  <p 
-                    className="font-body text-sm mb-2"
-                    style={{ color: 'hsl(40 40% 75%)' }}
-                  >
-                    ft. {track.featuring}
-                  </p>
-                )}
-                <p 
-                  className="font-body text-sm"
-                  style={{ color: 'hsl(40 40% 65%)' }}
-                >
-                  Lab Report #{String(track.row).padStart(2, '0')}
-                </p>
+
+                {/* Track Navigation Row */}
+                <div className="flex items-center justify-center gap-4 md:gap-6">
+                  {/* Prev Track */}
+                  {onSwitchTrack && prevTrack && (
+                    <motion.button
+                      className="flex flex-col items-center gap-1 p-2 rounded-xl group"
+                      style={{
+                        background: 'hsl(0 0% 0% / 0.3)',
+                        border: '1px solid hsl(40 30% 25% / 0.5)',
+                      }}
+                      whileHover={{ 
+                        scale: 1.05, 
+                        borderColor: `hsl(${theme.accentColor} / 0.6)`,
+                        background: `hsl(${theme.accentColor} / 0.1)`,
+                      }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => onSwitchTrack(prevTrack)}
+                    >
+                      <ChevronLeft className="w-5 h-5" style={{ color: `hsl(${theme.accentColor} / 0.7)` }} />
+                      <span className="text-[9px] font-body tracking-wider uppercase hidden md:block" style={{ color: 'hsl(40 30% 55%)' }}>
+                        {prevTrack.track}
+                      </span>
+                    </motion.button>
+                  )}
+
+                  {/* Song Title */}
+                  <div className="flex-shrink-0">
+                    <h1 
+                      className="text-3xl md:text-4xl mb-2"
+                      style={{ 
+                        fontFamily: "'Staatliches', sans-serif",
+                        color: 'hsl(40 50% 95%)',
+                        textShadow: `0 0 30px hsl(${theme.accentColor} / 0.4)`,
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      {track.track}
+                    </h1>
+                    {track.featuring && (
+                      <p 
+                        className="font-body text-sm mb-2"
+                        style={{ color: 'hsl(40 40% 75%)' }}
+                      >
+                        ft. {track.featuring}
+                      </p>
+                    )}
+                    <p 
+                      className="font-body text-sm"
+                      style={{ color: 'hsl(40 40% 65%)' }}
+                    >
+                      Lab Report #{String(track.row).padStart(2, '0')}
+                    </p>
+                  </div>
+
+                  {/* Next Track */}
+                  {onSwitchTrack && nextTrack && (
+                    <motion.button
+                      className="flex flex-col items-center gap-1 p-2 rounded-xl group"
+                      style={{
+                        background: 'hsl(0 0% 0% / 0.3)',
+                        border: '1px solid hsl(40 30% 25% / 0.5)',
+                      }}
+                      whileHover={{ 
+                        scale: 1.05, 
+                        borderColor: `hsl(${theme.accentColor} / 0.6)`,
+                        background: `hsl(${theme.accentColor} / 0.1)`,
+                      }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => onSwitchTrack(nextTrack)}
+                    >
+                      <ChevronRight className="w-5 h-5" style={{ color: `hsl(${theme.accentColor} / 0.7)` }} />
+                      <span className="text-[9px] font-body tracking-wider uppercase hidden md:block" style={{ color: 'hsl(40 30% 55%)' }}>
+                        {nextTrack.track}
+                      </span>
+                    </motion.button>
+                  )}
+                </div>
               </motion.div>
 
               {/* Function Seal - AgroMajic Protocol Designation */}
