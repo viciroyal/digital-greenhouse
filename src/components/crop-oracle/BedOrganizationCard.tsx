@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
-import { Ruler, Maximize, Grid3X3, TrendingUp, ExternalLink } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Ruler, Maximize, Grid3X3, TrendingUp } from 'lucide-react';
 import type { MasterCrop } from '@/hooks/useMasterCrops';
 
 /* ─── Bed Organization Card ───
@@ -121,7 +120,6 @@ interface BedOrganizationCardProps {
 }
 
 const BedOrganizationCard = ({ crop, zoneColor }: BedOrganizationCardProps) => {
-  const navigate = useNavigate();
   const layout = calculateLayout(crop);
   const patternInfo = PATTERN_LABELS[layout.pattern];
   const densityStyle = DENSITY_COLORS[layout.density];
@@ -284,27 +282,6 @@ const BedOrganizationCard = ({ crop, zoneColor }: BedOrganizationCardProps) => {
           </div>
         </div>
 
-        {/* View Placement button */}
-        <button
-          onClick={() => navigate(`/bed-strum?freq=${crop.frequency_hz}`)}
-          className="w-full mt-3 flex items-center justify-center gap-2 py-2.5 rounded-lg font-mono text-xs font-bold tracking-wider transition-all"
-          style={{
-            background: `${zoneColor}15`,
-            border: `1px solid ${zoneColor}40`,
-            color: zoneColor,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = `${zoneColor}25`;
-            e.currentTarget.style.boxShadow = `0 0 20px ${zoneColor}20`;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = `${zoneColor}15`;
-            e.currentTarget.style.boxShadow = 'none';
-          }}
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-          VIEW PLACEMENT IN BED STRUM
-        </button>
       </div>
     </motion.div>
   );
