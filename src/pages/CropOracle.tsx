@@ -377,23 +377,47 @@ const CropOracle = () => {
       className="min-h-screen relative"
       style={{ background: 'linear-gradient(180deg, hsl(0 0% 4%) 0%, hsl(0 0% 2%) 100%)' }}
     >
-      {/* Back to Stage */}
-      <button
-        onClick={() => navigate('/')}
-        className="fixed top-4 left-4 z-50 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+      {/* Top Header Bar — unified to prevent mobile overlap */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-3 py-2 safe-area-top"
         style={{
-          background: 'hsl(0 0% 10%)',
-          border: '1px solid hsl(0 0% 20%)',
+          background: 'hsl(0 0% 3% / 0.85)',
+          backdropFilter: 'blur(12px)',
+          borderBottom: '1px solid hsl(0 0% 12%)',
         }}
       >
-        <ArrowLeft className="w-5 h-5" style={{ color: 'hsl(0 0% 60%)' }} />
-      </button>
+        <button
+          onClick={() => navigate('/')}
+          className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110 shrink-0"
+          style={{
+            background: 'hsl(0 0% 10%)',
+            border: '1px solid hsl(0 0% 20%)',
+          }}
+        >
+          <ArrowLeft className="w-4 h-4" style={{ color: 'hsl(0 0% 60%)' }} />
+        </button>
 
-      {/* Beginner / Pro Toggle */}
-      <div className="fixed top-4 right-4 z-50 flex items-center">
+        {/* Step indicators — inline in header on mobile */}
+        <div className="flex items-center gap-1.5">
+          {[1, 2, 3].map(s => (
+            <div
+              key={s}
+              className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold transition-all"
+              style={{
+                background: step >= s
+                  ? (s === 3 && selectedZone ? selectedZone.color + '30' : 'hsl(45 80% 55% / 0.2)')
+                  : 'hsl(0 0% 8%)',
+                border: `1.5px solid ${step >= s ? (s === 3 && selectedZone ? selectedZone.color : 'hsl(45 80% 55%)') : 'hsl(0 0% 15%)'}`,
+                color: step >= s ? 'hsl(45 80% 55%)' : 'hsl(0 0% 30%)',
+              }}
+            >
+              {s}
+            </div>
+          ))}
+        </div>
+
         <button
           onClick={() => setProMode(!proMode)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-full font-mono text-[10px] tracking-wider transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[10px] tracking-wider transition-all shrink-0"
           style={{
             background: proMode
               ? 'linear-gradient(135deg, hsl(270 40% 18%), hsl(270 30% 12%))'
