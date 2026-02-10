@@ -10,6 +10,8 @@ import { FieldModeProvider } from "@/contexts/FieldModeContext";
 import Index from "./pages/Index";
 import CropOracle from "./pages/CropOracle";
 import Auth from "./pages/Auth";
+import UserGuide from "./pages/UserGuide";
+import DevGuide from "./pages/DevGuide";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +29,8 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/crop-oracle" element={<CropOracle />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/user-guide" element={<UserGuide />} />
+                <Route path="/dev-guide" element={<DevGuide />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
