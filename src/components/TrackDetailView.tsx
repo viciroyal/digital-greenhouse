@@ -96,6 +96,7 @@ const TrackDetailView = ({
   track, 
   isOpen, 
   onClose,
+  onSwitchTrack,
   isPlaying = false,
   onTogglePlay,
   currentTime = 0,
@@ -107,6 +108,9 @@ const TrackDetailView = ({
   const [isSpectralVaultOpen, setIsSpectralVaultOpen] = useState(false);
   
   if (!track) return null;
+
+  const prevTrack = trackData.find(t => t.row === (track.row > 1 ? track.row - 1 : 12));
+  const nextTrack = trackData.find(t => t.row === (track.row < 12 ? track.row + 1 : 1));
 
   // Get civilization theme based on track number
   const theme = getCivilizationTheme(track.row);
