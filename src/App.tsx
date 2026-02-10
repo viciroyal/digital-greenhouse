@@ -22,6 +22,7 @@ import AgroMajicConductor from "./pages/AgroMajicConductor";
 import LinerNotes from "./pages/LinerNotes";
 import MasterBuild from "./pages/MasterBuild";
 import Auth from "./pages/Auth";
+import CropExport from "./pages/CropExport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,6 +54,7 @@ const App = () => (
                 <Route path="/liner-notes" element={<LinerNotes />} />
                 <Route path="/master-build" element={<MasterBuild />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/crop-export" element={<CropExport />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
