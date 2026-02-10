@@ -16,7 +16,7 @@ const GriotOracle = () => {
     {
       id: 'welcome',
       role: 'griot',
-      content: 'The soil speaks through silence first. What weighs upon your roots, traveler?',
+      content: 'What can I help with? Ask about soil amendments, crop spacing, Brix targets, companion planting, or any growing question.',
       timestamp: new Date(),
     },
   ]);
@@ -61,7 +61,7 @@ const GriotOracle = () => {
         const authErrorMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: 'griot',
-          content: 'You must pass through The Threshold before consulting the ancestors. Sign in to continue your journey.',
+          content: 'Sign in to access the Field Advisor. Your questions require an authenticated session.',
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, authErrorMessage]);
@@ -105,7 +105,7 @@ const GriotOracle = () => {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'griot',
-        content: 'The ancestors require stillness. The connection wavers like wind through corn. Breathe, and speak again.',
+        content: 'Connection error. Please check your network and try again.',
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -199,7 +199,7 @@ const GriotOracle = () => {
             fontFamily: 'Space Mono, monospace',
           }}
         >
-          Consult The Griot
+          Ask The Field Advisor
         </div>
       </motion.button>
 
@@ -256,13 +256,13 @@ const GriotOracle = () => {
                     className="text-sm font-bold tracking-wide"
                     style={{ color: 'hsl(40 50% 85%)', fontFamily: 'Space Mono, monospace' }}
                   >
-                    THE HOGON
+                    FIELD ADVISOR
                   </h3>
                   <p
                     className="text-[10px] tracking-widest uppercase"
                     style={{ color: 'hsl(185 60% 50%)' }}
                   >
-                    Ancestral Oracle
+                    Soil Science · Crop Strategy
                   </p>
                 </div>
               </div>
@@ -389,7 +389,7 @@ const GriotOracle = () => {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Speak to the soil..."
+                  placeholder="Ask a growing question..."
                   disabled={isLoading}
                   className="flex-1 bg-transparent outline-none text-sm"
                   style={{
