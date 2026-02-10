@@ -401,7 +401,7 @@ const LunarAgronomyModule = ({ track }: LunarAgronomyModuleProps) => {
           transition={{ delay: 0.5 }}
         >
           <span 
-            className="font-mono text-xs"
+            className="font-body text-xs"
             style={{ color: `hsl(${track.colorHsl})` }}
           >
             {track.zodiacGlyph} {track.zodiacSign}
