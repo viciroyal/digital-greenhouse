@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, ArrowLeft, Music, Leaf, Shield, Pickaxe, Sparkles, Zap,
   AlertTriangle, Clock, Users, Layers, Disc, ToggleLeft, ToggleRight, X, Info, Plus,
-  Moon, Sprout, Ruler, Grid3X3, AudioWaveform,
+  Moon, Sprout, Ruler, Grid3X3, AudioWaveform, SlidersHorizontal,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -130,8 +130,8 @@ const CropOracle = () => {
   const [query, setQuery] = useState('');
   const [selectedCrop, setSelectedCrop] = useState<MasterCrop | null>(null);
   const [hoveredCrop, setHoveredCrop] = useState<MasterCrop | null>(null);
-  const [activeSection, setActiveSection] = useState<'profile' | 'guild' | 'timing' | 'beds' | 'strum' | 'planting'>('profile');
-  const [composerOpen, setComposerOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<'profile' | 'guild' | 'timing' | 'beds' | 'strum' | 'planting' | 'compose'>('profile');
+  // composerOpen no longer needed — composer is inline via tab
   const [pendingCrop, setPendingCrop] = useState<MasterCrop | null>(null);
   const [proMode, setProMode] = useState(() => {
     try { return localStorage.getItem('oracle-pro-mode') === 'true'; } catch { return false; }
@@ -232,7 +232,7 @@ const CropOracle = () => {
 
   const handleAddToChord = (crop: MasterCrop) => {
     setPendingCrop(crop);
-    if (!composerOpen) setComposerOpen(true);
+    setActiveSection('compose');
   };
 
   return (
@@ -304,12 +304,12 @@ const CropOracle = () => {
 
           {/* Compose Chord — hardware button */}
           <button
-            onClick={() => setComposerOpen(true)}
+            onClick={() => setActiveSection('compose')}
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all"
             style={{
               background: 'linear-gradient(180deg, hsl(0 0% 14%) 0%, hsl(0 0% 8%) 100%)',
-              border: `2px solid ${composerOpen ? 'hsl(270 50% 50% / 0.5)' : 'hsl(0 0% 18%)'}`,
-              boxShadow: composerOpen
+              border: `2px solid ${activeSection === 'compose' ? 'hsl(270 50% 50% / 0.5)' : 'hsl(0 0% 18%)'}`,
+              boxShadow: activeSection === 'compose'
                 ? '0 0 12px hsl(270 50% 50% / 0.15), inset 0 1px 0 hsl(0 0% 18%)'
                 : 'inset 0 1px 0 hsl(0 0% 18%)',
             }}
@@ -463,7 +463,7 @@ const CropOracle = () => {
                         </span>
                       </div>
                       <span className="text-sm shrink-0">{inst?.icon || '🌱'}</span>
-                      {composerOpen && isAdmin && crop.chord_interval && (
+                      {isAdmin && crop.chord_interval && (
                         <button
                           onClick={(e) => { e.stopPropagation(); handleAddToChord(crop); }}
                           className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors"
@@ -686,6 +686,7 @@ const CropOracle = () => {
                     { id: 'strum' as const, icon: <AudioWaveform className="w-4 h-4" />, label: 'Strum' },
                   ] : []),
                   { id: 'planting' as const, icon: <Ruler className="w-4 h-4" />, label: 'Place' },
+                  { id: 'compose' as const, icon: <SlidersHorizontal className="w-4 h-4" />, label: 'Compose' },
                 ]).map(tab => {
                   const isActive = activeSection === tab.id;
                   return (
@@ -1002,24 +1003,25 @@ const CropOracle = () => {
                     </div>
                   </SynthPanel>
                 )}
+
+                {/* COMPOSE — Inline Chord Composer */}
+                {activeSection === 'compose' && (
+                  <ChordComposer
+                    open={true}
+                    onOpenChange={() => {}}
+                    activeFrequency={activeFrequency}
+                    pendingCrop={pendingCrop}
+                    onClearPending={() => setPendingCrop(null)}
+                    allCrops={allCrops || []}
+                    inline
+                  />
+                )}
               </motion.div>
             </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
 
-
-
-
-      {/* Chord Composer Drawer */}
-      <ChordComposer
-        open={composerOpen}
-        onOpenChange={setComposerOpen}
-        activeFrequency={activeFrequency}
-        pendingCrop={pendingCrop}
-        onClearPending={() => setPendingCrop(null)}
-        allCrops={allCrops || []}
-      />
     </div>
   );
 };
