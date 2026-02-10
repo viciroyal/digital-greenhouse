@@ -53,7 +53,7 @@ const SpectralVaultTrigger = ({ track, onOpen }: SpectralVaultTriggerProps) => {
       {/* Trigger Button */}
       <motion.button
         onClick={onOpen}
-        className="w-full py-3 px-4 rounded-xl font-mono text-sm tracking-wider uppercase flex items-center justify-center gap-3"
+        className="w-full py-3 px-4 rounded-xl font-body text-sm tracking-wider uppercase flex items-center justify-center gap-3"
         style={{
           background: 'linear-gradient(135deg, hsl(180 50% 25%), hsl(200 60% 20%))',
           border: '1px solid hsl(180 60% 40% / 0.4)',
