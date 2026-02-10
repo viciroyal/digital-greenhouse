@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Music, Plus, Check, Crown, Leaf, Sparkles, Pickaxe, Zap, X, ChevronDown, Lock } from 'lucide-react';
+import { Music, Plus, Check, Crown, Leaf, Sparkles, Pickaxe, Zap, X, ChevronDown, Lock, CalendarDays, Users } from 'lucide-react';
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from '@/components/ui/sheet';
@@ -11,6 +11,8 @@ import {
 } from '@/hooks/useGardenBeds';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import type { MasterCrop } from '@/hooks/useMasterCrops';
+import { CHORD_RECIPES } from '@/data/chordRecipes';
+import { CSA_PHASES, getCurrentPhase } from '@/components/master-build/SeasonalMovements';
 import { toast } from 'sonner';
 
 /* ─── Constants ─── */
@@ -23,6 +25,10 @@ const NOTE_MAP: Record<number, string> = {
   396: 'C', 417: 'D', 528: 'E', 639: 'F', 741: 'G', 852: 'A', 963: 'B',
 };
 
+const FREQ_TO_ZONE: Record<number, number> = {
+  396: 1, 417: 2, 528: 3, 639: 4, 741: 5, 852: 6, 963: 7,
+};
+
 const INTERVAL_META: Record<string, { icon: React.ReactNode; shortLabel: string; color: string }> = {
   'Root (Lead)':      { icon: <Leaf className="w-3 h-3" />,     shortLabel: '1st',  color: 'hsl(120 50% 50%)' },
   '3rd (Triad)':      { icon: <Sparkles className="w-3 h-3" />, shortLabel: '3rd',  color: 'hsl(45 80% 55%)' },
@@ -30,23 +36,34 @@ const INTERVAL_META: Record<string, { icon: React.ReactNode; shortLabel: string;
   '7th (Signal)':     { icon: <Zap className="w-3 h-3" />,      shortLabel: '7th',  color: 'hsl(270 50% 60%)' },
 };
 
-const OVERLAY_INTERVALS = [
-  { key: '11th', label: '11th (Fungal)', color: 'hsl(180 40% 50%)' },
-  { key: '13th', label: '13th (Aerial)', color: 'hsl(300 40% 55%)' },
-];
+/** Map chord recipe interval labels to ChordInterval keys */
+const RECIPE_INTERVAL_MAP: Record<string, ChordInterval> = {
+  '1st': 'Root (Lead)',
+  '3rd': '3rd (Triad)',
+  '5th': '5th (Stabilizer)',
+  '7th': '7th (Signal)',
+};
+
+interface SeasonalSuggestion {
+  interval: ChordInterval;
+  crop: MasterCrop;
+  source: 'companion' | 'recipe';
+  label: string;
+}
 
 interface ChordComposerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   activeFrequency: number | null;
-  onAssignCrop?: (crop: MasterCrop) => void; // called when user taps "+ Add" on a crop card
+  onAssignCrop?: (crop: MasterCrop) => void;
   pendingCrop: MasterCrop | null;
   onClearPending: () => void;
+  allCrops?: MasterCrop[];
 }
 
 const ChordComposer = ({
   open, onOpenChange, activeFrequency,
-  pendingCrop, onClearPending,
+  pendingCrop, onClearPending, allCrops,
 }: ChordComposerProps) => {
   const { isAdmin } = useAdminRole();
   const { data: beds } = useGardenBeds();
@@ -120,7 +137,73 @@ const ChordComposer = ({
   const zoneColor = activeFrequency ? ZONE_COLORS[activeFrequency] || '#888' : '#888';
   const note = activeFrequency ? NOTE_MAP[activeFrequency] || '?' : '?';
 
-  // Handle assigning the pending crop to the bed
+  // ─── Seasonal Picks Logic ───
+  const currentPhase = useMemo(() => getCurrentPhase(), []);
+  const zoneNum = activeFrequency ? FREQ_TO_ZONE[activeFrequency] : null;
+  const isInSeason = currentPhase && zoneNum ? currentPhase.zones.includes(zoneNum) : false;
+
+  const seasonalSuggestions = useMemo((): SeasonalSuggestion[] => {
+    if (!activeFrequency || !allCrops || !selectedBed) return [];
+    const suggestions: SeasonalSuggestion[] = [];
+    const emptyIntervals = CHORD_INTERVALS.filter(iv => !chordStatus[iv]);
+    if (emptyIntervals.length === 0) return [];
+
+    // Get the Root crop's companion list (if Root is filled)
+    const rootPlanting = chordStatus['Root (Lead)'];
+    const rootCropData = rootPlanting?.crop;
+    const rootFullCrop = rootCropData
+      ? allCrops.find(c => c.id === rootCropData.id)
+      : null;
+    const companionNames = rootFullCrop?.companion_crops || [];
+
+    // Get the chord recipe for this zone
+    const recipe = CHORD_RECIPES.find(r => r.frequencyHz === activeFrequency);
+
+    for (const interval of emptyIntervals) {
+      let found: MasterCrop | undefined;
+      let source: 'companion' | 'recipe' = 'companion';
+
+      // 1. Try companion guild first
+      if (companionNames.length > 0) {
+        for (const name of companionNames) {
+          const match = allCrops.find(c =>
+            (c.common_name?.toLowerCase() === name.toLowerCase() ||
+             c.name.toLowerCase() === name.toLowerCase()) &&
+            c.chord_interval === interval
+          );
+          if (match) { found = match; break; }
+        }
+      }
+
+      // 2. Fallback to chord recipe
+      if (!found && recipe) {
+        const meta = INTERVAL_META[interval];
+        const recipeInterval = recipe.intervals.find(
+          ri => RECIPE_INTERVAL_MAP[ri.interval] === interval
+        );
+        if (recipeInterval) {
+          found = allCrops.find(c =>
+            c.common_name?.toLowerCase() === recipeInterval.cropName.toLowerCase() ||
+            c.name.toLowerCase() === recipeInterval.cropName.toLowerCase()
+          );
+          source = 'recipe';
+        }
+      }
+
+      if (found) {
+        suggestions.push({
+          interval,
+          crop: found,
+          source,
+          label: source === 'companion'
+            ? `From ${rootFullCrop?.common_name || rootFullCrop?.name}'s guild`
+            : `From ${recipe?.chordName || 'Recipe'}`,
+        });
+      }
+    }
+    return suggestions;
+  }, [activeFrequency, allCrops, selectedBed, chordStatus]);
+
   const handleAssign = () => {
     if (!pendingCrop || !selectedBed || !isAdmin) return;
     const interval = pendingCrop.chord_interval as ChordInterval;
@@ -159,6 +242,22 @@ const ChordComposer = ({
     if (!selectedBed || !isAdmin) return;
     removePlanting.mutate({ plantingId: planting.id, bedId: selectedBed.id }, {
       onSuccess: () => toast.success(`Removed ${planting.crop?.common_name || planting.crop?.name}`),
+    });
+  };
+
+  const handleSuggestionAssign = (suggestion: SeasonalSuggestion) => {
+    if (!selectedBed || !isAdmin) return;
+    const plantCount = suggestion.crop.spacing_inches
+      ? Math.floor((720 * 30) / (parseFloat(suggestion.crop.spacing_inches) ** 2 * 0.866)) || 1
+      : 1;
+    addPlanting.mutate({
+      bedId: selectedBed.id,
+      cropId: suggestion.crop.id,
+      guildRole: suggestion.crop.guild_role || 'Lead',
+      plantCount,
+    }, {
+      onSuccess: () => toast.success(`${suggestion.crop.common_name || suggestion.crop.name} → ${suggestion.interval}`),
+      onError: (err) => toast.error(`Failed: ${(err as Error).message}`),
     });
   };
 
@@ -302,6 +401,97 @@ const ChordComposer = ({
                 />
               </div>
             </div>
+          )}
+
+          {/* ─── Seasonal Picks Banner ─── */}
+          {selectedBed && seasonalSuggestions.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-xl overflow-hidden"
+              style={{
+                background: isInSeason
+                  ? (currentPhase ? currentPhase.gradient : 'hsl(0 0% 6%)')
+                  : 'hsl(0 0% 6%)',
+                border: `1px solid ${isInSeason ? (currentPhase?.borderColor || 'hsl(0 0% 12%)') : 'hsl(0 0% 12%)'}`,
+              }}
+            >
+              <div className="p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <CalendarDays className="w-4 h-4" style={{ color: isInSeason ? (currentPhase?.borderColor || zoneColor) : 'hsl(45 80% 55%)' }} />
+                  <span className="text-[9px] font-mono font-bold tracking-wider" style={{ color: isInSeason ? (currentPhase?.borderColor || zoneColor) : 'hsl(45 80% 55%)' }}>
+                    SEASONAL PICKS
+                  </span>
+                  {isInSeason && currentPhase && (
+                    <motion.span
+                      className="text-[7px] font-mono px-1.5 py-0.5 rounded-full ml-auto"
+                      style={{
+                        background: `${currentPhase.borderColor}20`,
+                        border: `1px solid ${currentPhase.borderColor}`,
+                        color: currentPhase.borderColor,
+                      }}
+                      animate={{ opacity: [0.7, 1, 0.7] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      ● IN SEASON
+                    </motion.span>
+                  )}
+                  {!isInSeason && (
+                    <span className="text-[7px] font-mono px-1.5 py-0.5 rounded-full ml-auto"
+                      style={{ background: 'hsl(0 0% 10%)', color: 'hsl(0 0% 40%)', border: '1px solid hsl(0 0% 15%)' }}>
+                      OFF SEASON
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  {seasonalSuggestions.map((suggestion, i) => {
+                    const meta = INTERVAL_META[suggestion.interval];
+                    return (
+                      <motion.div
+                        key={suggestion.interval}
+                        initial={{ opacity: 0, x: -6 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.08 }}
+                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg"
+                        style={{
+                          background: `${meta.color}10`,
+                          border: `1px solid ${meta.color}25`,
+                        }}
+                      >
+                        <span style={{ color: meta.color }}>{meta.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-[10px] font-mono font-bold block truncate" style={{ color: 'hsl(0 0% 75%)' }}>
+                            {suggestion.crop.common_name || suggestion.crop.name}
+                          </span>
+                          <span className="text-[8px] font-mono flex items-center gap-1" style={{ color: 'hsl(0 0% 40%)' }}>
+                            {suggestion.source === 'companion' ? <Users className="w-2.5 h-2.5 inline" /> : '🎵'}
+                            {' '}{suggestion.label}
+                          </span>
+                        </div>
+                        {isAdmin ? (
+                          <button
+                            onClick={() => handleSuggestionAssign(suggestion)}
+                            disabled={addPlanting.isPending}
+                            className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
+                            style={{
+                              background: `${meta.color}20`,
+                              border: `1px solid ${meta.color}40`,
+                            }}
+                            title={`Add ${suggestion.crop.common_name || suggestion.crop.name} to ${suggestion.interval}`}
+                          >
+                            <Plus className="w-3 h-3" style={{ color: meta.color }} />
+                          </button>
+                        ) : (
+                          <span className="text-[8px] font-mono" style={{ color: meta.color }}>
+                            {meta.shortLabel}
+                          </span>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
           )}
 
           {/* ─── Chord Slots (Ground Layer) ─── */}
