@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, ArrowLeft, Music, Leaf, Shield, Pickaxe, Sparkles, Zap,
   AlertTriangle, Clock, Users, Layers, Disc, ToggleLeft, ToggleRight, X, Info, Plus,
-  Moon, Sprout, Ruler,
+  Moon, Sprout, Ruler, Grid3X3, AudioWaveform,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -130,7 +130,7 @@ const CropOracle = () => {
   const [query, setQuery] = useState('');
   const [selectedCrop, setSelectedCrop] = useState<MasterCrop | null>(null);
   const [hoveredCrop, setHoveredCrop] = useState<MasterCrop | null>(null);
-  const [activeSection, setActiveSection] = useState<'profile' | 'guild' | 'harmony' | 'timing' | 'planting'>('profile');
+  const [activeSection, setActiveSection] = useState<'profile' | 'guild' | 'harmony' | 'timing' | 'beds' | 'strum' | 'planting'>('profile');
   const [composerOpen, setComposerOpen] = useState(false);
   const [pendingCrop, setPendingCrop] = useState<MasterCrop | null>(null);
   const [proMode, setProMode] = useState(() => {
@@ -682,7 +682,11 @@ const CropOracle = () => {
                     { id: 'harmony' as const, icon: <Music className="w-4 h-4" />, label: 'Harmony' },
                     { id: 'timing' as const, icon: <Moon className="w-4 h-4" />, label: 'Timing' },
                   ] : []),
-                  { id: 'planting' as const, icon: <Ruler className="w-4 h-4" />, label: 'Planting' },
+                  { id: 'beds' as const, icon: <Grid3X3 className="w-4 h-4" />, label: 'Beds' },
+                  ...(proMode ? [
+                    { id: 'strum' as const, icon: <AudioWaveform className="w-4 h-4" />, label: 'Strum' },
+                  ] : []),
+                  { id: 'planting' as const, icon: <Ruler className="w-4 h-4" />, label: 'Place' },
                 ]).map(tab => {
                   const isActive = activeSection === tab.id;
                   return (
@@ -882,12 +886,34 @@ const CropOracle = () => {
                   </>
                 )}
 
-                {/* PLANTING */}
+                {/* BEDS — Bed Organization */}
+                {activeSection === 'beds' && (
+                  <BedOrganizationCard crop={selectedCrop} zoneColor={zoneColor} />
+                )}
+
+                {/* STRUM — Bed Strum Visualizer (Pro only) */}
+                {activeSection === 'strum' && proMode && (
+                  <BedStrumEmbed frequencyHz={selectedCrop.frequency_hz} zoneColor={zoneColor} />
+                )}
+
+                {/* PLACE — Placement Details */}
                 {activeSection === 'planting' && (
-                  <>
-                    <BedOrganizationCard crop={selectedCrop} zoneColor={zoneColor} />
-                    {proMode && <BedStrumEmbed frequencyHz={selectedCrop.frequency_hz} zoneColor={zoneColor} />}
-                  </>
+                  <SynthPanel className="p-3">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Ruler className="w-4 h-4" style={{ color: zoneColor }} />
+                      <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: zoneColor }}>
+                        PLACEMENT DETAILS
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {selectedCrop.spacing_inches && <MetaItem label="IN-ROW SPACING" value={`${selectedCrop.spacing_inches}"`} />}
+                      {selectedCrop.harvest_days && <MetaItem label="HARVEST DAYS" value={`${selectedCrop.harvest_days} days`} />}
+                      {selectedCrop.planting_season && selectedCrop.planting_season.length > 0 && <MetaItem label="PLANTING SEASON" value={selectedCrop.planting_season.join(', ')} />}
+                      {selectedCrop.chord_interval && <MetaItem label="INTERVAL SLOT" value={selectedCrop.chord_interval} />}
+                      {selectedCrop.guild_role && <MetaItem label="GUILD ROLE" value={selectedCrop.guild_role} />}
+                      {selectedCrop.soil_protocol_focus && <MetaItem label="SOIL PROTOCOL" value={selectedCrop.soil_protocol_focus} />}
+                    </div>
+                  </SynthPanel>
                 )}
               </motion.div>
             </AnimatePresence>
