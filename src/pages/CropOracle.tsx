@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, ArrowLeft, Music, Leaf, Shield, Pickaxe, Sparkles, Zap,
@@ -11,6 +11,7 @@ import { CHORD_RECIPES } from '@/data/chordRecipes';
 import LunarGateCard, { getCurrentMoonPhase, getLunarPhase } from '@/components/crop-oracle/LunarGateCard';
 import SeasonalMovementCard from '@/components/crop-oracle/SeasonalMovementCard';
 import HarmonicWarningsCard from '@/components/crop-oracle/HarmonicWarningsCard';
+import BedOrganizationCard from '@/components/crop-oracle/BedOrganizationCard';
 
 /* ─── Zone color helper ─── */
 const ZONE_COLORS: Record<number, string> = {
@@ -34,10 +35,32 @@ const CropOracle = () => {
   const { data: allCrops, isLoading } = useMasterCrops();
   const [query, setQuery] = useState('');
   const [selectedCrop, setSelectedCrop] = useState<MasterCrop | null>(null);
+  const [hoveredCrop, setHoveredCrop] = useState<MasterCrop | null>(null);
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout>>();
 
-  /* ─── Search results ─── */
+  /* ─── Search results (auto-populate when empty) ─── */
   const results = useMemo(() => {
-    if (!allCrops || query.length < 2) return [];
+    if (!allCrops) return [];
+    if (query.length < 1) {
+      // Auto-populate: show a curated sample grouped by zone
+      const seen = new Set<number>();
+      const sample: MasterCrop[] = [];
+      for (const crop of allCrops) {
+        if (!seen.has(crop.frequency_hz)) {
+          seen.add(crop.frequency_hz);
+          sample.push(crop);
+        }
+      }
+      // Add more popular crops
+      const popular = allCrops
+        .filter(c => c.common_name && c.chord_interval === 'Root (Lead)')
+        .slice(0, 14);
+      const ids = new Set(sample.map(s => s.id));
+      for (const p of popular) {
+        if (!ids.has(p.id)) { sample.push(p); ids.add(p.id); }
+      }
+      return sample.slice(0, 21);
+    }
     const q = query.toLowerCase();
     return allCrops
       .filter(c =>
@@ -46,7 +69,7 @@ const CropOracle = () => {
         c.category.toLowerCase().includes(q) ||
         c.zone_name.toLowerCase().includes(q)
       )
-      .slice(0, 20);
+      .slice(0, 21);
   }, [allCrops, query]);
 
   /* ─── Companion lookup ─── */
@@ -145,69 +168,133 @@ const CropOracle = () => {
         </div>
       </div>
 
-      {/* Search Results Dropdown */}
+      {/* Search Results */}
       <AnimatePresence>
         {!selectedCrop && results.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            className="mx-4 rounded-xl overflow-hidden mb-4"
+            className="mx-4 rounded-xl overflow-hidden mb-4 relative"
             style={{
               background: 'hsl(0 0% 5%)',
               border: '1px solid hsl(0 0% 12%)',
-              maxHeight: '50vh',
+              maxHeight: '60vh',
               overflowY: 'auto',
             }}
           >
+            {!query && (
+              <div className="px-3 py-2" style={{ borderBottom: '1px solid hsl(0 0% 10%)' }}>
+                <span className="text-[9px] font-mono tracking-wider" style={{ color: 'hsl(0 0% 35%)' }}>
+                  POPULAR CROPS — TAP TO SELECT, HOVER FOR FACTS
+                </span>
+              </div>
+            )}
             {results.map((crop) => {
               const c = ZONE_COLORS[crop.frequency_hz] || '#888';
               const inst = crop.instrument_type ? INSTRUMENT_ICONS[crop.instrument_type as InstrumentType] : null;
+              const isHovered = hoveredCrop?.id === crop.id;
               return (
-                <button
-                  key={crop.id}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors"
-                  style={{ borderBottom: '1px solid hsl(0 0% 8%)' }}
-                  onClick={() => {
-                    setSelectedCrop(crop);
-                    setQuery(crop.common_name || crop.name);
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = `${c}10`)}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                >
-                  <div
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ background: c, boxShadow: `0 0 6px ${c}80` }}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <span className="text-xs font-bold block truncate" style={{ color: 'hsl(0 0% 80%)' }}>
-                      {crop.common_name || crop.name}
-                    </span>
-                    <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
-                      {crop.zone_name} • {crop.frequency_hz}Hz • {crop.chord_interval || '—'}
-                    </span>
-                  </div>
-                  <span className="text-sm shrink-0">{inst?.icon || '🌱'}</span>
-                </button>
+                <div key={crop.id} className="relative">
+                  <button
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors"
+                    style={{
+                      borderBottom: '1px solid hsl(0 0% 8%)',
+                      background: isHovered ? `${c}12` : 'transparent',
+                    }}
+                    onClick={() => {
+                      setSelectedCrop(crop);
+                      setQuery(crop.common_name || crop.name);
+                      setHoveredCrop(null);
+                    }}
+                    onMouseEnter={() => {
+                      clearTimeout(hoverTimeout.current);
+                      hoverTimeout.current = setTimeout(() => setHoveredCrop(crop), 200);
+                    }}
+                    onMouseLeave={() => {
+                      clearTimeout(hoverTimeout.current);
+                      hoverTimeout.current = setTimeout(() => setHoveredCrop(null), 150);
+                    }}
+                  >
+                    <div
+                      className="w-2.5 h-2.5 rounded-full shrink-0"
+                      style={{ background: c, boxShadow: `0 0 6px ${c}80` }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs font-bold block truncate" style={{ color: 'hsl(0 0% 80%)' }}>
+                        {crop.common_name || crop.name}
+                      </span>
+                      <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                        {crop.zone_name} • {crop.frequency_hz}Hz • {crop.chord_interval || '—'}
+                      </span>
+                    </div>
+                    <span className="text-sm shrink-0">{inst?.icon || '🌱'}</span>
+                  </button>
+
+                  {/* Hover fact tooltip */}
+                  <AnimatePresence>
+                    {isHovered && (
+                      <motion.div
+                        initial={{ opacity: 0, x: 4 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 4 }}
+                        className="absolute right-0 top-0 z-30 w-56 p-2.5 rounded-lg pointer-events-none"
+                        style={{
+                          background: 'rgba(0, 0, 0, 0.85)',
+                          backdropFilter: 'blur(12px)',
+                          border: `1px solid ${c}40`,
+                          boxShadow: `0 8px 24px rgba(0,0,0,0.6), 0 0 15px ${c}15`,
+                          transform: 'translateX(100%) translateX(8px)',
+                        }}
+                      >
+                        <span className="text-[10px] font-mono font-bold block mb-1" style={{ color: c }}>
+                          {crop.common_name || crop.name}
+                        </span>
+                        {crop.description ? (
+                          <p className="text-[9px] font-mono leading-relaxed mb-1.5" style={{ color: 'hsl(0 0% 65%)' }}>
+                            {crop.description.slice(0, 120)}{crop.description.length > 120 ? '…' : ''}
+                          </p>
+                        ) : (
+                          <p className="text-[9px] font-mono mb-1.5" style={{ color: 'hsl(0 0% 45%)' }}>
+                            <em>{crop.name}</em> — {crop.category}
+                          </p>
+                        )}
+                        <div className="flex flex-wrap gap-1">
+                          {crop.dominant_mineral && (
+                            <span className="text-[7px] font-mono px-1 py-0.5 rounded" style={{ background: 'hsl(0 0% 12%)', color: 'hsl(45 70% 55%)' }}>
+                              {crop.dominant_mineral}
+                            </span>
+                          )}
+                          {crop.spacing_inches && (
+                            <span className="text-[7px] font-mono px-1 py-0.5 rounded" style={{ background: 'hsl(0 0% 12%)', color: 'hsl(0 0% 50%)' }}>
+                              {crop.spacing_inches}" spacing
+                            </span>
+                          )}
+                          {crop.harvest_days && (
+                            <span className="text-[7px] font-mono px-1 py-0.5 rounded" style={{ background: 'hsl(0 0% 12%)', color: 'hsl(0 0% 50%)' }}>
+                              {crop.harvest_days}d harvest
+                            </span>
+                          )}
+                          {crop.guild_role && (
+                            <span className="text-[7px] font-mono px-1 py-0.5 rounded" style={{ background: 'hsl(0 0% 12%)', color: 'hsl(120 40% 50%)' }}>
+                              {crop.guild_role}
+                            </span>
+                          )}
+                        </div>
+                        {crop.library_note && (
+                          <p className="text-[8px] font-mono mt-1.5 italic leading-relaxed" style={{ color: 'hsl(45 50% 50%)' }}>
+                            💡 {crop.library_note.slice(0, 100)}{crop.library_note.length > 100 ? '…' : ''}
+                          </p>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               );
             })}
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Empty state */}
-      {!selectedCrop && query.length < 2 && (
-        <div className="px-4 pt-8 text-center">
-          <Disc className="w-12 h-12 mx-auto mb-3" style={{ color: 'hsl(0 0% 15%)' }} />
-          <p className="text-xs font-mono" style={{ color: 'hsl(0 0% 30%)' }}>
-            Type a crop name to reveal its full harmonic profile —<br />
-            zone, chord role, companions, instrument, and conflicts.
-          </p>
-          <p className="text-[10px] font-mono mt-2" style={{ color: 'hsl(0 0% 20%)' }}>
-            {isLoading ? 'Loading registry...' : `${allCrops?.length || 0} crops in registry`}
-          </p>
-        </div>
-      )}
 
       {/* ─── CROP PROFILE CARD ─── */}
       <AnimatePresence>
@@ -444,6 +531,9 @@ const CropOracle = () => {
                 </div>
               </div>
             )}
+
+            {/* Bed Organization & Spacing */}
+            <BedOrganizationCard crop={selectedCrop} zoneColor={zoneColor} />
 
             {/* Metadata Footer */}
             <div
