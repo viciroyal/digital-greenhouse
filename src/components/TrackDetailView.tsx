@@ -228,7 +228,7 @@ const TrackDetailView = ({
                   </span>
                 </div>
                 <p 
-                  className="text-[10px] font-mono mt-2 italic"
+                  className="text-[10px] font-body mt-2 italic"
                   style={{ color: 'hsl(40 30% 65%)' }}
                 >
                   "{theme.concept}"
