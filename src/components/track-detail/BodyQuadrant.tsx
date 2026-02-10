@@ -71,7 +71,7 @@ const BodyQuadrant = ({ track }: BodyQuadrantProps) => {
 
           <div>
             <p 
-              className="font-mono text-[10px] uppercase tracking-wider mb-1"
+              className="font-body text-[10px] uppercase tracking-wider mb-1"
               style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
             >
               Frequency
