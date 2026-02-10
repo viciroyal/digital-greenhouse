@@ -540,7 +540,67 @@ const CropOracle = () => {
         </div>
       </motion.div>
 
-      {/* Step Indicator */}
+      {/* ═══ Weather Alert Banners ═══ */}
+      <AnimatePresence>
+        {!weather.isLoading && weather.alerts.length > 0 && weather.alerts.map((alert, i) => (
+          <motion.div
+            key={alert.type + i}
+            className="mx-auto max-w-2xl px-4 mt-2"
+            initial={{ opacity: 0, y: -8, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <div
+              className="rounded-xl px-4 py-3 flex items-start gap-3"
+              style={{
+                background: alert.type === 'frost'
+                  ? 'linear-gradient(135deg, hsl(200 60% 12%), hsl(210 50% 8%))'
+                  : alert.type === 'heat'
+                    ? 'linear-gradient(135deg, hsl(0 60% 12%), hsl(15 50% 8%))'
+                    : 'linear-gradient(135deg, hsl(45 60% 12%), hsl(30 50% 8%))',
+                border: `1px solid ${alert.type === 'frost'
+                  ? 'hsl(200 60% 40% / 0.5)'
+                  : alert.type === 'heat'
+                    ? 'hsl(0 60% 40% / 0.5)'
+                    : 'hsl(45 60% 40% / 0.5)'}`,
+                boxShadow: `0 0 20px ${alert.type === 'frost'
+                  ? 'hsl(200 60% 30% / 0.2)'
+                  : alert.type === 'heat'
+                    ? 'hsl(0 60% 30% / 0.2)'
+                    : 'hsl(45 60% 30% / 0.2)'}`,
+              }}
+            >
+              <span className="text-xl shrink-0 mt-0.5">
+                {alert.type === 'frost' ? '🥶' : alert.type === 'heat' ? '🔥' : '⛈️'}
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <AlertTriangle className="w-3.5 h-3.5" style={{
+                    color: alert.type === 'frost'
+                      ? 'hsl(200 70% 65%)'
+                      : 'hsl(0 70% 60%)',
+                  }} />
+                  <span className="text-xs font-mono font-bold" style={{
+                    color: alert.type === 'frost'
+                      ? 'hsl(200 70% 70%)'
+                      : 'hsl(0 70% 65%)',
+                  }}>
+                    {alert.message}
+                  </span>
+                </div>
+                <p className="text-[10px] font-body mt-1 leading-relaxed" style={{
+                  color: alert.type === 'frost'
+                    ? 'hsl(200 40% 60%)'
+                    : 'hsl(0 40% 60%)',
+                }}>
+                  {alert.actionNote}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+
       <div className="flex justify-center pt-4 pb-4 gap-3">
         {[1, 2, 3].map(s => (
           <div key={s} className="flex items-center gap-2">
