@@ -108,37 +108,45 @@ const ShopSection = () => {
                   </h3>
 
                   <p className="text-muted-foreground font-body mb-6">
-                    A complete treatment protocol from roots to cosmos. This formula includes every 
-                    active ingredient cultivated in the Cosmic Apothecary.
+                    The complete PHARMBOI experience — physical music, art, and tools in one bundle.
                   </p>
 
-                  {/* Active Ingredients */}
+                  {/* Bundle Contents */}
                   <div className="space-y-3 mb-8">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-gem-ruby/20 flex items-center justify-center text-gem-ruby">
                         📼
                       </div>
                       <div>
-                        <p className="text-foreground font-body font-medium">Delivery System</p>
-                        <p className="text-muted-foreground text-sm font-body">Clear-Tech™ mechanics, no black boxes</p>
+                        <p className="text-foreground font-body font-medium">PHARMBOI Cassette Tape</p>
+                        <p className="text-muted-foreground text-sm font-body">Full 12-track album on clear cassette with printed J-card</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-gem-sapphire/30 flex items-center justify-center text-gem-sapphire">
-                        🎵
+                        💿
                       </div>
                       <div>
-                        <p className="text-foreground font-body font-medium">Active Compound</p>
-                        <p className="text-muted-foreground text-sm font-body">12 doses, tuned to sacred frequencies</p>
+                        <p className="text-foreground font-body font-medium">Signed Vinyl 7"</p>
+                        <p className="text-muted-foreground text-sm font-body">Limited-press first single, hand-signed by Vici Royàl</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-gem-topaz/20 flex items-center justify-center text-gem-topaz">
+                        📖
+                      </div>
+                      <div>
+                        <p className="text-foreground font-body font-medium">Clear-Tech™ Transparent Player</p>
+                        <p className="text-muted-foreground text-sm font-body">See-through portable cassette player — no black boxes</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gem-emerald/20 flex items-center justify-center text-gem-emerald">
                         🗺️
                       </div>
                       <div>
-                        <p className="text-foreground font-body font-medium">Dosage Chart</p>
-                        <p className="text-muted-foreground text-sm font-body">Navigate the mineral-frequency matrix</p>
+                        <p className="text-foreground font-body font-medium">Cosmic Frequency Map</p>
+                        <p className="text-muted-foreground text-sm font-body">Fold-out poster mapping every track to its mineral & frequency</p>
                       </div>
                     </div>
                   </div>
