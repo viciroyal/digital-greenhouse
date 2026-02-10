@@ -76,7 +76,7 @@ const FunctionSeal = ({ track }: FunctionSealProps) => {
           {/* AgroMajic Protocol stamp */}
           <div className="absolute -bottom-2 right-4 px-2 py-0.5 bg-background">
             <span 
-              className="font-mono text-[10px] tracking-[0.2em] uppercase"
+              className="font-body text-[10px] tracking-[0.2em] uppercase"
               style={{ color: `hsl(${track.colorHsl} / 0.5)` }}
             >
               AGROMAJIC PROTOCOL

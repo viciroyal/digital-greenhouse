@@ -223,7 +223,7 @@ const TrackDetailView = ({
                   >
                     {theme.name}
                   </span>
-                  <span className="text-[10px] font-mono" style={{ color: 'hsl(40 50% 75%)' }}>
+                  <span className="text-[10px] font-body" style={{ color: 'hsl(40 50% 75%)' }}>
                     {theme.frequency}
                   </span>
                 </div>

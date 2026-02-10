@@ -76,7 +76,7 @@ const DataQuadrant = ({
           {title}
         </h3>
         <span 
-          className="font-mono text-[10px] ml-auto tracking-[0.15em] uppercase"
+          className="font-body text-[10px] ml-auto tracking-[0.15em] uppercase"
           style={{ color: `hsl(${trackColor} / 0.7)` }}
         >
           {label}

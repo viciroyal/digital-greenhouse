@@ -204,7 +204,7 @@ const WaveformPlayer = ({
             animate={{ scale: [1, 1.5, 1] }}
             transition={{ duration: 0.8, repeat: Infinity }}
           />
-          <span className="text-[9px] font-mono tracking-widest uppercase" style={{ color: 'hsl(40 30% 50%)' }}>
+          <span className="text-[9px] font-body tracking-widest uppercase" style={{ color: 'hsl(40 30% 50%)' }}>
             RESONATING
           </span>
           <motion.div

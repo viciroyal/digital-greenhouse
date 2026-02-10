@@ -97,7 +97,7 @@ const EarthQuadrant = ({ track }: EarthQuadrantProps) => {
             {track.mineral}
           </p>
           <p 
-            className="font-mono text-xs tracking-[0.2em] uppercase mt-1"
+            className="font-body text-xs tracking-[0.2em] uppercase mt-1"
             style={{ color: `hsl(${track.colorHsl} / 0.6)` }}
           >
             {track.mineralSymbol}

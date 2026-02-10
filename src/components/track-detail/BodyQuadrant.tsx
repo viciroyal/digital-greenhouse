@@ -77,7 +77,7 @@ const BodyQuadrant = ({ track }: BodyQuadrantProps) => {
               Frequency
             </p>
             <p 
-              className="font-mono text-lg"
+              className="font-body text-lg"
               style={{ color: 'hsl(45 90% 60%)' }}
             >
               {track.frequency}

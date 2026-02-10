@@ -59,7 +59,7 @@ const LogicQuadrant = ({ track }: LogicQuadrantProps) => {
           className="h-px flex-1"
           style={{ background: `linear-gradient(90deg, hsl(${track.colorHsl} / 0.4), transparent)` }}
         />
-        <p className="font-mono text-[10px]" style={{ color: 'hsl(40 30% 55%)' }}>
+        <p className="font-body text-[10px]" style={{ color: 'hsl(40 30% 55%)' }}>
           {track.mineral} → {track.chakra} → {track.frequency}
         </p>
         <div 

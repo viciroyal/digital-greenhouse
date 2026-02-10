@@ -92,7 +92,7 @@ const SpectralVaultTrigger = ({ track, onOpen }: SpectralVaultTriggerProps) => {
             />
           ))}
         </div>
-        <span className="font-mono text-[10px] text-muted-foreground/60">
+        <span className="font-body text-[10px] text-muted-foreground/60">
           NIR READY
         </span>
       </div>

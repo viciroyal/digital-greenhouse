@@ -81,7 +81,7 @@ const SkyQuadrant = ({ track }: SkyQuadrantProps) => {
           {/* Moon Phase */}
           <div>
             <p 
-              className="font-mono text-[10px] uppercase tracking-[0.15em] mb-1"
+              className="font-body text-[10px] uppercase tracking-[0.15em] mb-1"
               style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
             >
               ◇ Moon Cycle
