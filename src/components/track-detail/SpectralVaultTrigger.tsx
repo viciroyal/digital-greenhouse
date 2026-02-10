@@ -35,7 +35,7 @@ const SpectralVaultTrigger = ({ track, onOpen }: SpectralVaultTriggerProps) => {
           <FlaskConical className="w-5 h-5 text-cyan-400" />
         </div>
         <div>
-          <p className="font-mono text-xs tracking-wider text-cyan-400/80">
+          <p className="font-body text-xs tracking-wider text-cyan-400/80">
             PROOF PROTOCOL
           </p>
           <h3 className="font-display text-lg text-foreground">
