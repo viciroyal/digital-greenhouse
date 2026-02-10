@@ -298,16 +298,18 @@ const VibrationalAudioPlayer = ({
           </div>
 
           {/* Center: Play controls */}
-          <div className="flex items-center gap-4">
-            <motion.button
-              className="p-2 rounded-full transition-colors"
-              style={{ color: 'hsl(40 30% 55%)' }}
-              whileHover={{ scale: 1.1, color: `hsl(${colorHsl})` }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleRestart}
-            >
-              <RotateCcw size={20} />
-            </motion.button>
+          <div className="flex items-center gap-3">
+            {onPrevTrack && (
+              <motion.button
+                className="p-2 rounded-full transition-colors"
+                style={{ color: 'hsl(40 30% 55%)' }}
+                whileHover={{ scale: 1.1, color: `hsl(${colorHsl})` }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onPrevTrack}
+              >
+                <SkipBack size={20} />
+              </motion.button>
+            )}
 
             <motion.button
               className="w-16 h-16 rounded-full flex items-center justify-center"
@@ -327,8 +329,17 @@ const VibrationalAudioPlayer = ({
               )}
             </motion.button>
 
-            {/* Placeholder for symmetry */}
-            <div className="w-9" />
+            {onNextTrack && (
+              <motion.button
+                className="p-2 rounded-full transition-colors"
+                style={{ color: 'hsl(40 30% 55%)' }}
+                whileHover={{ scale: 1.1, color: `hsl(${colorHsl})` }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onNextTrack}
+              >
+                <SkipForward size={20} />
+              </motion.button>
+            )}
           </div>
 
           {/* Right: Frequency badge */}
