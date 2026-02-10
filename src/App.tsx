@@ -10,6 +10,7 @@ import { FieldModeProvider } from "@/contexts/FieldModeContext";
 import Index from "./pages/Index";
 import CropOracle from "./pages/CropOracle";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 import UserGuide from "./pages/UserGuide";
 import DevGuide from "./pages/DevGuide";
 import TestingSuiteDocs from "./pages/TestingSuiteDocs";
@@ -30,6 +31,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/crop-oracle" element={<CropOracle />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/user-guide" element={<UserGuide />} />
                 <Route path="/dev-guide" element={<DevGuide />} />
                 <Route path="/testing-docs" element={<TestingSuiteDocs />} />
