@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { INSTRUMENT_ICONS, InstrumentType, checkDissonance, getMasterMixSetting } from '@/hooks/useAutoGeneration';
 import { CHORD_RECIPES } from '@/data/chordRecipes';
+import LunarGateCard from '@/components/crop-oracle/LunarGateCard';
 
 /* ─── Zone color helper ─── */
 const ZONE_COLORS: Record<number, string> = {
@@ -291,6 +292,9 @@ const CropOracle = () => {
                 accent="hsl(35 70% 55%)"
               />
             </div>
+
+            {/* Lunar Gate Timing */}
+            <LunarGateCard crop={selectedCrop} zoneColor={zoneColor} />
 
             {/* Companion Guild */}
             <div
