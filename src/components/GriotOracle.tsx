@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, X, Leaf } from 'lucide-react';
+import { Send, X, Leaf, Music } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
@@ -11,6 +12,9 @@ interface Message {
 }
 
 const GriotOracle = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isCropOracle = location.pathname === '/crop-oracle';
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -126,25 +130,51 @@ const GriotOracle = () => {
       {/* Cowrie Shell Trigger */}
       <motion.button
         className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full flex items-center justify-center cursor-pointer group"
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          if (isCropOracle) {
+            setIsOpen(true);
+          } else if (location.pathname === '/') {
+            // Scroll to sound system section on home page
+            const el = document.querySelector('[data-section="sound-system"]');
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth' });
+            } else {
+              window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+            }
+          } else {
+            navigate('/');
+          }
+        }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         animate={{
-          boxShadow: [
-            '0 0 20px hsl(120 50% 35% / 0.3)',
-            '0 0 40px hsl(120 50% 45% / 0.5)',
-            '0 0 20px hsl(120 50% 35% / 0.3)',
-          ],
+          boxShadow: isCropOracle
+            ? [
+                '0 0 20px hsl(120 50% 35% / 0.3)',
+                '0 0 40px hsl(120 50% 45% / 0.5)',
+                '0 0 20px hsl(120 50% 35% / 0.3)',
+              ]
+            : [
+                '0 0 20px hsl(270 50% 35% / 0.3)',
+                '0 0 40px hsl(270 50% 45% / 0.5)',
+                '0 0 20px hsl(270 50% 35% / 0.3)',
+              ],
         }}
         transition={{
           boxShadow: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
         }}
         style={{
-          background: 'linear-gradient(135deg, hsl(120 40% 18%), hsl(140 35% 12%))',
-          border: '2px solid hsl(120 40% 35%)',
+          background: isCropOracle
+            ? 'linear-gradient(135deg, hsl(120 40% 18%), hsl(140 35% 12%))'
+            : 'linear-gradient(135deg, hsl(270 40% 18%), hsl(280 35% 12%))',
+          border: `2px solid ${isCropOracle ? 'hsl(120 40% 35%)' : 'hsl(270 40% 35%)'}`,
         }}
       >
-        <Leaf className="w-7 h-7" style={{ color: 'hsl(120 50% 65%)' }} />
+        {isCropOracle ? (
+          <Leaf className="w-7 h-7" style={{ color: 'hsl(120 50% 65%)' }} />
+        ) : (
+          <Music className="w-7 h-7" style={{ color: 'hsl(270 60% 70%)' }} />
+        )}
 
         {/* Glow effect */}
         <motion.div
@@ -152,7 +182,9 @@ const GriotOracle = () => {
           animate={{ opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 4, repeat: Infinity }}
           style={{
-            background: 'radial-gradient(circle, hsl(120 50% 45% / 0.3) 0%, transparent 70%)',
+            background: isCropOracle
+              ? 'radial-gradient(circle, hsl(120 50% 45% / 0.3) 0%, transparent 70%)'
+              : 'radial-gradient(circle, hsl(270 50% 45% / 0.3) 0%, transparent 70%)',
           }}
         />
 
@@ -161,21 +193,21 @@ const GriotOracle = () => {
           className="absolute bottom-full right-0 mb-2 px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"
           style={{
             background: 'hsl(220 40% 10% / 0.9)',
-            border: '1px solid hsl(120 50% 40%)',
-            color: 'hsl(120 50% 70%)',
+            border: `1px solid ${isCropOracle ? 'hsl(120 50% 40%)' : 'hsl(270 50% 40%)'}`,
+            color: isCropOracle ? 'hsl(120 50% 70%)' : 'hsl(270 60% 75%)',
             fontSize: '10px',
             letterSpacing: '0.15em',
             textTransform: 'uppercase' as const,
             fontFamily: 'Space Mono, monospace',
           }}
         >
-          Ask The Field Advisor
+          {isCropOracle ? 'Ask The Field Advisor' : 'Automajic Sound System'}
         </div>
       </motion.button>
 
       {/* Chat Panel */}
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && isCropOracle && (
           <motion.div
             className="fixed inset-x-4 bottom-4 md:right-6 md:left-auto md:w-[420px] z-50 rounded-2xl overflow-hidden"
             initial={{ y: '100%', opacity: 0 }}
