@@ -64,6 +64,7 @@ const CropOracle = () => {
   const [starSearchQuery, setStarSearchQuery] = useState('');
   const [showSavedRecipes, setShowSavedRecipes] = useState(false);
   const [deletingRecipeId, setDeletingRecipeId] = useState<string | null>(null);
+  const [proMode, setProMode] = useState(false);
 
   // Fetch saved recipes
   const { data: savedRecipes } = useQuery({
@@ -379,6 +380,25 @@ const CropOracle = () => {
         <ArrowLeft className="w-5 h-5" style={{ color: 'hsl(0 0% 60%)' }} />
       </button>
 
+      {/* Beginner / Pro Toggle */}
+      <div className="fixed top-4 right-4 z-50 flex items-center">
+        <button
+          onClick={() => setProMode(!proMode)}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-full font-mono text-[10px] tracking-wider transition-all"
+          style={{
+            background: proMode
+              ? 'linear-gradient(135deg, hsl(270 40% 18%), hsl(270 30% 12%))'
+              : 'hsl(0 0% 10%)',
+            border: `1px solid ${proMode ? 'hsl(270 50% 40%)' : 'hsl(0 0% 20%)'}`,
+            color: proMode ? 'hsl(270 60% 75%)' : 'hsl(120 40% 60%)',
+            boxShadow: proMode ? '0 0 12px hsl(270 50% 30% / 0.3)' : 'none',
+          }}
+        >
+          <span className="text-sm">{proMode ? '🎛️' : '🌱'}</span>
+          {proMode ? 'PRO' : 'BEGIN'}
+        </button>
+      </div>
+
       {/* ═══ Celestial Banner ═══ */}
       <motion.div
         className="mx-auto max-w-2xl px-4 pt-4"
@@ -616,14 +636,14 @@ const CropOracle = () => {
                 Your {selectedZone.vibe} Recipe
               </h2>
               <p className="text-center text-sm font-mono mb-2" style={{ color: 'hsl(0 0% 45%)' }}>
-                STEP 3 — THE 13TH CHORD
+                STEP 3 — {proMode ? 'THE 13TH CHORD' : 'THE TRIAD'}
               </p>
               <p className="text-center text-[10px] font-mono mb-4" style={{ color: 'hsl(0 0% 30%)' }}>
                 ZONE {ZONES.indexOf(selectedZone) + 1} • {selectedZone.name.toUpperCase()} • {selectedZone.hz}Hz • KEY OF {selectedZone.note}
               </p>
 
-              {/* ═══ Star Picker ═══ */}
-              <motion.div
+              {/* ═══ Star Picker (Pro only) ═══ */}
+              {proMode && <motion.div
                 className="mb-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -774,7 +794,7 @@ const CropOracle = () => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </motion.div>}
 
               {/* ─── Seasonal Gate Warning ─── */}
               {seasonalGate && !seasonalOverride && (
@@ -829,13 +849,15 @@ const CropOracle = () => {
                 >
                   <Sparkles className="w-4 h-4" style={{ color: selectedZone.color }} />
                   <span className="font-mono text-xs font-bold tracking-wider" style={{ color: selectedZone.color }}>
-                    7-VOICE PLANTING CHORD
+                    {proMode ? '7-VOICE PLANTING CHORD' : '3-VOICE TRIAD'}
                   </span>
                 </div>
 
                 {/* Interval rows */}
                 <div className="divide-y" style={{ borderColor: 'hsl(0 0% 10%)' }}>
                   {chordCard.map((slot, i) => {
+                    // Beginner mode: only show Triad (Root, 3rd, 5th)
+                    if (!proMode && i >= 3) return null;
                     const isReady = slot.crop
                       ? isCropLunarReady(slot.crop.category, slot.crop.common_name || slot.crop.name, lunar.plantingType)
                       : false;
@@ -1003,8 +1025,8 @@ const CropOracle = () => {
                 </motion.div>
               )}
 
-              {/* ═══ Crop Search ═══ */}
-              <motion.div
+              {/* ═══ Crop Search (Pro only) ═══ */}
+              {proMode && <motion.div
                 className="mt-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -1136,7 +1158,7 @@ const CropOracle = () => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </motion.div>}
 
               {/* Save Recipe Button */}
               <motion.div
