@@ -73,7 +73,7 @@ const WaveformPlayer = ({
             }}
           />
           <span 
-            className="font-mono text-[10px] tracking-widest uppercase"
+            className="font-body text-[10px] tracking-widest uppercase"
             style={{ color: `hsl(${track.colorHsl})` }}
           >
             {isPlaying ? 'NOW PLAYING' : hasAudio ? 'VIBRATIONAL PLAYER' : 'NO AUDIO'}
