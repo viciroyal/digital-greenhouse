@@ -1,345 +1,303 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Music, Leaf, Sparkles, Pickaxe, Zap, Link2, Layers } from 'lucide-react';
-import { CHORD_RECIPES, type ChordRecipe } from '@/data/chordRecipes';
+import { ChevronLeft, ChevronRight, Layers } from 'lucide-react';
+import { useGardenBeds, useAllBedPlantings, type GardenBed, type BedPlanting } from '@/hooks/useGardenBeds';
 
 /* ─── Constants ─── */
-const TOTAL_SLOTS = 50;
 const PAGE_SIZE = 5;
-const TOTAL_PAGES = Math.ceil(TOTAL_SLOTS / PAGE_SIZE); // 10
-
-const ZONE_COLORS: Record<number, string> = {
-  396: '#FF0000', 417: '#FF7F00', 528: '#FFFF00',
-  639: '#00FF00', 741: '#0000FF', 852: '#4B0082', 963: '#8B00FF',
-};
 
 const NOTE_MAP: Record<number, string> = {
   396: 'C', 417: 'D', 528: 'E', 639: 'F', 741: 'G', 852: 'A', 963: 'B',
 };
 
-const FREQUENCIES = [396, 417, 528, 639, 741, 852, 963];
-
-const INTERVAL_ICONS: Record<string, React.ReactNode> = {
-  '1st':  <Leaf className="w-3 h-3" />,
-  '3rd':  <Sparkles className="w-3 h-3" />,
-  '5th':  <Pickaxe className="w-3 h-3" />,
-  '7th':  <Zap className="w-3 h-3" />,
-  '9th':  <Layers className="w-3 h-3" />,
-  '11th': <Music className="w-3 h-3" />,
-  '13th': <Link2 className="w-3 h-3" />,
-};
-
-/* ─── Build 50 slots from chord recipes ─── */
-interface ChordSlot {
+/* ─── Bed slot type ─── */
+interface BedSlot {
+  bed: GardenBed | null;
+  plantings: BedPlanting[];
   index: number;
-  recipe: ChordRecipe | null;
-  frequencyHz: number;
-  zoneColor: string;
-  zoneName: string;
-  label: string;
 }
 
-function buildSlots(): ChordSlot[] {
-  const slots: ChordSlot[] = [];
-  // Distribute recipes across slots, cycling through frequencies
-  const recipesByFreq: Record<number, ChordRecipe[]> = {};
-  for (const r of CHORD_RECIPES) {
-    if (!recipesByFreq[r.frequencyHz]) recipesByFreq[r.frequencyHz] = [];
-    recipesByFreq[r.frequencyHz].push(r);
+/* ─── Resonance between two beds ─── */
+function getBedResonance(a: BedSlot, b: BedSlot): number {
+  if (!a.bed || !b.bed) return 0;
+
+  let score = 0;
+
+  // Same zone = high base resonance
+  if (a.bed.frequency_hz === b.bed.frequency_hz) {
+    score += 0.4;
+  } else {
+    // Frequency proximity bonus
+    const dist = Math.abs(a.bed.frequency_hz - b.bed.frequency_hz);
+    if (dist <= 150) score += 0.25;
+    else if (dist <= 300) score += 0.1;
   }
 
-  // Fill 50 slots: 7 zones × ~7 slots each + 1 extra
-  let slotIdx = 0;
-  // First pass: assign real recipes
-  for (const freq of FREQUENCIES) {
-    const recipes = recipesByFreq[freq] || [];
-    for (const recipe of recipes) {
-      if (slotIdx >= TOTAL_SLOTS) break;
-      slots.push({
-        index: slotIdx,
-        recipe,
-        frequencyHz: freq,
-        zoneColor: ZONE_COLORS[freq] || '#888',
-        zoneName: recipe.zoneName,
-        label: recipe.chordName,
-      });
-      slotIdx++;
-    }
+  // Shared crops across beds
+  if (a.plantings.length > 0 && b.plantings.length > 0) {
+    const aCrops = new Set(a.plantings.map(p => p.crop_id));
+    const bCrops = new Set(b.plantings.map(p => p.crop_id));
+    let shared = 0;
+    for (const c of aCrops) if (bCrops.has(c)) shared++;
+    score += shared * 0.15;
   }
-  // Fill remaining with empty expansion slots
-  while (slotIdx < TOTAL_SLOTS) {
-    const freqIdx = slotIdx % FREQUENCIES.length;
-    const freq = FREQUENCIES[freqIdx];
-    slots.push({
-      index: slotIdx,
-      recipe: null,
-      frequencyHz: freq,
-      zoneColor: ZONE_COLORS[freq] || '#888',
-      zoneName: `Zone ${freqIdx + 1}`,
-      label: `Slot ${slotIdx + 1}`,
-    });
-    slotIdx++;
-  }
-  return slots;
-}
 
-/* ─── Resonance score between two chord slots ─── */
-function getResonanceScore(a: ChordSlot, b: ChordSlot): number {
-  if (!a.recipe || !b.recipe) return 0;
-  // Check shared crop names across intervals
-  const aCrops = new Set(a.recipe.intervals.map(i => i.cropName.toLowerCase()));
-  const bCrops = new Set(b.recipe.intervals.map(i => i.cropName.toLowerCase()));
-  let shared = 0;
-  for (const c of aCrops) if (bCrops.has(c)) shared++;
-  // Frequency proximity bonus
-  const freqDist = Math.abs(a.frequencyHz - b.frequencyHz);
-  const proximityBonus = freqDist <= 150 ? 0.3 : freqDist <= 300 ? 0.15 : 0;
+  // Both beds have plantings = active harmony
+  if (a.plantings.length > 0 && b.plantings.length > 0) {
+    score += 0.1;
+  }
+
   // Complementary interval coverage
-  const aIntervals = new Set(a.recipe.intervals.map(i => i.interval));
-  const bIntervals = new Set(b.recipe.intervals.map(i => i.interval));
-  const coverage = new Set([...aIntervals, ...bIntervals]).size;
-  const coverageBonus = coverage >= 6 ? 0.2 : 0;
-  return Math.min(1, shared * 0.15 + proximityBonus + coverageBonus);
+  if (a.plantings.length > 0 && b.plantings.length > 0) {
+    const aIntervals = new Set(a.plantings.map(p => p.crop?.chord_interval).filter(Boolean));
+    const bIntervals = new Set(b.plantings.map(p => p.crop?.chord_interval).filter(Boolean));
+    const combined = new Set([...aIntervals, ...bIntervals]);
+    if (combined.size >= 3) score += 0.15;
+  }
+
+  return Math.min(1, score);
 }
 
-function resonanceToColor(score: number): string {
-  if (score >= 0.5) return 'hsl(120 60% 40%)';
-  if (score >= 0.3) return 'hsl(60 70% 45%)';
-  if (score > 0) return 'hsl(30 60% 40%)';
-  return 'hsl(0 0% 15%)';
+function resonanceToStyle(score: number): { bg: string; border: string } {
+  if (score >= 0.5) return { bg: 'hsl(120 25% 12%)', border: 'hsl(120 30% 25%)' };
+  if (score >= 0.3) return { bg: 'hsl(45 20% 10%)', border: 'hsl(45 25% 22%)' };
+  if (score > 0)    return { bg: 'hsl(30 15% 8%)', border: 'hsl(30 15% 16%)' };
+  return { bg: 'hsl(0 0% 5%)', border: 'hsl(0 0% 9%)' };
 }
 
 /* ─── Component ─── */
 const HarmonicCarousel = () => {
+  const { data: beds } = useGardenBeds();
+  const { data: allPlantingsMap } = useAllBedPlantings();
   const [page, setPage] = useState(0);
-  const [hoveredSlot, setHoveredSlot] = useState<number | null>(null);
-  const [resonanceDepth, setResonanceDepth] = useState(1); // 1 = diagonal only, up to 5
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [resonanceDepth, setResonanceDepth] = useState(1);
 
-  const allSlots = useMemo(() => buildSlots(), []);
-  const pageSlots = useMemo(() => allSlots.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE), [allSlots, page]);
-
-  // Adjacent page slots for cross-row dependency
-  const prevPageSlots = useMemo(() => page > 0 ? allSlots.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) : [], [allSlots, page]);
-  const nextPageSlots = useMemo(() => page < TOTAL_PAGES - 1 ? allSlots.slice((page + 1) * PAGE_SIZE, (page + 2) * PAGE_SIZE) : [], [allSlots, page]);
-
-  // Resonance heatmap: pairwise scores within current page
-  const resonanceMatrix = useMemo(() => {
-    const matrix: number[][] = [];
-    for (let i = 0; i < pageSlots.length; i++) {
-      matrix[i] = [];
-      for (let j = 0; j < pageSlots.length; j++) {
-        matrix[i][j] = i === j ? 1 : getResonanceScore(pageSlots[i], pageSlots[j]);
-      }
+  // Build slots from live beds (up to 50)
+  const slots = useMemo((): BedSlot[] => {
+    if (!beds) return [];
+    const result: BedSlot[] = beds.map((bed, i) => ({
+      bed,
+      plantings: allPlantingsMap?.[bed.id] || [],
+      index: i,
+    }));
+    // Pad to 50
+    while (result.length < 50) {
+      result.push({ bed: null, plantings: [], index: result.length });
     }
-    return matrix;
-  }, [pageSlots]);
+    return result.slice(0, 50);
+  }, [beds, allPlantingsMap]);
 
-  // Cross-row dependencies (shared crops between current and adjacent pages)
+  const totalPages = Math.ceil(slots.length / PAGE_SIZE);
+  const pageSlots = useMemo(() => slots.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE), [slots, page]);
+
+  // Cross-page shared crops
+  const prevSlots = useMemo(() => page > 0 ? slots.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) : [], [slots, page]);
+  const nextSlots = useMemo(() => page < totalPages - 1 ? slots.slice((page + 1) * PAGE_SIZE, (page + 2) * PAGE_SIZE) : [], [slots, page, totalPages]);
+
   const crossDeps = useMemo(() => {
-    const deps: { from: number; to: number; direction: 'prev' | 'next'; cropName: string }[] = [];
-    for (let i = 0; i < pageSlots.length; i++) {
-      if (!pageSlots[i].recipe) continue;
-      const crops = pageSlots[i].recipe!.intervals.map(iv => iv.cropName.toLowerCase());
-      // Check adjacent pages
-      for (const [adjSlots, dir] of [[prevPageSlots, 'prev'], [nextPageSlots, 'next']] as const) {
-        for (let j = 0; j < adjSlots.length; j++) {
-          if (!adjSlots[j].recipe) continue;
-          for (const iv of adjSlots[j].recipe!.intervals) {
-            if (crops.includes(iv.cropName.toLowerCase())) {
-              deps.push({ from: i, to: j, direction: dir, cropName: iv.cropName });
+    const deps: { fromBed: number; dir: 'prev' | 'next'; cropName: string }[] = [];
+    for (const slot of pageSlots) {
+      if (slot.plantings.length === 0) continue;
+      const cropIds = new Set(slot.plantings.map(p => p.crop_id));
+      for (const [adjSlots, dir] of [[prevSlots, 'prev'], [nextSlots, 'next']] as const) {
+        for (const adj of adjSlots) {
+          for (const p of adj.plantings) {
+            if (cropIds.has(p.crop_id)) {
+              deps.push({
+                fromBed: slot.bed?.bed_number || 0,
+                dir,
+                cropName: p.crop?.common_name || p.crop?.name || '—',
+              });
               break;
             }
           }
         }
       }
     }
-    return deps;
-  }, [pageSlots, prevPageSlots, nextPageSlots]);
+    return deps.slice(0, 3);
+  }, [pageSlots, prevSlots, nextSlots]);
 
-  const goPage = (dir: -1 | 1) => {
-    setPage(p => Math.max(0, Math.min(TOTAL_PAGES - 1, p + dir)));
-  };
+  // Resonance matrix for current page
+  const matrix = useMemo(() => {
+    return pageSlots.map((a, i) =>
+      pageSlots.map((b, j) => i === j ? 1 : getBedResonance(a, b))
+    );
+  }, [pageSlots]);
+
+  const goPage = (dir: -1 | 1) => setPage(p => Math.max(0, Math.min(totalPages - 1, p + dir)));
+
+  if (!beds) return null;
 
   return (
     <div className="mx-4 mb-4 rounded-2xl overflow-hidden" style={{
-      background: 'hsl(0 0% 4%)',
-      border: '1px solid hsl(0 0% 12%)',
+      background: 'hsl(0 0% 3%)',
+      border: '1px solid hsl(0 0% 8%)',
     }}>
-      {/* Header */}
-      <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid hsl(0 0% 10%)' }}>
-        <div className="flex items-center gap-2">
-          <Music className="w-4 h-4" style={{ color: 'hsl(270 50% 60%)' }} />
-          <span className="text-[10px] font-mono font-bold tracking-widest" style={{ color: 'hsl(270 50% 60%)' }}>
-            HARMONIC MATRIX
+      {/* Header — minimal */}
+      <div className="px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-1 h-4 rounded-full" style={{ background: 'hsl(45 60% 50%)' }} />
+          <span className="text-[9px] font-mono tracking-[0.25em]" style={{ color: 'hsl(0 0% 50%)' }}>
+            BED HARMONY
           </span>
-          <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{ background: 'hsl(0 0% 10%)', color: 'hsl(0 0% 45%)' }}>
-            {TOTAL_SLOTS} CHORDS
+          <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 25%)' }}>
+            {beds.length} beds
           </span>
         </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => goPage(-1)}
-            disabled={page === 0}
-            className="w-7 h-7 rounded-lg flex items-center justify-center transition-opacity"
-            style={{
-              background: 'hsl(0 0% 8%)',
-              border: '1px solid hsl(0 0% 15%)',
-              opacity: page === 0 ? 0.3 : 1,
-            }}
-          >
-            <ChevronLeft className="w-3.5 h-3.5" style={{ color: 'hsl(0 0% 60%)' }} />
+        <div className="flex items-center gap-2">
+          <button onClick={() => goPage(-1)} disabled={page === 0}
+            className="w-6 h-6 rounded-md flex items-center justify-center transition-opacity"
+            style={{ opacity: page === 0 ? 0.2 : 0.6 }}>
+            <ChevronLeft className="w-3 h-3" style={{ color: 'hsl(0 0% 50%)' }} />
           </button>
-          <span className="text-[9px] font-mono w-14 text-center" style={{ color: 'hsl(0 0% 50%)' }}>
-            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, TOTAL_SLOTS)} / {TOTAL_SLOTS}
+          <span className="text-[8px] font-mono tabular-nums w-12 text-center" style={{ color: 'hsl(0 0% 30%)' }}>
+            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, slots.length)}
           </span>
-          <button
-            onClick={() => goPage(1)}
-            disabled={page === TOTAL_PAGES - 1}
-            className="w-7 h-7 rounded-lg flex items-center justify-center transition-opacity"
-            style={{
-              background: 'hsl(0 0% 8%)',
-              border: '1px solid hsl(0 0% 15%)',
-              opacity: page === TOTAL_PAGES - 1 ? 0.3 : 1,
-            }}
-          >
-            <ChevronRight className="w-3.5 h-3.5" style={{ color: 'hsl(0 0% 60%)' }} />
+          <button onClick={() => goPage(1)} disabled={page === totalPages - 1}
+            className="w-6 h-6 rounded-md flex items-center justify-center transition-opacity"
+            style={{ opacity: page === totalPages - 1 ? 0.2 : 0.6 }}>
+            <ChevronRight className="w-3 h-3" style={{ color: 'hsl(0 0% 50%)' }} />
           </button>
         </div>
       </div>
 
-      {/* Zone band indicator */}
-      <div className="flex h-1.5">
+      {/* Zone line — ultra thin */}
+      <div className="flex h-px mx-4">
         {pageSlots.map((slot, i) => (
-          <div key={i} className="flex-1" style={{ background: slot.zoneColor, opacity: 0.7 }} />
+          <div key={i} className="flex-1" style={{ background: slot.bed?.zone_color || 'hsl(0 0% 8%)' }} />
         ))}
       </div>
 
-      {/* Chord Cards Row */}
-      <div ref={containerRef} className="relative">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={page}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={{ duration: 0.25 }}
-            className="grid grid-cols-5 gap-2 p-3"
-          >
-            {pageSlots.map((slot, i) => {
-              const isHovered = hoveredSlot === i;
-              const recipe = slot.recipe;
-              return (
-                <motion.div
-                  key={slot.index}
-                  onMouseEnter={() => setHoveredSlot(i)}
-                  onMouseLeave={() => setHoveredSlot(null)}
-                  className="rounded-xl p-2.5 cursor-pointer transition-all relative overflow-hidden"
-                  style={{
-                    background: isHovered ? `${slot.zoneColor}15` : 'hsl(0 0% 6%)',
-                    border: `1px solid ${isHovered ? slot.zoneColor + '50' : 'hsl(0 0% 10%)'}`,
-                    boxShadow: isHovered ? `0 0 20px ${slot.zoneColor}15` : 'none',
-                  }}
-                  whileHover={{ scale: 1.02 }}
-                >
-                  {/* Zone dot + number */}
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: slot.zoneColor, boxShadow: `0 0 6px ${slot.zoneColor}80` }} />
-                    <span className="text-[8px] font-mono font-bold" style={{ color: slot.zoneColor }}>
-                      {NOTE_MAP[slot.frequencyHz] || '?'}/{slot.frequencyHz}Hz
-                    </span>
+      {/* Bed Cards */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={page}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.2 }}
+          className="grid grid-cols-5 gap-1.5 p-3"
+        >
+          {pageSlots.map((slot) => {
+            const bed = slot.bed;
+            const plantCount = slot.plantings.length;
+            const color = bed?.zone_color || 'hsl(0 0% 15%)';
+            const isEmpty = !bed;
+
+            return (
+              <motion.div
+                key={slot.index}
+                className="rounded-xl p-2.5 relative group"
+                style={{
+                  background: 'hsl(0 0% 4%)',
+                  border: `1px solid hsl(0 0% 8%)`,
+                  minHeight: 88,
+                }}
+                whileHover={{
+                  borderColor: color,
+                  transition: { duration: 0.15 },
+                }}
+              >
+                {isEmpty ? (
+                  <div className="flex items-center justify-center h-full">
+                    <span className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 15%)' }}>—</span>
                   </div>
-
-                  {/* Chord name */}
-                  <span className="text-[9px] font-mono font-bold block mb-2 leading-tight truncate" style={{ color: 'hsl(0 0% 75%)' }}>
-                    {slot.label}
-                  </span>
-
-                  {/* Intervals */}
-                  {recipe ? (
-                    <div className="space-y-1">
-                      {recipe.intervals.map(iv => (
-                        <div key={iv.interval} className="flex items-center gap-1">
-                          <span className="text-[8px]">{iv.emoji}</span>
-                          <span className="text-[7px] font-mono truncate" style={{ color: 'hsl(0 0% 50%)' }}>
-                            {iv.cropName}
-                          </span>
-                        </div>
-                      ))}
+                ) : (
+                  <>
+                    {/* Bed number — dominant, centered */}
+                    <div className="text-center mb-1.5">
+                      <span className="text-base font-mono font-bold" style={{ color }}>
+                        {bed.bed_number}
+                      </span>
                     </div>
-                  ) : (
-                    <div className="flex items-center justify-center py-4">
-                      <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 25%)' }}>EMPTY SLOT</span>
+
+                    {/* Note + Hz — whisper */}
+                    <div className="text-center mb-2">
+                      <span className="text-[7px] font-mono tracking-widest" style={{ color: 'hsl(0 0% 30%)' }}>
+                        {NOTE_MAP[bed.frequency_hz] || '?'} · {bed.frequency_hz}
+                      </span>
                     </div>
-                  )}
 
-                  {/* Slot number badge */}
-                  <div className="absolute top-1.5 right-1.5">
-                    <span className="text-[7px] font-mono px-1 py-0.5 rounded" style={{ background: 'hsl(0 0% 10%)', color: 'hsl(0 0% 35%)' }}>
-                      #{slot.index + 1}
-                    </span>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </motion.div>
-        </AnimatePresence>
+                    {/* Planting indicator — 4 dots for chord intervals */}
+                    <div className="flex justify-center gap-1">
+                      {['Root (Lead)', '3rd (Triad)', '5th (Stabilizer)', '7th (Signal)'].map(interval => {
+                        const filled = slot.plantings.some(p => p.crop?.chord_interval === interval);
+                        return (
+                          <div
+                            key={interval}
+                            className="w-1.5 h-1.5 rounded-full transition-all"
+                            style={{
+                              background: filled ? color : 'hsl(0 0% 10%)',
+                              boxShadow: filled ? `0 0 4px ${color}` : 'none',
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
 
-        {/* Cross-row dependency indicators */}
-        {crossDeps.length > 0 && (
-          <div className="px-3 pb-2">
-            <div className="flex flex-wrap gap-1">
-              {crossDeps.slice(0, 4).map((dep, i) => (
-                <span key={i} className="text-[7px] font-mono px-1.5 py-0.5 rounded-full flex items-center gap-1" style={{
-                  background: 'hsl(270 30% 15%)',
-                  border: '1px solid hsl(270 30% 25%)',
-                  color: 'hsl(270 50% 65%)',
-                }}>
-                  <Link2 className="w-2.5 h-2.5" />
-                  {dep.cropName} → {dep.direction === 'prev' ? '◀' : '▶'} Row {dep.direction === 'prev' ? page : page + 2}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+                    {/* Plant count — bottom right whisper */}
+                    {plantCount > 0 && (
+                      <div className="absolute bottom-1.5 right-2">
+                        <span className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 22%)' }}>
+                          {plantCount}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </AnimatePresence>
 
-      {/* Resonance Heatmap */}
-      <div className="px-3 pb-3">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-1.5">
-            <Layers className="w-3 h-3" style={{ color: 'hsl(45 70% 55%)' }} />
-            <span className="text-[8px] font-mono tracking-wider" style={{ color: 'hsl(0 0% 40%)' }}>
-              ROW RESONANCE
+      {/* Cross-bed dependencies */}
+      {crossDeps.length > 0 && (
+        <div className="px-4 pb-2 flex gap-1.5">
+          {crossDeps.map((dep, i) => (
+            <span key={i} className="text-[7px] font-mono px-2 py-0.5 rounded-full" style={{
+              background: 'hsl(0 0% 5%)',
+              border: '1px solid hsl(0 0% 10%)',
+              color: 'hsl(0 0% 35%)',
+            }}>
+              Bed {dep.fromBed} · {dep.cropName} {dep.dir === 'prev' ? '◂' : '▸'}
             </span>
-            <span className="text-[7px] font-mono px-1 py-0.5 rounded" style={{ background: 'hsl(0 0% 10%)', color: 'hsl(0 0% 35%)' }}>
-              {resonanceDepth} / 5
+          ))}
+        </div>
+      )}
+
+      {/* ─── BED RESONANCE ─── */}
+      <div className="px-4 pb-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <div className="w-0.5 h-3 rounded-full" style={{ background: 'hsl(45 40% 40%)' }} />
+            <span className="text-[8px] font-mono tracking-[0.2em]" style={{ color: 'hsl(0 0% 35%)' }}>
+              BED RESONANCE
+            </span>
+            <span className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 20%)' }}>
+              {resonanceDepth}/5
             </span>
           </div>
           <div className="flex items-center gap-1">
             {resonanceDepth > 1 && (
               <button
-                onClick={() => setResonanceDepth(d => Math.max(1, d - 1))}
-                className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-mono font-bold transition-all"
-                style={{
-                  background: 'hsl(0 0% 10%)',
-                  border: '1px solid hsl(0 0% 20%)',
-                  color: 'hsl(0 0% 55%)',
-                }}
+                onClick={() => setResonanceDepth(d => d - 1)}
+                className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-mono"
+                style={{ color: 'hsl(0 0% 35%)' }}
               >
                 −
               </button>
             )}
             {resonanceDepth < 5 && (
               <motion.button
-                onClick={() => setResonanceDepth(d => Math.min(5, d + 1))}
-                className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-mono font-bold transition-all"
+                onClick={() => setResonanceDepth(d => d + 1)}
+                className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-mono"
                 style={{
-                  background: 'hsl(270 30% 15%)',
-                  border: '1px solid hsl(270 40% 35%)',
-                  color: 'hsl(270 60% 70%)',
+                  background: 'hsl(0 0% 6%)',
+                  border: '1px solid hsl(0 0% 12%)',
+                  color: 'hsl(45 50% 55%)',
                 }}
-                whileHover={{ scale: 1.15 }}
+                whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
                 +
@@ -348,100 +306,82 @@ const HarmonicCarousel = () => {
           </div>
         </div>
 
-        {/* Heatmap grid — only show resonanceDepth rows */}
+        {/* Matrix */}
         <div className="space-y-1">
           <AnimatePresence>
-            {Array.from({ length: resonanceDepth }).map(rowIdx => {
-              const i = rowIdx as unknown as number;
-              return (
-                <motion.div
-                  key={`row-${i}`}
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="grid grid-cols-5 gap-1"
-                >
-                  {Array.from({ length: 5 }).map((_, j) => {
-                    const score = resonanceMatrix[i]?.[j] ?? 0;
-                    const isself = i === j;
-                    const isVisible = j <= i || j < resonanceDepth;
-                    if (!isVisible) {
-                      return (
-                        <div key={`${i}-${j}`} className="rounded-md aspect-square" style={{ background: 'hsl(0 0% 4%)' }} />
-                      );
-                    }
-                    if (isself) {
-                      return (
-                        <div
-                          key={`${i}-${j}`}
-                          className="rounded-md flex items-center justify-center aspect-square"
-                          style={{
-                            background: `${pageSlots[i]?.zoneColor || '#888'}20`,
-                            border: `1px solid ${pageSlots[i]?.zoneColor + '40'}`,
-                          }}
-                        >
-                          <span className="text-[7px] font-mono font-bold" style={{ color: pageSlots[i]?.zoneColor || '#888' }}>
-                            {NOTE_MAP[pageSlots[i]?.frequencyHz] || '?'}
-                          </span>
-                        </div>
-                      );
-                    }
+            {Array.from({ length: resonanceDepth }).map((_, i) => (
+              <motion.div
+                key={`r-${i}`}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.15 }}
+                className="grid grid-cols-5 gap-1"
+              >
+                {Array.from({ length: 5 }).map((_, j) => {
+                  const score = matrix[i]?.[j] ?? 0;
+                  const isSelf = i === j;
+                  const isVisible = j < resonanceDepth || j <= i;
+                  const slot = pageSlots[isSelf ? i : j];
+                  const color = slot?.bed?.zone_color || 'hsl(0 0% 15%)';
+
+                  if (!isVisible) {
+                    return <div key={`${i}-${j}`} className="rounded-lg aspect-square" style={{ background: 'hsl(0 0% 3%)' }} />;
+                  }
+
+                  if (isSelf) {
                     return (
-                      <div
-                        key={`${i}-${j}`}
-                        className="rounded-md flex items-center justify-center aspect-square"
-                        style={{
-                          background: resonanceToColor(score),
-                          border: `1px solid hsl(0 0% 10%)`,
-                          opacity: j > i ? 0.5 : 1,
-                        }}
-                      >
-                        <span className="text-[7px] font-mono font-bold" style={{ color: 'hsl(0 0% 70%)' }}>
-                          {score > 0 ? `${Math.round(score * 100)}%` : '—'}
+                      <div key={`${i}-${j}`} className="rounded-lg flex items-center justify-center aspect-square"
+                        style={{ background: 'hsl(0 0% 5%)', border: `1px solid ${color}30` }}>
+                        <span className="text-[8px] font-mono font-bold" style={{ color }}>
+                          {slot?.bed?.bed_number || '—'}
                         </span>
                       </div>
                     );
-                  })}
-                </motion.div>
-              );
-            })}
+                  }
+
+                  const style = resonanceToStyle(score);
+                  return (
+                    <div key={`${i}-${j}`} className="rounded-lg flex items-center justify-center aspect-square"
+                      style={{ background: style.bg, border: `1px solid ${style.border}`, opacity: j > i ? 0.4 : 1 }}>
+                      <span className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>
+                        {score > 0 ? `${Math.round(score * 100)}` : '·'}
+                      </span>
+                    </div>
+                  );
+                })}
+              </motion.div>
+            ))}
           </AnimatePresence>
         </div>
 
-        {/* Legend */}
-        <div className="flex items-center gap-3 mt-2">
+        {/* Legend — ultra minimal */}
+        <div className="flex items-center gap-4 mt-2">
           {[
-            { label: 'HIGH', color: 'hsl(120 60% 40%)' },
-            { label: 'MED', color: 'hsl(60 70% 45%)' },
-            { label: 'LOW', color: 'hsl(30 60% 40%)' },
-            { label: 'NONE', color: 'hsl(0 0% 15%)' },
+            { label: 'strong', bg: 'hsl(120 25% 12%)' },
+            { label: 'moderate', bg: 'hsl(45 20% 10%)' },
+            { label: 'weak', bg: 'hsl(30 15% 8%)' },
           ].map(l => (
-            <div key={l.label} className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-sm" style={{ background: l.color }} />
-              <span className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>{l.label}</span>
+            <div key={l.label} className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-sm" style={{ background: l.bg, border: '1px solid hsl(0 0% 12%)' }} />
+              <span className="text-[6px] font-mono tracking-wider" style={{ color: 'hsl(0 0% 28%)' }}>{l.label}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Page dots */}
-      <div className="flex items-center justify-center gap-1.5 pb-3">
-        {Array.from({ length: TOTAL_PAGES }).map((_, i) => {
-          // Color based on dominant zone in that page
-          const pageStart = i * PAGE_SIZE;
-          const dominantSlot = allSlots[pageStart];
-          const dotColor = dominantSlot?.zoneColor || '#888';
+      {/* Page dots — minimal */}
+      <div className="flex items-center justify-center gap-1 pb-3">
+        {Array.from({ length: totalPages }).map((_, i) => {
+          const dominantSlot = slots[i * PAGE_SIZE];
+          const c = dominantSlot?.bed?.zone_color || 'hsl(0 0% 12%)';
           return (
-            <button
-              key={i}
-              onClick={() => setPage(i)}
+            <button key={i} onClick={() => setPage(i)}
               className="rounded-full transition-all"
               style={{
-                width: page === i ? 16 : 6,
-                height: 6,
-                background: page === i ? dotColor : 'hsl(0 0% 15%)',
-                boxShadow: page === i ? `0 0 8px ${dotColor}60` : 'none',
+                width: page === i ? 12 : 4,
+                height: 4,
+                background: page === i ? c : 'hsl(0 0% 10%)',
               }}
             />
           );
