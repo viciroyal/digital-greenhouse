@@ -237,7 +237,7 @@ export const trackData: TrackData[] = [
   {
     row: 7,
     track: 'Quantum Love',
-    featuring: 'Shellie Sweets',
+    featuring: 'Shellie Sweets & Yohance',
     chakra: 'Heart',
     frequency: '741Hz',
     mineral: 'Calcium',

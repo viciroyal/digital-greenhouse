@@ -19,7 +19,7 @@ const CREDITS = [
   { role: 'Mixed by', name: 'Èks at Atlanta Sound Factory' },
   { role: 'Mastered by', name: 'Kristofer Sampson at Sampson Sound Studios' },
   { role: 'Album Artwork', name: 'Vici Royàl' },
-  { role: 'Featuring', name: 'Sistah Moon, Yamau, Briar Blakley, Sarafina Ethereal, James Cambridge IV, Shellie Sweets, Nichollé McKoy, Victoria, Dara Carter, Benjamin J. Davidow' },
+  { role: 'Featuring', name: 'Sistah Moon, Yamau, Briar Blakley, Sarafina Ethereal, James Cambridge IV, Shellie Sweets, Nichollé McKoy, Victoria, Dara Carter, Benjamin J. Davidow, Yohance' },
 ];
 
 const Index = () => {
