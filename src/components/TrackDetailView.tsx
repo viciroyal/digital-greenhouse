@@ -262,7 +262,7 @@ const TrackDetailView = ({
                 </h1>
                 {track.featuring && (
                   <p 
-                    className="font-mono text-sm mb-2"
+                    className="font-body text-sm mb-2"
                     style={{ color: 'hsl(40 40% 75%)' }}
                   >
                     ft. {track.featuring}
