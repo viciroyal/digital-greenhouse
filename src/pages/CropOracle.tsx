@@ -434,7 +434,7 @@ const CropOracle = () => {
 
       {/* ═══ Celestial Banner ═══ */}
       <motion.div
-        className="mx-auto max-w-2xl px-4 pt-4"
+        className="mx-auto max-w-2xl px-4 pt-14"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
       >
