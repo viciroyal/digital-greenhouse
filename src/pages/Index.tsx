@@ -77,7 +77,13 @@ const Index = () => {
               transition={{ duration: 1.2, ease: 'easeOut' }}
               className="mb-8"
             >
-              <div className="relative group">
+              <div 
+                className="relative group cursor-pointer"
+                onClick={() => {
+                  const el = document.querySelector('[data-section="sound-system"]');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
                 <div
                   className="absolute -inset-12 opacity-30 blur-[60px] group-hover:opacity-50 transition-opacity duration-1000"
                   style={{
@@ -87,7 +93,7 @@ const Index = () => {
                 <img
                   src={albumArt}
                   alt="PHARMBOI"
-                  className="relative w-56 md:w-72 lg:w-80 rounded-3xl"
+                  className="relative w-56 md:w-72 lg:w-80 rounded-3xl transition-transform group-hover:scale-[1.03]"
                   style={{
                     border: '3px solid hsl(20 40% 20% / 0.6)',
                     boxShadow: '0 30px 80px rgba(0,0,0,0.7), 0 0 80px hsl(350 75% 50% / 0.2)',
