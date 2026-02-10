@@ -626,31 +626,8 @@ const CropOracle = () => {
         ))}
       </AnimatePresence>
 
-      <div className="flex justify-center pt-4 pb-4 gap-3">
-        {[1, 2, 3].map(s => (
-          <div key={s} className="flex items-center gap-2">
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold transition-all"
-              style={{
-                background: step >= s
-                  ? (s === 3 && selectedZone ? selectedZone.color + '30' : 'hsl(45 80% 55% / 0.2)')
-                  : 'hsl(0 0% 8%)',
-                border: `2px solid ${step >= s ? (s === 3 && selectedZone ? selectedZone.color : 'hsl(45 80% 55%)') : 'hsl(0 0% 15%)'}`,
-                color: step >= s ? 'hsl(45 80% 55%)' : 'hsl(0 0% 30%)',
-                boxShadow: step === s ? `0 0 20px ${s === 3 && selectedZone ? selectedZone.color + '40' : 'hsl(45 80% 55% / 0.2)'}` : 'none',
-              }}
-            >
-              {s}
-            </div>
-            {s < 3 && (
-              <div
-                className="w-8 h-0.5 rounded-full"
-                style={{ background: step > s ? 'hsl(45 80% 55% / 0.4)' : 'hsl(0 0% 12%)' }}
-              />
-            )}
-          </div>
-        ))}
-      </div>
+      {/* Spacer for fixed header */}
+      <div className="h-2" />
 
       {/* Content Area */}
       <div className="max-w-2xl mx-auto px-4 pb-24">
