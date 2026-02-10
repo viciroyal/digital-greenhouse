@@ -1,5 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { trackData } from '@/data/trackData';
 import type { TrackData } from '@/data/trackData';
 import FunctionSeal from './track-detail/FunctionSeal';
 import WaveformPlayer from './track-detail/WaveformPlayer';
