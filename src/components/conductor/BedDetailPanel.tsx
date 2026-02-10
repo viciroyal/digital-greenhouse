@@ -958,16 +958,19 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: 
                         <SelectItem value="none" className="text-xs font-mono" style={{ color: 'hsl(0 0% 60%)' }}>
                           None
                         </SelectItem>
-                        {INOCULANT_OPTIONS.map((type) => (
-                          <SelectItem 
-                            key={type} 
-                            value={type!} 
-                            className="text-xs font-mono"
-                            style={{ color: 'hsl(180 60% 60%)' }}
-                          >
-                            {type}
-                          </SelectItem>
-                        ))}
+                        {INOCULANT_OPTIONS.map((type) => {
+                          const isRec = zoneRec && type && zoneRec.eleventh.name.toLowerCase().includes(type.toLowerCase().split(' ')[0].toLowerCase());
+                          return (
+                            <SelectItem 
+                              key={type} 
+                              value={type!} 
+                              className="text-xs font-mono"
+                              style={{ color: isRec ? zoneRec!.zoneColor : 'hsl(180 60% 60%)' }}
+                            >
+                              {isRec ? `★ ${type} (Recommended)` : type}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   </div>
