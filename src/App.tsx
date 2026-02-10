@@ -12,6 +12,7 @@ import CropOracle from "./pages/CropOracle";
 import Auth from "./pages/Auth";
 import UserGuide from "./pages/UserGuide";
 import DevGuide from "./pages/DevGuide";
+import TestingSuiteDocs from "./pages/TestingSuiteDocs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
