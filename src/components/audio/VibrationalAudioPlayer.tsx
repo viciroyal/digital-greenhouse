@@ -9,6 +9,8 @@ interface VibrationalAudioPlayerProps {
   artist?: string;
   frequency?: string;
   colorHsl?: string;
+  onPrevTrack?: () => void;
+  onNextTrack?: () => void;
 }
 
 const VibrationalAudioPlayer = ({ 
