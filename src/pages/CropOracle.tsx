@@ -14,7 +14,7 @@ import SeasonalMovementCard from '@/components/crop-oracle/SeasonalMovementCard'
 import HarmonicWarningsCard from '@/components/crop-oracle/HarmonicWarningsCard';
 import BedOrganizationCard from '@/components/crop-oracle/BedOrganizationCard';
 import BedStrumEmbed from '@/components/crop-oracle/BedStrumEmbed';
-import HarmonicCarousel from '@/components/crop-oracle/HarmonicCarousel';
+// HarmonicCarousel removed — merged into Guild tab
 import ChordComposer from '@/components/crop-oracle/ChordComposer';
 import { useAdminRole } from '@/hooks/useAdminRole';
 
@@ -130,7 +130,7 @@ const CropOracle = () => {
   const [query, setQuery] = useState('');
   const [selectedCrop, setSelectedCrop] = useState<MasterCrop | null>(null);
   const [hoveredCrop, setHoveredCrop] = useState<MasterCrop | null>(null);
-  const [activeSection, setActiveSection] = useState<'profile' | 'guild' | 'harmony' | 'timing' | 'beds' | 'strum' | 'planting'>('profile');
+  const [activeSection, setActiveSection] = useState<'profile' | 'guild' | 'timing' | 'beds' | 'strum' | 'planting'>('profile');
   const [composerOpen, setComposerOpen] = useState(false);
   const [pendingCrop, setPendingCrop] = useState<MasterCrop | null>(null);
   const [proMode, setProMode] = useState(() => {
@@ -679,7 +679,6 @@ const CropOracle = () => {
                   { id: 'profile' as const, icon: <Leaf className="w-4 h-4" />, label: 'Profile' },
                   { id: 'guild' as const, icon: <Users className="w-4 h-4" />, label: 'Guild' },
                   ...(proMode ? [
-                    { id: 'harmony' as const, icon: <Music className="w-4 h-4" />, label: 'Harmony' },
                     { id: 'timing' as const, icon: <Moon className="w-4 h-4" />, label: 'Timing' },
                   ] : []),
                   { id: 'beds' as const, icon: <Grid3X3 className="w-4 h-4" />, label: 'Beds' },
@@ -784,99 +783,187 @@ const CropOracle = () => {
                   </>
                 )}
 
-                {/* GUILD */}
-                {activeSection === 'guild' && (
-                  <SynthPanel className="p-3">
-                    <div className="flex items-center gap-2 mb-2.5">
-                      <Users className="w-4 h-4" style={{ color: 'hsl(120 50% 50%)' }} />
-                      <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: 'hsl(120 50% 50%)' }}>
-                        {proMode ? `COMPANION GUILD (${companionCrops.length})` : `PLANT WITH (${companionCrops.length})`}
-                      </span>
-                    </div>
-                    {companionCrops.length > 0 ? (
-                      <div className="space-y-1.5">
-                        {companionCrops.map(({ name, crop }) => (
-                          <button
-                            key={name}
-                            className="w-full flex items-center gap-2 p-2 rounded-lg text-left transition-colors"
-                            style={{
-                              background: crop ? `${ZONE_COLORS[crop.frequency_hz] || '#888'}08` : 'hsl(0 0% 5%)',
-                              border: `1px solid ${crop ? `${ZONE_COLORS[crop.frequency_hz] || '#888'}20` : 'hsl(0 0% 10%)'}`,
-                            }}
-                            onClick={() => {
-                              if (crop) { setSelectedCrop(crop); setQuery(crop.common_name || crop.name); }
-                            }}
-                          >
-                            <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{
-                              background: crop ? ZONE_COLORS[crop.frequency_hz] || '#888' : 'hsl(0 0% 25%)',
-                              boxShadow: crop ? `0 0 6px ${ZONE_COLORS[crop.frequency_hz]}50` : 'none',
-                            }} />
-                            <span className="text-xs font-mono flex-1" style={{ color: crop ? 'hsl(0 0% 70%)' : 'hsl(0 0% 35%)' }}>{name}</span>
-                            {proMode && crop && (
-                              <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
-                                {crop.frequency_hz}Hz • {crop.chord_interval || '—'}
-                              </span>
-                            )}
-                            {!crop && <span className="text-[8px] font-mono" style={{ color: 'hsl(0 60% 45%)' }}>NOT IN REGISTRY</span>}
-                          </button>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>No companions assigned yet.</p>
-                    )}
-                  </SynthPanel>
-                )}
+                {/* GUILD — Unified Companion + Harmony View */}
+                {activeSection === 'guild' && (() => {
+                  // Organize companions by their chord interval
+                  const INTERVALS = ['1st', '3rd', '5th', '7th', '9th', '11th', '13th'] as const;
+                  const INTERVAL_LABELS_MAP: Record<string, { emoji: string; role: string }> = {
+                    '1st': { emoji: '🌱', role: 'Root / Canopy' },
+                    '3rd': { emoji: '🌿', role: 'Aromatic / Trap' },
+                    '5th': { emoji: '🫘', role: 'Nitrogen / Stabilizer' },
+                    '7th': { emoji: '🌼', role: 'Pollinator / Signal' },
+                    '9th': { emoji: '🥕', role: 'Subterranean / Tuber' },
+                    '11th': { emoji: '🍄', role: 'Fungi / Sentinel' },
+                    '13th': { emoji: '🌺', role: 'Aerial / Vine' },
+                  };
 
-                {/* HARMONY (Pro only) */}
-                {activeSection === 'harmony' && proMode && (
-                  <>
-                    {chordRecipe && (
-                      <SynthPanel className="p-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Music className="w-4 h-4" style={{ color: 'hsl(45 80% 55%)' }} />
-                          <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: 'hsl(45 80% 55%)' }}>JAZZ 13TH RECIPE MATCH</span>
+                  // Build a map: interval -> { recipe crop, companion crops }
+                  const slotMap = INTERVALS.map(interval => {
+                    const recipeMatch = chordRecipe?.intervals.find(iv => iv.interval === interval);
+                    const slotCompanions = companionCrops.filter(({ crop }) =>
+                      crop?.chord_interval?.includes(interval)
+                    );
+                    return { interval, recipeMatch, companions: slotCompanions };
+                  });
+
+                  // Unslotted companions (no interval match)
+                  const slottedNames = new Set(
+                    slotMap.flatMap(s => s.companions.map(c => c.name))
+                  );
+                  const unslotted = companionCrops.filter(({ name }) => !slottedNames.has(name));
+
+                  return (
+                    <div className="space-y-2">
+                      {/* Recipe header (Pro) */}
+                      {proMode && chordRecipe && (
+                        <SynthPanel className="p-2.5">
+                          <div className="flex items-center gap-2">
+                            <Music className="w-3.5 h-3.5" style={{ color: 'hsl(45 80% 55%)' }} />
+                            <span className="text-[9px] font-mono font-bold tracking-wider" style={{ color: 'hsl(45 80% 55%)' }}>
+                              {chordRecipe.chordName}
+                            </span>
+                            <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
+                              {chordRecipe.zoneName} • {chordRecipe.frequencyHz}Hz
+                            </span>
+                          </div>
+                        </SynthPanel>
+                      )}
+
+                      {/* 7 Interval Slots */}
+                      <SynthPanel className="p-2">
+                        <div className="flex items-center gap-2 px-1 mb-2">
+                          <Users className="w-3.5 h-3.5" style={{ color: zoneColor }} />
+                          <span className="text-[9px] font-mono font-bold tracking-wider" style={{ color: zoneColor }}>
+                            {proMode ? 'CHORD GUILD' : 'PLANT WITH'} • {companionCrops.length} COMPANIONS
+                          </span>
                         </div>
-                        <p className="text-xs font-mono" style={{ color: 'hsl(45 60% 50%)' }}>
-                          Part of <strong>{chordRecipe.chordName}</strong> ({chordRecipe.zoneName} • {chordRecipe.frequencyHz}Hz)
-                        </p>
-                        <div className="flex gap-1 mt-2">
-                          {chordRecipe.intervals.map(iv => (
-                            <div key={iv.interval} className="px-1.5 py-1 rounded text-center" style={{
-                              background: iv.cropName === (selectedCrop.common_name || selectedCrop.name) ? `${zoneColor}30` : 'hsl(0 0% 6%)',
-                              border: iv.cropName === (selectedCrop.common_name || selectedCrop.name) ? `2px solid ${zoneColor}60` : '1px solid hsl(0 0% 12%)',
-                              boxShadow: iv.cropName === (selectedCrop.common_name || selectedCrop.name) ? `0 0 8px ${zoneColor}20` : 'none',
-                            }}>
-                              <span className="text-[8px] font-mono block" style={{ color: 'hsl(0 0% 40%)' }}>{iv.interval}</span>
-                              <span className="text-[10px]">{iv.emoji}</span>
+                        <div className="space-y-0.5">
+                          {slotMap.map(({ interval, recipeMatch, companions }) => {
+                            const meta = INTERVAL_LABELS_MAP[interval];
+                            const hasContent = recipeMatch || companions.length > 0;
+                            const isSelectedSlot = selectedCrop.chord_interval?.includes(interval);
+
+                            return (
+                              <div
+                                key={interval}
+                                className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg"
+                                style={{
+                                  background: isSelectedSlot ? `${zoneColor}15` : hasContent ? 'hsl(0 0% 5%)' : 'hsl(0 0% 3%)',
+                                  border: `1px solid ${isSelectedSlot ? `${zoneColor}40` : hasContent ? 'hsl(0 0% 10%)' : 'hsl(0 0% 6%)'}`,
+                                }}
+                              >
+                                {/* Interval badge */}
+                                <span className="text-[8px] font-mono font-bold w-7 text-center shrink-0" style={{ color: isSelectedSlot ? zoneColor : 'hsl(0 0% 40%)' }}>
+                                  {interval}
+                                </span>
+                                {/* Emoji */}
+                                <span className="text-xs shrink-0">{meta.emoji}</span>
+                                {/* Content */}
+                                <div className="flex-1 min-w-0">
+                                  {isSelectedSlot ? (
+                                    <span className="text-[10px] font-mono font-bold truncate block" style={{ color: zoneColor }}>
+                                      ★ {selectedCrop.common_name || selectedCrop.name}
+                                    </span>
+                                  ) : companions.length > 0 ? (
+                                    <div className="flex flex-wrap gap-1">
+                                      {companions.map(({ name, crop }) => (
+                                        <button
+                                          key={name}
+                                          className="text-[9px] font-mono px-1.5 py-0.5 rounded transition-colors truncate"
+                                          style={{
+                                            background: crop ? `${ZONE_COLORS[crop.frequency_hz] || '#888'}10` : 'hsl(0 0% 6%)',
+                                            border: `1px solid ${crop ? `${ZONE_COLORS[crop.frequency_hz] || '#888'}25` : 'hsl(0 0% 10%)'}`,
+                                            color: crop ? 'hsl(0 0% 65%)' : 'hsl(0 0% 35%)',
+                                          }}
+                                          onClick={() => {
+                                            if (crop) { setSelectedCrop(crop); setQuery(crop.common_name || crop.name); }
+                                          }}
+                                        >
+                                          {name}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  ) : recipeMatch ? (
+                                    <span className="text-[9px] font-mono truncate block" style={{ color: 'hsl(0 0% 35%)' }}>
+                                      {recipeMatch.emoji} {recipeMatch.cropName}
+                                      <span className="text-[7px] ml-1" style={{ color: 'hsl(0 0% 25%)' }}>recipe</span>
+                                    </span>
+                                  ) : (
+                                    <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 20%)' }}>
+                                      {proMode ? meta.role : '—'}
+                                    </span>
+                                  )}
+                                </div>
+                                {/* Pro: Hz badge for companions */}
+                                {proMode && companions.length > 0 && (
+                                  <span className="text-[7px] font-mono shrink-0" style={{ color: 'hsl(0 0% 30%)' }}>
+                                    {companions.length}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Unslotted companions */}
+                        {unslotted.length > 0 && (
+                          <div className="mt-2 pt-2" style={{ borderTop: '1px solid hsl(0 0% 8%)' }}>
+                            <span className="text-[8px] font-mono block mb-1 px-1" style={{ color: 'hsl(0 0% 30%)' }}>
+                              UNASSIGNED ({unslotted.length})
+                            </span>
+                            <div className="flex flex-wrap gap-1 px-1">
+                              {unslotted.map(({ name, crop }) => (
+                                <button
+                                  key={name}
+                                  className="text-[9px] font-mono px-1.5 py-0.5 rounded transition-colors"
+                                  style={{
+                                    background: crop ? `${ZONE_COLORS[crop.frequency_hz] || '#888'}08` : 'hsl(0 0% 5%)',
+                                    border: `1px solid ${crop ? `${ZONE_COLORS[crop.frequency_hz] || '#888'}20` : 'hsl(0 0% 10%)'}`,
+                                    color: crop ? 'hsl(0 0% 60%)' : 'hsl(0 0% 35%)',
+                                  }}
+                                  onClick={() => {
+                                    if (crop) { setSelectedCrop(crop); setQuery(crop.common_name || crop.name); }
+                                  }}
+                                >
+                                  {name}
+                                  {!crop && <span className="text-[7px] ml-0.5" style={{ color: 'hsl(0 60% 45%)' }}>✗</span>}
+                                </button>
+                              ))}
                             </div>
-                          ))}
-                        </div>
+                          </div>
+                        )}
                       </SynthPanel>
-                    )}
-                    <HarmonicWarningsCard crop={selectedCrop} />
-                    {conflicts.length > 0 && (
-                      <SynthPanel className="p-3">
-                        <div className="flex items-center gap-2 mb-2">
-                          <AlertTriangle className="w-4 h-4" style={{ color: 'hsl(0 60% 55%)' }} />
-                          <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: 'hsl(0 60% 55%)' }}>SLOT COMPETITORS ({conflicts.length})</span>
-                        </div>
-                        <p className="text-[9px] font-mono mb-2" style={{ color: 'hsl(0 0% 40%)' }}>Same zone + interval + instrument — only one can occupy this slot per bed.</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {conflicts.map(c => (
-                            <button key={c.id} className="px-2 py-1 rounded-lg text-[10px] font-mono"
-                              style={{
-                                background: 'hsl(0 0% 6%)',
-                                border: '1px solid hsl(0 0% 14%)',
-                                color: 'hsl(0 0% 60%)',
-                              }}
-                              onClick={() => { setSelectedCrop(c); setQuery(c.common_name || c.name); }}
-                            >{c.common_name || c.name}</button>
-                          ))}
-                        </div>
-                      </SynthPanel>
-                    )}
-                  </>
-                )}
+
+                      {/* Pro: Warnings + Conflicts */}
+                      {proMode && (
+                        <>
+                          <HarmonicWarningsCard crop={selectedCrop} />
+                          {conflicts.length > 0 && (
+                            <SynthPanel className="p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <AlertTriangle className="w-4 h-4" style={{ color: 'hsl(0 60% 55%)' }} />
+                                <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: 'hsl(0 60% 55%)' }}>SLOT COMPETITORS ({conflicts.length})</span>
+                              </div>
+                              <p className="text-[9px] font-mono mb-2" style={{ color: 'hsl(0 0% 40%)' }}>Same zone + interval + instrument — only one can occupy this slot per bed.</p>
+                              <div className="flex flex-wrap gap-1.5">
+                                {conflicts.map(c => (
+                                  <button key={c.id} className="px-2 py-1 rounded-lg text-[10px] font-mono"
+                                    style={{
+                                      background: 'hsl(0 0% 6%)',
+                                      border: '1px solid hsl(0 0% 14%)',
+                                      color: 'hsl(0 0% 60%)',
+                                    }}
+                                    onClick={() => { setSelectedCrop(c); setQuery(c.common_name || c.name); }}
+                                  >{c.common_name || c.name}</button>
+                                ))}
+                              </div>
+                            </SynthPanel>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {/* TIMING (Pro only) */}
                 {activeSection === 'timing' && proMode && (
@@ -921,8 +1008,8 @@ const CropOracle = () => {
         )}
       </AnimatePresence>
 
-      {/* ═══ HARMONIC MATRIX ═══ */}
-      {proMode && <HarmonicCarousel />}
+
+
 
       {/* Chord Composer Drawer */}
       <ChordComposer
