@@ -139,7 +139,7 @@ export const trackData: TrackData[] = [
   {
     row: 4,
     track: 'Destined Nation',
-    featuring: 'Briar Blakley',
+    featuring: 'Briar Blakley & Benjamin J. Davidow',
     chakra: 'Sacral',
     frequency: '528Hz',
     mineral: 'Nitrogen',
@@ -270,6 +270,7 @@ export const trackData: TrackData[] = [
   {
     row: 8,
     track: 'No Nouns (Acoustic)',
+    featuring: 'Benjamin J. Davidow',
     chakra: 'Throat',
     frequency: '741Hz',
     mineral: 'Calcium',
@@ -302,7 +303,7 @@ export const trackData: TrackData[] = [
   {
     row: 9,
     track: 'LAFS',
-    featuring: 'Nichollé McKoy',
+    featuring: 'Nichollé McKoy & Benjamin J. Davidow',
     chakra: 'Throat',
     frequency: '852Hz',
     mineral: 'Silicon',
@@ -335,6 +336,7 @@ export const trackData: TrackData[] = [
   {
     row: 10,
     track: 'M.O.E.',
+    featuring: 'Benjamin J. Davidow',
     chakra: 'Vision',
     frequency: '852Hz',
     mineral: 'Copper',
@@ -367,7 +369,7 @@ export const trackData: TrackData[] = [
   {
     row: 11,
     track: 'Awaken',
-    featuring: 'Victoria, Dara Carter & Briar Blakley',
+    featuring: 'Victoria, Dara Carter, Briar Blakley & Benjamin J. Davidow',
     chakra: 'Vision',
     frequency: '963Hz',
     mineral: 'Phosphorus',
