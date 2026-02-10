@@ -342,7 +342,7 @@ const ActivationQuadrant = forwardRef<HTMLDivElement, ActivationQuadrantProps>(
             {/* Why this pose */}
             <div>
               <p 
-                className="font-mono text-[10px] uppercase tracking-wider mb-2"
+                className="font-body text-[10px] uppercase tracking-wider mb-2"
                 style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
               >
                 Why This Pose
