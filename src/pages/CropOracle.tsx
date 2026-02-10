@@ -57,7 +57,6 @@ const CropOracle = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
   const [seasonalOverride, setSeasonalOverride] = useState(false);
   const [swapSlotIndex, setSwapSlotIndex] = useState<number | null>(null);
   const [manualOverrides, setManualOverrides] = useState<Record<number, MasterCrop>>({});
