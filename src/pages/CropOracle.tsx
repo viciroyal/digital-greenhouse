@@ -414,21 +414,39 @@ const CropOracle = () => {
           ))}
         </div>
 
-        <button
-          onClick={() => setProMode(!proMode)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[10px] tracking-wider transition-all shrink-0"
-          style={{
-            background: proMode
-              ? 'linear-gradient(135deg, hsl(270 40% 18%), hsl(270 30% 12%))'
-              : 'hsl(0 0% 10%)',
-            border: `1px solid ${proMode ? 'hsl(270 50% 40%)' : 'hsl(0 0% 20%)'}`,
-            color: proMode ? 'hsl(270 60% 75%)' : 'hsl(120 40% 60%)',
-            boxShadow: proMode ? '0 0 12px hsl(270 50% 30% / 0.3)' : 'none',
-          }}
-        >
-          <span className="text-sm">{proMode ? '🎛️' : '🌱'}</span>
-          {proMode ? 'PRO' : 'BEGIN'}
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => setProMode(!proMode)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[10px] tracking-wider transition-all"
+            style={{
+              background: proMode
+                ? 'linear-gradient(135deg, hsl(270 40% 18%), hsl(270 30% 12%))'
+                : 'hsl(0 0% 10%)',
+              border: `1px solid ${proMode ? 'hsl(270 50% 40%)' : 'hsl(0 0% 20%)'}`,
+              color: proMode ? 'hsl(270 60% 75%)' : 'hsl(120 40% 60%)',
+              boxShadow: proMode ? '0 0 12px hsl(270 50% 30% / 0.3)' : 'none',
+            }}
+          >
+            <span className="text-sm">{proMode ? '🎛️' : '🌱'}</span>
+            {proMode ? 'PRO' : 'BEGIN'}
+          </button>
+
+          <button
+            onClick={() => navigate(userId ? '/profile' : '/auth')}
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
+            style={{
+              background: 'hsl(0 0% 10%)',
+              border: userId ? '1px solid hsl(51 80% 50% / 0.4)' : '1px solid hsl(0 0% 20%)',
+            }}
+            title={userId ? 'Profile' : 'Sign In'}
+          >
+            {userId ? (
+              <User className="w-4 h-4" style={{ color: 'hsl(51 80% 60%)' }} />
+            ) : (
+              <LogIn className="w-4 h-4" style={{ color: 'hsl(0 0% 60%)' }} />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* ═══ Celestial Banner ═══ */}
