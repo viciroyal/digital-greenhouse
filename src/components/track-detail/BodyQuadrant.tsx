@@ -36,7 +36,7 @@ const BodyQuadrant = ({ track }: BodyQuadrantProps) => {
         <div className="space-y-4">
           <div>
             <p 
-              className="font-mono text-[10px] uppercase tracking-wider mb-1"
+              className="font-body text-[10px] uppercase tracking-wider mb-1"
               style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
             >
               Organ Systems
