@@ -155,8 +155,8 @@ const CropOracle = () => {
         </h1>
         {/* Easy / Pro Toggle */}
         <button
-          onClick={toggleProMode}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all"
+          onClick={() => { toggleProMode(); setShowHint(false); localStorage.setItem('oracle-hint-dismissed', 'true'); }}
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all ${showHint ? 'animate-[oracle-pulse_2s_ease-in-out_infinite]' : ''}`}
           style={{
             background: proMode ? 'hsl(45 80% 55% / 0.15)' : 'hsl(120 50% 50% / 0.12)',
             border: `1px solid ${proMode ? 'hsl(45 80% 55% / 0.4)' : 'hsl(120 50% 50% / 0.3)'}`,
