@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Music, ArrowLeft, Play, Pause } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CHORD_RECIPES, ChordRecipe } from '@/data/chordRecipes';
 
 /**
@@ -90,9 +90,19 @@ interface BedStrumVisualizerProps {
 
 const BedStrumVisualizer = ({ recipe: propRecipe }: BedStrumVisualizerProps) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selectedZone, setSelectedZone] = useState(0);
   const [strumming, setStrumming] = useState(false);
   const [activeLayer, setActiveLayer] = useState<number | null>(null);
+
+  // Support ?freq=528 URL param to pre-select zone
+  useEffect(() => {
+    const freq = searchParams.get('freq');
+    if (freq) {
+      const idx = CHORD_RECIPES.findIndex(r => r.frequencyHz === parseInt(freq));
+      if (idx >= 0) setSelectedZone(idx);
+    }
+  }, [searchParams]);
 
   const recipe = propRecipe || CHORD_RECIPES[selectedZone];
   const zoneColor = recipe.zoneColor;
