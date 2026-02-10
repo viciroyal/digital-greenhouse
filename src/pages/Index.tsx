@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ShopSection from '@/components/ShopSection';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, User } from 'lucide-react';
 import GrandCosmogram from '@/components/cosmogram/GrandCosmogram';
 import RespiratorySystem from '@/components/bio-digital/RespiratorySystem';
 import BioluminescentVeins from '@/components/bio-digital/BioluminescentVeins';
@@ -166,23 +166,41 @@ const Index = () => {
             </motion.button>
           </div>
 
-          {/* User Guide icon */}
-          <motion.button
-            onClick={() => navigate('/user-guide')}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 z-20"
-            style={{
-              background: 'hsl(0 0% 10% / 0.6)',
-              border: '1px solid hsl(0 0% 25% / 0.4)',
-              backdropFilter: 'blur(8px)',
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
-            whileHover={{ background: 'hsl(120 30% 15% / 0.6)' }}
-            title="User Guide"
-          >
-            <BookOpen className="w-4 h-4" style={{ color: 'hsl(40 50% 75% / 0.7)' }} />
-          </motion.button>
+          {/* Header icons */}
+          <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
+            <motion.button
+              onClick={() => navigate('/profile')}
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+              style={{
+                background: 'hsl(0 0% 10% / 0.6)',
+                border: '1px solid hsl(0 0% 25% / 0.4)',
+                backdropFilter: 'blur(8px)',
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.2 }}
+              whileHover={{ background: 'hsl(120 30% 15% / 0.6)' }}
+              title="Profile"
+            >
+              <User className="w-4 h-4" style={{ color: 'hsl(40 50% 75% / 0.7)' }} />
+            </motion.button>
+            <motion.button
+              onClick={() => navigate('/user-guide')}
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+              style={{
+                background: 'hsl(0 0% 10% / 0.6)',
+                border: '1px solid hsl(0 0% 25% / 0.4)',
+                backdropFilter: 'blur(8px)',
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.2 }}
+              whileHover={{ background: 'hsl(120 30% 15% / 0.6)' }}
+              title="User Guide"
+            >
+              <BookOpen className="w-4 h-4" style={{ color: 'hsl(40 50% 75% / 0.7)' }} />
+            </motion.button>
+          </div>
 
           {/* Scroll indicator */}
           <motion.div
