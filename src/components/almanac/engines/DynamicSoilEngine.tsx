@@ -7,6 +7,7 @@ import { LearnMoreButton } from '@/components/almanac';
 import EnvironmentSelector from './soil/EnvironmentSelector';
 import PotMixCalculator from './soil/PotMixCalculator';
 import HarmonizationPanel from './soil/HarmonizationPanel';
+import SavedSoilConfigs from './soil/SavedSoilConfigs';
 import {
   type EnvironmentType,
   MASTER_MIX_PROTOCOL,
@@ -70,6 +71,15 @@ const DynamicSoilEngine = () => {
     else if (env === 'high_tunnel') { setBedWidth(2.5); setBedLength(96); }
   };
 
+  const handleLoadConfig = (config: { environment: string; bed_width: number | null; bed_length: number | null; container_size: string | null; frequency_hz: number | null }) => {
+    const env = config.environment as EnvironmentType;
+    setEnvironment(env);
+    setCheckedItems({});
+    if (config.bed_width) setBedWidth(config.bed_width);
+    if (config.bed_length) setBedLength(config.bed_length);
+    setSelectedHz(config.frequency_hz);
+  };
+
   return (
     <div
       className="rounded-xl overflow-hidden"
@@ -105,6 +115,15 @@ const DynamicSoilEngine = () => {
 
         {/* Environment Selector */}
         <EnvironmentSelector selected={environment} onChange={handleEnvironmentChange} />
+
+        {/* Saved Configs */}
+        <SavedSoilConfigs
+          environment={environment}
+          bedWidth={bedWidth}
+          bedLength={bedLength}
+          selectedHz={selectedHz}
+          onLoad={handleLoadConfig}
+        />
 
         {/* ═══ POT MODE ═══ */}
         {!useMasterMix && (
