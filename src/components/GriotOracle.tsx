@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, X, Leaf, Music } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -16,6 +16,20 @@ const GriotOracle = () => {
   const navigate = useNavigate();
   const isCropOracle = location.pathname === '/crop-oracle';
   const [isOpen, setIsOpen] = useState(false);
+  const [hasScrolledToSound, setHasScrolledToSound] = useState(false);
+
+  // Track whether the sound system section is visible
+  useEffect(() => {
+    if (isCropOracle) return;
+    const el = document.querySelector('[data-section="sound-system"]');
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setHasScrolledToSound(true); },
+      { threshold: 0.2 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isCropOracle, location.pathname]);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
@@ -173,7 +187,12 @@ const GriotOracle = () => {
         {isCropOracle ? (
           <Leaf className="w-7 h-7" style={{ color: 'hsl(120 50% 65%)' }} />
         ) : (
-          <Music className="w-7 h-7" style={{ color: 'hsl(270 60% 70%)' }} />
+          <motion.div
+            animate={hasScrolledToSound ? {} : { y: [0, -4, 0, -2, 0] }}
+            transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.5, ease: 'easeInOut' }}
+          >
+            <Music className="w-7 h-7" style={{ color: 'hsl(270 60% 70%)' }} />
+          </motion.div>
         )}
 
         {/* Glow effect */}
