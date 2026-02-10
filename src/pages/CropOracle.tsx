@@ -12,6 +12,7 @@ import LunarGateCard, { getCurrentMoonPhase, getLunarPhase } from '@/components/
 import SeasonalMovementCard from '@/components/crop-oracle/SeasonalMovementCard';
 import HarmonicWarningsCard from '@/components/crop-oracle/HarmonicWarningsCard';
 import BedOrganizationCard from '@/components/crop-oracle/BedOrganizationCard';
+import BedStrumEmbed from '@/components/crop-oracle/BedStrumEmbed';
 
 /* ─── Zone color helper ─── */
 const ZONE_COLORS: Record<number, string> = {
@@ -534,6 +535,9 @@ const CropOracle = () => {
 
             {/* Bed Organization & Spacing */}
             <BedOrganizationCard crop={selectedCrop} zoneColor={zoneColor} />
+
+            {/* Bed Strum — Placement Guide (inline) */}
+            <BedStrumEmbed frequencyHz={selectedCrop.frequency_hz} zoneColor={zoneColor} />
 
             {/* Metadata Footer */}
             <div
