@@ -57,6 +57,9 @@ const CropOracle = () => {
   const [seasonalOverride, setSeasonalOverride] = useState(false);
   const [swapSlotIndex, setSwapSlotIndex] = useState<number | null>(null);
   const [manualOverrides, setManualOverrides] = useState<Record<number, MasterCrop>>({});
+  const [starCrop, setStarCrop] = useState<MasterCrop | null>(null);
+  const [showStarPicker, setShowStarPicker] = useState(false);
+  const [starSearchQuery, setStarSearchQuery] = useState('');
 
   // Real-time celestial data
   const lunar = useMemo(() => getLunarPhase(), []);
@@ -77,6 +80,9 @@ const CropOracle = () => {
     setIsSaved(false);
     setManualOverrides({});
     setSwapSlotIndex(null);
+    setStarCrop(null);
+    setShowStarPicker(false);
+    setStarSearchQuery('');
   }, [selectedZone, environment]);
 
   const handleSaveRecipe = async () => {
@@ -144,6 +150,29 @@ const CropOracle = () => {
     return filtered;
   }, [allCrops, selectedZone, environment]);
 
+  /* ─── Star crop candidates (all crops in zone that could lead) ─── */
+  const starCandidates = useMemo(() => {
+    if (!allCrops || !selectedZone) return [];
+    let candidates = allCrops.filter(c => c.frequency_hz === selectedZone.hz);
+    if (environment === 'pot') {
+      candidates = candidates.filter(c => {
+        const spacing = c.spacing_inches ? parseInt(c.spacing_inches) : 6;
+        return spacing <= POT_MAX_SPACING;
+      });
+    }
+    return candidates.sort((a, b) => (a.common_name || a.name).localeCompare(b.common_name || b.name));
+  }, [allCrops, selectedZone, environment]);
+
+  /* ─── Filtered star search ─── */
+  const filteredStarCandidates = useMemo(() => {
+    if (!starSearchQuery || starSearchQuery.length < 1) return starCandidates.slice(0, 20);
+    const q = starSearchQuery.toLowerCase();
+    return starCandidates.filter(c =>
+      (c.common_name && c.common_name.toLowerCase().includes(q)) ||
+      c.name.toLowerCase().includes(q)
+    ).slice(0, 20);
+  }, [starCandidates, starSearchQuery]);
+
   /* ─── Crop search across entire registry ─── */
   const searchResults = useMemo(() => {
     if (!allCrops || !searchQuery || searchQuery.length < 2) return [];
@@ -160,20 +189,43 @@ const CropOracle = () => {
 
   /* ─── Build 7-voice chord card ─── */
   const chordCard = useMemo(() => {
-    if (recipeCrops.length === 0) return [];
+    if (recipeCrops.length === 0 && !starCrop) return [];
 
+    // Use all zone crops (not just environment-filtered) for companion lookup
+    const zoneCrops = allCrops?.filter(c => selectedZone && c.frequency_hz === selectedZone.hz) || [];
+    const pool = recipeCrops.length > 0 ? recipeCrops : zoneCrops;
+    
     const usedIds = new Set<string>();
+
+    // Star crop's companion names for prioritization
+    const companionNames = (starCrop?.companion_crops || []).map(n => n.toLowerCase());
+
+    // Fuzzy match: does a crop match any companion name?
+    const isCompanion = (c: MasterCrop): boolean => {
+      const name = (c.common_name || c.name).toLowerCase();
+      return companionNames.some(cn => name.includes(cn) || cn.includes(name.split('(')[0].trim()));
+    };
 
     const pickCrop = (
       primary: MasterCrop | undefined,
       fallbackFn?: (c: MasterCrop) => boolean
     ): MasterCrop | null => {
+      // If star crop has companions, prefer companions that match the role
+      if (companionNames.length > 0 && fallbackFn) {
+        const companionMatch = pool.find(c => !usedIds.has(c.id) && isCompanion(c) && fallbackFn(c));
+        if (companionMatch) { usedIds.add(companionMatch.id); return companionMatch; }
+      }
       if (primary && !usedIds.has(primary.id)) {
         usedIds.add(primary.id);
         return primary;
       }
+      // Companion fallback (any role)
+      if (companionNames.length > 0) {
+        const anyCompanion = pool.find(c => !usedIds.has(c.id) && isCompanion(c));
+        if (anyCompanion) { usedIds.add(anyCompanion.id); return anyCompanion; }
+      }
       if (fallbackFn) {
-        const fb = recipeCrops.find(c => !usedIds.has(c.id) && fallbackFn(c));
+        const fb = pool.find(c => !usedIds.has(c.id) && fallbackFn(c));
         if (fb) { usedIds.add(fb.id); return fb; }
       }
       return null;
@@ -181,11 +233,17 @@ const CropOracle = () => {
 
     return INTERVAL_ORDER.map(interval => {
       let crop: MasterCrop | null = null;
-      const directMatch = recipeCrops.find(c => !usedIds.has(c.id) && c.chord_interval === interval.key);
+      const directMatch = pool.find(c => !usedIds.has(c.id) && c.chord_interval === interval.key);
 
       switch (interval.key) {
         case 'Root (Lead)':
-          crop = pickCrop(directMatch, c => c.chord_interval === 'Root (Lead)');
+          // Star crop always takes this slot
+          if (starCrop && !usedIds.has(starCrop.id)) {
+            usedIds.add(starCrop.id);
+            crop = starCrop;
+          } else {
+            crop = pickCrop(directMatch, c => c.chord_interval === 'Root (Lead)');
+          }
           break;
         case '3rd (Triad)':
           crop = pickCrop(directMatch, c => c.chord_interval === '3rd (Triad)');
@@ -234,7 +292,7 @@ const CropOracle = () => {
 
       return { ...interval, crop };
     }).map((slot, i) => manualOverrides[i] ? { ...slot, crop: manualOverrides[i] } : slot);
-  }, [recipeCrops, manualOverrides]);
+  }, [recipeCrops, manualOverrides, starCrop, allCrops, selectedZone]);
 
   const handleSwapCrop = (crop: MasterCrop) => {
     if (swapSlotIndex === null) return;
@@ -521,6 +579,149 @@ const CropOracle = () => {
               <p className="text-center text-[10px] font-mono mb-4" style={{ color: 'hsl(0 0% 30%)' }}>
                 ZONE {ZONES.indexOf(selectedZone) + 1} • {selectedZone.name.toUpperCase()} • {selectedZone.hz}Hz • KEY OF {selectedZone.note}
               </p>
+
+              {/* ═══ Star Picker ═══ */}
+              <motion.div
+                className="mb-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.15 }}
+              >
+                <button
+                  onClick={() => { setShowStarPicker(!showStarPicker); setStarSearchQuery(''); }}
+                  className="w-full py-3 rounded-xl font-mono text-xs tracking-wider flex items-center justify-center gap-2 transition-all"
+                  style={{
+                    background: starCrop
+                      ? `linear-gradient(135deg, ${selectedZone.color}12, hsl(0 0% 6%))`
+                      : 'hsl(0 0% 6%)',
+                    border: `1px solid ${starCrop ? selectedZone.color + '40' : 'hsl(0 0% 12%)'}`,
+                    color: starCrop ? selectedZone.color : 'hsl(45 80% 55%)',
+                  }}
+                >
+                  <span className="text-base">🌟</span>
+                  {starCrop
+                    ? `STAR: ${(starCrop.common_name || starCrop.name).toUpperCase()}`
+                    : 'CHOOSE YOUR STAR CROP'}
+                </button>
+
+                <AnimatePresence>
+                  {showStarPicker && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pt-2">
+                        <div
+                          className="flex items-center gap-2 px-4 py-3 rounded-xl mb-2"
+                          style={{
+                            background: 'hsl(0 0% 6%)',
+                            border: `1px solid ${selectedZone.color}20`,
+                          }}
+                        >
+                          <Search className="w-4 h-4 shrink-0" style={{ color: selectedZone.color + '60' }} />
+                          <input
+                            type="text"
+                            value={starSearchQuery}
+                            onChange={e => setStarSearchQuery(e.target.value)}
+                            placeholder={`Search ${starCandidates.length} crops in ${selectedZone.name}...`}
+                            className="bg-transparent flex-1 text-sm font-body outline-none"
+                            style={{ color: 'hsl(0 0% 80%)' }}
+                            autoFocus
+                          />
+                          {starSearchQuery && (
+                            <button onClick={() => setStarSearchQuery('')}>
+                              <X className="w-4 h-4" style={{ color: 'hsl(0 0% 35%)' }} />
+                            </button>
+                          )}
+                        </div>
+
+                        <div
+                          className="rounded-xl overflow-hidden divide-y max-h-64 overflow-y-auto"
+                          style={{
+                            background: 'hsl(0 0% 5%)',
+                            border: `1px solid ${selectedZone.color}15`,
+                          }}
+                        >
+                          {/* Clear star option */}
+                          {starCrop && (
+                            <button
+                              className="px-4 py-3 w-full text-left flex items-center gap-3 transition-all"
+                              style={{ borderColor: 'hsl(0 0% 10%)' }}
+                              onClick={() => {
+                                setStarCrop(null);
+                                setManualOverrides({});
+                                setShowStarPicker(false);
+                                setIsSaved(false);
+                              }}
+                              onMouseEnter={e => { e.currentTarget.style.background = 'hsl(0 60% 30% / 0.1)'; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                            >
+                              <X className="w-3 h-3" style={{ color: 'hsl(0 60% 60%)' }} />
+                              <span className="text-xs font-mono" style={{ color: 'hsl(0 60% 60%)' }}>
+                                CLEAR STAR — USE AUTO-SELECT
+                              </span>
+                            </button>
+                          )}
+
+                          {filteredStarCandidates.map(crop => {
+                            const isSelected = starCrop?.id === crop.id;
+                            const ready = isCropLunarReady(crop.category, crop.common_name || crop.name, lunar.plantingType);
+                            return (
+                              <button
+                                key={crop.id}
+                                className="px-4 py-3 w-full text-left flex items-center gap-3 transition-all"
+                                style={{
+                                  borderColor: 'hsl(0 0% 10%)',
+                                  background: isSelected ? `${selectedZone.color}10` : 'transparent',
+                                }}
+                                onClick={() => {
+                                  setStarCrop(crop);
+                                  setManualOverrides({});
+                                  setShowStarPicker(false);
+                                  setIsSaved(false);
+                                  toast({
+                                    title: `🌟 ${crop.common_name || crop.name}`,
+                                    description: 'Chord rebuilt around your Star.',
+                                  });
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.background = `${selectedZone.color}08`; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = isSelected ? `${selectedZone.color}10` : 'transparent'; }}
+                              >
+                                <div
+                                  className="w-3 h-3 rounded-full shrink-0"
+                                  style={{ background: isSelected ? selectedZone.color : `${selectedZone.color}50` }}
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-sm font-body truncate" style={{ color: isSelected ? selectedZone.color : 'hsl(0 0% 80%)' }}>
+                                      {crop.common_name || crop.name}
+                                    </span>
+                                    {isSelected && <span className="text-[8px]">🌟</span>}
+                                    {ready && (
+                                      <span className="text-[8px] font-mono px-1 py-0.5 rounded shrink-0" style={{
+                                        background: 'hsl(120 50% 25% / 0.3)',
+                                        color: 'hsl(120 60% 60%)',
+                                      }}>
+                                        {lunar.phaseEmoji} READY
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                                    {crop.category}{crop.chord_interval ? ` • ${crop.chord_interval}` : ''}
+                                    {crop.companion_crops?.length ? ` • ${crop.companion_crops.length} companions` : ''}
+                                  </p>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
 
               {/* ─── Seasonal Gate Warning ─── */}
               {seasonalGate && !seasonalOverride && (
