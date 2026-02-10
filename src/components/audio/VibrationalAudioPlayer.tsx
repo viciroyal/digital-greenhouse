@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Volume2, VolumeX, RotateCcw } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, RotateCcw, SkipBack, SkipForward } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 
 interface VibrationalAudioPlayerProps {
