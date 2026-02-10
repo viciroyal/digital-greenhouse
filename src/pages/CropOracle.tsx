@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import GriotOracle from '@/components/GriotOracle';
 import EshuLoader from '@/components/EshuLoader';
 import { useWeatherAlert } from '@/hooks/useWeatherAlert';
+import MiniMusicPlayer from '@/components/audio/MiniMusicPlayer';
 
 /* ─── Zone Data ─── */
 const ZONES = [
@@ -1629,6 +1630,9 @@ const CropOracle = () => {
 
       {/* Griot Oracle — Floating Help */}
       <GriotOracle />
+
+      {/* Mini Music Player */}
+      <MiniMusicPlayer />
     </div>
   );
 };
