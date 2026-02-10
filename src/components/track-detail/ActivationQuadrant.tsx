@@ -342,7 +342,7 @@ const ActivationQuadrant = forwardRef<HTMLDivElement, ActivationQuadrantProps>(
             {/* Why this pose */}
             <div>
               <p 
-                className="font-mono text-[10px] uppercase tracking-wider mb-2"
+                className="font-body text-[10px] uppercase tracking-wider mb-2"
                 style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
               >
                 Why This Pose
@@ -361,7 +361,7 @@ const ActivationQuadrant = forwardRef<HTMLDivElement, ActivationQuadrantProps>(
               }}
             >
               <p 
-                className="font-mono text-[10px] uppercase tracking-wider mb-2"
+                className="font-body text-[10px] uppercase tracking-wider mb-2"
                 style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
               >
                 The Action
@@ -380,7 +380,7 @@ const ActivationQuadrant = forwardRef<HTMLDivElement, ActivationQuadrantProps>(
                 className="h-px flex-1"
                 style={{ background: `linear-gradient(90deg, hsl(${track.colorHsl} / 0.3), transparent)` }}
               />
-              <p className="font-mono text-[10px]" style={{ color: 'hsl(40 30% 55%)' }}>
+              <p className="font-body text-[10px]" style={{ color: 'hsl(40 30% 55%)' }}>
                 {track.yogaPose} × {track.frequency} × {track.chakra}
               </p>
               <div 

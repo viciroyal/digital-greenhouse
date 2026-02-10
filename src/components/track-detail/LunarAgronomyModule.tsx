@@ -293,7 +293,7 @@ const LunarAgronomyModule = ({ track }: LunarAgronomyModuleProps) => {
 
           <div className="flex-1">
             <p 
-              className="font-mono text-[10px] tracking-[0.2em] uppercase mb-1"
+              className="font-body text-[10px] tracking-[0.2em] uppercase mb-1"
               style={{ color: 'hsl(220 20% 60%)' }}
             >
               LUNAR OPERATIONAL PROTOCOL
@@ -308,7 +308,7 @@ const LunarAgronomyModule = ({ track }: LunarAgronomyModuleProps) => {
               {lunarData.phase}
             </h3>
             <p 
-              className="font-mono text-xs italic"
+              className="font-body text-xs italic"
               style={{ color: 'hsl(40 50% 80%)' }}
             >
               "{lunarData.phaseName}"
@@ -344,14 +344,14 @@ const LunarAgronomyModule = ({ track }: LunarAgronomyModuleProps) => {
               <path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8V9a2 2 0 1 1 4 0" />
             </svg>
             <p 
-              className="font-mono text-[10px] tracking-[0.15em] uppercase"
+              className="font-body text-[10px] tracking-[0.15em] uppercase"
               style={{ color: lunarData.glowColor }}
             >
               [MANUAL_OVERRIDE] — THE HANDS
             </p>
           </div>
           <p 
-            className="font-mono text-sm leading-relaxed"
+              className="font-body text-sm leading-relaxed"
             style={{ color: 'hsl(40 50% 85%)' }}
           >
             {lunarData.task}
@@ -379,14 +379,14 @@ const LunarAgronomyModule = ({ track }: LunarAgronomyModuleProps) => {
               <path d="M9 22h6" />
             </svg>
             <p 
-              className="font-mono text-[10px] tracking-[0.15em] uppercase"
+              className="font-body text-[10px] tracking-[0.15em] uppercase"
               style={{ color: lunarData.glowColor }}
             >
               [GERMINATION_TARGET] — THE SEEDS
             </p>
           </div>
           <p 
-            className="font-mono text-sm leading-relaxed"
+            className="font-body text-sm leading-relaxed"
             style={{ color: 'hsl(40 50% 85%)' }}
           >
             {lunarData.plants}
@@ -401,14 +401,14 @@ const LunarAgronomyModule = ({ track }: LunarAgronomyModuleProps) => {
           transition={{ delay: 0.5 }}
         >
           <span 
-            className="font-mono text-xs"
+            className="font-body text-xs"
             style={{ color: `hsl(${track.colorHsl})` }}
           >
             {track.zodiacGlyph} {track.zodiacSign}
           </span>
           <span style={{ color: 'hsl(220 20% 40%)' }}>→</span>
           <span 
-            className="font-mono text-xs"
+            className="font-body text-xs"
             style={{ color: lunarData.glowColor }}
           >
             {lunarData.phase}

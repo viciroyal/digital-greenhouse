@@ -55,7 +55,7 @@ const SkyQuadrant = ({ track }: SkyQuadrantProps) => {
               {track.zodiacSign}
             </p>
             <p 
-              className="font-mono text-[10px] tracking-[0.2em] uppercase mt-1"
+              className="font-body text-[10px] tracking-[0.2em] uppercase mt-1"
               style={{ color: `hsl(${track.colorHsl})` }}
             >
               {track.zodiacName}
@@ -68,7 +68,7 @@ const SkyQuadrant = ({ track }: SkyQuadrantProps) => {
             style={{ borderColor: `hsl(${track.colorHsl} / 0.2)` }}
           >
             <p 
-              className="font-mono text-[10px] uppercase tracking-[0.15em] mb-1"
+              className="font-body text-[10px] uppercase tracking-[0.15em] mb-1"
               style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
             >
               ◇ Celestial Ruler
@@ -81,7 +81,7 @@ const SkyQuadrant = ({ track }: SkyQuadrantProps) => {
           {/* Moon Phase */}
           <div>
             <p 
-              className="font-mono text-[10px] uppercase tracking-[0.15em] mb-1"
+              className="font-body text-[10px] uppercase tracking-[0.15em] mb-1"
               style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
             >
               ◇ Moon Cycle

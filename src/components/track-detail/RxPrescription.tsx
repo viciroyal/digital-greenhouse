@@ -342,9 +342,8 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
             <KanagaSymbol color={track.colorHsl} />
             <div>
               <p 
-                className="text-sm tracking-[0.12em] uppercase font-bold"
+                className="text-sm tracking-[0.12em] uppercase font-bold font-staatliches"
                 style={{ 
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
                   color: DOGON_COLORS.paleStraw,
                   textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
                   letterSpacing: '0.15em',
@@ -353,9 +352,8 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
                 SPIRIT INSTRUCTION
               </p>
               <p 
-                className="text-xs tracking-wider uppercase mt-0.5"
+                className="text-xs tracking-wider uppercase mt-0.5 font-body"
                 style={{ 
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
                   color: DOGON_COLORS.rustClay,
                 }}
               >
@@ -370,13 +368,12 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
             >
               TRACK {String(track.row).padStart(2, '0')}
             </p>
-            <p 
-              className="text-xs mt-0.5 font-semibold"
-              style={{ 
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
-                color: `hsl(${track.colorHsl})`,
-              }}
-            >
+              <p 
+                className="text-xs mt-0.5 font-semibold font-body"
+                style={{ 
+                  color: `hsl(${track.colorHsl})`,
+                }}
+              >
               {track.frequency}
             </p>
           </div>
@@ -385,9 +382,8 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
         {/* Track Name */}
         <div className="mb-4">
           <p 
-            className="text-lg font-bold"
+            className="text-lg font-bold font-display"
             style={{ 
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
               color: DOGON_COLORS.paleStraw,
               textShadow: '2px 2px 4px rgba(0,0,0,0.4)',
             }}
@@ -421,9 +417,8 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
               ◆ SACRED ACTION
             </p>
             <p 
-              className="text-base font-bold"
+              className="text-base font-bold font-display"
               style={{ 
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
                 color: DOGON_COLORS.paleStraw,
                 textShadow: '1px 1px 2px rgba(0,0,0,0.4)',
               }}
@@ -502,7 +497,7 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
         <motion.button
           className="w-full py-3.5 rounded-lg font-bold text-sm tracking-wider uppercase transition-all duration-300 relative overflow-hidden"
           style={{
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontFamily: "'Staatliches', sans-serif",
             background: isActivated 
               ? `linear-gradient(135deg, hsl(${track.colorHsl}), hsl(${track.colorHsl} / 0.7))`
               : `linear-gradient(180deg, ${DOGON_COLORS.mudBrown} 0%, ${DOGON_COLORS.ebonyBlack} 100%)`,

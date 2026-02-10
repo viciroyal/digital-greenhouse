@@ -36,7 +36,7 @@ const BodyQuadrant = ({ track }: BodyQuadrantProps) => {
         <div className="space-y-4">
           <div>
             <p 
-              className="font-mono text-[10px] uppercase tracking-wider mb-1"
+              className="font-body text-[10px] uppercase tracking-wider mb-1"
               style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
             >
               Organ Systems
@@ -56,7 +56,7 @@ const BodyQuadrant = ({ track }: BodyQuadrantProps) => {
 
           <div>
             <p 
-              className="font-mono text-[10px] uppercase tracking-wider mb-1"
+              className="font-body text-[10px] uppercase tracking-wider mb-1"
               style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
             >
               Chakra
@@ -71,13 +71,13 @@ const BodyQuadrant = ({ track }: BodyQuadrantProps) => {
 
           <div>
             <p 
-              className="font-mono text-[10px] uppercase tracking-wider mb-1"
+              className="font-body text-[10px] uppercase tracking-wider mb-1"
               style={{ color: `hsl(${track.colorHsl} / 0.7)` }}
             >
               Frequency
             </p>
             <p 
-              className="font-mono text-lg"
+              className="font-body text-lg"
               style={{ color: 'hsl(45 90% 60%)' }}
             >
               {track.frequency}

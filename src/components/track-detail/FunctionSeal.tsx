@@ -46,7 +46,7 @@ const FunctionSeal = ({ track }: FunctionSealProps) => {
           {/* Main seal content */}
           <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
             {/* Function and Input */}
-            <div className="font-mono text-sm tracking-wider">
+            <div className="font-body text-sm tracking-wider">
               <span className="text-muted-foreground/60">FUNC:</span>
               <span 
                 className="ml-2 font-bold tracking-widest"
@@ -68,7 +68,7 @@ const FunctionSeal = ({ track }: FunctionSealProps) => {
             />
 
             {/* Context */}
-            <p className="font-mono text-xs text-muted-foreground/80 italic max-w-md">
+            <p className="font-body text-xs text-muted-foreground/80 italic max-w-md">
               "{track.designationContext}"
             </p>
           </div>
@@ -76,7 +76,7 @@ const FunctionSeal = ({ track }: FunctionSealProps) => {
           {/* AgroMajic Protocol stamp */}
           <div className="absolute -bottom-2 right-4 px-2 py-0.5 bg-background">
             <span 
-              className="font-mono text-[10px] tracking-[0.2em] uppercase"
+              className="font-body text-[10px] tracking-[0.2em] uppercase"
               style={{ color: `hsl(${track.colorHsl} / 0.5)` }}
             >
               AGROMAJIC PROTOCOL

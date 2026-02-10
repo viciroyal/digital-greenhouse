@@ -223,12 +223,12 @@ const TrackDetailView = ({
                   >
                     {theme.name}
                   </span>
-                  <span className="text-[10px] font-mono" style={{ color: 'hsl(40 50% 75%)' }}>
+                  <span className="text-[10px] font-body" style={{ color: 'hsl(40 50% 75%)' }}>
                     {theme.frequency}
                   </span>
                 </div>
                 <p 
-                  className="text-[10px] font-mono mt-2 italic"
+                  className="text-[10px] font-body mt-2 italic"
                   style={{ color: 'hsl(40 30% 65%)' }}
                 >
                   "{theme.concept}"
@@ -243,7 +243,7 @@ const TrackDetailView = ({
                 transition={{ delay: 0.2 }}
               >
                 <p 
-                  className="font-mono text-xs tracking-[0.3em] uppercase mb-2"
+                  className="font-body text-xs tracking-[0.3em] uppercase mb-2"
                   style={{ color: `hsl(${theme.accentColor} / 0.9)` }}
                 >
                   FREQUENCY DASHBOARD
@@ -262,14 +262,14 @@ const TrackDetailView = ({
                 </h1>
                 {track.featuring && (
                   <p 
-                    className="font-mono text-sm mb-2"
+                    className="font-body text-sm mb-2"
                     style={{ color: 'hsl(40 40% 75%)' }}
                   >
                     ft. {track.featuring}
                   </p>
                 )}
                 <p 
-                  className="font-mono text-sm"
+                  className="font-body text-sm"
                   style={{ color: 'hsl(40 40% 65%)' }}
                 >
                   Lab Report #{String(track.row).padStart(2, '0')}

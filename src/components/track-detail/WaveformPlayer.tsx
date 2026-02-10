@@ -73,13 +73,13 @@ const WaveformPlayer = ({
             }}
           />
           <span 
-            className="font-mono text-[10px] tracking-widest uppercase"
+            className="font-body text-[10px] tracking-widest uppercase"
             style={{ color: `hsl(${track.colorHsl})` }}
           >
             {isPlaying ? 'NOW PLAYING' : hasAudio ? 'VIBRATIONAL PLAYER' : 'NO AUDIO'}
           </span>
         </div>
-        <span className="font-mono text-[10px]" style={{ color: 'hsl(40 30% 55%)' }}>
+        <span className="font-body text-[10px]" style={{ color: 'hsl(40 30% 55%)' }}>
           {track.frequency}
         </span>
       </div>
@@ -95,7 +95,7 @@ const WaveformPlayer = ({
         >
           {track.track}
         </h4>
-        <p className="font-mono text-xs" style={{ color: 'hsl(40 40% 60%)' }}>
+        <p className="font-body text-xs" style={{ color: 'hsl(40 40% 60%)' }}>
           {track.featuring ? `ft. ${track.featuring}` : 'Vici Royàl'}
         </p>
       </div>
@@ -142,10 +142,10 @@ const WaveformPlayer = ({
 
         {/* Time display */}
         <div className="absolute bottom-1 left-2 right-2 flex justify-between">
-          <span className="text-[9px] font-mono" style={{ color: 'hsl(40 30% 50%)' }}>
+          <span className="text-[9px] font-body" style={{ color: 'hsl(40 30% 50%)' }}>
             {formatTime(currentTime)}
           </span>
-          <span className="text-[9px] font-mono" style={{ color: 'hsl(40 30% 50%)' }}>
+          <span className="text-[9px] font-body" style={{ color: 'hsl(40 30% 50%)' }}>
             {formatTime(duration)}
           </span>
         </div>
@@ -204,7 +204,7 @@ const WaveformPlayer = ({
             animate={{ scale: [1, 1.5, 1] }}
             transition={{ duration: 0.8, repeat: Infinity }}
           />
-          <span className="text-[9px] font-mono tracking-widest uppercase" style={{ color: 'hsl(40 30% 50%)' }}>
+          <span className="text-[9px] font-body tracking-widest uppercase" style={{ color: 'hsl(40 30% 50%)' }}>
             RESONATING
           </span>
           <motion.div

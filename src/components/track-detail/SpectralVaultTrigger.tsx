@@ -35,7 +35,7 @@ const SpectralVaultTrigger = ({ track, onOpen }: SpectralVaultTriggerProps) => {
           <FlaskConical className="w-5 h-5 text-cyan-400" />
         </div>
         <div>
-          <p className="font-mono text-xs tracking-wider text-cyan-400/80">
+          <p className="font-body text-xs tracking-wider text-cyan-400/80">
             PROOF PROTOCOL
           </p>
           <h3 className="font-display text-lg text-foreground">
@@ -53,7 +53,7 @@ const SpectralVaultTrigger = ({ track, onOpen }: SpectralVaultTriggerProps) => {
       {/* Trigger Button */}
       <motion.button
         onClick={onOpen}
-        className="w-full py-3 px-4 rounded-xl font-mono text-sm tracking-wider uppercase flex items-center justify-center gap-3"
+        className="w-full py-3 px-4 rounded-xl font-body text-sm tracking-wider uppercase flex items-center justify-center gap-3"
         style={{
           background: 'linear-gradient(135deg, hsl(180 50% 25%), hsl(200 60% 20%))',
           border: '1px solid hsl(180 60% 40% / 0.4)',
@@ -92,7 +92,7 @@ const SpectralVaultTrigger = ({ track, onOpen }: SpectralVaultTriggerProps) => {
             />
           ))}
         </div>
-        <span className="font-mono text-[10px] text-muted-foreground/60">
+        <span className="font-body text-[10px] text-muted-foreground/60">
           NIR READY
         </span>
       </div>
