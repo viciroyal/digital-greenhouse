@@ -382,9 +382,8 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
         {/* Track Name */}
         <div className="mb-4">
           <p 
-            className="text-lg font-bold"
+            className="text-lg font-bold font-display"
             style={{ 
-              fontFamily: "'Cormorant Garamond', Georgia, serif",
               color: DOGON_COLORS.paleStraw,
               textShadow: '2px 2px 4px rgba(0,0,0,0.4)',
             }}
