@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Music, Plus, Check, Crown, Leaf, Sparkles, Pickaxe, Zap, X, ChevronDown, Lock, CalendarDays, Users } from 'lucide-react';
+import { Music, Plus, Check, Crown, Leaf, Sparkles, Pickaxe, Zap, X, ChevronDown, Lock, CalendarDays, Users, Wand2, Loader2 } from 'lucide-react';
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from '@/components/ui/sheet';
@@ -265,6 +265,37 @@ const ChordComposer = ({
     });
   };
 
+  const [autoComposing, setAutoComposing] = useState(false);
+
+  const handleAutoComposeAll = async () => {
+    if (!selectedBed || !isAdmin || seasonalSuggestions.length === 0) return;
+    setAutoComposing(true);
+    const bedL = selectedBed.bed_length_ft || 60;
+    const bedW = selectedBed.bed_width_ft || 4;
+    let successCount = 0;
+
+    for (const suggestion of seasonalSuggestions) {
+      const plantCount = suggestion.crop.spacing_inches
+        ? Math.floor((bedL * 12 * bedW * 12) / (parseFloat(suggestion.crop.spacing_inches) ** 2 * 0.866)) || 1
+        : 1;
+      try {
+        await addPlanting.mutateAsync({
+          bedId: selectedBed.id,
+          cropId: suggestion.crop.id,
+          guildRole: suggestion.crop.guild_role || 'Lead',
+          plantCount,
+        });
+        successCount++;
+      } catch {
+        // skip failed slots
+      }
+    }
+    setAutoComposing(false);
+    if (successCount > 0) {
+      toast.success(`🎵 Auto-Composed ${successCount} slot${successCount > 1 ? 's' : ''}`);
+    }
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -494,6 +525,28 @@ const ChordComposer = ({
                     );
                   })}
                 </div>
+                {/* Auto-Compose All Button */}
+                {isAdmin && seasonalSuggestions.length > 1 && (
+                  <motion.button
+                    onClick={handleAutoComposeAll}
+                    disabled={autoComposing || addPlanting.isPending}
+                    className="w-full mt-2.5 flex items-center justify-center gap-2 py-2 rounded-lg font-mono text-[10px] font-bold tracking-wider"
+                    style={{
+                      background: `linear-gradient(135deg, ${zoneColor}25, ${zoneColor}15)`,
+                      border: `1px solid ${zoneColor}50`,
+                      color: zoneColor,
+                      opacity: autoComposing ? 0.7 : 1,
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {autoComposing ? (
+                      <><Loader2 className="w-3.5 h-3.5 animate-spin" /> COMPOSING...</>
+                    ) : (
+                      <><Wand2 className="w-3.5 h-3.5" /> AUTO-COMPOSE ALL ({seasonalSuggestions.length})</>
+                    )}
+                  </motion.button>
+                )}
               </div>
             </motion.div>
           )}
