@@ -1,8 +1,8 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, ArrowLeft, Music, Leaf, Shield, Pickaxe, Sparkles, Zap,
-  AlertTriangle, Clock, Users, Layers, Disc, ToggleLeft, ToggleRight,
+  AlertTriangle, Clock, Users, Layers, Disc, ToggleLeft, ToggleRight, X, Info,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -48,6 +48,14 @@ const CropOracle = () => {
       localStorage.setItem('oracle-pro-mode', String(next));
       return next;
     });
+  };
+
+  const [showHint, setShowHint] = useState(() => {
+    try { return !localStorage.getItem('oracle-hint-dismissed'); } catch { return true; }
+  });
+  const dismissHint = () => {
+    setShowHint(false);
+    localStorage.setItem('oracle-hint-dismissed', 'true');
   };
 
   /* ─── Search results (auto-populate when empty) ─── */
@@ -163,6 +171,38 @@ const CropOracle = () => {
           </span>
         </button>
       </div>
+
+      {/* Onboarding hint — first visit only */}
+      <AnimatePresence>
+        {showHint && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8, height: 0, marginBottom: 0 }}
+            className="mx-4 mt-3 mb-1 rounded-xl p-3 flex items-start gap-2.5"
+            style={{
+              background: 'rgba(0, 0, 0, 0.7)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
+          >
+            <Info className="w-4 h-4 mt-0.5 shrink-0" style={{ color: 'hsl(45 80% 55%)' }} />
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-mono leading-relaxed" style={{ color: 'hsl(0 0% 65%)' }}>
+                <span className="font-bold" style={{ color: 'hsl(120 50% 50%)' }}>EASY</span> shows crop basics, companions & spacing.
+                Switch to <span className="font-bold" style={{ color: 'hsl(45 80% 55%)' }}>PRO</span> to unlock frequencies, Brix targets, lunar timing, chord recipes, harmonic warnings & full placement guides.
+              </p>
+            </div>
+            <button
+              onClick={dismissHint}
+              className="shrink-0 w-5 h-5 rounded flex items-center justify-center"
+              style={{ background: 'hsl(0 0% 15%)' }}
+            >
+              <X className="w-3 h-3" style={{ color: 'hsl(0 0% 50%)' }} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Search Bar */}
       <div className="px-4 pt-4 pb-2">
