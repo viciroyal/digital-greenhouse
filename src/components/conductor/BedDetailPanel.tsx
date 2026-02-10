@@ -13,6 +13,7 @@ import {
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getZoneRecommendation } from '@/data/jazzVoicingRecommendations';
@@ -108,6 +109,7 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
   const [selectedInterval, setSelectedInterval] = useState<ChordInterval>('Root (Lead)');
   const [brixInput, setBrixInput] = useState(bed.internal_brix?.toString() || '');
   const [showChordSheet, setShowChordSheet] = useState(false);
+  const [whiteRefCalibrated, setWhiteRefCalibrated] = useState(false);
   const [dissonanceCheck, setDissonanceCheck] = useState<{ crop: MasterCrop; interval: ChordInterval } | null>(null);
   const [pendingCrop, setPendingCrop] = useState<MasterCrop | null>(null);
   
@@ -1202,18 +1204,38 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
             </div>
           )}
 
-          {/* Brix Section with Projection */}
-          <div className="px-4 pb-4">
+          {/* Brix Section with Projection & Calibration Guardrail */}
+          <div className="px-4 pb-4 space-y-3">
+            {/* Brix Status Badge */}
+            {baseBrix > 0 && (
+              <div className="flex items-center gap-2">
+                <motion.div
+                  className="px-3 py-1.5 rounded-full flex items-center gap-2"
+                  style={{
+                    background: baseBrix >= 18 ? 'hsl(45 80% 50% / 0.15)' : baseBrix >= 12 ? 'hsl(120 50% 45% / 0.15)' : 'hsl(0 60% 50% / 0.15)',
+                    border: `1px solid ${baseBrix >= 18 ? 'hsl(45 80% 55%)' : baseBrix >= 12 ? 'hsl(120 50% 50%)' : 'hsl(0 60% 55%)'}`,
+                  }}
+                  animate={baseBrix < 12 ? { opacity: [0.7, 1, 0.7] } : {}}
+                  transition={{ duration: 1, repeat: baseBrix < 12 ? Infinity : 0 }}
+                >
+                  <span className="text-[10px] font-mono font-bold tracking-wider" style={{
+                    color: baseBrix >= 18 ? 'hsl(45 90% 65%)' : baseBrix >= 12 ? 'hsl(120 60% 55%)' : 'hsl(0 65% 60%)',
+                  }}>
+                    {baseBrix >= 18 ? '✦ HIGH FIDELITY' : baseBrix >= 12 ? '♪ IN TUNE' : '⚠ DISSONANT'}
+                  </span>
+                </motion.div>
+              </div>
+            )}
+
             <div className="flex items-center gap-3 flex-wrap">
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-mono" style={{ color: 'hsl(45 80% 60%)' }}>
-                  INTERNAL BRIX:
+                  NIR BRIX READING:
                 </span>
                 <Input
                   type="number"
                   value={brixInput}
                   onChange={(e) => setBrixInput(e.target.value)}
-                  onBlur={handleUpdateBrix}
                   className="w-20 h-8 text-center font-mono text-sm rounded-lg"
                   style={{ 
                     background: 'hsl(0 0% 8%)', 
@@ -1221,6 +1243,8 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
                     color: 'hsl(45 80% 65%)',
                   }}
                   placeholder="—"
+                  min={0}
+                  max={24}
                 />
               </div>
               {has5thBonus && baseBrix > 0 && (
@@ -1232,23 +1256,73 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, onClose }: BedDetailPanelProp
                   <span className="text-[9px] font-mono" style={{ color: 'hsl(35 70% 55%)' }}>(projected)</span>
                 </div>
               )}
-              <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>Target: 15+</span>
+              <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                {baseBrix >= 18 ? '18-24 = High Fidelity' : baseBrix >= 12 ? '12-17 = In Tune' : '<12 = Dissonant'}
+              </span>
+            </div>
+
+            {/* White Reference Calibration Guardrail */}
+            <div 
+              className="p-3 rounded-xl space-y-2"
+              style={{
+                background: whiteRefCalibrated ? 'hsl(120 30% 8%)' : 'hsl(0 0% 8%)',
+                border: `1px solid ${whiteRefCalibrated ? 'hsl(120 40% 30%)' : 'hsl(0 0% 18%)'}`,
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id="white-ref"
+                  checked={whiteRefCalibrated}
+                  onCheckedChange={(checked) => setWhiteRefCalibrated(checked === true)}
+                  className="border-amber-600 data-[state=checked]:bg-amber-600"
+                />
+                <label htmlFor="white-ref" className="text-[10px] font-mono tracking-wider cursor-pointer" style={{ color: whiteRefCalibrated ? 'hsl(120 50% 55%)' : 'hsl(45 60% 55%)' }}>
+                  WHITE REFERENCE CALIBRATED
+                </label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <AlertTriangle className="w-3.5 h-3.5 cursor-help" style={{ color: 'hsl(45 70% 55%)' }} />
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-[250px] text-xs">
+                      The 5th Agreement requires precision calibration before data entry. Calibrate your refractometer with distilled water before logging.
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+
+              <motion.button
+                className="w-full py-2 px-4 rounded-lg font-mono text-xs font-bold tracking-wider"
+                style={{
+                  background: whiteRefCalibrated ? 'hsl(120 40% 25%)' : 'hsl(0 0% 15%)',
+                  border: `1px solid ${whiteRefCalibrated ? 'hsl(120 50% 40%)' : 'hsl(0 0% 25%)'}`,
+                  color: whiteRefCalibrated ? 'hsl(120 60% 70%)' : 'hsl(0 0% 35%)',
+                  cursor: whiteRefCalibrated ? 'pointer' : 'not-allowed',
+                  opacity: whiteRefCalibrated ? 1 : 0.5,
+                }}
+                disabled={!whiteRefCalibrated}
+                whileHover={whiteRefCalibrated ? { scale: 1.02 } : {}}
+                whileTap={whiteRefCalibrated ? { scale: 0.98 } : {}}
+                onClick={handleUpdateBrix}
+              >
+                {whiteRefCalibrated ? 'SAVE BRIX READING' : '⚠ CALIBRATE FIRST TO SAVE'}
+              </motion.button>
             </div>
             
-            <div className="mt-2 flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>RISK LEVEL:</span>
               <div 
                 className="px-2 py-0.5 rounded"
                 style={{
-                  background: hasPestMasking ? 'hsl(120 40% 15%)' : baseBrix >= 15 ? 'hsl(45 50% 15%)' : 'hsl(0 40% 15%)',
-                  border: `1px solid ${hasPestMasking ? 'hsl(120 50% 40%)' : baseBrix >= 15 ? 'hsl(45 60% 45%)' : 'hsl(0 50% 45%)'}`,
+                  background: hasPestMasking ? 'hsl(120 40% 15%)' : baseBrix >= 12 ? 'hsl(120 30% 15%)' : 'hsl(0 40% 15%)',
+                  border: `1px solid ${hasPestMasking ? 'hsl(120 50% 40%)' : baseBrix >= 12 ? 'hsl(120 40% 40%)' : 'hsl(0 50% 45%)'}`,
                 }}
               >
                 <span 
                   className="text-[10px] font-mono font-bold"
-                  style={{ color: hasPestMasking ? 'hsl(120 50% 50%)' : baseBrix >= 15 ? 'hsl(45 70% 55%)' : 'hsl(0 60% 55%)' }}
+                  style={{ color: hasPestMasking ? 'hsl(120 50% 50%)' : baseBrix >= 18 ? 'hsl(45 80% 55%)' : baseBrix >= 12 ? 'hsl(120 50% 50%)' : 'hsl(0 60% 55%)' }}
                 >
-                  {hasPestMasking ? 'LOW (Masked)' : baseBrix >= 15 ? 'MODERATE' : 'ELEVATED'}
+                  {hasPestMasking ? 'LOW (Masked)' : baseBrix >= 18 ? 'HIGH FIDELITY' : baseBrix >= 12 ? 'IN TUNE' : 'DISSONANT'}
                 </span>
               </div>
             </div>

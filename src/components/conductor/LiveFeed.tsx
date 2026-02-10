@@ -18,11 +18,10 @@ const NOTE_MAP: Record<number, string> = {
 
 const getSignalStrength = (brix: number | null): { label: string; color: string; bars: number } => {
   if (brix === null) return { label: 'No Reading', color: 'hsl(0 0% 40%)', bars: 0 };
-  if (brix >= 18) return { label: 'PEAK SIGNAL', color: 'hsl(45 90% 60%)', bars: 5 };
-  if (brix >= 15) return { label: 'Strong', color: 'hsl(120 60% 50%)', bars: 4 };
-  if (brix >= 12) return { label: 'Building', color: 'hsl(51 80% 55%)', bars: 3 };
-  if (brix >= 8) return { label: 'Warming Up', color: 'hsl(30 70% 55%)', bars: 2 };
-  return { label: 'Static', color: 'hsl(0 60% 50%)', bars: 1 };
+  if (brix >= 18) return { label: 'HIGH FIDELITY', color: 'hsl(45 90% 60%)', bars: 5 };
+  if (brix >= 15) return { label: 'In Tune+', color: 'hsl(120 60% 50%)', bars: 4 };
+  if (brix >= 12) return { label: 'In Tune', color: 'hsl(120 50% 45%)', bars: 3 };
+  return { label: 'DISSONANT', color: 'hsl(0 60% 50%)', bars: 1 };
 };
 
 const getHarvestCountdown = (plantings: BedPlanting[]): { days: number | null; cropName: string | null } => {

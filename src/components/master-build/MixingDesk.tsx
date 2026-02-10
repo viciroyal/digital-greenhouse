@@ -24,8 +24,8 @@ const MASTER_MIX_INGREDIENTS = [
 
 const getBrixStatus = (brix: number | null) => {
   if (brix === null) return { label: 'NO SIGNAL', color: 'hsl(0 0% 30%)', status: 'silent' as const };
+  if (brix >= 18) return { label: 'HIGH FIDELITY', color: 'hsl(45 90% 55%)', status: 'highfidelity' as const };
   if (brix >= 12) return { label: 'IN TUNE', color: 'hsl(120 60% 45%)', status: 'tuned' as const };
-  if (brix >= 8) return { label: 'WARMING UP', color: 'hsl(45 70% 50%)', status: 'warming' as const };
   return { label: 'DISSONANT', color: 'hsl(0 65% 50%)', status: 'dissonant' as const };
 };
 
@@ -104,6 +104,15 @@ const ZoneRow = ({ zone, avgBrix, bedCount }: ZoneRowProps) => {
                 style={{ background: 'hsl(0 70% 50% / 0.3)' }}
                 animate={{ opacity: [0.3, 0.7, 0.3] }}
                 transition={{ duration: 1, repeat: Infinity }}
+              />
+            )}
+            {/* High Fidelity gold shimmer */}
+            {brixStatus.status === 'highfidelity' && (
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                style={{ background: 'hsl(45 80% 50% / 0.2)' }}
+                animate={{ opacity: [0.2, 0.5, 0.2] }}
+                transition={{ duration: 2, repeat: Infinity }}
               />
             )}
             {/* Scale markers at 8 and 12 */}
