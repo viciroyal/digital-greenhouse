@@ -113,6 +113,7 @@ function resonanceToColor(score: number): string {
 const HarmonicCarousel = () => {
   const [page, setPage] = useState(0);
   const [hoveredSlot, setHoveredSlot] = useState<number | null>(null);
+  const [resonanceDepth, setResonanceDepth] = useState(1); // 1 = diagonal only, up to 5
   const containerRef = useRef<HTMLDivElement>(null);
 
   const allSlots = useMemo(() => buildSlots(), []);
@@ -305,52 +306,107 @@ const HarmonicCarousel = () => {
 
       {/* Resonance Heatmap */}
       <div className="px-3 pb-3">
-        <div className="flex items-center gap-1.5 mb-2">
-          <Layers className="w-3 h-3" style={{ color: 'hsl(45 70% 55%)' }} />
-          <span className="text-[8px] font-mono tracking-wider" style={{ color: 'hsl(0 0% 40%)' }}>
-            ROW RESONANCE
-          </span>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1.5">
+            <Layers className="w-3 h-3" style={{ color: 'hsl(45 70% 55%)' }} />
+            <span className="text-[8px] font-mono tracking-wider" style={{ color: 'hsl(0 0% 40%)' }}>
+              ROW RESONANCE
+            </span>
+            <span className="text-[7px] font-mono px-1 py-0.5 rounded" style={{ background: 'hsl(0 0% 10%)', color: 'hsl(0 0% 35%)' }}>
+              {resonanceDepth} / 5
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            {resonanceDepth > 1 && (
+              <button
+                onClick={() => setResonanceDepth(d => Math.max(1, d - 1))}
+                className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-mono font-bold transition-all"
+                style={{
+                  background: 'hsl(0 0% 10%)',
+                  border: '1px solid hsl(0 0% 20%)',
+                  color: 'hsl(0 0% 55%)',
+                }}
+              >
+                −
+              </button>
+            )}
+            {resonanceDepth < 5 && (
+              <motion.button
+                onClick={() => setResonanceDepth(d => Math.min(5, d + 1))}
+                className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-mono font-bold transition-all"
+                style={{
+                  background: 'hsl(270 30% 15%)',
+                  border: '1px solid hsl(270 40% 35%)',
+                  color: 'hsl(270 60% 70%)',
+                }}
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                +
+              </motion.button>
+            )}
+          </div>
         </div>
 
-        {/* Heatmap grid */}
-        <div className="grid grid-cols-5 gap-1">
-          {resonanceMatrix.map((row, i) =>
-            row.map((score, j) => {
-              if (j <= i) {
-                // Lower triangle + diagonal
-                const isself = i === j;
-                return (
-                  <div
-                    key={`${i}-${j}`}
-                    className="rounded-md flex items-center justify-center aspect-square"
-                    style={{
-                      background: isself ? `${pageSlots[i]?.zoneColor || '#888'}20` : resonanceToColor(score),
-                      border: `1px solid ${isself ? pageSlots[i]?.zoneColor + '40' : 'hsl(0 0% 10%)'}`,
-                    }}
-                  >
-                    <span className="text-[7px] font-mono font-bold" style={{
-                      color: isself ? (pageSlots[i]?.zoneColor || '#888') : 'hsl(0 0% 70%)',
-                    }}>
-                      {isself ? (NOTE_MAP[pageSlots[i]?.frequencyHz] || '?') : (score > 0 ? `${Math.round(score * 100)}%` : '—')}
-                    </span>
-                  </div>
-                );
-              }
-              // Upper triangle: mirror
-              const mirrorScore = resonanceMatrix[j]?.[i] ?? 0;
+        {/* Heatmap grid — only show resonanceDepth rows */}
+        <div className="space-y-1">
+          <AnimatePresence>
+            {Array.from({ length: resonanceDepth }).map(rowIdx => {
+              const i = rowIdx as unknown as number;
               return (
-                <div
-                  key={`${i}-${j}`}
-                  className="rounded-md flex items-center justify-center aspect-square"
-                  style={{
-                    background: `${resonanceToColor(mirrorScore)}`,
-                    border: '1px solid hsl(0 0% 8%)',
-                    opacity: 0.5,
-                  }}
-                />
+                <motion.div
+                  key={`row-${i}`}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="grid grid-cols-5 gap-1"
+                >
+                  {Array.from({ length: 5 }).map((_, j) => {
+                    const score = resonanceMatrix[i]?.[j] ?? 0;
+                    const isself = i === j;
+                    const isVisible = j <= i || j < resonanceDepth;
+                    if (!isVisible) {
+                      return (
+                        <div key={`${i}-${j}`} className="rounded-md aspect-square" style={{ background: 'hsl(0 0% 4%)' }} />
+                      );
+                    }
+                    if (isself) {
+                      return (
+                        <div
+                          key={`${i}-${j}`}
+                          className="rounded-md flex items-center justify-center aspect-square"
+                          style={{
+                            background: `${pageSlots[i]?.zoneColor || '#888'}20`,
+                            border: `1px solid ${pageSlots[i]?.zoneColor + '40'}`,
+                          }}
+                        >
+                          <span className="text-[7px] font-mono font-bold" style={{ color: pageSlots[i]?.zoneColor || '#888' }}>
+                            {NOTE_MAP[pageSlots[i]?.frequencyHz] || '?'}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div
+                        key={`${i}-${j}`}
+                        className="rounded-md flex items-center justify-center aspect-square"
+                        style={{
+                          background: resonanceToColor(score),
+                          border: `1px solid hsl(0 0% 10%)`,
+                          opacity: j > i ? 0.5 : 1,
+                        }}
+                      >
+                        <span className="text-[7px] font-mono font-bold" style={{ color: 'hsl(0 0% 70%)' }}>
+                          {score > 0 ? `${Math.round(score * 100)}%` : '—'}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </motion.div>
               );
-            })
-          )}
+            })}
+          </AnimatePresence>
         </div>
 
         {/* Legend */}
