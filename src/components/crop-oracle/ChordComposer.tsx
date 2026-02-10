@@ -63,12 +63,11 @@ interface ChordComposerProps {
   pendingCrop: MasterCrop | null;
   onClearPending: () => void;
   allCrops?: MasterCrop[];
-  inline?: boolean; // If true, renders content directly without Sheet wrapper
 }
 
 const ChordComposer = ({
   open, onOpenChange, activeFrequency,
-  pendingCrop, onClearPending, allCrops, inline = false,
+  pendingCrop, onClearPending, allCrops,
 }: ChordComposerProps) => {
   const { isAdmin } = useAdminRole();
   const { data: beds } = useGardenBeds();
@@ -338,34 +337,46 @@ const ChordComposer = ({
     }
   };
 
-  /* ─── Shared content (used inline or in Sheet) ─── */
-  const composerContent = (
-    <div className={inline ? 'space-y-3' : 'p-4 space-y-4'}>
-      {/* Inline header */}
-      {inline && (
-        <div className="flex items-center gap-2 mb-1">
-          <Music className="w-4 h-4" style={{ color: zoneColor }} />
-          <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: zoneColor }}>
-            CHORD COMPOSER
-          </span>
-          {!isAdmin && (
-            <span className="ml-auto flex items-center gap-1 text-[8px] font-mono px-1.5 py-0.5 rounded"
-              style={{ background: 'hsl(0 0% 10%)', color: 'hsl(0 0% 45%)', border: '1px solid hsl(0 0% 15%)' }}>
-              <Lock className="w-2.5 h-2.5" /> VIEW ONLY
+  return (
+    <>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="right"
+        className="w-[340px] sm:w-[380px] p-0 overflow-y-auto"
+        style={{
+          background: 'hsl(0 0% 4%)',
+          borderLeft: `2px solid ${zoneColor}40`,
+        }}
+      >
+        <SheetHeader className="p-4 pb-2" style={{ borderBottom: `1px solid ${zoneColor}20` }}>
+          <div className="flex items-center gap-2">
+            <Music className="w-5 h-5" style={{ color: zoneColor }} />
+            <SheetTitle className="text-sm font-mono font-bold tracking-wider" style={{ color: zoneColor }}>
+              CHORD COMPOSER
+            </SheetTitle>
+            {!isAdmin && (
+              <span className="ml-auto flex items-center gap-1 text-[8px] font-mono px-1.5 py-0.5 rounded"
+                style={{ background: 'hsl(0 0% 10%)', color: 'hsl(0 0% 45%)', border: '1px solid hsl(0 0% 15%)' }}>
+                <Lock className="w-2.5 h-2.5" /> VIEW ONLY
+              </span>
+            )}
+          </div>
+          <SheetDescription className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+            {isAdmin
+              ? `Build a chord for ${note}/${activeFrequency}Hz beds`
+              : `Viewing chord status for ${note}/${activeFrequency}Hz beds`
+            }
+          </SheetDescription>
+        </SheetHeader>
+
+        <div className="p-4 space-y-4">
+          {/* ─── Bed Picker ─── */}
+          <div>
+            <span className="text-[8px] font-mono tracking-wider block mb-1.5" style={{ color: 'hsl(0 0% 35%)' }}>
+              SELECT BED
             </span>
-          )}
-          <span className="text-[8px] font-mono ml-auto" style={{ color: 'hsl(0 0% 35%)' }}>
-            {isAdmin ? `${note}/${activeFrequency}Hz` : `Viewing ${note}/${activeFrequency}Hz`}
-          </span>
-        </div>
-      )}
-      {/* ─── Bed Picker ─── */}
-      <div>
-        <span className="text-[8px] font-mono tracking-wider block mb-1.5" style={{ color: 'hsl(0 0% 35%)' }}>
-          SELECT BED
-        </span>
-        <button
-          onClick={() => setShowBedPicker(!showBedPicker)}
+            <button
+              onClick={() => setShowBedPicker(!showBedPicker)}
               className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-left"
               style={{
                 background: `${zoneColor}10`,
@@ -761,114 +772,6 @@ const ChordComposer = ({
               </p>
             </div>
           )}
-    </div>
-  );
-
-  /* ─── Inline mode: render content directly ─── */
-  if (inline) {
-    return (
-      <>
-        <div
-          className="mx-4 mb-4 rounded-xl overflow-hidden"
-          style={{
-            background: 'linear-gradient(180deg, hsl(0 0% 6%), hsl(0 0% 4%))',
-            border: `1px solid ${zoneColor}25`,
-            boxShadow: `inset 0 1px 0 hsl(0 0% 10%), 0 4px 12px rgba(0,0,0,0.4)`,
-          }}
-        >
-          <div className="p-3">
-            {composerContent}
-          </div>
-        </div>
-
-        {/* Auto-Compose Confirmation Dialog */}
-        <AlertDialog open={showAutoConfirm} onOpenChange={setShowAutoConfirm}>
-          <AlertDialogContent
-            className="max-w-sm rounded-2xl border-0 p-0 overflow-hidden"
-            style={{
-              background: 'hsl(0 0% 5%)',
-              border: `2px solid ${zoneColor}40`,
-              boxShadow: `0 0 40px ${zoneColor}15`,
-            }}
-          >
-            <AlertDialogHeader className="p-4 pb-2" style={{ borderBottom: `1px solid ${zoneColor}15` }}>
-              <div className="flex items-center gap-2">
-                <Wand2 className="w-5 h-5" style={{ color: zoneColor }} />
-                <AlertDialogTitle className="text-sm font-mono font-bold tracking-wider" style={{ color: zoneColor }}>
-                  AUTO-COMPOSE ALL
-                </AlertDialogTitle>
-              </div>
-              <AlertDialogDescription className="text-[9px] font-mono mt-1" style={{ color: 'hsl(0 0% 45%)' }}>
-                The following crops will be planted into Bed {selectedBed?.bed_number}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <div className="p-4 space-y-1.5">
-              {suggestionPlantCounts.map((item) => {
-                const meta = INTERVAL_META[item.interval];
-                return (
-                  <div key={item.interval} className="flex items-center gap-2 px-3 py-2 rounded-lg"
-                    style={{ background: `${meta.color}10`, border: `1px solid ${meta.color}20` }}>
-                    <span style={{ color: meta.color }}>{meta.icon}</span>
-                    <span className="text-[9px] font-mono font-bold w-8" style={{ color: meta.color }}>{meta.shortLabel}</span>
-                    <span className="text-[10px] font-mono flex-1 truncate" style={{ color: 'hsl(0 0% 75%)' }}>
-                      {item.crop.common_name || item.crop.name}
-                    </span>
-                    <span className="text-[9px] font-mono font-bold" style={{ color: 'hsl(140 50% 55%)' }}>×{item.plantCount}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <AlertDialogFooter className="p-4 pt-0 flex gap-2">
-              <AlertDialogCancel className="flex-1 rounded-lg font-mono text-[10px] font-bold tracking-wider"
-                style={{ background: 'hsl(0 0% 10%)', color: 'hsl(0 0% 50%)', border: '1px solid hsl(0 0% 18%)' }}>
-                CANCEL
-              </AlertDialogCancel>
-              <AlertDialogAction onClick={handleAutoComposeAll}
-                className="flex-1 rounded-lg font-mono text-[10px] font-bold tracking-wider flex items-center justify-center gap-1.5"
-                style={{ background: zoneColor, color: 'hsl(0 0% 3%)' }}>
-                <Wand2 className="w-3.5 h-3.5" /> COMPOSE {suggestionPlantCounts.length} SLOTS
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </>
-    );
-  }
-
-  /* ─── Sheet (drawer) mode ─── */
-  return (
-    <>
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="right"
-        className="w-[340px] sm:w-[380px] p-0 overflow-y-auto"
-        style={{
-          background: 'hsl(0 0% 4%)',
-          borderLeft: `2px solid ${zoneColor}40`,
-        }}
-      >
-        <SheetHeader className="p-4 pb-2" style={{ borderBottom: `1px solid ${zoneColor}20` }}>
-          <div className="flex items-center gap-2">
-            <Music className="w-5 h-5" style={{ color: zoneColor }} />
-            <SheetTitle className="text-sm font-mono font-bold tracking-wider" style={{ color: zoneColor }}>
-              CHORD COMPOSER
-            </SheetTitle>
-            {!isAdmin && (
-              <span className="ml-auto flex items-center gap-1 text-[8px] font-mono px-1.5 py-0.5 rounded"
-                style={{ background: 'hsl(0 0% 10%)', color: 'hsl(0 0% 45%)', border: '1px solid hsl(0 0% 15%)' }}>
-                <Lock className="w-2.5 h-2.5" /> VIEW ONLY
-              </span>
-            )}
-          </div>
-          <SheetDescription className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
-            {isAdmin
-              ? `Build a chord for ${note}/${activeFrequency}Hz beds`
-              : `Viewing chord status for ${note}/${activeFrequency}Hz beds`
-            }
-          </SheetDescription>
-        </SheetHeader>
-        <div className="p-4 space-y-4">
-          {composerContent}
         </div>
       </SheetContent>
     </Sheet>
