@@ -379,7 +379,7 @@ const LunarAgronomyModule = ({ track }: LunarAgronomyModuleProps) => {
               <path d="M9 22h6" />
             </svg>
             <p 
-              className="font-mono text-[10px] tracking-[0.15em] uppercase"
+              className="font-body text-[10px] tracking-[0.15em] uppercase"
               style={{ color: lunarData.glowColor }}
             >
               [GERMINATION_TARGET] — THE SEEDS
