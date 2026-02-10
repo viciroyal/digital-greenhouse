@@ -169,7 +169,7 @@ const ChordComposer = ({
     const companionNames = rootFullCrop?.companion_crops || [];
 
     // Get the chord recipe for this zone
-    const recipe = CHORD_RECIPES.find(r => r.frequencyHz === activeFrequency);
+    const recipes = CHORD_RECIPES.filter(r => r.frequencyHz === activeFrequency);
 
     for (const interval of emptyIntervals) {
       let found: MasterCrop | undefined;
@@ -188,21 +188,36 @@ const ChordComposer = ({
         }
       }
 
-      // 2. Fallback to chord recipe (must fit bed width)
-      if (!found && recipe) {
-        const recipeInterval = recipe.intervals.find(
-          ri => RECIPE_INTERVAL_MAP[ri.interval] === interval
-        );
-        if (recipeInterval) {
-          const recipeMatch = allCrops.find(c =>
-            (c.common_name?.toLowerCase() === recipeInterval.cropName.toLowerCase() ||
-            c.name.toLowerCase() === recipeInterval.cropName.toLowerCase()) &&
-            fitsInBed(c)
+      // 2. Fallback to chord recipes — search ALL matching recipes for this zone
+      if (!found && recipes.length > 0) {
+        let matchedRecipeName = '';
+        for (const recipe of recipes) {
+          const recipeInterval = recipe.intervals.find(
+            ri => RECIPE_INTERVAL_MAP[ri.interval] === interval
           );
-          if (recipeMatch) {
-            found = recipeMatch;
-            source = 'recipe';
+          if (recipeInterval) {
+            const recipeMatch = allCrops.find(c =>
+              (c.common_name?.toLowerCase() === recipeInterval.cropName.toLowerCase() ||
+              c.name.toLowerCase() === recipeInterval.cropName.toLowerCase()) &&
+              fitsInBed(c)
+            );
+            if (recipeMatch) {
+              found = recipeMatch;
+              source = 'recipe';
+              matchedRecipeName = recipe.chordName;
+              break;
+            }
           }
+        }
+
+        if (found) {
+          suggestions.push({
+            interval,
+            crop: found,
+            source,
+            label: `From ${matchedRecipeName || 'Recipe'}`,
+          });
+          continue;
         }
       }
 
@@ -213,7 +228,7 @@ const ChordComposer = ({
           source,
           label: source === 'companion'
             ? `From ${rootFullCrop?.common_name || rootFullCrop?.name}'s guild`
-            : `From ${recipe?.chordName || 'Recipe'}`,
+            : `From Recipe`,
         });
       }
     }
