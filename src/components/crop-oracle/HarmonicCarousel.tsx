@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Music } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Music, Radio } from 'lucide-react';
 import { CHORD_RECIPES, type ChordRecipe } from '@/data/chordRecipes';
+import { CSA_PHASES, getCurrentPhase } from '@/components/master-build/SeasonalMovements';
 
 /* ─── Constants ─── */
 const PAGE_SIZE = 5;
@@ -10,11 +11,14 @@ const NOTE_MAP: Record<number, string> = {
   396: 'C', 417: 'D', 528: 'E', 639: 'F', 741: 'G', 852: 'A', 963: 'B',
 };
 
+const FREQ_TO_ZONE: Record<number, number> = {
+  396: 1, 417: 2, 528: 3, 639: 4, 741: 5, 852: 6, 963: 7,
+};
+
 /* ─── Row Resonance between two recipes ─── */
 function getRowResonance(a: ChordRecipe, b: ChordRecipe): number {
   let score = 0;
 
-  // Same zone = high base resonance
   if (a.frequencyHz === b.frequencyHz) {
     score += 0.4;
   } else {
@@ -23,19 +27,16 @@ function getRowResonance(a: ChordRecipe, b: ChordRecipe): number {
     else if (dist <= 300) score += 0.1;
   }
 
-  // Shared crops across recipes
   const aCrops = new Set(a.intervals.map(i => i.cropName));
   const bCrops = new Set(b.intervals.map(i => i.cropName));
   let shared = 0;
   for (const c of aCrops) if (bCrops.has(c)) shared++;
   score += shared * 0.15;
 
-  // Both full 7-voice = active harmony
   if (a.intervals.length === 7 && b.intervals.length === 7) {
     score += 0.1;
   }
 
-  // Complementary role coverage
   const aRoles = new Set(a.intervals.map(i => i.role));
   const bRoles = new Set(b.intervals.map(i => i.role));
   const combined = new Set([...aRoles, ...bRoles]);
@@ -55,14 +56,35 @@ function resonanceToStyle(score: number): { bg: string; border: string } {
 const HarmonicCarousel = () => {
   const [page, setPage] = useState(0);
   const [resonanceDepth, setResonanceDepth] = useState(1);
+  const [filterSeason, setFilterSeason] = useState(true);
 
-  const recipes = CHORD_RECIPES;
-  const totalPages = Math.ceil(recipes.length / PAGE_SIZE);
-  const pageRecipes = useMemo(() => recipes.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE), [recipes, page]);
+  const activePhase = getCurrentPhase();
+
+  // Sort recipes: in-season first, then the rest
+  const sortedRecipes = useMemo(() => {
+    if (!filterSeason || !activePhase) return CHORD_RECIPES;
+
+    const inSeason: ChordRecipe[] = [];
+    const outSeason: ChordRecipe[] = [];
+
+    for (const recipe of CHORD_RECIPES) {
+      const zone = FREQ_TO_ZONE[recipe.frequencyHz];
+      if (zone && activePhase.zones.includes(zone)) {
+        inSeason.push(recipe);
+      } else {
+        outSeason.push(recipe);
+      }
+    }
+
+    return [...inSeason, ...outSeason];
+  }, [filterSeason, activePhase]);
+
+  const totalPages = Math.ceil(sortedRecipes.length / PAGE_SIZE);
+  const pageRecipes = useMemo(() => sortedRecipes.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE), [sortedRecipes, page]);
 
   // Cross-page shared crops
-  const prevRecipes = useMemo(() => page > 0 ? recipes.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) : [], [recipes, page]);
-  const nextRecipes = useMemo(() => page < totalPages - 1 ? recipes.slice((page + 1) * PAGE_SIZE, (page + 2) * PAGE_SIZE) : [], [recipes, page, totalPages]);
+  const prevRecipes = useMemo(() => page > 0 ? sortedRecipes.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) : [], [sortedRecipes, page]);
+  const nextRecipes = useMemo(() => page < totalPages - 1 ? sortedRecipes.slice((page + 1) * PAGE_SIZE, (page + 2) * PAGE_SIZE) : [], [sortedRecipes, page, totalPages]);
 
   const crossDeps = useMemo(() => {
     const deps: { fromChord: string; dir: 'prev' | 'next'; cropName: string }[] = [];
@@ -91,6 +113,13 @@ const HarmonicCarousel = () => {
 
   const goPage = (dir: -1 | 1) => setPage(p => Math.max(0, Math.min(totalPages - 1, p + dir)));
 
+  // Check if a recipe is in the active season
+  const isInSeason = (recipe: ChordRecipe): boolean => {
+    if (!activePhase) return false;
+    const zone = FREQ_TO_ZONE[recipe.frequencyHz];
+    return zone ? activePhase.zones.includes(zone) : false;
+  };
+
   return (
     <div className="mx-4 mb-4 rounded-2xl overflow-hidden" style={{
       background: 'rgba(0, 0, 0, 0.7)',
@@ -105,7 +134,7 @@ const HarmonicCarousel = () => {
             HARMONIC MATRIX
           </span>
           <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
-            {recipes.length} chords
+            {sortedRecipes.length} chords
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -115,7 +144,7 @@ const HarmonicCarousel = () => {
             <ChevronLeft className="w-3.5 h-3.5" style={{ color: 'hsl(0 0% 60%)' }} />
           </button>
           <span className="text-[9px] font-mono tabular-nums w-14 text-center" style={{ color: 'hsl(0 0% 40%)' }}>
-            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, recipes.length)}
+            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, sortedRecipes.length)}
           </span>
           <button onClick={() => goPage(1)} disabled={page === totalPages - 1}
             className="w-7 h-7 rounded-lg flex items-center justify-center transition-opacity"
@@ -125,10 +154,44 @@ const HarmonicCarousel = () => {
         </div>
       </div>
 
+      {/* Seasonal Phase Banner */}
+      {activePhase && (
+        <div className="mx-4 mb-2 rounded-lg px-3 py-2 flex items-center justify-between"
+          style={{
+            background: activePhase.gradient,
+            border: `1px solid ${activePhase.borderColor}40`,
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <Radio className="w-3.5 h-3.5" style={{ color: activePhase.borderColor }} />
+            <span className="text-[9px] font-mono font-bold tracking-wider" style={{ color: activePhase.borderColor }}>
+              {activePhase.name}
+            </span>
+            <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>
+              {activePhase.dateRange} • {activePhase.frequencyRange}
+            </span>
+          </div>
+          <button
+            onClick={() => { setFilterSeason(f => !f); setPage(0); }}
+            className="text-[8px] font-mono px-2 py-0.5 rounded-full transition-all"
+            style={{
+              background: filterSeason ? `${activePhase.borderColor}20` : 'hsl(0 0% 8%)',
+              border: `1px solid ${filterSeason ? activePhase.borderColor + '50' : 'hsl(0 0% 15%)'}`,
+              color: filterSeason ? activePhase.borderColor : 'hsl(0 0% 40%)',
+            }}
+          >
+            {filterSeason ? '● IN SEASON' : '○ ALL'}
+          </button>
+        </div>
+      )}
+
       {/* Zone color strip */}
       <div className="flex h-1 mx-4 rounded-full overflow-hidden">
         {pageRecipes.map((recipe, i) => (
-          <div key={i} className="flex-1" style={{ background: recipe.zoneColor }} />
+          <div key={i} className="flex-1" style={{
+            background: recipe.zoneColor,
+            opacity: isInSeason(recipe) ? 1 : 0.3,
+          }} />
         ))}
       </div>
 
@@ -144,22 +207,35 @@ const HarmonicCarousel = () => {
         >
           {pageRecipes.map((recipe) => {
             const note = NOTE_MAP[recipe.frequencyHz] || '?';
+            const inSeason = isInSeason(recipe);
 
             return (
               <motion.div
                 key={recipe.chordName}
                 className="rounded-xl p-2.5 relative group cursor-default"
                 style={{
-                  background: `${recipe.zoneColor}08`,
-                  border: `1px solid ${recipe.zoneColor}20`,
+                  background: inSeason ? `${recipe.zoneColor}12` : `${recipe.zoneColor}05`,
+                  border: `1px solid ${inSeason ? `${recipe.zoneColor}40` : `${recipe.zoneColor}15`}`,
                   minHeight: 120,
+                  opacity: inSeason ? 1 : 0.5,
                 }}
                 whileHover={{
                   borderColor: `${recipe.zoneColor}60`,
-                  background: `${recipe.zoneColor}12`,
+                  background: `${recipe.zoneColor}15`,
+                  opacity: 1,
                   transition: { duration: 0.15 },
                 }}
               >
+                {/* In-season glow indicator */}
+                {inSeason && activePhase && (
+                  <motion.div
+                    className="absolute top-1 right-1 w-2 h-2 rounded-full"
+                    style={{ background: activePhase.borderColor }}
+                    animate={{ opacity: [0.4, 1, 0.4] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                )}
+
                 {/* Zone note — large */}
                 <div className="text-center mb-1">
                   <span className="text-lg font-mono font-bold" style={{ color: recipe.zoneColor }}>
@@ -194,7 +270,7 @@ const HarmonicCarousel = () => {
                       style={{
                         background: recipe.zoneColor,
                         opacity: 0.3 + (idx * 0.1),
-                        boxShadow: `0 0 3px ${recipe.zoneColor}40`,
+                        boxShadow: inSeason ? `0 0 4px ${recipe.zoneColor}40` : 'none',
                       }}
                     />
                   ))}
@@ -333,7 +409,7 @@ const HarmonicCarousel = () => {
       {/* Page dots */}
       <div className="flex items-center justify-center gap-1 pb-3">
         {Array.from({ length: totalPages }).map((_, i) => {
-          const firstRecipe = recipes[i * PAGE_SIZE];
+          const firstRecipe = sortedRecipes[i * PAGE_SIZE];
           const c = firstRecipe?.zoneColor || 'hsl(0 0% 15%)';
           return (
             <button key={i} onClick={() => setPage(i)}
