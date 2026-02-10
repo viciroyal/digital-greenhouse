@@ -1066,7 +1066,6 @@ const CropOracle = () => {
                             setSwapSlotIndex(null);
                           } else {
                             setSwapSlotIndex(i);
-                            setShowSearch(true);
                             setSearchQuery('');
                           }
                         }}
