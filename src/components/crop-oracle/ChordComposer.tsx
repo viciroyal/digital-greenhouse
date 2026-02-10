@@ -152,7 +152,7 @@ const ChordComposer = ({
     const emptyIntervals = CHORD_INTERVALS.filter(iv => !chordStatus[iv]);
     if (emptyIntervals.length === 0) return [];
 
-    const bedWidthInches = (selectedBed.bed_width_ft || 4) * 12;
+    const bedWidthInches = (selectedBed.bed_width_ft || 2.5) * 12;
 
     // Helper: check if a crop's spacing fits the bed width
     const fitsInBed = (crop: MasterCrop): boolean => {
@@ -250,7 +250,7 @@ const ChordComposer = ({
     }
 
     const bedL = selectedBed.bed_length_ft || 60;
-    const bedW = selectedBed.bed_width_ft || 4;
+    const bedW = selectedBed.bed_width_ft || 2.5;
     const plantCount = pendingCrop.spacing_inches
       ? Math.floor((bedL * 12 * bedW * 12) / (parseFloat(pendingCrop.spacing_inches) ** 2 * 0.866)) || 1
       : 1;
@@ -281,7 +281,7 @@ const ChordComposer = ({
   const handleSuggestionAssign = (suggestion: SeasonalSuggestion) => {
     if (!selectedBed || !isAdmin) return;
     const bedL = selectedBed.bed_length_ft || 60;
-    const bedW = selectedBed.bed_width_ft || 4;
+    const bedW = selectedBed.bed_width_ft || 2.5;
     const plantCount = suggestion.crop.spacing_inches
       ? Math.floor((bedL * 12 * bedW * 12) / (parseFloat(suggestion.crop.spacing_inches) ** 2 * 0.866)) || 1
       : 1;
@@ -303,7 +303,7 @@ const ChordComposer = ({
   const suggestionPlantCounts = useMemo(() => {
     if (!selectedBed) return [];
     const bedL = selectedBed.bed_length_ft || 60;
-    const bedW = selectedBed.bed_width_ft || 4;
+    const bedW = selectedBed.bed_width_ft || 2.5;
     return seasonalSuggestions.map(s => {
       const count = s.crop.spacing_inches
         ? Math.floor((bedL * 12 * bedW * 12) / (parseFloat(s.crop.spacing_inches) ** 2 * 0.866)) || 1
@@ -390,7 +390,7 @@ const ChordComposer = ({
                 </span>
                 {selectedBed && (
                   <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
-                    {selectedBed.zone_name} • {selectedBed.bed_length_ft || 60}×{selectedBed.bed_width_ft || 4}ft
+                    {selectedBed.zone_name} • {selectedBed.bed_length_ft || 60}×{selectedBed.bed_width_ft || 2.5}ft
                   </span>
                 )}
               </div>
@@ -823,7 +823,7 @@ const ChordComposer = ({
           {selectedBed && (
             <div className="pt-2 flex items-center justify-between">
               <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
-                Bed: {selectedBed.bed_length_ft || 60}ft × {selectedBed.bed_width_ft || 4}ft
+                Bed: {selectedBed.bed_length_ft || 60}ft × {selectedBed.bed_width_ft || 2.5}ft
               </span>
               <span className="text-[8px] font-mono font-bold" style={{ color: 'hsl(0 0% 45%)' }}>
                 Total: {suggestionPlantCounts.reduce((s, i) => s + i.plantCount, 0)} plants
