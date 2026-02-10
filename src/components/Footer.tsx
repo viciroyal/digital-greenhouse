@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { Instagram } from 'lucide-react';
+import { Instagram, BookOpen } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 // Organic Vine Icon
 const VineIcon = ({ className = "" }: { className?: string }) => (
@@ -44,6 +45,7 @@ const CosmicSwirlIcon = ({ className = "" }: { className?: string }) => (
 );
 
 const Footer = () => {
+  const navigate = useNavigate();
   const cosmicArtists = [
     'Sistah Moon',
     'Nichollé McKoy',
@@ -185,6 +187,14 @@ const Footer = () => {
             >
               → Enter the Dispensary
             </motion.a>
+            <motion.button
+              onClick={() => navigate('/user-guide')}
+              className="inline-flex items-center gap-2 text-cream-muted/60 hover:text-gem-emerald transition-colors font-body text-sm"
+              whileHover={{ y: -2 }}
+            >
+              <BookOpen size={18} />
+              User Guide
+            </motion.button>
             <motion.a
               href="https://instagram.com/officialpharmboi"
               target="_blank"
