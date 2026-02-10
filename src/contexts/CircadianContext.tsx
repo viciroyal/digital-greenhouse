@@ -24,7 +24,7 @@ interface CircadianProviderProps {
 }
 
 export const CircadianProvider = ({ children }: CircadianProviderProps) => {
-  const [hour, setHour] = useState(() => new Date().getHours());
+  const [hour, setHour] = React.useState(() => new Date().getHours());
   
   useEffect(() => {
     // Update hour every minute
