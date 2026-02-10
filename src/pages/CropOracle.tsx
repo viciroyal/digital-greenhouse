@@ -55,6 +55,8 @@ const CropOracle = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [seasonalOverride, setSeasonalOverride] = useState(false);
+  const [swapSlotIndex, setSwapSlotIndex] = useState<number | null>(null);
+  const [manualOverrides, setManualOverrides] = useState<Record<number, MasterCrop>>({});
 
   // Real-time celestial data
   const lunar = useMemo(() => getLunarPhase(), []);
@@ -73,6 +75,8 @@ const CropOracle = () => {
   // Reset saved state when recipe changes
   useEffect(() => {
     setIsSaved(false);
+    setManualOverrides({});
+    setSwapSlotIndex(null);
   }, [selectedZone, environment]);
 
   const handleSaveRecipe = async () => {
@@ -229,8 +233,20 @@ const CropOracle = () => {
       }
 
       return { ...interval, crop };
+    }).map((slot, i) => manualOverrides[i] ? { ...slot, crop: manualOverrides[i] } : slot);
+  }, [recipeCrops, manualOverrides]);
+
+  const handleSwapCrop = (crop: MasterCrop) => {
+    if (swapSlotIndex === null) return;
+    setManualOverrides(prev => ({ ...prev, [swapSlotIndex]: crop }));
+    setSwapSlotIndex(null);
+    setSearchQuery('');
+    setIsSaved(false);
+    toast({
+      title: `${INTERVAL_ORDER[swapSlotIndex].label} swapped`,
+      description: `Now: ${crop.common_name || crop.name}`,
     });
-  }, [recipeCrops]);
+  };
 
   /* ─── Seasonal gate check ─── */
   const seasonalGate = useMemo(() => {
@@ -570,9 +586,28 @@ const CropOracle = () => {
                       ? isCropLunarReady(slot.crop.category, slot.crop.common_name || slot.crop.name, lunar.plantingType)
                       : false;
                     return (
-                      <motion.div
+                      <motion.button
                         key={slot.key}
-                        className="px-5 py-4 flex items-center gap-4"
+                        className="px-5 py-4 flex items-center gap-4 w-full text-left transition-all"
+                        style={{
+                          background: swapSlotIndex === i
+                            ? `${selectedZone.color}10`
+                            : 'transparent',
+                          outline: swapSlotIndex === i
+                            ? `2px solid ${selectedZone.color}60`
+                            : 'none',
+                          outlineOffset: '-2px',
+                          borderRadius: swapSlotIndex === i ? '8px' : '0',
+                        }}
+                        onClick={() => {
+                          if (swapSlotIndex === i) {
+                            setSwapSlotIndex(null);
+                          } else {
+                            setSwapSlotIndex(i);
+                            setShowSearch(true);
+                            setSearchQuery('');
+                          }
+                        }}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.08 }}
@@ -599,6 +634,14 @@ const CropOracle = () => {
                                 {lunar.phaseEmoji} READY NOW
                               </span>
                             )}
+                            {swapSlotIndex === i && (
+                              <span className="text-[8px] font-mono px-1.5 py-0.5 rounded animate-pulse" style={{
+                                background: `${selectedZone.color}20`,
+                                color: selectedZone.color,
+                              }}>
+                                ↕ TAP A SEARCH RESULT TO SWAP
+                              </span>
+                            )}
                           </div>
                           {slot.crop ? (
                             <p className="text-xs font-body mt-0.5" style={{ color: 'hsl(0 0% 65%)' }}>
@@ -618,7 +661,7 @@ const CropOracle = () => {
                             {slot.crop.frequency_hz}Hz
                           </span>
                         )}
-                      </motion.div>
+                      </motion.button>
                     );
                   })}
                 </div>
@@ -669,7 +712,7 @@ const CropOracle = () => {
                 transition={{ delay: 0.5 }}
               >
                 <button
-                  onClick={() => setShowSearch(!showSearch)}
+                  onClick={() => { setShowSearch(!showSearch); if (showSearch) setSwapSlotIndex(null); }}
                   className="w-full py-3 rounded-xl font-mono text-xs tracking-wider flex items-center justify-center gap-2 transition-all"
                   style={{
                     background: showSearch ? 'hsl(0 0% 8%)' : 'hsl(0 0% 6%)',
@@ -678,7 +721,7 @@ const CropOracle = () => {
                   }}
                 >
                   <Search className="w-3.5 h-3.5" />
-                  {showSearch ? 'CLOSE SEARCH' : 'SEARCH CROP REGISTRY'}
+                  {showSearch ? 'CLOSE SEARCH' : swapSlotIndex !== null ? `SWAP ${INTERVAL_ORDER[swapSlotIndex].label.toUpperCase()}` : 'SEARCH CROP REGISTRY'}
                 </button>
 
                 <AnimatePresence>
@@ -728,10 +771,19 @@ const CropOracle = () => {
                               const zoneData = ZONES.find(z => z.hz === crop.frequency_hz);
                               const ready = isCropLunarReady(crop.category, crop.common_name || crop.name, lunar.plantingType);
                               return (
-                                <div
+                                <button
                                   key={crop.id}
-                                  className="px-4 py-3 flex items-center gap-3"
-                                  style={{ borderColor: 'hsl(0 0% 10%)' }}
+                                  className="px-4 py-3 flex items-center gap-3 w-full text-left transition-all"
+                                  style={{
+                                    borderColor: 'hsl(0 0% 10%)',
+                                    cursor: swapSlotIndex !== null ? 'pointer' : 'default',
+                                    background: swapSlotIndex !== null ? 'transparent' : 'transparent',
+                                  }}
+                                  onClick={() => swapSlotIndex !== null && handleSwapCrop(crop)}
+                                  onMouseEnter={e => {
+                                    if (swapSlotIndex !== null) e.currentTarget.style.background = 'hsl(45 80% 55% / 0.05)';
+                                  }}
+                                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
                                 >
                                   <div
                                     className="w-3 h-3 rounded-full shrink-0"
@@ -750,6 +802,14 @@ const CropOracle = () => {
                                           {lunar.phaseEmoji} READY
                                         </span>
                                       )}
+                                      {swapSlotIndex !== null && (
+                                        <span className="text-[8px] font-mono px-1 py-0.5 rounded shrink-0" style={{
+                                          background: `${selectedZone?.color || 'hsl(45 80% 55%)'}20`,
+                                          color: selectedZone?.color || 'hsl(45 80% 55%)',
+                                        }}>
+                                          TAP TO SWAP
+                                        </span>
+                                      )}
                                     </div>
                                     <p className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
                                       {crop.frequency_hz}Hz • {zoneData?.name || crop.zone_name} • {crop.category}
@@ -762,7 +822,7 @@ const CropOracle = () => {
                                       {crop.spacing_inches}"
                                     </span>
                                   )}
-                                </div>
+                                </button>
                               );
                             })}
                           </div>
