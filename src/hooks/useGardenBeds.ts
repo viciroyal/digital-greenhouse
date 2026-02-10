@@ -4,13 +4,26 @@ import { supabase } from '@/integrations/supabase/client';
 /**
  * Inoculant types for the 11th Interval (Fungal Network)
  */
-export type InoculantType = 'Mycorrhizae' | 'Wine Cap' | 'Oyster' | 'Reishi' | null;
+export type InoculantType = 
+  | 'Mycorrhizae' 
+  | 'Red Reishi' 
+  | "Lion's Mane" 
+  | 'Wine Cap' 
+  | 'Oyster Mushrooms' 
+  | 'Turkey Tail' 
+  | 'Purple Spore Woodear' 
+  | 'White Ghost Fungus' 
+  | null;
 
 export const INOCULANT_OPTIONS: InoculantType[] = [
   'Mycorrhizae',
-  'Wine Cap', 
-  'Oyster',
-  'Reishi',
+  'Red Reishi',
+  "Lion's Mane",
+  'Wine Cap',
+  'Oyster Mushrooms',
+  'Turkey Tail',
+  'Purple Spore Woodear',
+  'White Ghost Fungus',
 ];
 
 export interface GardenBed {

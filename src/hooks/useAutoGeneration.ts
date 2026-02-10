@@ -213,11 +213,13 @@ export const useAutoGeneration = (
     let eleventh: InoculantType = null;
     if (zoneRec) {
       const recName = zoneRec.eleventh.name.toLowerCase();
-      if (recName.includes('reishi')) eleventh = 'Reishi';
+      if (recName.includes('red reishi')) eleventh = 'Red Reishi';
+      else if (recName.includes('lion')) eleventh = "Lion's Mane";
       else if (recName.includes('wine cap')) eleventh = 'Wine Cap';
-      else if (recName.includes('oyster')) eleventh = 'Oyster';
-      else if (recName.includes('lion') || recName.includes('mane')) eleventh = 'Mycorrhizae';
-      else if (recName.includes('turkey')) eleventh = 'Mycorrhizae';
+      else if (recName.includes('oyster')) eleventh = 'Oyster Mushrooms';
+      else if (recName.includes('turkey')) eleventh = 'Turkey Tail';
+      else if (recName.includes('purple spore') || recName.includes('woodear')) eleventh = 'Purple Spore Woodear';
+      else if (recName.includes('white ghost')) eleventh = 'White Ghost Fungus';
       else eleventh = 'Mycorrhizae'; // Default
     }
 
