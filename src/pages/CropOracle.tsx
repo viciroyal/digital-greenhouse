@@ -13,6 +13,7 @@ import SeasonalMovementCard from '@/components/crop-oracle/SeasonalMovementCard'
 import HarmonicWarningsCard from '@/components/crop-oracle/HarmonicWarningsCard';
 import BedOrganizationCard from '@/components/crop-oracle/BedOrganizationCard';
 import BedStrumEmbed from '@/components/crop-oracle/BedStrumEmbed';
+import HarmonicCarousel from '@/components/crop-oracle/HarmonicCarousel';
 import ChordComposer from '@/components/crop-oracle/ChordComposer';
 import { useAdminRole } from '@/hooks/useAdminRole';
 
@@ -722,6 +723,9 @@ const CropOracle = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Harmonic Matrix Carousel — 50 chords, 5 at a time */}
+      {proMode && <HarmonicCarousel />}
 
       {/* Chord Composer Drawer */}
       <ChordComposer
