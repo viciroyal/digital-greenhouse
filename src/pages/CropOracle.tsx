@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, ArrowLeft, Music, Leaf, Shield, Pickaxe, Sparkles, Zap,
-  AlertTriangle, Clock, Users, Layers, Disc, ToggleLeft, ToggleRight, X, Info,
+  AlertTriangle, Clock, Users, Layers, Disc, ToggleLeft, ToggleRight, X, Info, Plus,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -13,6 +13,8 @@ import SeasonalMovementCard from '@/components/crop-oracle/SeasonalMovementCard'
 import HarmonicWarningsCard from '@/components/crop-oracle/HarmonicWarningsCard';
 import BedOrganizationCard from '@/components/crop-oracle/BedOrganizationCard';
 import BedStrumEmbed from '@/components/crop-oracle/BedStrumEmbed';
+import ChordComposer from '@/components/crop-oracle/ChordComposer';
+import { useAdminRole } from '@/hooks/useAdminRole';
 
 /* ─── Zone color helper ─── */
 const ZONE_COLORS: Record<number, string> = {
@@ -34,9 +36,12 @@ const INTERVAL_LABELS: Record<string, { label: string; color: string; icon: Reac
 const CropOracle = () => {
   const navigate = useNavigate();
   const { data: allCrops, isLoading } = useMasterCrops();
+  const { isAdmin } = useAdminRole();
   const [query, setQuery] = useState('');
   const [selectedCrop, setSelectedCrop] = useState<MasterCrop | null>(null);
   const [hoveredCrop, setHoveredCrop] = useState<MasterCrop | null>(null);
+  const [composerOpen, setComposerOpen] = useState(false);
+  const [pendingCrop, setPendingCrop] = useState<MasterCrop | null>(null);
   const [proMode, setProMode] = useState(() => {
     try { return localStorage.getItem('oracle-pro-mode') === 'true'; } catch { return false; }
   });
@@ -131,6 +136,14 @@ const CropOracle = () => {
   const note = selectedCrop ? (NOTE_MAP[selectedCrop.frequency_hz] || '?') : '?';
   const mixSetting = selectedCrop ? getMasterMixSetting(selectedCrop.frequency_hz) : null;
 
+  // Determine active frequency for Chord Composer (from selected crop or first result)
+  const activeFrequency = selectedCrop?.frequency_hz || (results.length > 0 ? results[0].frequency_hz : null);
+
+  const handleAddToChord = (crop: MasterCrop) => {
+    setPendingCrop(crop);
+    if (!composerOpen) setComposerOpen(true);
+  };
+
   return (
     <div className="min-h-screen" style={{ background: 'hsl(0 0% 3%)' }}>
       {/* Header */}
@@ -168,6 +181,20 @@ const CropOracle = () => {
           }
           <span className="text-[9px] font-mono font-bold" style={{ color: proMode ? 'hsl(45 80% 55%)' : 'hsl(120 50% 50%)' }}>
             {proMode ? 'PRO' : 'EASY'}
+          </span>
+        </button>
+        {/* Compose Chord Button — visible to all, functionality differs by role */}
+        <button
+          onClick={() => setComposerOpen(true)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all"
+          style={{
+            background: composerOpen ? 'hsl(270 50% 40% / 0.25)' : 'hsl(270 30% 20% / 0.15)',
+            border: `1px solid ${composerOpen ? 'hsl(270 50% 50% / 0.5)' : 'hsl(270 30% 30% / 0.3)'}`,
+          }}
+        >
+          <Music className="w-4 h-4" style={{ color: 'hsl(270 50% 60%)' }} />
+          <span className="text-[9px] font-mono font-bold" style={{ color: 'hsl(270 50% 60%)' }}>
+            🎹
           </span>
         </button>
       </div>
@@ -301,6 +328,20 @@ const CropOracle = () => {
                       </span>
                     </div>
                     <span className="text-sm shrink-0">{inst?.icon || '🌱'}</span>
+                    {/* "+ Add" button when composer is open (admin only) */}
+                    {composerOpen && isAdmin && crop.chord_interval && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleAddToChord(crop); }}
+                        className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 transition-colors"
+                        style={{
+                          background: `${c}20`,
+                          border: `1px solid ${c}40`,
+                        }}
+                        title={`Add to chord (${crop.chord_interval})`}
+                      >
+                        <Plus className="w-3 h-3" style={{ color: c }} />
+                      </button>
+                    )}
                   </button>
 
                   {/* Hover fact tooltip */}
@@ -419,6 +460,22 @@ const CropOracle = () => {
                   <p className="text-[11px] mt-2 leading-relaxed" style={{ color: 'hsl(0 0% 55%)' }}>
                     {selectedCrop.description}
                   </p>
+                )}
+
+                {/* Add to Chord button (admin only, when composer is open) */}
+                {isAdmin && selectedCrop.chord_interval && (
+                  <button
+                    onClick={() => handleAddToChord(selectedCrop)}
+                    className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-mono font-bold transition-colors"
+                    style={{
+                      background: composerOpen ? `${zoneColor}25` : `${zoneColor}12`,
+                      border: `1px solid ${zoneColor}40`,
+                      color: zoneColor,
+                    }}
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    ADD TO CHORD
+                  </button>
                 )}
               </div>
 
@@ -660,6 +717,15 @@ const CropOracle = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Chord Composer Drawer */}
+      <ChordComposer
+        open={composerOpen}
+        onOpenChange={setComposerOpen}
+        activeFrequency={activeFrequency}
+        pendingCrop={pendingCrop}
+        onClearPending={() => setPendingCrop(null)}
+      />
     </div>
   );
 };
