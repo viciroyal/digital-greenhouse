@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, X } from 'lucide-react';
+import { Send, X, Leaf } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
@@ -131,50 +131,20 @@ const GriotOracle = () => {
         whileTap={{ scale: 0.95 }}
         animate={{
           boxShadow: [
-            '0 0 20px hsl(185 80% 40% / 0.3)',
-            '0 0 40px hsl(185 80% 50% / 0.5)',
-            '0 0 20px hsl(185 80% 40% / 0.3)',
+            '0 0 20px hsl(120 50% 35% / 0.3)',
+            '0 0 40px hsl(120 50% 45% / 0.5)',
+            '0 0 20px hsl(120 50% 35% / 0.3)',
           ],
         }}
         transition={{
           boxShadow: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
         }}
         style={{
-          background: 'linear-gradient(135deg, hsl(35 60% 25%), hsl(25 50% 20%))',
-          border: '2px solid hsl(35 50% 40%)',
+          background: 'linear-gradient(135deg, hsl(120 40% 18%), hsl(140 35% 12%))',
+          border: '2px solid hsl(120 40% 35%)',
         }}
       >
-        {/* Cowrie Shell SVG */}
-        <svg viewBox="0 0 40 40" className="w-10 h-10">
-          {/* Shell body */}
-          <ellipse
-            cx="20"
-            cy="20"
-            rx="14"
-            ry="10"
-            fill="url(#cowrieGradient)"
-            stroke="hsl(35 40% 50%)"
-            strokeWidth="1"
-          />
-          {/* Shell opening/teeth pattern */}
-          <path
-            d="M10 20 Q12 18, 14 20 Q16 22, 18 20 Q20 18, 22 20 Q24 22, 26 20 Q28 18, 30 20"
-            stroke="hsl(25 40% 30%)"
-            strokeWidth="1.5"
-            fill="none"
-          />
-          {/* Ridge lines */}
-          <path d="M8 16 Q20 14, 32 16" stroke="hsl(35 30% 45%)" strokeWidth="0.5" fill="none" />
-          <path d="M8 24 Q20 26, 32 24" stroke="hsl(35 30% 45%)" strokeWidth="0.5" fill="none" />
-          {/* Gradient definition */}
-          <defs>
-            <radialGradient id="cowrieGradient" cx="40%" cy="30%">
-              <stop offset="0%" stopColor="hsl(40 50% 85%)" />
-              <stop offset="50%" stopColor="hsl(35 45% 70%)" />
-              <stop offset="100%" stopColor="hsl(30 40% 55%)" />
-            </radialGradient>
-          </defs>
-        </svg>
+        <Leaf className="w-7 h-7" style={{ color: 'hsl(120 50% 65%)' }} />
 
         {/* Glow effect */}
         <motion.div
@@ -182,7 +152,7 @@ const GriotOracle = () => {
           animate={{ opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 4, repeat: Infinity }}
           style={{
-            background: 'radial-gradient(circle, hsl(185 80% 50% / 0.3) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, hsl(120 50% 45% / 0.3) 0%, transparent 70%)',
           }}
         />
 
@@ -191,11 +161,11 @@ const GriotOracle = () => {
           className="absolute bottom-full right-0 mb-2 px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"
           style={{
             background: 'hsl(220 40% 10% / 0.9)',
-            border: '1px solid hsl(185 60% 40%)',
-            color: 'hsl(185 80% 70%)',
+            border: '1px solid hsl(120 50% 40%)',
+            color: 'hsl(120 50% 70%)',
             fontSize: '10px',
             letterSpacing: '0.15em',
-            textTransform: 'uppercase',
+            textTransform: 'uppercase' as const,
             fontFamily: 'Space Mono, monospace',
           }}
         >
@@ -241,15 +211,12 @@ const GriotOracle = () => {
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center"
                   style={{
-                    background: 'linear-gradient(135deg, hsl(280 50% 30%), hsl(240 50% 25%))',
-                    border: '2px solid hsl(185 60% 40%)',
-                    boxShadow: '0 0 15px hsl(185 60% 40% / 0.4)',
+                    background: 'linear-gradient(135deg, hsl(120 40% 20%), hsl(140 35% 15%))',
+                    border: '2px solid hsl(120 50% 40%)',
+                    boxShadow: '0 0 15px hsl(120 50% 40% / 0.4)',
                   }}
                 >
-                  {/* Mask icon */}
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="hsl(40 50% 80%)">
-                    <path d="M12 2C8 2 5 5 5 9c0 2 1 4 2 5.5V17c0 1 .5 2 1.5 2.5L12 22l3.5-2.5c1-.5 1.5-1.5 1.5-2.5v-2.5c1-1.5 2-3.5 2-5.5 0-4-3-7-7-7zm-2 8a1 1 0 100-2 1 1 0 000 2zm4 0a1 1 0 100-2 1 1 0 000 2zm-2 5c-1.5 0-2.5-.5-3-1 .5.5 1.5 1.5 3 1.5s2.5-1 3-1.5c-.5.5-1.5 1-3 1z" />
-                  </svg>
+                  <Leaf className="w-5 h-5" style={{ color: 'hsl(120 50% 65%)' }} />
                 </div>
                 <div>
                   <h3
