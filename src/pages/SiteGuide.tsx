@@ -86,22 +86,106 @@ const SubHead = ({ children }: { children: React.ReactNode }) => (
   </h4>
 );
 
+const MANUAL_CSV_ROWS = [
+  ['Section', 'Page', 'Route', 'Feature', 'Description'],
+  ['Home', 'Home Page', '/', 'Landing', 'The front door. See PharmBoi artwork, branding, and navigation links.'],
+  ['Auth', 'Sign In', '/auth', 'Sign Up / Log In', 'Create an account with email or log in to access personal progress, journal, and farm data.'],
+  ['Star Mapping', 'Star Mapping', '/star-mapping', 'Birth Chart Entry', 'Enter full name, birth date, birth time (AM/PM), and city/state to calculate your cosmic fingerprint.'],
+  ['Star Mapping', 'Star Mapping', '/star-mapping', 'Calculate Resonance', 'Button glows gold when all fields are filled. Generates your personalized star map.'],
+  ['Resonance Report', 'Resonance Report', '/resonance-report', 'Zone Alignment', 'View which of the 7 frequency zones align with your birth chart and get crop/task recommendations.'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Living Almanac (Chapters)', 'Roman numeral chapters (I, II, III). Unlock sequentially. Locked chapters shake when tapped.'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Sap Rise Progress', 'Top-left thermometer showing curriculum progress. Fills as you complete lessons.'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Journal View', 'Personal reflection space. Write about garden observations with guided prompts.'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Sovereignty Map', 'Visual ecosystem with 5 layers (Root/Flow/Fire/Gold/Seed) that light up as you log observations.'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Stewards Utility Belt', '5 tools: Compass (calendars), Shield (pest defense), Kora (storytelling), Mortar (recipes), Kiva (seed inventory).'],
+  ['Ancestral Path', 'The Ancestral Path', '/ancestral-path', 'Scale Toggle', 'Seed = Beginner, Sprout = Intermediate, Canopy = Advanced (full technical detail).'],
+  ['Field Almanac', 'The Field Almanac', '/field-almanac', 'Master Mix', '5 quarts per 60ft bed. Resets soil to Middle C (396Hz). Worm castings, compost, kelp, minerals.'],
+  ['Field Almanac', 'The Field Almanac', '/field-almanac', 'Brix Validator', 'Refractometer reading: <12 = Dissonant (red), 12-17 = In Tune (green), 18-24 = High Fidelity (gold). Must calibrate first.'],
+  ['Field Almanac', 'The Field Almanac', '/field-almanac', 'Beginners Field Guide', 'Simplified version for new users with plain-language explanations.'],
+  ['Conductor', 'AgroMajic Conductor', '/conductor', 'Bed Grid', 'Visual grid of all 44 beds, color-coded by frequency zone. Click any bed for details.'],
+  ['Conductor', 'AgroMajic Conductor', '/conductor', 'Chord Sheet', 'Each beds current chord: crops planted, Tone (Hz), Master Mix recipe, Voicing Density.'],
+  ['Conductor', 'AgroMajic Conductor', '/conductor', 'Dissonance Warning', 'Fires if wrong-zone crop is planted. Jazz Mode toggle allows valid cross-zone companion planting.'],
+  ['Conductor', 'AgroMajic Conductor', '/conductor', 'Bed Detail Panel', 'Current plantings by interval, Brix readings, notes. Bed width: 30 inches (2.5 ft).'],
+  ['Conductor', 'AgroMajic Conductor', '/conductor', 'Seven Pillars Sidebar', '7 farm infrastructure stations: Compost, Entrance, Solar, Pavilion, Wash/Pack, Tool Shed, Perimeter.'],
+  ['Crop Oracle', 'The Crop Oracle', '/crop-oracle', 'Crop Profile', 'Search 487 crops. See name, zone, element, Brix targets, spacing, harvest days, guild role, instrument.'],
+  ['Crop Oracle', 'The Crop Oracle', '/crop-oracle', 'Beginner/Pro Toggle', 'Easy = common names & basics. Pro = full Hz, minerals, Brix targets, technical metadata.'],
+  ['Crop Oracle', 'The Crop Oracle', '/crop-oracle', 'Unified Guild', 'Combined Harmonic Matrix + Companion Guild. Companions in 7 chord interval slots (1st-13th).'],
+  ['Crop Oracle', 'The Crop Oracle', '/crop-oracle', 'Compose', 'Build custom 7-voice chord recipe for a bed. Calculates plant counts from 30-inch width & spacing.'],
+  ['Crop Oracle', 'The Crop Oracle', '/crop-oracle', 'Timing - Lunar Gate', 'Current moon phase: Waxing = Leaf, Full = Fruit, Waning = Root crops.'],
+  ['Crop Oracle', 'The Crop Oracle', '/crop-oracle', 'Timing - Seasonal Movements', '3 CSA phases: Cool Octave (Apr-May), Solar Peak (Jun-Aug), Harvest Signal (Aug-Oct).'],
+  ['Crop Oracle', 'The Crop Oracle', '/crop-oracle', 'Bed Organization', 'Assign crops to beds with proper spacing math for 30x60ft beds.'],
+  ['Chord Recipes', 'Chord Recipe Gallery', '/chord-recipes', 'Greatest Hits', 'Pre-made 7-voice polyculture templates for each zone. Starter playlists to plant directly.'],
+  ['Master Build', 'Master Build', '/master-build', 'Bed Map', 'Spatial layout of all beds with zone coloring.'],
+  ['Master Build', 'Master Build', '/master-build', 'Seasonal Movements', '3-phase CSA calendar with active phase highlighted.'],
+  ['Liner Notes', 'Liner Notes', '/liner-notes', 'Fidelity Meter', 'Quality score per track. Story and science behind each planting decision.'],
+  ['Profile', 'Pharmer Profile', '/pharmer-profile', 'Songs Sung', 'Total bed resets completed.'],
+  ['Profile', 'Pharmer Profile', '/pharmer-profile', 'Resonance Score', 'Rolling 7-day Brix average. High Fidelity Badge if >= 12.'],
+  ['Profile', 'Pharmer Profile', '/pharmer-profile', 'Farm Team Mode', 'Rocky (Infrastructure), River (Irrigation), Sunny (Planting), Spirit (Journaling).'],
+  ['Hogon Review', 'Hogon Review', '/hogon-review', 'Elder Review', 'Admin page to review and approve field journal entries.'],
+  ['Crop Export', 'Crop Export', '/crop-export', 'CSV Download', 'Download full 463-crop master registry as CSV with all metadata.'],
+  ['Ascension Map', 'Ascension Map', '/ascension-map', 'Curriculum Journey', 'Visual demo of the full curriculum as a climbing path.'],
+  ['Zones', 'Reference', '-', 'Zone 1: C / 396Hz / Red', 'Foundation — Root anchoring, add Phosphorus.'],
+  ['Zones', 'Reference', '-', 'Zone 2: D / 417Hz / Orange', 'Flow — Water management, fungal networks.'],
+  ['Zones', 'Reference', '-', 'Zone 3: E / 528Hz / Yellow', 'Alchemy — Growth power, add Nitrogen.'],
+  ['Zones', 'Reference', '-', 'Zone 4: F / 639Hz / Green', 'Heart — Connect plant guilds, Calcium.'],
+  ['Zones', 'Reference', '-', 'Zone 5: G / 741Hz / Blue', 'Signal — Check Brix quality (12-24 target).'],
+  ['Zones', 'Reference', '-', 'Zone 6: A / 852Hz / Indigo', 'Vision — Medicinal plant monitoring.'],
+  ['Zones', 'Reference', '-', 'Zone 7: B / 963Hz / Violet', 'Source — Garlic/Onion protection shield.'],
+  ['Glossary', 'Reference', '-', 'Brix', 'A number (0-24) measuring plant nutrition via sugar content. Higher = healthier.'],
+  ['Glossary', 'Reference', '-', 'Hz / Frequency', 'Each zone has a musical frequency. It organizes crops by biological function.'],
+  ['Glossary', 'Reference', '-', 'Chord', 'A group of 7 plants that work together like musical notes in harmony.'],
+  ['Glossary', 'Reference', '-', 'Interval', 'The role a plant plays in the chord (1st, 3rd, 5th, 7th, 9th, 11th, 13th).'],
+  ['Glossary', 'Reference', '-', 'Guild', 'Plants that help each other grow when planted side by side.'],
+  ['Glossary', 'Reference', '-', 'Master Mix', 'The core soil recipe — 5 quarts per 60-foot bed.'],
+  ['Glossary', 'Reference', '-', 'Refractometer', 'A handheld tool that measures Brix by looking at a leafs juice.'],
+  ['Glossary', 'Reference', '-', 'Three Sisters', 'Ancient Native American polyculture: Corn + Beans + Squash.'],
+  ['Glossary', 'Reference', '-', 'Mycelium', 'Underground fungal network that connects plant roots like an internet.'],
+  ['Glossary', 'Reference', '-', 'CSA', 'Community Supported Agriculture — a subscription farming model.'],
+  ['Glossary', 'Reference', '-', 'Cowries', 'Points earned through progress in the system.'],
+];
+
+const exportManualCSV = () => {
+  const csvContent = MANUAL_CSV_ROWS
+    .map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(','))
+    .join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'pharmboi-field-manual.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 const SiteGuide = () => {
   return (
     <div className="min-h-screen" style={{ background: 'hsl(0 0% 4%)' }}>
       {/* Header */}
-      <div className="sticky top-0 z-50 px-4 py-3 flex items-center gap-3" style={{
+      <div className="sticky top-0 z-50 px-4 py-3 flex items-center justify-between" style={{
         background: 'hsl(0 0% 4% / 0.9)',
         backdropFilter: 'blur(20px)',
         borderBottom: '1px solid hsl(0 0% 100% / 0.06)',
       }}>
-        <Link to="/" className="p-1.5 rounded-lg hover:bg-white/5 transition-colors">
-          <ChevronLeft className="w-5 h-5" style={{ color: 'hsl(0 0% 50%)' }} />
-        </Link>
-        <BookOpen className="w-5 h-5" style={{ color: 'hsl(45 60% 55%)' }} />
-        <h1 className="text-lg tracking-wider" style={{ fontFamily: "'Staatliches', sans-serif", color: 'hsl(45 60% 75%)' }}>
-          THE PHARMBOI FIELD MANUAL
-        </h1>
+        <div className="flex items-center gap-3">
+          <Link to="/" className="p-1.5 rounded-lg hover:bg-white/5 transition-colors">
+            <ChevronLeft className="w-5 h-5" style={{ color: 'hsl(0 0% 50%)' }} />
+          </Link>
+          <BookOpen className="w-5 h-5" style={{ color: 'hsl(45 60% 55%)' }} />
+          <h1 className="text-lg tracking-wider" style={{ fontFamily: "'Staatliches', sans-serif", color: 'hsl(45 60% 75%)' }}>
+            THE PHARMBOI FIELD MANUAL
+          </h1>
+        </div>
+        <button
+          onClick={exportManualCSV}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono tracking-wider transition-colors hover:bg-white/5"
+          style={{
+            border: '1px solid hsl(45 60% 55% / 0.3)',
+            color: 'hsl(45 60% 55%)',
+          }}
+        >
+          <Download className="w-3.5 h-3.5" />
+          EXPORT CSV
+        </button>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
