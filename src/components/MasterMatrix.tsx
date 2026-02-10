@@ -464,6 +464,7 @@ const MasterMatrix = () => {
           track={selectedTrack}
           isOpen={isDetailOpen}
           onClose={handleClose}
+          onSwitchTrack={(track) => setSelectedTrack(track)}
         />
       )}
     </>
