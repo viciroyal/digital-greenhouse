@@ -344,7 +344,7 @@ const LunarAgronomyModule = ({ track }: LunarAgronomyModuleProps) => {
               <path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8V9a2 2 0 1 1 4 0" />
             </svg>
             <p 
-              className="font-mono text-[10px] tracking-[0.15em] uppercase"
+              className="font-body text-[10px] tracking-[0.15em] uppercase"
               style={{ color: lunarData.glowColor }}
             >
               [MANUAL_OVERRIDE] — THE HANDS
