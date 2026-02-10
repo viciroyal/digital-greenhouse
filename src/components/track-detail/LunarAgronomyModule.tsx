@@ -351,7 +351,7 @@ const LunarAgronomyModule = ({ track }: LunarAgronomyModuleProps) => {
             </p>
           </div>
           <p 
-            className="font-mono text-sm leading-relaxed"
+              className="font-body text-sm leading-relaxed"
             style={{ color: 'hsl(40 50% 85%)' }}
           >
             {lunarData.task}
