@@ -68,7 +68,7 @@ const FunctionSeal = ({ track }: FunctionSealProps) => {
             />
 
             {/* Context */}
-            <p className="font-mono text-xs text-muted-foreground/80 italic max-w-md">
+            <p className="font-body text-xs text-muted-foreground/80 italic max-w-md">
               "{track.designationContext}"
             </p>
           </div>
