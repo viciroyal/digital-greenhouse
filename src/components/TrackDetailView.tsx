@@ -27,6 +27,7 @@ interface TrackDetailViewProps {
   track: TrackData | null;
   isOpen: boolean;
   onClose: () => void;
+  onSwitchTrack?: (track: TrackData) => void;
   // Audio player props
   isPlaying?: boolean;
   onTogglePlay?: () => void;
