@@ -18,7 +18,9 @@ const VibrationalAudioPlayer = ({
   title = "Pulling Weeds",
   artist = "Vici Royàl",
   frequency = "396Hz",
-  colorHsl = "0 70% 50%"
+  colorHsl = "0 70% 50%",
+  onPrevTrack,
+  onNextTrack,
 }: VibrationalAudioPlayerProps) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
