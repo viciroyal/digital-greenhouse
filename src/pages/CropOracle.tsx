@@ -782,9 +782,51 @@ const CropOracle = () => {
               <p className="text-center text-sm font-mono mb-2" style={{ color: 'hsl(0 0% 45%)' }}>
                 STEP 3 — {proMode ? 'THE 13TH CHORD' : 'THE TRIAD'}
               </p>
-              <p className="text-center text-[10px] font-mono mb-4" style={{ color: 'hsl(0 0% 30%)' }}>
-                ZONE {ZONES.indexOf(selectedZone) + 1} • {selectedZone.name.toUpperCase()} • {selectedZone.hz}Hz • KEY OF {selectedZone.note}
-              </p>
+              {/* ═══ Inline Key Changer ═══ */}
+              <div className="flex items-center justify-center gap-1.5 mb-4 flex-wrap">
+                <span className="text-[9px] font-mono tracking-widest mr-1" style={{ color: 'hsl(0 0% 35%)' }}>
+                  KEY:
+                </span>
+                {ZONES.map(zone => {
+                  const isActive = selectedZone.hz === zone.hz;
+                  return (
+                    <button
+                      key={zone.hz}
+                      onClick={() => {
+                        if (zone.hz !== selectedZone.hz) {
+                          setSelectedZone(zone);
+                          setManualOverrides({});
+                          setStarCrop(null);
+                          setIsSaved(false);
+                          setShowStarPicker(false);
+                          toast({
+                            title: `🎵 Key changed to ${zone.note} (${zone.hz}Hz)`,
+                            description: `Recipe retuned to ${zone.vibe}.`,
+                          });
+                        }
+                      }}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-full font-mono text-[10px] tracking-wider transition-all"
+                      style={{
+                        background: isActive
+                          ? `${zone.color}20`
+                          : 'hsl(0 0% 8%)',
+                        border: `1.5px solid ${isActive ? zone.color : 'hsl(0 0% 15%)'}`,
+                        color: isActive ? zone.color : 'hsl(0 0% 40%)',
+                        boxShadow: isActive ? `0 0 12px ${zone.color}25` : 'none',
+                      }}
+                    >
+                      <div
+                        className="w-2.5 h-2.5 rounded-full"
+                        style={{
+                          background: isActive ? zone.color : `${zone.color}40`,
+                          boxShadow: isActive ? `0 0 6px ${zone.color}50` : 'none',
+                        }}
+                      />
+                      {zone.note}
+                    </button>
+                  );
+                })}
+              </div>
 
               {/* ═══ Star Picker ═══ */}
               {<motion.div
