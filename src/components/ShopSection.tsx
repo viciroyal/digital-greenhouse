@@ -51,45 +51,76 @@ const ShopSection = () => {
                   />
                   
                   {/* Bundle visualization */}
-                  <div className="relative">
+                  <div className="relative w-64 h-64">
+                    {/* Vinyl Record */}
+                    <motion.div
+                      className="absolute -left-6 top-0 z-0"
+                      animate={{ rotate: [0, 360] }}
+                      transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+                    >
+                      <div className="w-40 h-40 rounded-full relative" style={{
+                        background: 'radial-gradient(circle, hsl(0 0% 8%) 20%, hsl(0 0% 4%) 21%, hsl(0 0% 12%) 22%, hsl(0 0% 4%) 45%, hsl(0 0% 8%) 46%, hsl(0 0% 4%) 47%, hsl(0 0% 10%) 80%, hsl(0 0% 5%) 100%)',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+                      }}>
+                        {/* Center label */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center" style={{
+                          background: 'linear-gradient(135deg, hsl(350 60% 40%), hsl(280 50% 30%))',
+                        }}>
+                          <div className="w-3 h-3 rounded-full" style={{ background: 'hsl(0 0% 8%)' }} />
+                        </div>
+                        {/* Grooves */}
+                        <div className="absolute inset-3 rounded-full border border-white/5" />
+                        <div className="absolute inset-6 rounded-full border border-white/5" />
+                        <div className="absolute inset-9 rounded-full border border-white/5" />
+                      </div>
+                    </motion.div>
+
+                    {/* Vinyl sleeve peeking behind */}
+                    <div className="absolute -left-8 top-2 w-40 h-40 rounded-lg z-[-1]" style={{
+                      background: 'linear-gradient(135deg, hsl(350 50% 25%), hsl(280 40% 20%))',
+                      border: '1px solid hsl(350 40% 30% / 0.5)',
+                    }}>
+                      <p className="text-[8px] text-cream/30 font-body text-center mt-3 tracking-widest">7" SINGLE</p>
+                    </div>
+
                     {/* Cassette */}
                     <motion.div
-                      className="root-card w-48 h-32 rounded-organic p-4 absolute -left-4 -top-4 z-10"
+                      className="root-card w-44 h-28 rounded-organic p-3 absolute right-0 -top-2 z-10"
                       animate={{ rotate: [-2, 2, -2] }}
                       transition={{ duration: 4, repeat: Infinity }}
                     >
-                      <div className="flex justify-between mb-2">
-                        <div className="w-8 h-8 rounded-full border-2 border-cream/30" />
-                        <div className="w-8 h-8 rounded-full border-2 border-cream/30" />
+                      <div className="flex justify-between mb-1.5">
+                        <div className="w-7 h-7 rounded-full border-2 border-cream/30" />
+                        <div className="w-7 h-7 rounded-full border-2 border-cream/30" />
                       </div>
-                      <div className="h-4 bg-root-brown/50 rounded-full" />
-                      <p className="text-center text-xs text-cream/50 mt-2 font-body">PHARMBOI TAPE</p>
+                      <div className="h-3 bg-root-brown/50 rounded-full" />
+                      <p className="text-center text-[10px] text-cream/50 mt-1.5 font-body">PHARMBOI TAPE</p>
                     </motion.div>
 
                     {/* Player */}
                     <motion.div
-                      className="root-card w-52 h-36 rounded-organic-lg p-4 relative z-20 mx-auto mt-16"
+                      className="root-card w-48 h-32 rounded-organic-lg p-4 relative z-20 mx-auto mt-24"
                       animate={{ rotate: [1, -1, 1] }}
                       transition={{ duration: 5, repeat: Infinity }}
                     >
                       <div className="text-center">
-                        <p className="text-gem-topaz text-xs tracking-widest font-body">CLEAR-TECH™</p>
-                        <div className="mt-4 flex justify-center gap-3">
-                          <div className="w-10 h-10 rounded-full border-2 border-cream/30" />
-                          <div className="w-10 h-10 rounded-full border-2 border-cream/30" />
+                        <p className="text-gem-topaz text-[10px] tracking-widest font-body">CLEAR-TECH™</p>
+                        <div className="mt-3 flex justify-center gap-3">
+                          <div className="w-9 h-9 rounded-full border-2 border-cream/30" />
+                          <div className="w-9 h-9 rounded-full border-2 border-cream/30" />
                         </div>
-                        <p className="text-cream/40 text-xs mt-3 font-body">TRANSPARENT PLAYER</p>
+                        <p className="text-cream/40 text-[10px] mt-2 font-body">TRANSPARENT PLAYER</p>
                       </div>
                     </motion.div>
 
                     {/* Map */}
                     <motion.div
-                      className="root-card w-40 h-24 rounded-organic absolute -right-8 bottom-4 z-0 p-3"
+                      className="root-card w-36 h-20 rounded-organic absolute -right-4 bottom-0 z-0 p-2"
                       animate={{ rotate: [3, -1, 3] }}
                       transition={{ duration: 6, repeat: Infinity }}
                     >
                       <div className="h-full border-2 border-dashed border-cream/20 rounded-xl flex items-center justify-center">
-                        <p className="text-cream/40 text-xs text-center font-body">COSMIC MAP</p>
+                        <p className="text-cream/40 text-[10px] text-center font-body">COSMIC MAP</p>
                       </div>
                     </motion.div>
                   </div>
