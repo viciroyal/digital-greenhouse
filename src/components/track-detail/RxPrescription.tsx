@@ -342,9 +342,8 @@ const RxPrescription = ({ track, onActivate }: RxPrescriptionProps) => {
             <KanagaSymbol color={track.colorHsl} />
             <div>
               <p 
-                className="text-sm tracking-[0.12em] uppercase font-bold"
+                className="text-sm tracking-[0.12em] uppercase font-bold font-staatliches"
                 style={{ 
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
                   color: DOGON_COLORS.paleStraw,
                   textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
                   letterSpacing: '0.15em',
