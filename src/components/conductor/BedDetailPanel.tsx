@@ -140,10 +140,29 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: 
     return null;
   }, [rootCrop, generateChord]);
 
-  // 13th Interval: Get available aerial/overstory crops (trees, tall perennials)
-  const aerialCrops = allCrops.filter(crop => 
-    crop.category === 'tree' || crop.category === 'perennial' || crop.guild_role === 'Enhancer'
-  );
+  // 13th Interval: Get available aerial/overstory crops
+  // Filter to signal plants, flowers, aromatics, trees — sorted with zone recommendation first
+  const aerialCrops = useMemo(() => {
+    const zoneRec = getZoneRecommendation(bed.frequency_hz);
+    const recName = zoneRec?.thirteenth.name.toLowerCase() || '';
+    const candidates = allCrops.filter(crop => 
+      crop.category === 'tree' || crop.category === 'perennial' || 
+      crop.category === 'Dye/Fiber/Aromatic' || crop.guild_role === 'Enhancer' ||
+      crop.chord_interval === '7th (Signal)' || crop.instrument_type === 'Synthesizers'
+    );
+    return candidates.sort((a, b) => {
+      const aName = (a.common_name || a.name).toLowerCase();
+      const bName = (b.common_name || b.name).toLowerCase();
+      const recKey = recName.split(' ')[0].toLowerCase();
+      const aIsRec = recKey && aName.includes(recKey);
+      const bIsRec = recKey && bName.includes(recKey);
+      if (aIsRec && !bIsRec) return -1;
+      if (!aIsRec && bIsRec) return 1;
+      const aZone = a.frequency_hz === bed.frequency_hz ? 0 : 1;
+      const bZone = b.frequency_hz === bed.frequency_hz ? 0 : 1;
+      return aZone - bZone;
+    });
+  }, [allCrops, bed.frequency_hz]);
   const has13thInterval = bed.aerial_crop_id !== null || bed.aerial_crop !== null;
 
   // Filter crops by frequency AND chord interval
@@ -1113,16 +1132,22 @@ const BedDetailPanel = ({ bed, plantings, isAdmin, jazzMode = false, onClose }: 
                         <SelectItem value="none" className="text-xs font-mono" style={{ color: 'hsl(0 0% 60%)' }}>
                           None
                         </SelectItem>
-                        {allCrops.map((crop) => (
-                          <SelectItem 
-                            key={crop.id} 
-                            value={crop.id} 
-                            className="text-xs font-mono"
-                            style={{ color: 'hsl(90 60% 60%)' }}
-                          >
-                            {crop.name} {crop.common_name ? `(${crop.common_name})` : ''}
-                          </SelectItem>
-                        ))}
+                        {aerialCrops.map((crop) => {
+                          const recName = zoneRec?.thirteenth.name.toLowerCase() || '';
+                          const recKey = recName.split(' ')[0].toLowerCase();
+                          const cropLabel = (crop.common_name || crop.name).toLowerCase();
+                          const isRec = recKey && cropLabel.includes(recKey);
+                          return (
+                            <SelectItem 
+                              key={crop.id} 
+                              value={crop.id} 
+                              className="text-xs font-mono"
+                              style={{ color: isRec ? zoneRec!.zoneColor : 'hsl(90 60% 60%)' }}
+                            >
+                              {isRec ? `★ ${crop.common_name || crop.name} (Recommended)` : (crop.common_name || crop.name)}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   </div>
