@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import UserGuide from "./pages/UserGuide";
 import DevGuide from "./pages/DevGuide";
 import TestingSuiteDocs from "./pages/TestingSuiteDocs";
+import CropLibrary from "./pages/CropLibrary";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
                 <Route path="/user-guide" element={<UserGuide />} />
                 <Route path="/dev-guide" element={<DevGuide />} />
                 <Route path="/testing-docs" element={<TestingSuiteDocs />} />
+                <Route path="/crop-library" element={<CropLibrary />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
