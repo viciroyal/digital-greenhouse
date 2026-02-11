@@ -206,12 +206,13 @@ const UserGuide = () => {
 
         <Section title="Crop Library & CSV Export" emoji="📊">
           <p>Visit the <strong>Crop Library</strong> (/crop-library) to see all <strong>1,684 crops</strong> organized by frequency zone in a high-density, printable table.</p>
-          <p><strong>Table Columns (19):</strong></p>
+          <p><strong>Table Columns (21):</strong></p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Common Name, Scientific Name, Hz, Zone, Element, Category</li>
             <li>Growth Habit (with emoji badge), Chord Interval, Instrument Type</li>
             <li>Dominant Mineral, Brix Range, Hardiness Zone (sub-zone a/b format)</li>
-            <li>Harvest Days, Spacing, Planting Season, Guild Role, Focus Tag</li>
+            <li>Harvest Days, Spacing, Root Depth (inches), Min Container (gallons)</li>
+            <li>Planting Season, Guild Role, Focus Tag</li>
             <li>Companion Crops, Crop Guild</li>
           </ul>
           <p><strong>CSV Export (27 columns):</strong> Adds root_depth_inches, min_container_gal, soil_protocol_focus, cultural_role, description, and library_note beyond what the table shows. Array fields (companions, guilds, seasons) use semicolon separators.</p>

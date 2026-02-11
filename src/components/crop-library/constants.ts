@@ -15,6 +15,8 @@ export const TABLE_HEADERS = [
   { label: 'Hardiness', align: 'text-center' },
   { label: 'Days', align: 'text-center' },
   { label: 'Spacing', align: '' },
+  { label: 'Depth″', align: 'text-center' },
+  { label: 'Min Gal', align: 'text-center' },
   { label: 'Season', align: '' },
   { label: 'Guild', align: '' },
   { label: 'Focus', align: '' },
