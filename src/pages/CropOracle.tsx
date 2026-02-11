@@ -395,12 +395,44 @@ const CropOracle = () => {
       return companionNames.some(cn => name.includes(cn) || cn.includes(name.split('(')[0].trim()));
     };
 
-    // Seeded rotation: pick from candidates using recipeSeed to rotate selection
+    // Season + zone harmony scoring for candidate ranking
+    const starSeasons = (starCrop?.planting_season || []).map(s => s.toLowerCase());
+    const starHarvestDays = starCrop?.harvest_days ?? null;
+
+    const harmonicScore = (c: MasterCrop): number => {
+      let score = 0;
+      // Season overlap with star crop (+3 per shared season)
+      const cSeasons = (c.planting_season || []).map(s => s.toLowerCase());
+      const sharedSeasons = starSeasons.filter(s => cSeasons.includes(s));
+      score += sharedSeasons.length * 3;
+      // Bonus if ANY season data exists (+1)
+      if (cSeasons.length > 0) score += 1;
+      // Zone compatibility (+2 if crop fits user's zone)
+      if (hardinessZone && c.hardiness_zone_min != null && c.hardiness_zone_max != null) {
+        if (hardinessZone >= c.hardiness_zone_min && hardinessZone <= c.hardiness_zone_max) score += 2;
+        else score -= 3; // penalize zone-incompatible crops
+      }
+      // Harvest alignment bonus (+1 if within 30 days of star)
+      if (starHarvestDays !== null && c.harvest_days != null) {
+        const diff = Math.abs(c.harvest_days - starHarvestDays);
+        if (diff <= 15) score += 2;
+        else if (diff <= 30) score += 1;
+      }
+      return score;
+    };
+
+    // Seeded rotation: pick from candidates using recipeSeed, preferring harmonically-scored crops
     let pickCounter = 0;
     const rotatedPick = (candidates: MasterCrop[]): MasterCrop | undefined => {
       if (candidates.length === 0) return undefined;
-      const idx = (recipeSeed + pickCounter++) % candidates.length;
-      return candidates[idx];
+      // Sort by harmonic score descending, then use seed to rotate within top-tier
+      const scored = candidates.map(c => ({ crop: c, score: harmonicScore(c) }));
+      scored.sort((a, b) => b.score - a.score);
+      // Pick from the top-scoring tier (all candidates within 1 point of best)
+      const bestScore = scored[0].score;
+      const topTier = scored.filter(s => s.score >= bestScore - 1);
+      const idx = (recipeSeed + pickCounter++) % topTier.length;
+      return topTier[idx].crop;
     };
 
     const pickCrop = (
@@ -583,7 +615,7 @@ const CropOracle = () => {
 
       return { ...interval, crop, isCompanionFill };
     }).map((slot, i) => manualOverrides[i] ? { ...slot, crop: manualOverrides[i], isCompanionFill: false } : slot);
-  }, [recipeCrops, manualOverrides, starCrop, allCrops, selectedZone, environment, recipeSeed]);
+  }, [recipeCrops, manualOverrides, starCrop, allCrops, selectedZone, environment, recipeSeed, hardinessZone]);
 
   /* ─── Modal Signature: derive musical mode from filled intervals ─── */
   const modalSignature = useMemo(() => {
