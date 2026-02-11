@@ -12,6 +12,7 @@ const ORGS = [
     note: 'Ethiopian & Eritrean agricultural heritage network in Georgia',
     color: 'hsl(45 60% 55%)',
     icon: '🌍',
+    url: null,
   },
   {
     name: 'Collectively Sustainable',
@@ -19,6 +20,7 @@ const ORGS = [
     note: 'Black-led sustainability education & community organizing',
     color: 'hsl(160 50% 50%)',
     icon: '♻️',
+    url: null,
   },
   {
     name: 'Black Sustainability',
@@ -26,6 +28,7 @@ const ORGS = [
     note: 'Centering Black communities in sustainability movements',
     color: 'hsl(270 40% 55%)',
     icon: '✊🏿',
+    url: 'https://blacksustainability.org',
   },
   {
     name: 'Community Farmers Markets',
@@ -33,6 +36,7 @@ const ORGS = [
     note: 'Find your local farmers market — support sovereign food systems',
     color: 'hsl(120 40% 50%)',
     icon: '🧑‍🌾',
+    url: null,
   },
 ];
 
@@ -92,26 +96,32 @@ const GACommunityResources = ({ variant = 'full' }: GACommunityResourcesProps) =
         Local organizations to connect with & learn from
       </p>
       <div className="space-y-3 text-left">
-        {ORGS.map(org => (
-          <div
-            key={org.name}
-            className="px-4 py-3 rounded-lg"
-            style={{ background: 'hsl(0 0% 6%)', border: '1px solid hsl(0 0% 13%)' }}
-          >
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-base">{org.icon}</span>
-              <span className="font-body font-bold text-sm" style={{ color: org.color }}>
-                {org.name}
-              </span>
-            </div>
-            <p className="font-body text-xs" style={{ color: 'hsl(0 0% 50%)' }}>
-              {org.type}
-            </p>
-            <p className="font-body text-[11px] mt-1" style={{ color: 'hsl(0 0% 40%)' }}>
-              {org.note}
-            </p>
-          </div>
-        ))}
+        {ORGS.map(org => {
+          const Wrapper = org.url ? 'a' : 'div';
+          const linkProps = org.url ? { href: org.url, target: '_blank' as const, rel: 'noopener noreferrer' } : {};
+          return (
+            <Wrapper
+              key={org.name}
+              {...linkProps}
+              className={`px-4 py-3 rounded-lg block ${org.url ? 'hover:border-current transition-colors' : ''}`}
+              style={{ background: 'hsl(0 0% 6%)', border: '1px solid hsl(0 0% 13%)' }}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-base">{org.icon}</span>
+                <span className="font-body font-bold text-sm" style={{ color: org.color }}>
+                  {org.name}
+                </span>
+                {org.url && <ExternalLink className="w-3 h-3 ml-auto" style={{ color: 'hsl(0 0% 35%)' }} />}
+              </div>
+              <p className="font-body text-xs" style={{ color: 'hsl(0 0% 50%)' }}>
+                {org.type}
+              </p>
+              <p className="font-body text-[11px] mt-1" style={{ color: 'hsl(0 0% 40%)' }}>
+                {org.note}
+              </p>
+            </Wrapper>
+          );
+        })}
       </div>
     </motion.div>
   );
