@@ -719,15 +719,25 @@ const CropOracle = () => {
                 n.includes('onion') || c.category === 'Fungi';
             }));
           } else {
-            assign(pickCrop(undefined, c =>
+            const sentinelFilter = (c: MasterCrop) =>
               c.guild_role?.toLowerCase().includes('sentinel') ||
               c.name.toLowerCase().includes('garlic') ||
               c.name.toLowerCase().includes('onion') ||
               c.name.toLowerCase().includes('chive') ||
               c.name.toLowerCase().includes('leek') ||
               c.name.toLowerCase().includes('shallot') ||
-              c.category === 'Fungi'
-            ));
+              c.category === 'Fungi';
+            assign(pickCrop(undefined, sentinelFilter));
+            // Cross-zone fallback: if no sentinel found in current frequency pool, search all crops
+            if (!crop && allCrops) {
+              const crossZoneSentinels = allCrops.filter(c =>
+                !usedIds.has(c.id) && sentinelFilter(c) &&
+                (hardinessZone == null || c.hardiness_zone_min == null || c.hardiness_zone_max == null ||
+                  (hardinessZone >= c.hardiness_zone_min && hardinessZone <= c.hardiness_zone_max))
+              );
+              const picked = rotatedPick(crossZoneSentinels);
+              if (picked) { usedIds.add(picked.id); crop = picked; isCompanionFill = false; }
+            }
           }
           break;
         case '13th (Top Note)':
