@@ -9,7 +9,7 @@ const EcoParadigmCard = ({ variant = 'inline' }: EcoParadigmCardProps) => {
   if (variant === 'compact') {
     return (
       <a
-        href="https://www.eco-paradigm.com"
+        href="https://www.ecoparadigm.net"
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors"
@@ -55,22 +55,22 @@ const EcoParadigmCard = ({ variant = 'inline' }: EcoParadigmCardProps) => {
         </p>
         <div className="space-y-2">
           <a
-            href="https://www.eco-paradigm.com"
+            href="https://www.ecoparadigm.net"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 transition-colors"
             style={{ color: 'hsl(160 40% 65%)' }}
           >
             <Globe className="w-4 h-4" />
-            <span className="font-mono text-sm">eco-paradigm.com</span>
+            <span className="font-mono text-sm">ecoparadigm.net</span>
           </a>
           <a
-            href="mailto:info@eco-paradigm.com"
+            href="mailto:info@ecoparadigm.net"
             className="flex items-center justify-center gap-2 transition-colors"
             style={{ color: 'hsl(160 40% 65%)' }}
           >
             <Mail className="w-4 h-4" />
-            <span className="font-mono text-sm">info@eco-paradigm.com</span>
+            <span className="font-mono text-sm">info@ecoparadigm.net</span>
           </a>
           <a
             href="tel:+14045551234"
@@ -108,20 +108,20 @@ const EcoParadigmCard = ({ variant = 'inline' }: EcoParadigmCardProps) => {
       </p>
       <div className="flex flex-wrap gap-3">
         <a
-          href="https://www.eco-paradigm.com"
+          href="https://www.ecoparadigm.net"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1 text-[8px] font-mono transition-colors"
           style={{ color: 'hsl(160 40% 60%)' }}
         >
-          <Globe className="w-3 h-3" /> eco-paradigm.com
+          <Globe className="w-3 h-3" /> ecoparadigm.net
         </a>
         <a
-          href="mailto:info@eco-paradigm.com"
+          href="mailto:info@ecoparadigm.net"
           className="flex items-center gap-1 text-[8px] font-mono transition-colors"
           style={{ color: 'hsl(160 40% 60%)' }}
         >
-          <Mail className="w-3 h-3" /> info@eco-paradigm.com
+          <Mail className="w-3 h-3" /> info@ecoparadigm.net
         </a>
         <a
           href="tel:+14045551234"
