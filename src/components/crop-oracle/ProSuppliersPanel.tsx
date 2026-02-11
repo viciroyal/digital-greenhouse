@@ -19,7 +19,7 @@ const CATEGORIES: { id: Category; label: string; icon: React.ReactNode; color: s
   { id: 'biocontrol', label: 'BIOCONTROL & IPM', icon: <Bug className="w-3.5 h-3.5" />, color: 'hsl(160 50% 50%)' },
 ];
 
-const SUPPLIERS: Record<Category, { name: string; url: string; note: string; specialty: string }[]> = {
+const SUPPLIERS: Record<Category, { name: string; url?: string; note: string; specialty: string }[]> = {
   gaLocal: [
     { name: 'Georgia Organics', url: 'https://georgiaorganics.org', note: 'Farmer services, grants, accelerator program & local food network', specialty: 'GA farmer hub' },
     { name: 'Rodale Institute SE', url: 'https://rodaleinstitute.org/about/facilities-and-campuses/regional-resource-centers/southeast-organic-center/', note: 'Southeast Organic Center in Chattahoochee Hills — research & education', specialty: 'Organic research' },
@@ -27,6 +27,7 @@ const SUPPLIERS: Record<Category, { name: string; url: string; note: string; spe
     { name: 'Food Well Alliance', url: 'https://www.foodwellalliance.org', note: 'Community garden grants, compost deliveries, workshops in metro ATL', specialty: 'ATL gardens' },
     { name: 'UGA Extension', url: 'https://extension.uga.edu', note: 'Free soil testing, pest ID, and county-specific growing guides for GA', specialty: 'Free soil tests' },
     { name: 'Levity Farms', url: 'https://www.levityfarms.com', note: 'Local GA farm offering CSA shares — support regenerative land stewards', specialty: 'GA CSA' },
+    { name: 'Standard Feed & Seed', note: '2339 Brannen Rd SE, Atlanta GA 30316 • (404) 241-6922 — local farm supply store', specialty: 'Local farm supply' },
   ],
   seeds: [
     { name: 'Georgia Seed & Garden', url: 'https://georgiaseeds.com', note: 'GA-specific growing instructions with heirloom & open-pollinated seed', specialty: 'GA heirloom' },
@@ -145,12 +146,12 @@ const ProSuppliersPanel = ({ zoneColor, zoneName }: ProSuppliersPanelProps) => {
                 >
                   {SUPPLIERS[activeCategory].map(supplier => {
                     const catColor = CATEGORIES.find(c => c.id === activeCategory)?.color || 'hsl(0 0% 60%)';
+                    const Wrapper = supplier.url ? 'a' : 'div';
+                    const linkProps = supplier.url ? { href: supplier.url, target: '_blank' as const, rel: 'noopener noreferrer' } : {};
                     return (
-                      <a
+                      <Wrapper
                         key={supplier.name}
-                        href={supplier.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        {...linkProps}
                         className="group px-3 py-2.5 rounded-lg transition-all hover:scale-[1.01]"
                         style={{
                           background: 'hsl(0 0% 7%)',
@@ -161,10 +162,12 @@ const ProSuppliersPanel = ({ zoneColor, zoneName }: ProSuppliersPanelProps) => {
                           <span className="text-[10px] font-mono font-bold" style={{ color: catColor }}>
                             {supplier.name}
                           </span>
-                          <ExternalLink
-                            className="w-2.5 h-2.5 ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
-                            style={{ color: 'hsl(0 0% 40%)' }}
-                          />
+                          {supplier.url && (
+                            <ExternalLink
+                              className="w-2.5 h-2.5 ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
+                              style={{ color: 'hsl(0 0% 40%)' }}
+                            />
+                          )}
                         </div>
                         <p className="text-[8px] font-mono leading-relaxed" style={{ color: 'hsl(0 0% 50%)' }}>
                           {supplier.note}
@@ -179,7 +182,7 @@ const ProSuppliersPanel = ({ zoneColor, zoneName }: ProSuppliersPanelProps) => {
                         >
                           {supplier.specialty}
                         </span>
-                      </a>
+                      </Wrapper>
                     );
                   })}
                 </motion.div>
