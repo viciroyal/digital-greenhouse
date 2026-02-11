@@ -1,59 +1,59 @@
 
-## Aromatic Scent Corridor Visualization
+
+## Add Companion Planting Data for Aromatic Crops
 
 ### Overview
-Add a new "Scent Corridor" panel to the Crop Oracle's utility toolbar (alongside Soil Protocol, Planting Calendar, and Modal Guide). This panel visualizes which aromatic, pest-deterrent, and fragrance species create biological barriers around the current food forest guild recipe.
+Update the `companion_crops` and `crop_guild` arrays for all 16 new aromatic species in the `master_crops` table. Each aromatic will be linked to the canopy trees, food crops, and guild partners it best protects or enhances within its frequency zone.
 
-### What It Shows
-The panel will display a concentric ring diagram (styled as a retro-synth radar display) representing the three aromatic layers that surround a food forest guild:
+### Data Updates (by frequency zone)
 
-1. **Inner Ring — Culinary Aromatics**: Herbs like Bee Balm, Shiso, Sweet Marjoram, Lemon Balm that serve dual culinary/pest-confusing roles
-2. **Middle Ring — Pest Deterrent Barrier**: Sentinel species like Citronella Grass, Pyrethrum Daisy, Catnip, Feverfew that form biological exclusion zones
-3. **Outer Ring — Fragrance Corridor**: Pollinator-attracting species like Star Jasmine, Honeysuckle, Sweet Woodruff, Anise Hyssop that draw beneficial insects
+**396Hz — Foundation**
+| Aromatic | companion_crops | crop_guild |
+|---|---|---|
+| Bee Balm (Scarlet) | Tomatoes, Peppers, Carrots, Beetroot | Desirable Pecan, Pawnee Pecan, Sweet Fern, Sweet Woodruff |
+| Sweet Woodruff | Carrots, Beetroot, Ramps | Desirable Pecan, Pawnee Pecan, Bee Balm, Sweet Fern |
+| Sweet Fern | Tomatoes, Peppers, Blueberry | Desirable Pecan, Pawnee Pecan, Bee Balm, Sweet Woodruff |
 
-Each ring shows species available in the current frequency zone, with zone-colored accents and icons indicating their deterrent targets (mosquito, aphid, deer, etc.).
+**417Hz — Flow**
+| Aromatic | companion_crops | crop_guild |
+|---|---|---|
+| Citronella Grass | Cucumber, Squash, Melon, Celery | Issai Hardy Kiwi, Comfrey, Shiso |
+| Shiso (Red Perilla) | Cucumber, Eggplant, Okra | Issai Hardy Kiwi, Citronella Grass, Comfrey |
 
-### User Experience
-- A new **Shield icon** button appears in the toolbar next to Beaker/Calendar/Music (only visible in Food Forest mode or Pro mode)
-- Clicking it opens an inline panel below the frequency bar
-- The panel queries `master_crops` for entries with aromatic-related `library_note` tags
-- Species already present in the current chord recipe are highlighted with a checkmark
-- Users can tap any aromatic species to swap it into an open chord slot
+**528Hz — Alchemy**
+| Aromatic | companion_crops | crop_guild |
+|---|---|---|
+| Sweet Marjoram | Corn, Pole Beans, Squash, Peppers | Chicago Hardy Fig, Goumi Berry, Honeysuckle, Pyrethrum Daisy |
+| Pyrethrum Daisy | Corn, Cabbage, Broccoli, Kale | Chicago Hardy Fig, Thornless Honey Locust, Sweet Marjoram |
+| Honeysuckle (Japanese) | Corn, Pole Beans, Squash | Chicago Hardy Fig, Celeste Fig, Goumi Berry, Sweet Marjoram |
+
+**639Hz — Heart**
+| Aromatic | companion_crops | crop_guild |
+|---|---|---|
+| Lemon Balm | Kale, Broccoli, Cabbage, Lettuce | Serviceberry, Mulberry, Star Jasmine, Catnip |
+| Catnip | Collards, Kale, Cabbage, Squash | Serviceberry, Mulberry, Lemon Balm, Star Jasmine |
+| Star Jasmine | Broccoli, Cabbage, Lettuce | Serviceberry, Mulberry, Lemon Balm, Catnip |
+
+**741Hz — Expression**
+| Aromatic | companion_crops | crop_guild |
+|---|---|---|
+| Anise Hyssop | Gooseberry, Black Currant, Jostaberry | Hinnomaki Red Gooseberry, Titania Black Currant, Mexican Oregano |
+| Mexican Oregano | Gooseberry, Black Currant, Peppers | Hinnomaki Red Gooseberry, Cascade Hops, Anise Hyssop |
+
+**852Hz — Vision**
+| Aromatic | companion_crops | crop_guild |
+|---|---|---|
+| Feverfew | Pawpaw, Turmeric, Ginger | Pennsylvania Golden Pawpaw, Sunflower Pawpaw, Spicebush |
+
+**963Hz — Source**
+| Aromatic | companion_crops | crop_guild |
+|---|---|---|
+| Night-Blooming Jasmine | Persimmon, Elderberry | American Persimmon, York Elderberry, Southernwood |
+| Southernwood | Persimmon, Elderberry, Garlic | American Persimmon, York Elderberry, Night-Blooming Jasmine |
 
 ### Technical Details
 
-**1. New Component: `src/components/crop-oracle/ScentCorridorPanel.tsx`**
-- Receives props: `frequencyHz`, `zoneColor`, `zoneName`, `chordCrops` (current recipe crops), `allCrops`, `onSwapRequest`
-- Filters `allCrops` by frequency zone and aromatic classification using `library_note` patterns (`'Aromatic'`, `'Pest Barrier'`, `'Fragrance'`, `'Ground Cover'`) and `category === 'Dye/Fiber/Aromatic'`
-- Groups species into three tiers: Culinary, Pest-Deterrent, Fragrance
-- Each species row shows: name, role tag (Sentinel/Enhancer/Signal), deterrent target if applicable, and whether it's already in the recipe
-- Collapsible accordion sections for each tier
+**Single database migration** using UPDATE statements to set `companion_crops` and `crop_guild` arrays for each of the 16 species, matched by their `name` (scientific name key).
 
-**2. Modify `src/pages/CropOracle.tsx`**
-- Add `'scent'` to the `activeToolPanel` union type: `'soil' | 'calendar' | 'modal' | 'scent'`
-- Add a Shield (lucide) icon button to the toolbar array, conditionally shown when `environment === 'food-forest'` or `proMode`
-- Add the `ScentCorridorPanel` render block inside the `AnimatePresence` for tool panels
-- Import the new component and the `Shield` icon from lucide-react
+No code changes are needed -- the existing `ScentCorridorPanel`, `CompanionEngine`, and `ChordComposer` components already read `companion_crops` and `crop_guild` from the `master_crops` table and will automatically display the new relationships.
 
-**3. Panel Layout (matching retro-synth aesthetic)**
-- Dark background (`hsl(0 0% 5%)`) with zone-colored border accents
-- Three collapsible sections with zone-colored headers:
-  - "CULINARY AROMATICS" with a leaf icon
-  - "PEST DETERRENT BARRIER" with a shield icon  
-  - "FRAGRANCE CORRIDOR" with a flower icon
-- Each species rendered as a compact row with:
-  - Aromatic type badge (Culinary / Sentinel / Fragrance)
-  - Species name in mono font
-  - Deterrent target tag if available (extracted from `library_note`)
-  - Checkmark if already in the current chord recipe
-  - Zone badge showing frequency
-- Footer showing coverage stats: "3/5 aromatic roles filled" with a simple progress indicator
-
-**4. Data Classification Logic**
-Species classification based on existing `library_note` and `category` fields:
-- **Culinary**: `library_note` contains "Aromatic Layer" (not "Pest") AND (`guild_role` = 'Enhancer')
-- **Pest-Deterrent**: `library_note` contains "Pest Barrier" OR `guild_role` = 'Sentinel'
-- **Fragrance**: `library_note` contains "Fragrance" OR "Ground Cover" OR "Pollinator"
-- Falls back to `category === 'Dye/Fiber/Aromatic'` for uncategorized aromatics
-
-No database changes are needed since the classification data already exists in `library_note` fields from the recent migrations.
