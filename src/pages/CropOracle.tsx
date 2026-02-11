@@ -22,6 +22,7 @@ import EcoParadigmCard from '@/components/community/EcoParadigmCard';
 import ProSuppliersPanel from '@/components/crop-oracle/ProSuppliersPanel';
 import FoodForestHoleProtocol from '@/components/crop-oracle/FoodForestHoleProtocol';
 import TwoWeekDashboard from '@/components/crop-oracle/TwoWeekDashboard';
+import { getZoneAwarePlantingWindows, cropFitsZone } from '@/lib/frostDates';
 
 /* ─── Zone Data ─── */
 const ZONES = [
@@ -1945,6 +1946,20 @@ const CropOracle = () => {
                                     🌾 {slot.crop!.harvest_days}d harvest
                                   </span>
                                 )}
+                                {/* Zone-aware planting window */}
+                                {slot.crop!.planting_season && slot.crop!.planting_season.length > 0 && hardinessZone && (
+                                  <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                    style={{ background: 'hsl(200 40% 18% / 0.3)', color: 'hsl(200 60% 60%)', border: '1px solid hsl(200 40% 30% / 0.3)' }}>
+                                    📅 {getZoneAwarePlantingWindows(slot.crop!.planting_season, hardinessZone).map(w => w.window).join(' · ')}
+                                  </span>
+                                )}
+                                {/* Zone incompatibility warning */}
+                                {hardinessZone && slot.crop!.hardiness_zone_min != null && slot.crop!.hardiness_zone_max != null && !cropFitsZone(slot.crop!.hardiness_zone_min, slot.crop!.hardiness_zone_max, hardinessZone) && (
+                                  <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                    style={{ background: 'hsl(0 50% 15% / 0.4)', color: 'hsl(0 60% 60%)', border: '1px solid hsl(0 40% 30% / 0.3)' }}>
+                                    ❄️ Not rated for Zone {hardinessSubZone || hardinessZone}
+                                  </span>
+                                )}
                                 {/* Season mismatch warning */}
                                 {i > 0 && slot.crop && (() => {
                                   const rootCropCard = chordCard[0]?.crop;
@@ -1952,15 +1967,8 @@ const CropOracle = () => {
                                   const rootSeasons = rootCropCard.planting_season || [];
                                   const slotSeasons = slot.crop!.planting_season || [];
                                   if (rootSeasons.length === 0 && slotSeasons.length === 0) return null;
-                                  const hasNoData = slotSeasons.length === 0;
                                   const hasOverlap = rootSeasons.some(s => slotSeasons.includes(s));
-                                  if (hasNoData) return (
-                                    <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
-                                      style={{ background: 'hsl(30 50% 15% / 0.4)', color: 'hsl(30 60% 60%)', border: '1px solid hsl(30 40% 30% / 0.3)' }}>
-                                      ⚠️ No season data
-                                    </span>
-                                  );
-                                  if (!hasOverlap) return (
+                                  if (!hasOverlap && rootSeasons.length > 0 && slotSeasons.length > 0) return (
                                     <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
                                       style={{ background: 'hsl(0 50% 15% / 0.4)', color: 'hsl(0 60% 60%)', border: '1px solid hsl(0 40% 30% / 0.3)' }}>
                                       ⚠️ Season mismatch

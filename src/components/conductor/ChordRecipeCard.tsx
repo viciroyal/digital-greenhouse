@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Music, Leaf, Shield, Pickaxe, Sparkles, Zap, Layers, ChevronDown, ChevronUp, CalendarCheck, AlertTriangle } from 'lucide-react';
 import { ChordRecipe, ChordRecipeInterval } from '@/data/chordRecipes';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
+import { getZoneAwarePlantingWindows, cropFitsZone } from '@/lib/frostDates';
 
 const INTERVAL_STYLES: Record<string, { icon: React.ReactNode; accent: string }> = {
   '1st':  { icon: <Leaf className="w-3.5 h-3.5" />,     accent: 'hsl(120 50% 50%)' },
@@ -18,9 +19,10 @@ interface ChordRecipeCardProps {
   recipe: ChordRecipe;
   isSelected?: boolean;
   onSelect?: (recipe: ChordRecipe) => void;
+  hardinessZone?: number | null;
 }
 
-const ChordRecipeCard = ({ recipe, isSelected, onSelect }: ChordRecipeCardProps) => {
+const ChordRecipeCard = ({ recipe, isSelected, onSelect, hardinessZone }: ChordRecipeCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const { frequencyHz, zoneName, zoneColor, chordName, intervals } = recipe;
   const { data: allCrops } = useMasterCrops();
@@ -120,6 +122,7 @@ const ChordRecipeCard = ({ recipe, isSelected, onSelect }: ChordRecipeCardProps)
                 zoneColor={zoneColor}
                 starCrop={starCrop}
                 companionCrop={companionCrop}
+                hardinessZone={hardinessZone}
               />
             );
           })}
@@ -196,9 +199,10 @@ interface IntervalRowProps {
   zoneColor: string;
   starCrop?: MasterCrop;
   companionCrop?: MasterCrop;
+  hardinessZone?: number | null;
 }
 
-const IntervalRow = ({ interval, index, zoneColor, starCrop, companionCrop }: IntervalRowProps) => {
+const IntervalRow = ({ interval, index, zoneColor, starCrop, companionCrop, hardinessZone }: IntervalRowProps) => {
   const style = INTERVAL_STYLES[interval.interval];
   const accent = style?.accent || 'hsl(0 0% 50%)';
 
@@ -265,7 +269,9 @@ const IntervalRow = ({ interval, index, zoneColor, starCrop, companionCrop }: In
                 title={`Shared seasons: ${sharedSeasons.join(', ')}`}
               >
                 <CalendarCheck className="w-2.5 h-2.5" />
-                {sharedSeasons.join(', ')}
+                {hardinessZone
+                  ? getZoneAwarePlantingWindows(sharedSeasons, hardinessZone).map(w => w.window).join(' · ')
+                  : sharedSeasons.join(', ')}
               </span>
             )}
             {seasonMismatch && (
@@ -318,6 +324,20 @@ const IntervalRow = ({ interval, index, zoneColor, starCrop, companionCrop }: In
                 }}
               >
                 ⚠ Season data pending
+              </span>
+            )}
+            {/* Zone compatibility warning */}
+            {hardinessZone && companionCrop && companionCrop.hardiness_zone_min != null && companionCrop.hardiness_zone_max != null && !cropFitsZone(companionCrop.hardiness_zone_min, companionCrop.hardiness_zone_max, hardinessZone) && (
+              <span
+                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold"
+                style={{
+                  background: 'hsl(0 50% 20% / 0.4)',
+                  border: '1px solid hsl(0 50% 40% / 0.5)',
+                  color: 'hsl(0 50% 65%)',
+                }}
+                title={`Not rated for Zone ${Math.floor(hardinessZone)}`}
+              >
+                ❄️ Not for your zone
               </span>
             )}
             {harvestDiff !== null && (
