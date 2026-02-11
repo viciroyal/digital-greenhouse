@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 import { Instagram, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import EcoParadigmCard from '@/components/community/EcoParadigmCard';
+import GACommunityResources from '@/components/community/GACommunityResources';
 
 // Organic Vine Icon
 const VineIcon = ({ className = "" }: { className?: string }) => (
@@ -160,6 +162,12 @@ const Footer = () => {
               "Elements woven through the formula"
             </p>
           </motion.div>
+        </div>
+
+        {/* Community Resources & Eco-Paradigm */}
+        <div className="grid md:grid-cols-2 gap-8 mb-16">
+          <EcoParadigmCard variant="full" />
+          <GACommunityResources variant="full" />
         </div>
 
         {/* Connect Section */}
