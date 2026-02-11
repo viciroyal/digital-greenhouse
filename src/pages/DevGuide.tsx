@@ -84,6 +84,7 @@ const DevGuide = () => {
           <p>The app follows <strong>"The Mullet Strategy"</strong>: a creative landing page (World 1 / The Stage) and a functional 3-step crop planning wizard (World 2 / The Studio).</p>
           <p><strong>Stack:</strong> React 18 + Vite + TypeScript + Tailwind CSS + Framer Motion + Lovable Cloud (Supabase)</p>
           <p><strong>State:</strong> React Query for server state, useState for local UI state. No Redux or Zustand needed.</p>
+          <p><strong>Environments:</strong> Pot, Raised Bed, Farm (Pro), High Tunnel (Pro), Food Forest (Pro). Each environment applies custom recipe filtering logic.</p>
         </Section>
 
         <Section title="FILE STRUCTURE">
@@ -91,9 +92,10 @@ const DevGuide = () => {
 ├── pages/              # Route-level components
 │   ├── Index.tsx        # Landing page (The Stage)
 │   ├── CropOracle.tsx   # 3-step wizard (The Studio) — MAIN feature
+│   ├── CropLibrary.tsx  # Full crop registry + CSV export
 │   ├── Auth.tsx         # Login / signup
-│   ├── UserGuide.tsx    # User manual (this file)
-│   ├── DevGuide.tsx     # Developer docs (this file)
+│   ├── UserGuide.tsx    # User manual
+│   ├── DevGuide.tsx     # Developer docs
 │   └── NotFound.tsx     # 404 page
 ├── components/
 │   ├── ui/              # shadcn/ui primitives (button, card, dialog...)
@@ -149,7 +151,7 @@ const DevGuide = () => {
 
         <Section title="DATABASE SCHEMA">
           <p>All data lives in Lovable Cloud (Supabase). Key tables:</p>
-          <Code>{`master_crops       — 100+ crops with frequency_hz, zone, Brix targets, chord_interval, spacing
+          <Code>{`master_crops       — 695+ crops with frequency_hz, zone, Brix targets, chord_interval, spacing
 garden_beds        — User garden beds with zone assignment, Brix readings, inoculants
 bed_plantings      — Crops planted in specific beds with guild roles
 saved_recipes      — User-saved chord recipes (environment + zone + chord data)
@@ -184,6 +186,28 @@ user_roles         — Admin/moderator/user roles`}</Code>
 9th (Sub-bass)   — Underground root layer (Pro Mode)
 11th (Tension)   — Fungal inoculant (Pro Mode)
 13th (Top Note)  — Aerial overstory (Pro Mode)`}</Code>
+        </Section>
+
+        <Section title="FOOD FOREST ENVIRONMENT">
+          <p>When <code>environment === 'food-forest'</code>, the recipe engine remaps chord slots to forest layers:</p>
+          <Code>{`Root (Lead)      → Canopy Tree   — Fruit/nut trees (perennials prioritized)
+3rd (Triad)      → Understory    — Berry bushes, comfrey, small trees
+5th (Stabilizer) → N-Fixer       — Clover, beans, vetch (nitrogen fixers)
+7th (Signal)     → Pollinator    — Perennial flowers/herbs
+9th (Sub-bass)   → Root Layer    — Deep nutrient miners (comfrey, dandelion)
+11th (Tension)   → Fungal Net    — Mycelium, shiitake, reishi
+13th (Top Note)  → Vine Layer    — Grapes, passion fruit, kiwi`}</Code>
+          <p>Filtering: perennials, fruit trees, and nitrogen-fixers are sorted to top of pool. Labels, emojis, and hints override via <code>FOOD_FOREST_LAYERS</code> constant.</p>
+        </Section>
+
+        <Section title="CSV EXPORT (CROP LIBRARY)">
+          <p><code>CropLibrary.tsx</code> includes a <code>generateCsv()</code> function that exports all 24 columns:</p>
+          <Code>{`common_name, latin_name, frequency_hz, zone_name, element, category,
+chord_interval, instrument_type, dominant_mineral, brix_min, brix_max,
+hardiness_zone_min, hardiness_zone_max, harvest_days, spacing_inches,
+planting_season, guild_role, focus_tag, companion_crops, crop_guild,
+soil_protocol_focus, cultural_role, description, library_note`}</Code>
+          <p>Arrays (companion_crops, crop_guild, planting_season) use semicolon separators. Fields with commas/quotes are properly escaped.</p>
         </Section>
 
         <Section title="BEST PRACTICES">
