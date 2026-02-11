@@ -438,7 +438,7 @@ const JadamPanel = ({ frequencyHz, zoneColor, zoneName, environment }: JadamPane
         <FullReferenceView zoneColor={zoneColor} environment={environment} />
       )}
       {tab === 'calendar' && (
-        <JadamCalendar frequencyHz={frequencyHz} zoneColor={zoneColor} zoneName={zoneName} />
+        <JadamCalendar frequencyHz={frequencyHz} zoneColor={zoneColor} zoneName={zoneName} environment={environment} />
       )}
 
       {/* Joseon (Morning Calm) attribution */}
