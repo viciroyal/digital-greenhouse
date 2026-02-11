@@ -87,17 +87,25 @@ function pickRecipe(
     })
     .sort((a, b) => b.score - a.score);
 
-  // Deduplicate by common name prefix (avoid 3 types of tomato)
+  // Enforce diversity: max 1 crop per species (scientific_name) and per category
   const picked: MasterCrop[] = [];
-  const usedPrefixes = new Set<string>();
+  const usedSpecies = new Set<string>();
+  const usedCategories = new Map<string, number>();
 
   for (const { crop } of scored) {
     if (picked.length >= maxPlants) break;
-    const name = (crop.common_name || crop.name).toLowerCase();
-    const prefix = name.split(' ')[0]; // e.g. "cherry" from "cherry tomato"
-    // Allow same prefix only once
-    if (usedPrefixes.has(prefix) && usedPrefixes.size > 2) continue;
-    usedPrefixes.add(prefix);
+
+    // Deduplicate by scientific name (prevents 4 tomato varieties)
+    const species = (crop.scientific_name || crop.name).toLowerCase().trim();
+    if (usedSpecies.has(species)) continue;
+
+    // Limit any single category to max 2 picks for variety
+    const cat = crop.category || 'Other';
+    const catCount = usedCategories.get(cat) || 0;
+    if (catCount >= 2) continue;
+
+    usedSpecies.add(species);
+    usedCategories.set(cat, catCount + 1);
     picked.push(crop);
   }
 
