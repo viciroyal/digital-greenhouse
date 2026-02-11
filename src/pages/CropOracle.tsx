@@ -68,22 +68,61 @@ const ANTAGONIST_PAIRS: { groupA: string[]; groupB: string[]; reason: string }[]
   { groupA: ['sage'], groupB: ['cucumber'], reason: 'Sage inhibits cucumber growth' },
   { groupA: ['mint'], groupB: ['parsley'], reason: 'Mint overwhelms parsley through aggressive root competition' },
   { groupA: ['sunflower'], groupB: ['potato'], reason: 'Sunflowers release allelopathic compounds that inhibit potato growth' },
+  { groupA: ['corn'], groupB: ['tomato'], reason: 'Corn earworm is identical to tomato fruitworm — proximity amplifies infestations' },
 ];
+
+/** Bodyguard crops: pest-specific protectors to boost in scoring */
+const BODYGUARD_MAP: Record<string, { guard: string[]; pest: string }> = {
+  tomato: { guard: ['marigold'], pest: 'Hornworms & Blight' },
+  corn: { guard: ['dill'], pest: 'Corn Earworm (attracts parasitic wasps)' },
+  potato: { guard: ['tansy', 'catnip'], pest: 'Potato Beetle' },
+  bean: { guard: ['nasturtium'], pest: 'Aphids' },
+  carrot: { guard: ['chive', 'leek'], pest: 'Carrot Fly' },
+  broccoli: { guard: ['thyme', 'sage'], pest: 'Cabbage Moth' },
+  lettuce: { guard: ['mint', 'calendula'], pest: 'Slugs & Snails' },
+  onion: { guard: ['marigold'], pest: 'Onion Maggot' },
+};
+
+/** Placement rules: spatial guidance for bed layout */
+const PLACEMENT_RULES: Record<string, string> = {
+  tomato: 'Place south of Corn; avoid Potato row',
+  corn: 'North-most row to prevent shading',
+  potato: 'Deep-root layer; isolated from Blight cousins',
+  bean: 'Nitrogen fixer; interplant with Heavy Feeders',
+  carrot: 'Middle-root layer; use Lettuce for shade',
+  broccoli: 'Heavy feeder; pair with Nitrogen fixers',
+  lettuce: 'South-most row; use as "Living Mulch"',
+  onion: 'The "Allium Shield" border plant',
+};
 
 const SYNERGY_PATTERNS: { keywords: string[]; badge: string; tip: string }[] = [
   { keywords: ['corn', 'bean', 'squash'], badge: '🌾 THREE SISTERS', tip: 'Corn provides a trellis for beans, beans fix nitrogen, squash shades soil & deters pests.' },
   { keywords: ['tomato', 'basil'], badge: '🍅 CLASSIC PAIR', tip: 'Basil repels whiteflies, mosquitoes, spider mites & aphids while improving tomato flavor and pollination.' },
+  { keywords: ['tomato', 'garlic'], badge: '🧄 BLIGHT SHIELD', tip: 'Garlic\'s sulfur compounds deter spider mites and act as a natural fungicide against blight.' },
+  { keywords: ['tomato', 'carrot'], badge: '🥕 ROOT HARMONY', tip: 'Carrots loosen soil for tomato roots; tomatoes provide shade for carrot shoulders.' },
+  { keywords: ['tomato', 'marigold'], badge: '💛 BODYGUARD', tip: 'Marigolds repel hornworms, whiteflies, and nematodes — the classic tomato bodyguard.' },
   { keywords: ['carrot', 'onion'], badge: '🛡️ PEST SHIELD', tip: 'Carrots repel onion flies; onions repel carrot rust fly.' },
   { keywords: ['carrot', 'rosemary'], badge: '🛡️ CARROT FLY SHIELD', tip: 'Rosemary repels carrot fly with its aromatic oils.' },
   { keywords: ['carrot', 'sage'], badge: '🛡️ CARROT FLY SHIELD', tip: 'Sage repels carrot fly with its strong scent.' },
+  { keywords: ['carrot', 'leek'], badge: '🛡️ MUTUAL GUARD', tip: 'Leeks repel carrot fly; carrots repel leek moth.' },
   { keywords: ['strawberry', 'borage'], badge: '🐝 POLLINATOR BOOST', tip: 'Borage attracts pollinators and is believed to improve strawberry yield.' },
   { keywords: ['tomato', 'asparagus'], badge: '🧬 NEMATODE SHIELD', tip: 'Asparagus repels root-knot nematodes that attack tomato roots.' },
   { keywords: ['tomato', 'borage'], badge: '🐛 HORNWORM GUARD', tip: 'Borage repels tomato hornworms and improves tomato vigor.' },
   { keywords: ['cucumber', 'nasturtium'], badge: '🪲 BEETLE TRAP', tip: 'Nasturtiums serve as trap crops for cucumber beetles, luring them away.' },
   { keywords: ['cucumber', 'dill'], badge: '🦟 APHID SHIELD', tip: 'Dill protects cucumbers against aphids and mites.' },
   { keywords: ['lettuce', 'chive'], badge: '🧅 SCENT MASK', tip: 'Chives mask lettuce scent, deterring aphids and other pests.' },
+  { keywords: ['lettuce', 'basil'], badge: '🌿 SLUG REPEL', tip: 'Basil\'s strong scent deters slugs and aphids from lettuce.' },
+  { keywords: ['lettuce', 'radish'], badge: '⚡ TRAP CROP', tip: 'Radishes lure flea beetles away from lettuce leaves.' },
   { keywords: ['potato', 'horseradish'], badge: '🪲 BEETLE WARD', tip: 'Horseradish planted at corners of potato patches wards off Colorado potato beetles.' },
+  { keywords: ['potato', 'bean'], badge: '🤝 FEED & FIX', tip: 'Beans fix nitrogen for heavy-feeding potatoes; potatoes repel Mexican bean beetles.' },
   { keywords: ['bean', 'nasturtium'], badge: '🪤 APHID TRAP', tip: 'Nasturtiums act as trap plants, enticing aphids away from beans.' },
+  { keywords: ['bean', 'rosemary'], badge: '🌿 BEAN GUARD', tip: 'Rosemary repels bean beetles with its aromatic oils.' },
+  { keywords: ['corn', 'bean'], badge: '🌽 MILPA DUO', tip: 'Corn stalks trellis beans; beans fix nitrogen for corn — the core of Three Sisters.' },
+  { keywords: ['corn', 'pea'], badge: '🫛 NITROGEN TRELLIS', tip: 'Peas fix nitrogen while climbing corn stalks — a cool-season Three Sisters variant.' },
+  { keywords: ['broccoli', 'onion'], badge: '🧅 PEST MASK', tip: 'Onion scent masks brassica smell from cabbage moths and flea beetles.' },
+  { keywords: ['broccoli', 'rosemary'], badge: '🌿 MOTH REPEL', tip: 'Rosemary repels cabbage moths with its strong aromatic oils.' },
+  { keywords: ['onion', 'beet'], badge: '🫱 ROOT NEIGHBORS', tip: 'Beets and onions share space efficiently at different root depths without competition.' },
+  { keywords: ['onion', 'carrot'], badge: '🛡️ PEST SHIELD', tip: 'Onions repel carrot rust fly; carrots repel onion flies.' },
   { keywords: ['cabbage', 'nasturtium'], badge: '🪤 PEST DECOY', tip: 'Nasturtiums deter beetles and aphids from brassicas.' },
   { keywords: ['spinach', 'strawberry'], badge: '🤝 SHADE FRIENDS', tip: 'Spinach and strawberries share similar growing conditions and benefit from proximity.' },
 ];
@@ -2330,14 +2369,35 @@ const CropOracle = () => {
                   </div>
                 )}
 
-                {/* Synergy & Antagonist Summary */}
+                {/* Synergy, Antagonist, Bodyguard & Placement Summary */}
                 {(() => {
                   const recipeCropsForCheck = chordCard.map(s => s.crop);
                   const antagonisms = findAntagonisms(recipeCropsForCheck);
                   const synergies = findSynergies(recipeCropsForCheck);
-                  if (antagonisms.length === 0 && synergies.length === 0) return null;
+                  const validCrops = recipeCropsForCheck.filter((c): c is MasterCrop => c !== null);
+                  const cropNames = validCrops.map(c => (c.common_name || c.name).toLowerCase());
+
+                  // Find bodyguard matches
+                  const bodyguardBadges: { crop: string; guard: string; pest: string }[] = [];
+                  for (const name of cropNames) {
+                    for (const [target, info] of Object.entries(BODYGUARD_MAP)) {
+                      if (name.includes(target)) {
+                        for (const g of info.guard) {
+                          if (cropNames.some(n => n.includes(g))) {
+                            bodyguardBadges.push({ crop: target, guard: g, pest: info.pest });
+                          }
+                        }
+                      }
+                    }
+                  }
+
+                  // Find placement rules for star crop
+                  const starName = recipeCropsForCheck[0] ? (recipeCropsForCheck[0].common_name || recipeCropsForCheck[0].name).toLowerCase() : '';
+                  const placementRule = Object.entries(PLACEMENT_RULES).find(([k]) => starName.includes(k));
+
+                  if (antagonisms.length === 0 && synergies.length === 0 && bodyguardBadges.length === 0 && !placementRule) return null;
                   return (
-                    <div className="px-5 py-2 flex flex-wrap gap-2" style={{ background: 'hsl(0 0% 3%)', borderBottom: '1px solid hsl(0 0% 10%)' }}>
+                    <div className="px-5 py-2 flex flex-wrap gap-2 items-center" style={{ background: 'hsl(0 0% 3%)', borderBottom: '1px solid hsl(0 0% 10%)' }}>
                       {synergies.map((s, idx) => (
                         <Tooltip key={`syn-${idx}`}>
                           <TooltipTrigger asChild>
@@ -2348,6 +2408,19 @@ const CropOracle = () => {
                           </TooltipTrigger>
                           <TooltipContent side="bottom" className="max-w-xs text-xs">
                             <p>{s.tip}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ))}
+                      {bodyguardBadges.map((bg, idx) => (
+                        <Tooltip key={`bg-${idx}`}>
+                          <TooltipTrigger asChild>
+                            <span className="text-[8px] font-mono font-bold px-2 py-1 rounded cursor-help"
+                              style={{ background: 'hsl(45 60% 18% / 0.4)', color: 'hsl(45 80% 60%)', border: '1px solid hsl(45 50% 35% / 0.3)' }}>
+                              🛡️ {bg.guard.toUpperCase()} guards {bg.crop.toUpperCase()}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="max-w-xs text-xs">
+                            <p><strong>Natural Bodyguard:</strong> {bg.guard} protects {bg.crop} against {bg.pest}</p>
                           </TooltipContent>
                         </Tooltip>
                       ))}
@@ -2364,6 +2437,19 @@ const CropOracle = () => {
                           </TooltipContent>
                         </Tooltip>
                       ))}
+                      {placementRule && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-[8px] font-mono font-bold px-2 py-1 rounded cursor-help"
+                              style={{ background: 'hsl(210 40% 18% / 0.4)', color: 'hsl(210 60% 65%)', border: '1px solid hsl(210 40% 35% / 0.3)' }}>
+                              📐 {placementRule[1]}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="max-w-xs text-xs">
+                            <p><strong>Placement Rule:</strong> {placementRule[1]}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
                     </div>
                   );
                 })()}
