@@ -46,16 +46,26 @@ const PlantingCalendar = ({ crops, labels, zoneColor, hardinessZone }: PlantingC
             harvestMonths.add((pm + harvestOffset) % 12);
           }
         }
+        // Seed-start months (transplants start ~4-6 weeks before planting)
+        const seedStartMonths = new Set<number>();
+        const propMethod = crop.propagation_method || 'both';
+        if (propMethod === 'transplant' || propMethod === 'both') {
+          for (const pm of plantMonths) {
+            seedStartMonths.add((pm - 1 + 12) % 12); // ~4 weeks before
+          }
+        }
         return {
           name: crop.common_name || crop.name,
           label: labels[i],
           plantMonths,
           harvestMonths,
+          seedStartMonths,
           harvestDays: crop.harvest_days,
           seasons,
+          propagation: propMethod,
         };
       })
-      .filter((r): r is { name: string; label: string; plantMonths: Set<number>; harvestMonths: Set<number>; harvestDays: number | null; seasons: string[] } => r !== null);
+      .filter((r): r is NonNullable<typeof r> => r !== null);
   }, [crops, labels]);
 
   const currentMonth = new Date().getMonth();
@@ -131,13 +141,26 @@ const PlantingCalendar = ({ crops, labels, zoneColor, hardinessZone }: PlantingC
                     <span className="text-[8px] font-mono truncate" style={{ color: 'hsl(0 0% 55%)' }}>
                       {row.name}
                     </span>
-                    <span className="text-[6px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>
-                      {row.label} {row.harvestDays ? `• ${row.harvestDays}d` : ''}
-                    </span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[6px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>
+                        {row.label} {row.harvestDays ? `• ${row.harvestDays}d` : ''}
+                      </span>
+                      <span className="text-[6px] font-mono px-1 rounded" style={{
+                        background: row.propagation === 'direct_sow' ? 'hsl(90 40% 25% / 0.4)'
+                          : row.propagation === 'transplant' ? 'hsl(200 40% 25% / 0.4)'
+                          : 'hsl(45 40% 25% / 0.4)',
+                        color: row.propagation === 'direct_sow' ? 'hsl(90 50% 55%)'
+                          : row.propagation === 'transplant' ? 'hsl(200 50% 60%)'
+                          : 'hsl(45 50% 55%)',
+                      }}>
+                        {row.propagation === 'direct_sow' ? '🌰 Sow' : row.propagation === 'transplant' ? '🌱 Trans' : '🔄 Both'}
+                      </span>
+                    </div>
                   </div>
                   {MONTHS.map((_, mi) => {
                     const isPlant = row.plantMonths.has(mi);
                     const isHarvest = row.harvestMonths.has(mi);
+                    const isSeedStart = row.seedStartMonths.has(mi) && !isPlant;
                     const isCurrent = mi === currentMonth;
                     return (
                       <div
@@ -146,21 +169,22 @@ const PlantingCalendar = ({ crops, labels, zoneColor, hardinessZone }: PlantingC
                         style={{
                           background: isHarvest
                             ? 'hsl(45 80% 40% / 0.2)'
-                            : isPlant
-                              ? `${zoneColor}15`
-                              : isCurrent
-                                ? 'hsl(0 0% 8%)'
-                                : 'transparent',
+                            : isSeedStart
+                              ? 'hsl(270 50% 40% / 0.15)'
+                              : isPlant
+                                ? `${zoneColor}15`
+                                : isCurrent
+                                  ? 'hsl(0 0% 8%)'
+                                  : 'transparent',
                           border: isCurrent ? `1px solid ${zoneColor}30` : '1px solid transparent',
                         }}
                       >
                         {isHarvest ? (
                           <span className="text-[8px]">🌾</span>
+                        ) : isSeedStart ? (
+                          <span className="text-[8px]">🏠</span>
                         ) : isPlant ? (
-                          <div
-                            className="w-2 h-2 rounded-full"
-                            style={{ background: `${zoneColor}60` }}
-                          />
+                          <span className="text-[8px]">{row.propagation === 'direct_sow' ? '🌰' : row.propagation === 'transplant' ? '🌱' : '●'}</span>
                         ) : null}
                       </div>
                     );
@@ -169,10 +193,18 @@ const PlantingCalendar = ({ crops, labels, zoneColor, hardinessZone }: PlantingC
               ))}
 
               {/* Legend */}
-              <div className="flex items-center gap-3 mt-2 pt-2" style={{ borderTop: '1px solid hsl(0 0% 8%)' }}>
+              <div className="flex items-center gap-3 mt-2 pt-2 flex-wrap" style={{ borderTop: '1px solid hsl(0 0% 8%)' }}>
                 <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full" style={{ background: `${zoneColor}60` }} />
-                  <span className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>PLANT</span>
+                  <span className="text-[8px]">🏠</span>
+                  <span className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>SEED START</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-[8px]">🌰</span>
+                  <span className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>DIRECT SOW</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-[8px]">🌱</span>
+                  <span className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>TRANSPLANT</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="text-[8px]">🌾</span>

@@ -59,6 +59,7 @@ export interface MasterCrop {
   growth_habit: string | null; // tree, shrub, vine, herb, underground, bulb, etc.
   root_depth_inches: number | null;
   min_container_gal: number | null;
+  propagation_method: string | null; // 'direct_sow', 'transplant', 'both'
   created_at: string;
   updated_at: string;
 }

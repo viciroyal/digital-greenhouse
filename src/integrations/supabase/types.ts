@@ -236,6 +236,7 @@ export type Database = {
           min_container_gal: number | null
           name: string
           planting_season: string[] | null
+          propagation_method: string | null
           root_depth_inches: number | null
           scientific_name: string | null
           soil_protocol_focus: string | null
@@ -270,6 +271,7 @@ export type Database = {
           min_container_gal?: number | null
           name: string
           planting_season?: string[] | null
+          propagation_method?: string | null
           root_depth_inches?: number | null
           scientific_name?: string | null
           soil_protocol_focus?: string | null
@@ -304,6 +306,7 @@ export type Database = {
           min_container_gal?: number | null
           name?: string
           planting_season?: string[] | null
+          propagation_method?: string | null
           root_depth_inches?: number | null
           scientific_name?: string | null
           soil_protocol_focus?: string | null
