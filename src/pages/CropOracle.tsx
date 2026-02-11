@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield, Shuffle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -91,6 +91,7 @@ const CropOracle = () => {
   const [showStateDropdown, setShowStateDropdown] = useState(false);
   const [modalInfoOpen, setModalInfoOpen] = useState(false);
   const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | 'scent' | null>(null);
+  const [recipeSeed, setRecipeSeed] = useState(0);
 
   // Fetch saved recipes
   const { data: savedRecipes } = useQuery({
@@ -381,13 +382,22 @@ const CropOracle = () => {
       return companionNames.some(cn => name.includes(cn) || cn.includes(name.split('(')[0].trim()));
     };
 
+    // Seeded rotation: pick from candidates using recipeSeed to rotate selection
+    let pickCounter = 0;
+    const rotatedPick = (candidates: MasterCrop[]): MasterCrop | undefined => {
+      if (candidates.length === 0) return undefined;
+      const idx = (recipeSeed + pickCounter++) % candidates.length;
+      return candidates[idx];
+    };
+
     const pickCrop = (
       primary: MasterCrop | undefined,
       fallbackFn?: (c: MasterCrop) => boolean
     ): { crop: MasterCrop; companionMatch: boolean } | null => {
       // If star crop has companions, prefer companions that match the role
       if (companionNames.length > 0 && fallbackFn) {
-        const companionMatch = pool.find(c => !usedIds.has(c.id) && isCompanion(c) && fallbackFn(c));
+        const companionCandidates = pool.filter(c => !usedIds.has(c.id) && isCompanion(c) && fallbackFn(c));
+        const companionMatch = rotatedPick(companionCandidates);
         if (companionMatch) { usedIds.add(companionMatch.id); return { crop: companionMatch, companionMatch: true }; }
       }
       if (primary && !usedIds.has(primary.id)) {
@@ -396,11 +406,13 @@ const CropOracle = () => {
       }
       // Companion fallback (any role)
       if (companionNames.length > 0) {
-        const anyCompanion = pool.find(c => !usedIds.has(c.id) && isCompanion(c));
+        const anyCompanionCandidates = pool.filter(c => !usedIds.has(c.id) && isCompanion(c));
+        const anyCompanion = rotatedPick(anyCompanionCandidates);
         if (anyCompanion) { usedIds.add(anyCompanion.id); return { crop: anyCompanion, companionMatch: true }; }
       }
       if (fallbackFn) {
-        const fb = pool.find(c => !usedIds.has(c.id) && fallbackFn(c));
+        const fbCandidates = pool.filter(c => !usedIds.has(c.id) && fallbackFn(c));
+        const fb = rotatedPick(fbCandidates);
         if (fb) { usedIds.add(fb.id); return { crop: fb, companionMatch: false }; }
       }
       return null;
@@ -554,7 +566,7 @@ const CropOracle = () => {
 
       return { ...interval, crop, isCompanionFill };
     }).map((slot, i) => manualOverrides[i] ? { ...slot, crop: manualOverrides[i], isCompanionFill: false } : slot);
-  }, [recipeCrops, manualOverrides, starCrop, allCrops, selectedZone, environment]);
+  }, [recipeCrops, manualOverrides, starCrop, allCrops, selectedZone, environment, recipeSeed]);
 
   /* ─── Modal Signature: derive musical mode from filled intervals ─── */
   const modalSignature = useMemo(() => {
@@ -1269,6 +1281,22 @@ const CropOracle = () => {
               <p className="text-center text-sm font-mono mb-2" style={{ color: 'hsl(0 0% 45%)' }}>
                 STEP 3 — {proMode ? 'THE 13TH CHORD' : 'THE TRIAD'}
               </p>
+              {/* ═══ Shuffle / Reroll Button ═══ */}
+              <div className="flex justify-center mb-2">
+                <button
+                  onClick={() => setRecipeSeed(s => s + 1)}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono tracking-wider transition-all hover:scale-105"
+                  style={{
+                    background: `${selectedZone.color}18`,
+                    color: selectedZone.color,
+                    border: `1px solid ${selectedZone.color}30`,
+                  }}
+                  title="Rotate crops — shuffle different species into each slot"
+                >
+                  <Shuffle className="w-3 h-3" />
+                  SHUFFLE VOICING
+                </button>
+              </div>
               {/* ═══ Inline Key Changer ═══ */}
               <div className="flex items-center justify-center gap-1.5 mb-4 flex-wrap">
                 <span className="text-[9px] font-mono tracking-widest mr-1" style={{ color: 'hsl(0 0% 35%)' }}>
