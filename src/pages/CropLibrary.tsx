@@ -35,6 +35,8 @@ const CropRow = ({ crop }: { crop: MasterCrop }) => (
     <td className="py-1 px-1.5">{crop.planting_season?.join(', ') || '–'}</td>
     <td className="py-1 px-1.5">{crop.guild_role || '–'}</td>
     <td className="py-1 px-1.5">{crop.focus_tag?.replace('_FOCUS', '') || '–'}</td>
+    <td className="py-1 px-1.5">{crop.companion_crops?.join(', ') || '–'}</td>
+    <td className="py-1 px-1.5">{crop.crop_guild?.join(', ') || '–'}</td>
   </tr>
 );
 
@@ -130,6 +132,8 @@ const CropLibrary = () => {
                     <th className="py-1 px-1.5">Season</th>
                     <th className="py-1 px-1.5">Guild</th>
                     <th className="py-1 px-1.5">Focus</th>
+                    <th className="py-1 px-1.5">Companions</th>
+                    <th className="py-1 px-1.5">Crop Guild</th>
                   </tr>
                 </thead>
                 <tbody>
