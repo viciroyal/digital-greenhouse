@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import BrewJmsCard from './BrewJmsCard';
+import BrewCard from './BrewCard';
 import { motion } from 'framer-motion';
 import { Calendar, Moon, Sun, Sprout, Leaf, AlertTriangle } from 'lucide-react';
 import { getLunarPhase, type LunarPhaseData, type PlantingType } from '@/hooks/useLunarPhase';
@@ -11,14 +11,6 @@ interface JadamCalendarProps {
   zoneName: string;
 }
 
-/**
- * Maps lunar planting types to JADAM application priorities.
- *
- * Leaf phase  → JMS (microbial colonization for rapid leaf growth)
- * Fruit phase → JLF (nutrient-dense fertilizer for fruit set)
- * Root phase  → JLF + JS (soil amendment window — roots pull nutrients down)
- * Harvest     → JNP (protect ripening crops from pests/disease)
- */
 interface JadamTiming {
   protocol: JadamProtocolId;
   priority: 'optimal' | 'good' | 'avoid';
@@ -69,11 +61,19 @@ const PRIORITY_META = {
   avoid:   { emoji: '🔴', label: 'AVOID',   color: 'hsl(0 55% 50%)'   },
 };
 
+const BREW_BUTTONS: { id: JadamProtocolId; gradient: [string, string]; borderColor: string; textColor: string }[] = [
+  { id: 'JMS', gradient: ['hsl(120 45% 20%)', 'hsl(120 45% 30%)'], borderColor: 'hsl(120 45% 35%)', textColor: 'hsl(120 45% 70%)' },
+  { id: 'JLF', gradient: ['hsl(35 50% 20%)', 'hsl(35 50% 30%)'], borderColor: 'hsl(35 50% 40%)', textColor: 'hsl(35 70% 65%)' },
+  { id: 'JNP', gradient: ['hsl(0 40% 20%)', 'hsl(0 40% 28%)'], borderColor: 'hsl(0 40% 35%)', textColor: 'hsl(0 55% 65%)' },
+];
+
 const JadamCalendar = ({ frequencyHz, zoneColor, zoneName }: JadamCalendarProps) => {
-  const [showBrewCard, setShowBrewCard] = useState(false);
+  const [activeBrewId, setActiveBrewId] = useState<JadamProtocolId | null>(null);
   const lunar = useMemo(() => getLunarPhase(), []);
   const timings = LUNAR_JADAM_MAP[lunar.plantingType];
   const csaFocus = CSA_JADAM_FOCUS[lunar.seasonalMovement.phase];
+
+  const activeProtocol = activeBrewId ? JADAM_PROTOCOLS.find(p => p.id === activeBrewId) : null;
 
   // Build a 7-day lookahead
   const lookahead = useMemo(() => {
@@ -264,26 +264,41 @@ const JadamCalendar = ({ frequencyHz, zoneColor, zoneName }: JadamCalendarProps)
           ))}
         </div>
       </div>
-      {/* Brew JMS Now Button */}
-      <button
-        onClick={() => setShowBrewCard(true)}
-        className="w-full py-2.5 rounded-lg flex items-center justify-center gap-2 text-[10px] font-mono font-bold tracking-wider transition-all hover:brightness-110"
-        style={{
-          background: `linear-gradient(135deg, hsl(120 45% 20%), hsl(120 45% 30%))`,
-          border: '1px solid hsl(120 45% 35%)',
-          color: 'hsl(120 45% 70%)',
-        }}
-      >
-        🦠 BREW JMS NOW
-      </button>
+
+      {/* Brew Now Buttons */}
+      <div className="space-y-1.5">
+        {BREW_BUTTONS.map(btn => {
+          const protocol = JADAM_PROTOCOLS.find(p => p.id === btn.id)!;
+          return (
+            <button
+              key={btn.id}
+              onClick={() => setActiveBrewId(btn.id)}
+              className="w-full py-2.5 rounded-lg flex items-center justify-center gap-2 text-[10px] font-mono font-bold tracking-wider transition-all hover:brightness-110"
+              style={{
+                background: `linear-gradient(135deg, ${btn.gradient[0]}, ${btn.gradient[1]})`,
+                border: `1px solid ${btn.borderColor}`,
+                color: btn.textColor,
+              }}
+            >
+              {protocol.emoji} BREW {btn.id} NOW
+              {protocol.variants.length > 1 && (
+                <span className="text-[7px] font-normal opacity-70">
+                  ({protocol.variants.length} variants)
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
 
       {/* Brew Card Modal */}
-      {showBrewCard && (
-        <BrewJmsCard
+      {activeProtocol && (
+        <BrewCard
+          protocol={activeProtocol}
           zoneColor={zoneColor}
           zoneName={zoneName}
           frequencyHz={frequencyHz}
-          onClose={() => setShowBrewCard(false)}
+          onClose={() => setActiveBrewId(null)}
         />
       )}
     </div>
