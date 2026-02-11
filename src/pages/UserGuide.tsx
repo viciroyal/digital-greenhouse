@@ -84,7 +84,7 @@ const UserGuide = () => {
         <Section title="What Is This App?" emoji="🤔">
           <p>PharmBoi is a <strong>garden planning tool</strong> that helps you figure out what to plant, where to plant it, and how to take care of your soil. Think of it like a recipe book — but for growing food!</p>
           <p>The app uses <strong>music ideas</strong> (like keys on a piano) to organize plants into groups called <strong>"Zones."</strong> Each zone has a color and a purpose, just like notes in a song work together.</p>
-          <p>The registry contains <strong>1,684 crops</strong> across 7 Solfeggio frequency zones — from tomatoes and herbs to fruit trees and medicinal mushrooms.</p>
+          <p>The registry contains <strong>1,684 crops</strong> across 7 Solfeggio frequency zones — from tomatoes and herbs to fruit trees and medicinal mushrooms. Every crop includes scientific names, growth habits, container sizing, root depth, and hardiness zone data.</p>
         </Section>
 
         <Section title="The Home Page (The Stage)" emoji="🎤">
@@ -164,7 +164,7 @@ const UserGuide = () => {
         </Section>
 
         <Section title="Container Sizing" emoji="🪴">
-          <p>Every crop now includes <strong>root depth</strong> and <strong>minimum container size</strong> data:</p>
+          <p>All <strong>1,684 crops</strong> include <strong>root depth</strong> and <strong>minimum container size</strong> data:</p>
           <ul className="list-disc pl-5 space-y-1">
             <li><strong>Root Depth (inches)</strong> — How deep the roots go. Shallow herbs are 6-12", deep trees 36-72"+</li>
             <li><strong>Min Container (gallons)</strong> — The smallest pot that will work. Small herbs need 1-2 gal, trees need 15-25+ gal</li>

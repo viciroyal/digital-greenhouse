@@ -85,7 +85,8 @@ const DevGuide = () => {
           <p><strong>Stack:</strong> React 18 + Vite + TypeScript + Tailwind CSS + Framer Motion + Lovable Cloud (Supabase)</p>
           <p><strong>State:</strong> React Query for server state (Infinity staleTime for static crop data), useState for local UI state. No Redux or Zustand needed.</p>
           <p><strong>Environments:</strong> Pot, Raised Bed, Farm (Pro), High Tunnel (Pro), Food Forest (Pro). Each environment applies custom recipe filtering logic.</p>
-          <p><strong>Performance:</strong> All secondary routes use <code>React.lazy()</code> for code splitting. Only the landing page (Index) loads eagerly for instant first paint. CropRow components use <code>React.memo()</code> to prevent unnecessary re-renders in large lists.</p>
+          <p><strong>Performance:</strong> All secondary routes use <code>React.lazy()</code> for code splitting. Only the landing page (Index) loads eagerly for instant first paint. CropRow components use <code>React.memo()</code> to prevent unnecessary re-renders. The Crop Library uses <code>@tanstack/react-virtual</code> for row virtualization.</p>
+          <p><strong>Data completeness:</strong> All 1,684 crops have 100% population across all 6 AI-batch fields: growth_habit, scientific_name, planting_season, harvest_days, root_depth_inches, min_container_gal.</p>
         </Section>
 
         <Section title="FILE STRUCTURE">
@@ -354,7 +355,7 @@ const MyPage = lazy(() => import("./pages/MyPage"));
 ├── griot-oracle/index.ts       — AI advisor (Lovable AI gateway)
 ├── populate-crop-data/index.ts — Batch AI data population
 ├── populate-scientific-names/  — Scientific name population (legacy)`}</Code>
-          <p>Edge functions deploy automatically. The <code>populate-crop-data</code> function supports batch-filling fields: <code>growth_habit</code>, <code>scientific_name</code>, <code>planting_season</code>, <code>harvest_days</code>, <code>root_depth_inches</code>, <code>min_container_gal</code>.</p>
+          <p>Edge functions deploy automatically. The <code>populate-crop-data</code> function supports batch-filling fields: <code>growth_habit</code>, <code>scientific_name</code>, <code>planting_season</code>, <code>harvest_days</code>, <code>root_depth_inches</code>, <code>min_container_gal</code>. All 6 fields are now <strong>100% populated</strong> across all 1,684 crops.</p>
           <Code>{`// Usage: POST /populate-crop-data
 { "field": "growth_habit" }  // Fills 50 crops per batch`}</Code>
         </Section>
