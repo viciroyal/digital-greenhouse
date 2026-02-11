@@ -1916,17 +1916,26 @@ const CropOracle = () => {
                                 onMouseEnter={e => { e.currentTarget.style.background = `${cropZone?.color || 'hsl(120 50% 55%)'}08`; }}
                                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
                               >
-                                <div className="flex flex-col items-center shrink-0 gap-0.5">
-                                  <div
-                                    className="w-2.5 h-2.5 rounded-full"
-                                    style={{ background: cropZone?.color || 'hsl(0 0% 30%)' }}
-                                  />
-                                  <span className="text-[8px] font-mono font-bold" style={{
-                                    color: compatibility >= 70 ? 'hsl(120 55% 55%)' : compatibility >= 40 ? 'hsl(45 70% 55%)' : 'hsl(0 0% 45%)',
-                                  }}>
-                                    {compatibility}%
-                                  </span>
-                                </div>
+                                {(() => {
+                                  const ringColor = compatibility >= 70 ? 'hsl(120 55% 55%)' : compatibility >= 40 ? 'hsl(45 70% 55%)' : 'hsl(0 0% 45%)';
+                                  const r = 14; const stroke = 3; const circ = 2 * Math.PI * r;
+                                  const offset = circ - (compatibility / 100) * circ;
+                                  return (
+                                    <div className="flex flex-col items-center shrink-0" style={{ width: 36 }}>
+                                      <svg width="36" height="36" viewBox="0 0 36 36">
+                                        <circle cx="18" cy="18" r={r} fill="none" stroke="hsl(0 0% 15%)" strokeWidth={stroke} />
+                                        <circle cx="18" cy="18" r={r} fill="none" stroke={ringColor} strokeWidth={stroke}
+                                          strokeDasharray={circ} strokeDashoffset={offset}
+                                          strokeLinecap="round" transform="rotate(-90 18 18)"
+                                          style={{ transition: 'stroke-dashoffset 0.4s ease' }} />
+                                        <text x="18" y="19" textAnchor="middle" dominantBaseline="central"
+                                          fill={ringColor} fontSize="9" fontFamily="monospace" fontWeight="bold">
+                                          {compatibility}
+                                        </text>
+                                      </svg>
+                                    </div>
+                                  );
+                                })()}
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-1.5 flex-wrap">
                                     <span className="text-xs font-body truncate" style={{ color: 'hsl(0 0% 80%)' }}>
