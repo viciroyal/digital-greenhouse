@@ -125,7 +125,7 @@ const MiniMusicPlayer = () => {
       {/* Floating Music Trigger */}
       {!isOpen && (
         <motion.button
-          className="fixed bottom-32 right-6 z-50 w-12 h-12 rounded-full flex items-center justify-center"
+          className="fixed bottom-32 right-6 z-50 w-10 h-10 rounded-full flex items-center justify-center"
           onClick={() => setIsOpen(true)}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
@@ -142,7 +142,7 @@ const MiniMusicPlayer = () => {
             border: '2px solid hsl(270 40% 35%)',
           }}
         >
-          <Music className="w-5 h-5" style={{ color: 'hsl(270 60% 70%)' }} />
+          <Music className="w-4 h-4" style={{ color: 'hsl(270 60% 70%)' }} />
         </motion.button>
       )}
 
@@ -150,9 +150,9 @@ const MiniMusicPlayer = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed right-4 bottom-4 z-50 rounded-2xl overflow-hidden"
+            className="fixed right-3 bottom-3 z-50 rounded-xl overflow-hidden"
             style={{
-              width: '320px',
+              width: '260px',
               background: 'linear-gradient(180deg, hsl(20 30% 10% / 0.97) 0%, hsl(20 25% 6% / 0.99) 100%)',
               backdropFilter: 'blur(20px)',
               border: `1px solid hsl(${trackColor} / 0.3)`,
@@ -165,13 +165,13 @@ const MiniMusicPlayer = () => {
           >
             {/* Header */}
             <div
-              className="flex items-center justify-between px-4 py-3"
+              className="flex items-center justify-between px-3 py-2"
               style={{ borderBottom: `1px solid hsl(${trackColor} / 0.2)` }}
             >
               <div className="flex items-center gap-2">
-                <Music className="w-4 h-4" style={{ color: `hsl(${trackColor})` }} />
+                <Music className="w-3 h-3" style={{ color: `hsl(${trackColor})` }} />
                 <span
-                  className="font-mono text-xs tracking-wider uppercase"
+                  className="font-mono text-[10px] tracking-wider uppercase"
                   style={{ color: 'hsl(40 50% 85%)' }}
                 >
                   PHARMBOI
@@ -201,9 +201,9 @@ const MiniMusicPlayer = () => {
 
             {/* Now Playing */}
             {currentTrack && (
-              <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: `1px solid hsl(${trackColor} / 0.15)` }}>
+              <div className="px-3 py-2 flex items-center gap-2" style={{ borderBottom: `1px solid hsl(${trackColor} / 0.15)` }}>
                 <motion.div
-                  className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0"
+                  className="w-8 h-8 rounded-md overflow-hidden flex-shrink-0"
                   style={{
                     border: `2px solid hsl(${trackColor} / 0.5)`,
                     boxShadow: `0 0 12px hsl(${trackColor} / 0.3)`,
@@ -214,7 +214,7 @@ const MiniMusicPlayer = () => {
                   <img src={pharmbotArtwork} alt="Album Art" className="w-full h-full object-cover" />
                 </motion.div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-display text-sm truncate" style={{ color: `hsl(${trackColor})` }}>
+                  <p className="font-display text-xs truncate" style={{ color: `hsl(${trackColor})` }}>
                     {currentTrack.track}
                   </p>
                   <p className="font-mono text-[10px] truncate" style={{ color: 'hsl(40 50% 60%)' }}>
@@ -225,7 +225,7 @@ const MiniMusicPlayer = () => {
             )}
 
             {/* Transport Controls */}
-            <div className="px-4 py-3">
+            <div className="px-3 py-2">
               {/* Progress */}
               {currentTrack && (
                 <div className="mb-2">
@@ -244,15 +244,15 @@ const MiniMusicPlayer = () => {
               )}
 
               {/* Buttons */}
-              <div className="flex items-center justify-center gap-3">
+              <div className="flex items-center justify-center gap-2">
                 <motion.button
                   onClick={() => setIsMuted(!isMuted)}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
-                  className="p-1.5 rounded-full"
+                  className="p-1 rounded-full"
                   style={{ color: isMuted ? 'hsl(40 30% 45%)' : `hsl(${trackColor})` }}
                 >
-                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                  {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
                 </motion.button>
 
                 <motion.button
@@ -262,7 +262,7 @@ const MiniMusicPlayer = () => {
                   className="p-2 rounded-full"
                   style={{ background: 'hsl(20 30% 18%)', color: 'hsl(40 50% 70%)' }}
                 >
-                  <SkipBack className="w-4 h-4" />
+                  <SkipBack className="w-3.5 h-3.5" />
                 </motion.button>
 
                 <motion.button
@@ -276,7 +276,7 @@ const MiniMusicPlayer = () => {
                   }}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
-                  className="p-3 rounded-full"
+                  className="p-2.5 rounded-full"
                   style={{
                     background: isPlaying
                       ? `linear-gradient(135deg, hsl(${trackColor}), hsl(${trackColor} / 0.7))`
@@ -285,9 +285,9 @@ const MiniMusicPlayer = () => {
                   }}
                 >
                   {isPlaying ? (
-                    <Pause className="w-5 h-5" style={{ color: 'hsl(20 30% 8%)' }} />
+                    <Pause className="w-4 h-4" style={{ color: 'hsl(20 30% 8%)' }} />
                   ) : (
-                    <Play className="w-5 h-5 ml-0.5" style={{ color: 'hsl(40 50% 85%)' }} />
+                    <Play className="w-4 h-4 ml-0.5" style={{ color: 'hsl(40 50% 85%)' }} />
                   )}
                 </motion.button>
 
@@ -295,10 +295,10 @@ const MiniMusicPlayer = () => {
                   onClick={skipNext}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded-full"
+                  className="p-1.5 rounded-full"
                   style={{ background: 'hsl(20 30% 18%)', color: 'hsl(40 50% 70%)' }}
                 >
-                  <SkipForward className="w-4 h-4" />
+                  <SkipForward className="w-3.5 h-3.5" />
                 </motion.button>
               </div>
             </div>
