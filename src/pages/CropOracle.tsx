@@ -100,6 +100,7 @@ const CropOracle = () => {
   const [modalInfoOpen, setModalInfoOpen] = useState(false);
   const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | 'scent' | 'propagation' | 'suppliers' | 'hole' | null>(null);
   const [recipeSeed, setRecipeSeed] = useState(0);
+  const [showSeasonalCompanions, setShowSeasonalCompanions] = useState(false);
 
   // Fetch saved recipes
   const { data: savedRecipes } = useQuery({
@@ -368,6 +369,46 @@ const CropOracle = () => {
     const q = searchQuery.toLowerCase();
     return allCrops.filter(c => deepCropMatch(c, q)).slice(0, 12);
   }, [allCrops, searchQuery]);
+
+  /* ─── Seasonal Companions for Star Crop ─── */
+  const seasonalCompanions = useMemo(() => {
+    if (!starCrop || !allCrops) return [];
+    const sSeasons = (starCrop.planting_season || []).map(s => s.toLowerCase());
+    const sHarvest = starCrop.harvest_days ?? null;
+    const sCompanions = (starCrop.companion_crops || []).map(n => n.toLowerCase());
+    const sName = (starCrop.common_name || starCrop.name).toLowerCase();
+
+    return allCrops
+      .filter(c => c.id !== starCrop.id && c.frequency_hz === starCrop.frequency_hz)
+      .map(c => {
+        const cSeasons = (c.planting_season || []).map(s => s.toLowerCase());
+        const sharedSeasons = sSeasons.filter(s => cSeasons.includes(s));
+        const cName = (c.common_name || c.name).toLowerCase();
+        const starListsC = sCompanions.some(cn => cName.includes(cn) || cn.includes(cName.split('(')[0].trim()));
+        const cListsStar = (c.companion_crops || []).map(n => n.toLowerCase()).some(cn => sName.includes(cn) || cn.includes(sName.split('(')[0].trim()));
+        const isCompanionMatch = starListsC || cListsStar;
+        let harvestAlign: 'close' | 'near' | 'none' = 'none';
+        if (sHarvest !== null && c.harvest_days != null) {
+          const diff = Math.abs(c.harvest_days - sHarvest);
+          if (diff <= 15) harvestAlign = 'close';
+          else if (diff <= 30) harvestAlign = 'near';
+        }
+        const lunarReady = isCropLunarReady(c.category, c.common_name || c.name, lunar.plantingType);
+        const zoneOk = !hardinessZone || c.hardiness_zone_min == null || c.hardiness_zone_max == null ||
+          (hardinessZone >= c.hardiness_zone_min && hardinessZone <= c.hardiness_zone_max);
+        let score = sharedSeasons.length * 3;
+        if (isCompanionMatch) score += 6;
+        if (harvestAlign === 'close') score += 3;
+        else if (harvestAlign === 'near') score += 1;
+        if (lunarReady) score += 3;
+        if (zoneOk) score += 2;
+        else score -= 5;
+        return { crop: c, score, sharedSeasons, isCompanionMatch, harvestAlign, lunarReady, zoneOk };
+      })
+      .filter(r => r.score > 0 && r.zoneOk)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8);
+  }, [starCrop, allCrops, lunar.plantingType, hardinessZone]);
 
   /* ─── Build 7-voice chord card ─── */
   const chordCard = useMemo(() => {
@@ -1755,6 +1796,126 @@ const CropOracle = () => {
                   )}
                 </AnimatePresence>
               </motion.div>}
+
+              {/* ─── Seasonal Companions Panel ─── */}
+              {starCrop && seasonalCompanions.length > 0 && (
+                <motion.div
+                  className="mb-4 rounded-xl overflow-hidden"
+                  style={{
+                    background: 'hsl(0 0% 5%)',
+                    border: `1px solid ${selectedZone?.color || 'hsl(45 80% 55%)'}20`,
+                  }}
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <button
+                    onClick={() => setShowSeasonalCompanions(!showSeasonalCompanions)}
+                    className="w-full px-4 py-2.5 flex items-center gap-2 transition-all"
+                    style={{ background: `${selectedZone?.color || 'hsl(45 80% 55%)'}08` }}
+                  >
+                    <Leaf className="w-3.5 h-3.5" style={{ color: 'hsl(120 50% 55%)' }} />
+                    <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: 'hsl(120 50% 55%)' }}>
+                      SEASONAL COMPANIONS
+                    </span>
+                    <span className="text-[9px] font-mono ml-1" style={{ color: 'hsl(0 0% 40%)' }}>
+                      {seasonalCompanions.length} matches
+                    </span>
+                    <ChevronDown
+                      className="w-3.5 h-3.5 ml-auto transition-transform"
+                      style={{
+                        color: 'hsl(0 0% 40%)',
+                        transform: showSeasonalCompanions ? 'rotate(180deg)' : 'rotate(0deg)',
+                      }}
+                    />
+                  </button>
+                  <AnimatePresence>
+                    {showSeasonalCompanions && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="divide-y max-h-64 overflow-y-auto" style={{ borderColor: 'hsl(0 0% 10%)' }}>
+                          {seasonalCompanions.map(({ crop, sharedSeasons, isCompanionMatch, harvestAlign, lunarReady }) => {
+                            const cropZone = ZONES.find(z => z.hz === crop.frequency_hz);
+                            return (
+                              <button
+                                key={crop.id}
+                                className="px-4 py-2.5 w-full text-left flex items-center gap-3 transition-all"
+                                style={{ borderColor: 'hsl(0 0% 10%)' }}
+                                onClick={() => {
+                                  if (swapSlotIndex !== null) {
+                                    handleSwapCrop(crop);
+                                  } else {
+                                    setSearchQuery(crop.common_name || crop.name);
+                                  }
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.background = `${cropZone?.color || 'hsl(120 50% 55%)'}08`; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                              >
+                                <div
+                                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                                  style={{ background: cropZone?.color || 'hsl(0 0% 30%)' }}
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="text-xs font-body truncate" style={{ color: 'hsl(0 0% 80%)' }}>
+                                      {crop.common_name || crop.name}
+                                    </span>
+                                    {isCompanionMatch && (
+                                      <span className="text-[7px] font-mono px-1 py-0.5 rounded shrink-0" style={{
+                                        background: 'hsl(330 50% 30% / 0.3)',
+                                        color: 'hsl(330 60% 65%)',
+                                      }}>💚 COMPANION</span>
+                                    )}
+                                    {lunarReady && (
+                                      <span className="text-[7px] font-mono px-1 py-0.5 rounded shrink-0" style={{
+                                        background: 'hsl(120 50% 25% / 0.3)',
+                                        color: 'hsl(120 60% 60%)',
+                                      }}>{lunar.phaseEmoji} READY</span>
+                                    )}
+                                    <TrapCropBadge description={crop.description} guildRole={crop.guild_role} size="sm" />
+                                  </div>
+                                  <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                    {sharedSeasons.length > 0 && (
+                                      <span className="text-[7px] font-mono px-1 py-0.5 rounded" style={{
+                                        background: 'hsl(120 40% 20% / 0.3)',
+                                        color: 'hsl(120 40% 55%)',
+                                      }}>
+                                        📅 {sharedSeasons.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(', ')}
+                                      </span>
+                                    )}
+                                    {harvestAlign !== 'none' && (
+                                      <span className="text-[7px] font-mono px-1 py-0.5 rounded" style={{
+                                        background: 'hsl(45 50% 20% / 0.3)',
+                                        color: 'hsl(45 60% 55%)',
+                                      }}>
+                                        🌾 {harvestAlign === 'close' ? '±15d' : '±30d'}
+                                      </span>
+                                    )}
+                                    <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
+                                      {crop.chord_interval || crop.category}
+                                    </span>
+                                    <GrowthHabitBadge habit={crop.growth_habit} size="sm" />
+                                  </div>
+                                </div>
+                                {swapSlotIndex !== null && (
+                                  <span className="text-[8px] font-mono px-1.5 py-0.5 rounded shrink-0" style={{
+                                    background: `${selectedZone?.color || 'hsl(45 80% 55%)'}20`,
+                                    color: selectedZone?.color || 'hsl(45 80% 55%)',
+                                  }}>SWAP</span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )}
 
               {/* ─── Seasonal Gate Warning ─── */}
               {seasonalGate && !seasonalOverride && (
