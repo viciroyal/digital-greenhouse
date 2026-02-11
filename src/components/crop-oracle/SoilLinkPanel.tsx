@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Beaker } from 'lucide-react';
+import { ChevronDown, Beaker, Leaf } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import JadamPanel from './JadamPanel';
 
 interface SoilLinkPanelProps {
   frequencyHz: number;
@@ -13,6 +14,7 @@ interface SoilLinkPanelProps {
 
 const SoilLinkPanel = ({ frequencyHz, environment, zoneColor, zoneName }: SoilLinkPanelProps) => {
   const [open, setOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState<'master-mix' | 'jadam'>('master-mix');
 
   const { data: amendments } = useQuery({
     queryKey: ['soil-amendments'],
@@ -83,48 +85,83 @@ const SoilLinkPanel = ({ frequencyHz, environment, zoneColor, zoneName }: SoilLi
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-3 space-y-1.5" style={{ borderTop: '1px solid hsl(0 0% 10%)' }}>
-              <p className="text-[9px] font-mono pt-2 mb-2" style={{ color: 'hsl(0 0% 40%)' }}>
-                5-QUART MASTER MIX • {isPot ? 'SCALED FOR CONTAINER' : '60-FT BED'} • ⚡ = ZONE BOOST (2×)
-              </p>
-              {soilRecipe.map(a => (
-                <div
-                  key={a.id}
-                  className="flex items-center gap-2 py-1.5 px-2 rounded-lg"
-                  style={{
-                    background: a.boosted ? `${zoneColor}08` : 'transparent',
-                    border: a.boosted ? `1px solid ${zoneColor}15` : '1px solid transparent',
-                  }}
-                >
-                  {a.boosted && (
-                    <span className="text-[10px]">⚡</span>
-                  )}
-                  <span
-                    className="text-[10px] font-mono flex-1"
-                    style={{ color: a.boosted ? `${zoneColor}cc` : 'hsl(0 0% 55%)' }}
-                  >
-                    {a.name}
-                  </span>
-                  <span
-                    className="text-[10px] font-mono font-bold"
-                    style={{ color: a.boosted ? zoneColor : 'hsl(0 0% 45%)' }}
-                  >
-                    {a.displayQty.toFixed(isPot ? 2 : 1)} {unit}
-                  </span>
-                  <span
-                    className="text-[8px] font-mono px-1.5 py-0.5 rounded"
+            <div className="px-4 pb-3" style={{ borderTop: '1px solid hsl(0 0% 10%)' }}>
+              {/* Tab Switcher */}
+              <div className="flex gap-1 pt-2 mb-3">
+                {[
+                  { id: 'master-mix' as const, label: '5-QUART MASTER MIX', icon: <Beaker className="w-3 h-3" /> },
+                  { id: 'jadam' as const, label: 'JADAM 자연농업', icon: <Leaf className="w-3 h-3" /> },
+                ].map(t => (
+                  <button
+                    key={t.id}
+                    onClick={() => setActiveTab(t.id)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[8px] font-mono tracking-wider transition-all flex-1 justify-center"
                     style={{
-                      background: 'hsl(0 0% 8%)',
-                      color: 'hsl(0 0% 35%)',
+                      background: activeTab === t.id ? `${zoneColor}15` : 'hsl(0 0% 4%)',
+                      border: `1px solid ${activeTab === t.id ? `${zoneColor}40` : 'hsl(0 0% 10%)'}`,
+                      color: activeTab === t.id ? zoneColor : 'hsl(0 0% 40%)',
                     }}
                   >
-                    {a.category}
-                  </span>
+                    {t.icon} {t.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Master Mix Tab */}
+              {activeTab === 'master-mix' && (
+                <div className="space-y-1.5">
+                  <p className="text-[9px] font-mono mb-2" style={{ color: 'hsl(0 0% 40%)' }}>
+                    5-QUART MASTER MIX • {isPot ? 'SCALED FOR CONTAINER' : '60-FT BED'} • ⚡ = ZONE BOOST (2×)
+                  </p>
+                  {soilRecipe.map(a => (
+                    <div
+                      key={a.id}
+                      className="flex items-center gap-2 py-1.5 px-2 rounded-lg"
+                      style={{
+                        background: a.boosted ? `${zoneColor}08` : 'transparent',
+                        border: a.boosted ? `1px solid ${zoneColor}15` : '1px solid transparent',
+                      }}
+                    >
+                      {a.boosted && (
+                        <span className="text-[10px]">⚡</span>
+                      )}
+                      <span
+                        className="text-[10px] font-mono flex-1"
+                        style={{ color: a.boosted ? `${zoneColor}cc` : 'hsl(0 0% 55%)' }}
+                      >
+                        {a.name}
+                      </span>
+                      <span
+                        className="text-[10px] font-mono font-bold"
+                        style={{ color: a.boosted ? zoneColor : 'hsl(0 0% 45%)' }}
+                      >
+                        {a.displayQty.toFixed(isPot ? 2 : 1)} {unit}
+                      </span>
+                      <span
+                        className="text-[8px] font-mono px-1.5 py-0.5 rounded"
+                        style={{
+                          background: 'hsl(0 0% 8%)',
+                          color: 'hsl(0 0% 35%)',
+                        }}
+                      >
+                        {a.category}
+                      </span>
+                    </div>
+                  ))}
+                  <p className="text-[8px] font-mono pt-1" style={{ color: 'hsl(0 0% 30%)' }}>
+                    Apply before planting to "tune the instrument" to {frequencyHz}Hz
+                  </p>
                 </div>
-              ))}
-              <p className="text-[8px] font-mono pt-1" style={{ color: 'hsl(0 0% 30%)' }}>
-                Apply before planting to "tune the instrument" to {frequencyHz}Hz
-              </p>
+              )}
+
+              {/* JADAM Tab */}
+              {activeTab === 'jadam' && (
+                <JadamPanel
+                  frequencyHz={frequencyHz}
+                  zoneColor={zoneColor}
+                  zoneName={zoneName}
+                />
+              )}
             </div>
           </motion.div>
         )}
