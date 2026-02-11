@@ -212,7 +212,9 @@ const IntervalRow = ({ interval, index, zoneColor, starCrop, companionCrop }: In
   const harvestDiff = starHarvest !== null && compHarvest !== null ? compHarvest - starHarvest : null;
 
   const hasSeasonData = !isStar && starSeasons.length > 0 && compSeasons.length > 0;
-  const noSeasonData = !isStar && (starSeasons.length === 0 || compSeasons.length === 0);
+  const companionMissingSeason = !isStar && compSeasons.length === 0;
+  const starMissingSeason = !isStar && starSeasons.length === 0 && compSeasons.length > 0;
+  const noSeasonData = !isStar && starSeasons.length === 0 && compSeasons.length === 0;
   const seasonMismatch = hasSeasonData && sharedSeasons.length === 0;
 
   return (
@@ -278,6 +280,32 @@ const IntervalRow = ({ interval, index, zoneColor, starCrop, companionCrop }: In
               >
                 <AlertTriangle className="w-2.5 h-2.5" />
                 No season overlap
+              </span>
+            )}
+            {companionMissingSeason && (
+              <span
+                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold"
+                style={{
+                  background: 'hsl(40 60% 20% / 0.3)',
+                  border: '1px solid hsl(40 60% 40% / 0.4)',
+                  color: 'hsl(40 60% 55%)',
+                }}
+                title="This companion has no planting season data — pairing is unverified"
+              >
+                <AlertTriangle className="w-2.5 h-2.5" />
+                Unverified pairing
+              </span>
+            )}
+            {starMissingSeason && (
+              <span
+                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold"
+                style={{
+                  background: 'hsl(40 60% 20% / 0.3)',
+                  border: '1px solid hsl(40 60% 40% / 0.4)',
+                  color: 'hsl(40 60% 55%)',
+                }}
+              >
+                ⚠ Star season pending
               </span>
             )}
             {noSeasonData && (
