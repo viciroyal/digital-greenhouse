@@ -1,0 +1,1 @@
+ALTER TABLE public.master_crops ADD COLUMN growth_habit text DEFAULT NULL;
