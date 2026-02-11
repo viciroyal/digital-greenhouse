@@ -365,6 +365,30 @@ export type Database = {
         }
         Relationships: []
       }
+      readiness_checklist: {
+        Row: {
+          checked_items: string[]
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checked_items?: string[]
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checked_items?: string[]
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       saved_recipes: {
         Row: {
           chord_data: Json
