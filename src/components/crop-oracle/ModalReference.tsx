@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
-import { Music } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Music, ChevronDown } from 'lucide-react';
 import { HARMONIC_ZONES } from '@/data/harmonicZoneProtocol';
 
 const MODES = [
@@ -69,6 +70,8 @@ const MODES = [
 ];
 
 const ModalReference = () => {
+  const [open, setOpen] = useState(false);
+
   return (
     <div
       className="mx-4 mb-4 rounded-xl overflow-hidden"
@@ -78,10 +81,10 @@ const ModalReference = () => {
         boxShadow: 'inset 0 1px 0 hsl(0 0% 10%), 0 4px 16px rgba(0,0,0,0.5)',
       }}
     >
-      {/* Header */}
-      <div
-        className="px-4 py-3 flex items-center gap-2"
-        style={{ borderBottom: '1px solid hsl(0 0% 10%)' }}
+      {/* Header — clickable toggle */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full px-4 py-3 flex items-center gap-2 text-left"
       >
         <Music className="w-4 h-4" style={{ color: 'hsl(45 80% 55%)' }} />
         <span
@@ -90,10 +93,28 @@ const ModalReference = () => {
         >
           MODAL FIELD GUIDE
         </span>
-        <span className="text-[8px] font-mono ml-auto" style={{ color: 'hsl(0 0% 30%)' }}>
+        <span className="text-[8px] font-mono ml-auto mr-1" style={{ color: 'hsl(0 0% 30%)' }}>
           7 MODES • 7 ZONES
         </span>
-      </div>
+        <ChevronDown
+          className="w-3 h-3 transition-transform"
+          style={{
+            color: 'hsl(0 0% 35%)',
+            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+          }}
+        />
+      </button>
+
+      {/* Collapsible content */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
 
       {/* Mode Cards */}
       <div className="divide-y" style={{ borderColor: 'hsl(0 0% 8%)' }}>
@@ -206,6 +227,9 @@ const ModalReference = () => {
           );
         })}
       </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
