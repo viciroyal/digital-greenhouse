@@ -1,1 +1,4 @@
 project_id = "hskewohbngatoqzlvlef"
+
+[functions.populate-scientific-names]
+verify_jwt = false

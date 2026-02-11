@@ -15,7 +15,7 @@ const ZONE_ORDER = [396, 417, 528, 639, 741, 852, 963];
 const CropRow = ({ crop }: { crop: MasterCrop }) => (
   <tr className="border-b border-border/30 text-[10px] leading-tight print:text-[9px]">
     <td className="py-1 px-1.5 font-bold">{crop.common_name || crop.name}</td>
-    <td className="py-1 px-1.5 italic opacity-70">{crop.name !== crop.common_name ? crop.name : ''}</td>
+    <td className="py-1 px-1.5 italic opacity-70">{crop.scientific_name || '–'}</td>
     <td className="py-1 px-1.5 text-center">{crop.frequency_hz}</td>
     <td className="py-1 px-1.5">{crop.zone_name}</td>
     <td className="py-1 px-1.5">{crop.element}</td>
@@ -50,7 +50,7 @@ const escapeCsvField = (value: string): string => {
 
 const generateCsv = (crops: MasterCrop[]): string => {
   const headers = [
-    'common_name', 'latin_name', 'frequency_hz', 'zone_name', 'element', 'category',
+    'common_name', 'scientific_name', 'frequency_hz', 'zone_name', 'element', 'category',
     'chord_interval', 'instrument_type', 'dominant_mineral', 'brix_min', 'brix_max',
     'hardiness_zone_min', 'hardiness_zone_max', 'harvest_days', 'spacing_inches',
     'planting_season', 'guild_role', 'focus_tag', 'companion_crops', 'crop_guild',
@@ -59,7 +59,7 @@ const generateCsv = (crops: MasterCrop[]): string => {
 
   const rows = crops.map(c => [
     c.common_name || c.name,
-    c.name,
+    c.scientific_name || '',
     String(c.frequency_hz),
     c.zone_name,
     c.element,
@@ -188,7 +188,7 @@ const CropLibrary = () => {
                 <thead>
                   <tr className="text-[9px] font-apothecary uppercase tracking-wider text-muted-foreground print:text-black/60 border-b-2 border-border/50">
                     <th className="py-1 px-1.5">Common Name</th>
-                    <th className="py-1 px-1.5">Latin</th>
+                    <th className="py-1 px-1.5">Scientific Name</th>
                     <th className="py-1 px-1.5 text-center">Hz</th>
                     <th className="py-1 px-1.5">Zone</th>
                     <th className="py-1 px-1.5">Element</th>
