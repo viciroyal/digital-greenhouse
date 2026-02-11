@@ -275,7 +275,22 @@ const CropOracle = () => {
     return GROUND_COVER_KEYWORDS.some(kw => name.includes(kw));
   };
 
-  /* ─── Filter crops by zone + environment ─── */
+  /* ─── Current calendar season helper ─── */
+  const currentSeason = useMemo(() => {
+    const month = new Date().getMonth(); // 0-indexed
+    if (month >= 2 && month <= 4) return 'spring';
+    if (month >= 5 && month <= 7) return 'summer';
+    if (month >= 8 && month <= 10) return 'fall';
+    return 'winter';
+  }, []);
+
+  const isInCurrentSeason = (c: MasterCrop): boolean => {
+    const seasons = (c.planting_season || []).map(s => s.toLowerCase());
+    if (seasons.length === 0) return true; // no data = don't exclude
+    return seasons.includes(currentSeason);
+  };
+
+  /* ─── Filter crops by zone + environment + season ─── */
   const recipeCrops = useMemo(() => {
     if (!allCrops || !selectedZone) return [];
 
@@ -284,6 +299,10 @@ const CropOracle = () => {
     if (hardinessZone) {
       filtered = filtered.filter(fitsHardinessZone);
     }
+
+    // Season filter: only show crops plantable in the current season
+    const seasonFiltered = filtered.filter(isInCurrentSeason);
+    filtered = seasonFiltered.length >= 3 ? seasonFiltered : filtered;
 
     if (environment === 'pot') {
       filtered = filtered.filter(c => {
@@ -316,7 +335,7 @@ const CropOracle = () => {
     }
 
     return filtered;
-  }, [allCrops, selectedZone, environment, hardinessZone]);
+  }, [allCrops, selectedZone, environment, hardinessZone, currentSeason]);
 
   /* ─── Star crop candidates (ANY crop from ANY zone can be the Star) ─── */
   const starCandidates = useMemo(() => {
@@ -325,6 +344,9 @@ const CropOracle = () => {
     if (hardinessZone) {
       candidates = candidates.filter(fitsHardinessZone);
     }
+    // Season filter
+    const seasonFiltered = candidates.filter(isInCurrentSeason);
+    candidates = seasonFiltered.length >= 10 ? seasonFiltered : candidates;
     if (environment === 'pot') {
       candidates = candidates.filter(c => {
         const spacing = c.spacing_inches ? parseInt(c.spacing_inches) : 6;
@@ -332,7 +354,7 @@ const CropOracle = () => {
       });
     }
     return candidates.sort((a, b) => (a.common_name || a.name).localeCompare(b.common_name || b.name));
-  }, [allCrops, environment, hardinessZone]);
+  }, [allCrops, environment, hardinessZone, currentSeason]);
 
   /* ─── Total crops matching hardiness zone (across all frequency zones) ─── */
   const zoneMatchCount = useMemo(() => {
@@ -445,9 +467,16 @@ const CropOracle = () => {
       return starSeasons.some(s => cSeasons.includes(s));
     };
 
-    // Apply the gate — keep a fallback to the full pool if too few crops pass
-    const gatedPool = pool.filter(c => isZoneCompatible(c) && isSeasonCompatible(c));
-    pool = gatedPool.length >= 3 ? gatedPool : pool;
+    const isInSeason = (c: MasterCrop): boolean => {
+      const seasons = (c.planting_season || []).map(s => s.toLowerCase());
+      if (seasons.length === 0) return true;
+      return seasons.includes(currentSeason);
+    };
+
+    // Apply the gate — zone + season + star-season compatibility
+    const gatedPool = pool.filter(c => isZoneCompatible(c) && isSeasonCompatible(c) && isInSeason(c));
+    pool = gatedPool.length >= 3 ? gatedPool : pool.filter(c => isZoneCompatible(c) && isInSeason(c));
+    if (pool.length < 3) pool = gatedPool.length > 0 ? gatedPool : pool;
 
     const usedIds = new Set<string>();
 
