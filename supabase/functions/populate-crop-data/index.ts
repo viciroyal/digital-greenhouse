@@ -18,7 +18,7 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const field = body.field || "growth_habit";
 
-    const VALID_FIELDS = ["growth_habit", "scientific_name", "planting_season", "harvest_days"];
+    const VALID_FIELDS = ["growth_habit", "scientific_name", "planting_season", "harvest_days", "root_depth_inches", "min_container_gal"];
     if (!VALID_FIELDS.includes(field)) {
       throw new Error("Invalid field. Valid: " + VALID_FIELDS.join(", "));
     }
@@ -56,6 +56,8 @@ serve(async (req) => {
       scientific_name: `You are a botanist. Given crop names, return the correct binomial scientific name (genus + species) for each. Use the most commonly cultivated species. Return via the tool call.`,
       planting_season: `You are an agronomist. Given crop names, return the planting seasons for each. Use ONLY these season values: "Spring", "Summer", "Fall", "Winter". Return an array of 1-4 seasons when the crop can be planted. Most vegetables are Spring; cool-season crops may include Fall; perennials may include multiple. Return via the tool call.`,
       harvest_days: `You are an agronomist. Given crop names, return the typical days to harvest (from transplant/planting to first harvest) for each. Return an integer number of days. Use typical values for the most common cultivar. For perennials that produce in year 2+, use days from spring emergence to harvest in a mature plant. Return via the tool call.`,
+      root_depth_inches: `You are a horticulturist. Given crop names, return the typical mature root depth in inches for each. Use integer values. Shallow herbs ~6-12, medium vegetables ~12-24, deep-rooted crops ~24-48, trees ~36-72+. Return via the tool call.`,
+      min_container_gal: `You are a container gardening expert. Given crop names, return the minimum container size in gallons needed to grow each crop successfully. Use numeric values (decimals OK). Small herbs ~1-2, medium vegetables ~3-5, large vegetables ~5-10, shrubs ~10-15, small trees ~15-25, large trees ~25+. Return via the tool call.`,
     };
 
     // Build tool schema based on field type
@@ -64,10 +66,15 @@ serve(async (req) => {
           index: { type: "integer", description: "The index number from the list" },
           value: { type: "array", items: { type: "string", enum: ["Spring", "Summer", "Fall", "Winter"] } },
         }
-      : field === "harvest_days"
+      : (field === "harvest_days" || field === "root_depth_inches")
       ? {
           index: { type: "integer", description: "The index number from the list" },
           value: { type: "integer" },
+        }
+      : field === "min_container_gal"
+      ? {
+          index: { type: "integer", description: "The index number from the list" },
+          value: { type: "number" },
         }
       : {
           index: { type: "integer", description: "The index number from the list" },
