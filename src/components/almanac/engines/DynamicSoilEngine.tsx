@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Ruler, RefreshCw, CheckCircle } from 'lucide-react';
+import { Ruler, RefreshCw, CheckCircle, Beaker, Shield, Leaf } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { LearnMoreButton } from '@/components/almanac';
@@ -18,11 +18,14 @@ import {
 
 const STORAGE_KEY_BED_RESETS = 'pharmer-bed-reset-count';
 
-const DynamicSoilEngine = () => {
-  // Environment selection
-  const [environment, setEnvironment] = useState<EnvironmentType>('raised_bed');
+const TIER_META: Record<string, { label: string; icon: typeof Leaf; color: string; description: string }> = {
+  core: { label: 'CORE MIX', icon: Leaf, color: 'hsl(35 60% 55%)', description: 'Foundation — structure, N-P-K, carbon, calcium, biology' },
+  mineral: { label: 'MINERAL SPECTRUM', icon: Beaker, color: 'hsl(210 55% 60%)', description: 'Fills P, K, Si, S, Mg gaps — completes zone boosts' },
+  biology: { label: 'BIOLOGY & MICRONUTRIENTS', icon: Shield, color: 'hsl(120 45% 50%)', description: 'Mycorrhizae, rock dust (67+ trace minerals), pest defense' },
+};
 
-  // INPUT STATE (for bed/farm/tunnel)
+const DynamicSoilEngine = () => {
+  const [environment, setEnvironment] = useState<EnvironmentType>('raised_bed');
   const [bedWidth, setBedWidth] = useState(2.5);
   const [bedLength, setBedLength] = useState(60);
   const [selectedHz, setSelectedHz] = useState<number | null>(null);
@@ -30,16 +33,11 @@ const DynamicSoilEngine = () => {
 
   const useMasterMix = environment !== 'pot';
 
-  // THE MATH
   const { currentArea, scaleFactor } = useMemo(() => {
     const area = bedWidth * bedLength;
-    return {
-      currentArea: Math.round(area * 10) / 10,
-      scaleFactor: area / BASE_AREA_SQ_FT,
-    };
+    return { currentArea: Math.round(area * 10) / 10, scaleFactor: area / BASE_AREA_SQ_FT };
   }, [bedWidth, bedLength]);
 
-  // OUTPUT: Scaled quantities with frequency boost
   const scaledProtocol = useMemo(() => {
     return MASTER_MIX_PROTOCOL.map((item) => {
       const isBoosted = selectedHz && item.frequencyBoost?.includes(selectedHz);
@@ -62,7 +60,6 @@ const DynamicSoilEngine = () => {
   const checkedCount = Object.values(checkedItems).filter(Boolean).length;
   const isComplete = checkedCount === MASTER_MIX_PROTOCOL.length;
 
-  // Default bed lengths per environment
   const handleEnvironmentChange = (env: EnvironmentType) => {
     setEnvironment(env);
     setCheckedItems({});
@@ -79,6 +76,16 @@ const DynamicSoilEngine = () => {
     if (config.bed_length) setBedLength(config.bed_length);
     setSelectedHz(config.frequency_hz);
   };
+
+  // Group by tier
+  const tiers = useMemo(() => {
+    const grouped: Record<string, typeof scaledProtocol> = {};
+    scaledProtocol.forEach(item => {
+      if (!grouped[item.tier]) grouped[item.tier] = [];
+      grouped[item.tier].push(item);
+    });
+    return grouped;
+  }, [scaledProtocol]);
 
   return (
     <div
@@ -113,10 +120,7 @@ const DynamicSoilEngine = () => {
           )}
         </div>
 
-        {/* Environment Selector */}
         <EnvironmentSelector selected={environment} onChange={handleEnvironmentChange} />
-
-        {/* Saved Configs */}
         <SavedSoilConfigs
           environment={environment}
           bedWidth={bedWidth}
@@ -125,14 +129,12 @@ const DynamicSoilEngine = () => {
           onLoad={handleLoadConfig}
         />
 
-        {/* ═══ POT MODE ═══ */}
         {!useMasterMix && (
           <div className="mt-4">
             <PotMixCalculator />
           </div>
         )}
 
-        {/* ═══ BED/FARM/TUNNEL MODE ═══ */}
         {useMasterMix && (
           <>
             {/* Dimension Sliders */}
@@ -147,7 +149,6 @@ const DynamicSoilEngine = () => {
                 </span>
               </div>
 
-              {/* Width */}
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
                   <span className="text-xs font-mono" style={{ color: 'hsl(0 0% 55%)' }}>Width</span>
@@ -159,7 +160,6 @@ const DynamicSoilEngine = () => {
                 <Slider value={[bedWidth]} onValueChange={([val]) => setBedWidth(val)} min={2} max={10} step={0.5} />
               </div>
 
-              {/* Length */}
               <div className="space-y-1">
                 <div className="flex justify-between items-center">
                   <span className="text-xs font-mono" style={{ color: 'hsl(0 0% 55%)' }}>Length</span>
@@ -171,7 +171,6 @@ const DynamicSoilEngine = () => {
                 <Slider value={[bedLength]} onValueChange={([val]) => setBedLength(val)} min={5} max={200} step={1} />
               </div>
 
-              {/* Area & Scale */}
               <div className="grid grid-cols-2 gap-2 pt-2" style={{ borderTop: '1px solid hsl(35 30% 20%)' }}>
                 <div className="text-center py-2 rounded" style={{ background: 'hsl(120 20% 12%)' }}>
                   <span className="text-[10px] font-mono block" style={{ color: 'hsl(0 0% 50%)' }}>AREA</span>
@@ -232,6 +231,41 @@ const DynamicSoilEngine = () => {
               )}
             </div>
 
+            {/* NIR Targets & pH — shown when zone selected */}
+            {selectedHz && FREQUENCY_PROTOCOLS[selectedHz] && (
+              <motion.div
+                className="mt-3 p-3 rounded-lg space-y-2"
+                style={{ background: 'hsl(210 20% 8%)', border: `1px solid ${FREQUENCY_PROTOCOLS[selectedHz].color}30` }}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+              >
+                <span className="text-[10px] font-mono tracking-widest block" style={{ color: 'hsl(210 50% 65%)' }}>
+                  🔬 NIR SPECTROSCOPY TARGETS
+                </span>
+
+                {/* pH Target */}
+                <div className="flex items-center gap-2 p-2 rounded" style={{ background: 'hsl(45 20% 10%)', border: '1px solid hsl(45 30% 25%)' }}>
+                  <span className="text-[9px] font-mono" style={{ color: 'hsl(45 60% 60%)' }}>TARGET pH</span>
+                  <span className="text-sm font-mono font-bold" style={{ color: 'hsl(45 70% 65%)' }}>
+                    {FREQUENCY_PROTOCOLS[selectedHz].targetPH.min} – {FREQUENCY_PROTOCOLS[selectedHz].targetPH.max}
+                  </span>
+                </div>
+
+                {/* Mineral ppm targets */}
+                <div className="space-y-1">
+                  {FREQUENCY_PROTOCOLS[selectedHz].nirTargets.map((target, i) => (
+                    <div key={i} className="flex items-center justify-between p-1.5 rounded" style={{ background: 'hsl(0 0% 6%)' }}>
+                      <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 55%)' }}>{target.mineral}</span>
+                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded"
+                        style={{ background: `${FREQUENCY_PROTOCOLS[selectedHz].color}15`, color: FREQUENCY_PROTOCOLS[selectedHz].color }}>
+                        {target.ppm_min}–{target.ppm_max} {target.mineral.includes('%') || target.mineral.includes('°') ? '' : 'ppm'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {/* Harmonization Panel */}
             <div className="mt-4">
               <HarmonizationPanel selectedHz={selectedHz} />
@@ -244,21 +278,20 @@ const DynamicSoilEngine = () => {
               </span>
               <p className="text-[10px] font-mono leading-relaxed" style={{ color: 'hsl(120 30% 65%)' }}>
                 {environment === 'raised_bed' && (
-                  <>Apply <strong>5-Quart Master Mix</strong> per 60ft bed as the base protocol (scaled to your dimensions).
+                  <>Apply full <strong>3-Tier Master Mix</strong> per bed (scaled to your dimensions).
                   For raised beds, ensure 12–18 inches of soil depth. Layer: 4″ hugelkultur base → 
-                  6″ native soil/compost blend → Master Mix top-dress. Re-apply each season.</>
+                  6″ native soil/compost blend → Master Mix top-dress. Apply Mycorrhizal Inoculant directly at root zone during transplant. Re-apply amendments each season.</>
                 )}
                 {environment === 'farm' && (
                   <>Apply <strong>Master Mix protocol</strong> at the scaled rate below. For farm rows,
-                  broadcast evenly and rake in the top 2 inches. Pair with cover crop termination for
-                  maximum biological activation. The 5-Quart Reset tunes the bed to 'Middle C' (396Hz) —
-                  a neutral biological foundation before planting.</>
+                  broadcast Core + Mineral tiers evenly and rake in the top 2 inches. Apply Mycorrhizal Inoculant in-furrow at seeding.
+                  Pair with cover crop termination for maximum biological activation. Azomite rock dust provides 67+ trace minerals for complete NIR spectrum coverage.</>
                 )}
                 {environment === 'high_tunnel' && (
                   <>High tunnel beds benefit from <strong>concentrated Master Mix</strong> due to protected
                   environment. Increase worm castings by 25% for sustained biological activity under cover.
-                  Monitor moisture carefully — tunnels dry faster. Apply compost tea foliar spray weekly
-                  at 528Hz frequency for photosynthetic support.</>
+                  Monitor moisture carefully — tunnels dry faster. DE (Silica) is especially valuable here for strengthening stalks under low-UV tunnel conditions.
+                  Apply Neem Cake at season start for nematode suppression in warm, moist tunnel soil.</>
                 )}
               </p>
             </div>
@@ -276,68 +309,136 @@ const DynamicSoilEngine = () => {
             <LearnMoreButton wisdomKey="ingham-soil-food-web" size="sm" />
           </div>
 
-          <div className="space-y-1.5">
-            {scaledProtocol.map((item) => {
-              const isChecked = checkedItems[item.id];
-              return (
-                <motion.button
-                  key={item.id}
-                  className="w-full flex items-center gap-3 p-2.5 rounded-lg text-left"
-                  style={{
-                    background: isChecked ? 'hsl(120 30% 15%)' : item.isBoosted ? 'hsl(45 30% 12%)' : 'hsl(0 0% 10%)',
-                    border: `1px solid ${isChecked ? 'hsl(120 50% 40%)' : item.isBoosted ? 'hsl(45 60% 40%)' : 'hsl(0 0% 18%)'}`,
-                  }}
-                  onClick={() => toggleCheck(item.id)}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div
-                    className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
-                    style={{
-                      background: isChecked ? 'hsl(120 50% 40%)' : 'hsl(0 0% 18%)',
-                      border: `2px solid ${isChecked ? 'hsl(120 60% 50%)' : 'hsl(0 0% 28%)'}`,
-                    }}
-                  >
-                    {isChecked && <CheckCircle className="w-3 h-3 text-white" />}
-                  </div>
+          {/* Grouped by tier */}
+          {(['core', 'mineral', 'biology'] as const).map(tierKey => {
+            const tierItems = tiers[tierKey];
+            if (!tierItems || tierItems.length === 0) return null;
+            const meta = TIER_META[tierKey];
+            const TierIcon = meta.icon;
 
-                  <span
-                    className="text-[9px] font-mono px-1.5 py-0.5 rounded shrink-0"
-                    style={{ background: `${item.roleColor}20`, color: item.roleColor, border: `1px solid ${item.roleColor}40` }}
-                  >
-                    {item.role}
+            return (
+              <div key={tierKey} className="mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <TierIcon className="w-3.5 h-3.5" style={{ color: meta.color }} />
+                  <span className="text-[10px] font-mono tracking-widest" style={{ color: meta.color }}>
+                    {meta.label}
                   </span>
-
-                  <div className="flex-1 flex items-center gap-1.5 min-w-0">
-                    <span
-                      className="text-sm font-mono truncate"
-                      style={{
-                        color: isChecked ? 'hsl(120 50% 65%)' : item.isBoosted ? 'hsl(45 70% 65%)' : 'hsl(35 50% 70%)',
-                        textDecoration: isChecked ? 'line-through' : 'none',
-                      }}
-                    >
-                      {item.name}
-                    </span>
-                    {item.isBoosted && (
-                      <span className="text-[8px] font-mono font-bold px-1 py-0.5 rounded shrink-0"
-                        style={{ background: 'hsl(45 60% 30%)', color: 'hsl(45 80% 70%)' }}>
-                        2×
-                      </span>
-                    )}
-                  </div>
-
-                  <span
-                    className="text-sm font-mono font-bold px-2 py-0.5 rounded shrink-0"
-                    style={{
-                      background: item.isBoosted ? 'hsl(45 50% 18%)' : 'hsl(51 50% 15%)',
-                      color: item.isBoosted ? 'hsl(45 80% 65%)' : 'hsl(51 80% 60%)',
-                      border: `1px solid ${item.isBoosted ? 'hsl(45 60% 40%)' : 'hsl(51 50% 30%)'}`,
-                    }}
-                  >
-                    {item.display}
+                  <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                    — {meta.description}
                   </span>
-                </motion.button>
-              );
-            })}
+                </div>
+
+                <div className="space-y-1.5">
+                  {tierItems.map((item) => {
+                    const isChecked = checkedItems[item.id];
+                    return (
+                      <motion.button
+                        key={item.id}
+                        className="w-full flex items-center gap-2 p-2.5 rounded-lg text-left"
+                        style={{
+                          background: isChecked ? 'hsl(120 30% 15%)' : item.isBoosted ? 'hsl(45 30% 12%)' : 'hsl(0 0% 10%)',
+                          border: `1px solid ${isChecked ? 'hsl(120 50% 40%)' : item.isBoosted ? 'hsl(45 60% 40%)' : 'hsl(0 0% 18%)'}`,
+                        }}
+                        onClick={() => toggleCheck(item.id)}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <div
+                          className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                          style={{
+                            background: isChecked ? 'hsl(120 50% 40%)' : 'hsl(0 0% 18%)',
+                            border: `2px solid ${isChecked ? 'hsl(120 60% 50%)' : 'hsl(0 0% 28%)'}`,
+                          }}
+                        >
+                          {isChecked && <CheckCircle className="w-3 h-3 text-white" />}
+                        </div>
+
+                        <span
+                          className="text-[9px] font-mono px-1.5 py-0.5 rounded shrink-0"
+                          style={{ background: `${item.roleColor}20`, color: item.roleColor, border: `1px solid ${item.roleColor}40` }}
+                        >
+                          {item.role}
+                        </span>
+
+                        <div className="flex-1 flex flex-col min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className="text-sm font-mono truncate"
+                              style={{
+                                color: isChecked ? 'hsl(120 50% 65%)' : item.isBoosted ? 'hsl(45 70% 65%)' : 'hsl(35 50% 70%)',
+                                textDecoration: isChecked ? 'line-through' : 'none',
+                              }}
+                            >
+                              {item.name}
+                            </span>
+                            {item.isBoosted && (
+                              <span className="text-[8px] font-mono font-bold px-1 py-0.5 rounded shrink-0"
+                                style={{ background: 'hsl(45 60% 30%)', color: 'hsl(45 80% 70%)' }}>
+                                2×
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                              {item.nutrientKey}
+                            </span>
+                            <span className="text-[7px] font-mono px-1 rounded" style={{ background: 'hsl(120 15% 12%)', color: 'hsl(120 40% 55%)' }}>
+                              {item.organic}
+                            </span>
+                          </div>
+                        </div>
+
+                        <span
+                          className="text-sm font-mono font-bold px-2 py-0.5 rounded shrink-0"
+                          style={{
+                            background: item.isBoosted ? 'hsl(45 50% 18%)' : 'hsl(51 50% 15%)',
+                            color: item.isBoosted ? 'hsl(45 80% 65%)' : 'hsl(51 80% 60%)',
+                            border: `1px solid ${item.isBoosted ? 'hsl(45 60% 40%)' : 'hsl(51 50% 30%)'}`,
+                          }}
+                        >
+                          {item.display}
+                        </span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Mineral Coverage Summary */}
+          <div className="mt-2 p-3 rounded-lg" style={{ background: 'hsl(210 15% 8%)', border: '1px solid hsl(210 25% 20%)' }}>
+            <span className="text-[10px] font-mono tracking-widest block mb-2" style={{ color: 'hsl(210 50% 60%)' }}>
+              🧪 MINERAL SPECTRUM COVERAGE
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { sym: 'N', name: 'Nitrogen', color: 'hsl(45 70% 55%)' },
+                { sym: 'P', name: 'Phosphorus', color: 'hsl(0 55% 50%)' },
+                { sym: 'K', name: 'Potassium', color: 'hsl(210 60% 55%)' },
+                { sym: 'Ca', name: 'Calcium', color: 'hsl(0 0% 70%)' },
+                { sym: 'Mg', name: 'Magnesium', color: 'hsl(120 45% 50%)' },
+                { sym: 'S', name: 'Sulfur', color: 'hsl(300 45% 50%)' },
+                { sym: 'Si', name: 'Silica', color: 'hsl(270 45% 55%)' },
+                { sym: 'Fe', name: 'Iron', color: 'hsl(15 50% 50%)' },
+                { sym: 'Zn', name: 'Zinc', color: 'hsl(15 50% 50%)' },
+                { sym: 'Cu', name: 'Copper', color: 'hsl(15 50% 50%)' },
+                { sym: 'Mn', name: 'Manganese', color: 'hsl(15 50% 50%)' },
+                { sym: 'B', name: 'Boron', color: 'hsl(15 50% 50%)' },
+                { sym: 'Mo', name: 'Molybdenum', color: 'hsl(15 50% 50%)' },
+                { sym: 'C', name: 'Carbon', color: 'hsl(25 40% 40%)' },
+              ].map(m => (
+                <span key={m.sym} className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{
+                  background: `${m.color}15`,
+                  color: m.color,
+                  border: `1px solid ${m.color}30`,
+                }}>
+                  {m.sym}
+                </span>
+              ))}
+            </div>
+            <p className="text-[8px] font-mono mt-2" style={{ color: 'hsl(0 0% 40%)' }}>
+              All inputs OMRI-listed or naturally mined organic. Azomite covers 67+ trace minerals (Fe, Zn, Cu, Mn, B, Mo). All amendments verified per NIR Spectroscopy standards.
+            </p>
           </div>
 
           {/* Progress */}
@@ -351,7 +452,7 @@ const DynamicSoilEngine = () => {
             </div>
             <p className="text-[10px] font-mono text-center mt-1.5"
               style={{ color: isComplete ? 'hsl(120 50% 60%)' : 'hsl(0 0% 50%)' }}>
-              {isComplete ? '✓ BED RESET COMPLETE' : `${checkedCount}/${MASTER_MIX_PROTOCOL.length}`}
+              {isComplete ? '✓ FULL SPECTRUM BED RESET COMPLETE' : `${checkedCount}/${MASTER_MIX_PROTOCOL.length}`}
             </p>
           </div>
         </div>
