@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -11,6 +11,7 @@ import GriotOracle from '@/components/GriotOracle';
 import EshuLoader from '@/components/EshuLoader';
 import { useWeatherAlert } from '@/hooks/useWeatherAlert';
 import MiniMusicPlayer from '@/components/audio/MiniMusicPlayer';
+import { STATE_HARDINESS_ZONES, US_STATES } from '@/data/stateHardinessZones';
 
 /* ─── Zone Data ─── */
 const ZONES = [
@@ -68,7 +69,10 @@ const CropOracle = () => {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [proMode, setProMode] = useState(false);
   const [hardinessZone, setHardinessZone] = useState<number | null>(null);
+  const [hardinessSubZone, setHardinessSubZone] = useState<string | null>(null);
+  const [selectedState, setSelectedState] = useState<string | null>(null);
   const [showZonePicker, setShowZonePicker] = useState(false);
+  const [showStateDropdown, setShowStateDropdown] = useState(false);
 
   // Fetch saved recipes
   const { data: savedRecipes } = useQuery({
@@ -658,63 +662,133 @@ const CropOracle = () => {
 
         {/* USDA Hardiness Zone Picker */}
         <div
-          className="rounded-xl px-3 py-2 mt-2 flex items-center gap-2 overflow-x-auto"
+          className="rounded-xl px-3 py-2 mt-2 flex flex-col gap-2"
           style={{
             background: 'hsl(0 0% 5% / 0.8)',
             border: `1px solid ${hardinessZone ? 'hsl(140 40% 25%)' : 'hsl(0 0% 12%)'}`,
           }}
         >
-          <button
-            onClick={() => setShowZonePicker(!showZonePicker)}
-            className="flex items-center gap-1.5 shrink-0"
-          >
-            <MapPin className="w-3 h-3" style={{ color: hardinessZone ? 'hsl(140 60% 55%)' : 'hsl(0 0% 35%)' }} />
-            <span className="text-[8px] font-mono tracking-widest" style={{ color: hardinessZone ? 'hsl(140 50% 60%)' : 'hsl(0 0% 35%)' }}>
-              {hardinessZone ? `USDA ${hardinessZone}` : 'GROW ZONE'}
-            </span>
-            <ChevronDown className="w-2.5 h-2.5" style={{ color: 'hsl(0 0% 35%)', transform: showZonePicker ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
-          </button>
-
-          {!showZonePicker && hardinessZone && (
+          <div className="flex items-center gap-2 overflow-x-auto">
             <button
-              onClick={() => { setHardinessZone(null); toast({ title: 'Zone filter cleared', description: 'Showing all crops.' }); }}
-              className="flex items-center gap-1 px-2 py-0.5 rounded-full shrink-0"
-              style={{ background: 'hsl(0 30% 15%)', border: '1px solid hsl(0 40% 30%)' }}
+              onClick={() => { setShowZonePicker(!showZonePicker); setShowStateDropdown(false); }}
+              className="flex items-center gap-1.5 shrink-0"
             >
-              <X className="w-2.5 h-2.5" style={{ color: 'hsl(0 50% 55%)' }} />
-              <span className="text-[8px] font-mono" style={{ color: 'hsl(0 50% 60%)' }}>CLEAR</span>
+              <MapPin className="w-3 h-3" style={{ color: hardinessZone ? 'hsl(140 60% 55%)' : 'hsl(0 0% 35%)' }} />
+              <span className="text-[8px] font-mono tracking-widest" style={{ color: hardinessZone ? 'hsl(140 50% 60%)' : 'hsl(0 0% 35%)' }}>
+                {hardinessZone
+                  ? `USDA ${hardinessSubZone || hardinessZone}${selectedState ? ` · ${selectedState}` : ''}`
+                  : 'GROW ZONE'}
+              </span>
+              <ChevronDown className="w-2.5 h-2.5" style={{ color: 'hsl(0 0% 35%)', transform: showZonePicker ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
             </button>
-          )}
 
-          {showZonePicker && (
-            <div className="flex items-center gap-1 flex-wrap">
-              {Array.from({ length: 13 }, (_, i) => i + 1).map(z => {
-                const isActive = hardinessZone === z;
-                return (
-                  <button
-                    key={z}
-                    onClick={() => {
-                      setHardinessZone(isActive ? null : z);
-                      setShowZonePicker(false);
-                      toast({
-                        title: isActive ? 'Zone filter cleared' : `🌍 USDA Zone ${z} selected`,
-                        description: isActive ? 'Showing all crops.' : `Crops filtered for hardiness zone ${z}.`,
-                      });
-                    }}
-                    className="w-7 h-7 rounded-full font-mono text-[10px] font-bold transition-all shrink-0"
-                    style={{
-                      background: isActive ? 'hsl(140 40% 20%)' : 'hsl(0 0% 8%)',
-                      border: `1.5px solid ${isActive ? 'hsl(140 60% 45%)' : 'hsl(0 0% 18%)'}`,
-                      color: isActive ? 'hsl(140 70% 65%)' : 'hsl(0 0% 50%)',
-                      boxShadow: isActive ? '0 0 8px hsl(140 50% 35% / 0.3)' : 'none',
-                    }}
-                  >
-                    {z}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+            {/* Auto-detect by state button */}
+            {!showZonePicker && !hardinessZone && (
+              <button
+                onClick={() => { setShowStateDropdown(!showStateDropdown); setShowZonePicker(false); }}
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full shrink-0"
+                style={{ background: 'hsl(200 30% 12%)', border: '1px solid hsl(200 40% 25%)' }}
+              >
+                <Navigation className="w-2.5 h-2.5" style={{ color: 'hsl(200 50% 55%)' }} />
+                <span className="text-[8px] font-mono" style={{ color: 'hsl(200 50% 60%)' }}>BY STATE</span>
+              </button>
+            )}
+
+            {!showZonePicker && hardinessZone && (
+              <button
+                onClick={() => {
+                  setHardinessZone(null);
+                  setHardinessSubZone(null);
+                  setSelectedState(null);
+                  toast({ title: 'Zone filter cleared', description: 'Showing all crops.' });
+                }}
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full shrink-0"
+                style={{ background: 'hsl(0 30% 15%)', border: '1px solid hsl(0 40% 30%)' }}
+              >
+                <X className="w-2.5 h-2.5" style={{ color: 'hsl(0 50% 55%)' }} />
+                <span className="text-[8px] font-mono" style={{ color: 'hsl(0 50% 60%)' }}>CLEAR</span>
+              </button>
+            )}
+
+            {showZonePicker && (
+              <div className="flex items-center gap-1 flex-wrap">
+                {Array.from({ length: 13 }, (_, i) => i + 1).map(z => {
+                  const isActive = hardinessZone === z;
+                  return (
+                    <button
+                      key={z}
+                      onClick={() => {
+                        setHardinessZone(isActive ? null : z);
+                        setHardinessSubZone(isActive ? null : String(z));
+                        setSelectedState(null);
+                        setShowZonePicker(false);
+                        toast({
+                          title: isActive ? 'Zone filter cleared' : `🌍 USDA Zone ${z} selected`,
+                          description: isActive ? 'Showing all crops.' : `Crops filtered for hardiness zone ${z}.`,
+                        });
+                      }}
+                      className="w-7 h-7 rounded-full font-mono text-[10px] font-bold transition-all shrink-0"
+                      style={{
+                        background: isActive ? 'hsl(140 40% 20%)' : 'hsl(0 0% 8%)',
+                        border: `1.5px solid ${isActive ? 'hsl(140 60% 45%)' : 'hsl(0 0% 18%)'}`,
+                        color: isActive ? 'hsl(140 70% 65%)' : 'hsl(0 0% 50%)',
+                        boxShadow: isActive ? '0 0 8px hsl(140 50% 35% / 0.3)' : 'none',
+                      }}
+                    >
+                      {z}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* State dropdown for auto-detect */}
+          <AnimatePresence>
+            {showStateDropdown && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div
+                  className="grid grid-cols-3 sm:grid-cols-4 gap-1 max-h-48 overflow-y-auto rounded-lg p-2"
+                  style={{ background: 'hsl(0 0% 3%)', border: '1px solid hsl(0 0% 12%)' }}
+                >
+                  {US_STATES.map(state => {
+                    const info = STATE_HARDINESS_ZONES[state];
+                    const isActive = selectedState === state;
+                    return (
+                      <button
+                        key={state}
+                        onClick={() => {
+                          setSelectedState(state);
+                          setHardinessZone(info.zone);
+                          setHardinessSubZone(info.subZone);
+                          setShowStateDropdown(false);
+                          toast({
+                            title: `🌍 ${state} — ${info.label}`,
+                            description: `Crops filtered for USDA hardiness zone ${info.subZone}.`,
+                          });
+                        }}
+                        className="text-left px-2 py-1.5 rounded-md font-mono text-[9px] transition-all truncate"
+                        style={{
+                          background: isActive ? 'hsl(140 40% 15%)' : 'hsl(0 0% 6%)',
+                          border: `1px solid ${isActive ? 'hsl(140 50% 35%)' : 'hsl(0 0% 15%)'}`,
+                          color: isActive ? 'hsl(140 60% 65%)' : 'hsl(0 0% 55%)',
+                        }}
+                        title={`${state} — ${info.label}`}
+                      >
+                        {state.length > 10 ? state.slice(0, 2).toUpperCase() : state}
+                        <span className="ml-1 opacity-60">{info.subZone}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
 
