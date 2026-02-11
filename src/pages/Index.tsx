@@ -29,7 +29,7 @@ const Index = () => {
   const handleInitiate = useCallback(() => {
     setIsTransitioning(true);
     setTimeout(() => {
-      navigate('/crop-oracle');
+      navigate('/first-garden');
     }, 2800);
   }, [navigate]);
 
