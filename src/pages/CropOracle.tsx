@@ -1281,7 +1281,7 @@ const CropOracle = () => {
                               {slot.crop.spacing_inches && (
                                 <span style={{ color: 'hsl(0 0% 35%)' }}> • {slot.crop.spacing_inches}" spacing</span>
                               )}
-                              {(slot.crop as any).hardiness_zone_min != null && (slot.crop as any).hardiness_zone_max != null && (
+                              {slot.crop.hardiness_zone_min != null && slot.crop.hardiness_zone_max != null && (
                                 <span
                                   className="text-[8px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5"
                                   style={{
@@ -1290,7 +1290,7 @@ const CropOracle = () => {
                                     border: '1px solid hsl(140 40% 30% / 0.3)',
                                   }}
                                 >
-                                  🌍 Z{(slot.crop as any).hardiness_zone_min}–{(slot.crop as any).hardiness_zone_max}
+                                  🌍 Z{slot.crop.hardiness_zone_min}–{slot.crop.hardiness_zone_max}
                                 </span>
                               )}
                             </p>
