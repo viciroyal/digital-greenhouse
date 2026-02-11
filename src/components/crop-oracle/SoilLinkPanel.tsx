@@ -160,6 +160,7 @@ const SoilLinkPanel = ({ frequencyHz, environment, zoneColor, zoneName }: SoilLi
                   frequencyHz={frequencyHz}
                   zoneColor={zoneColor}
                   zoneName={zoneName}
+                  environment={environment}
                 />
               )}
             </div>
