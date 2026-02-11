@@ -118,8 +118,30 @@ const BrewCard = ({ protocol, initialVariantIndex = 0, zoneColor, zoneName, freq
           'Apply to coat all leaf surfaces — spray in evening',
           'Reapply every 5–7 days during pest pressure',
         ];
+      case 'JS':
+        return [
+          '⚠️ Full PPE required — goggles, gloves, long sleeves',
+          'Work OUTDOORS with good ventilation',
+          `Measure ${scaleQuantity(v.ingredients[0].quantity, isPot)} water into heat-safe container`,
+          `Slowly add ${scaleQuantity(v.ingredients[1].quantity, isPot)} caustic soda (NaOH) to water — NEVER reverse`,
+          'Stir until dissolved — exothermic reaction',
+          `Add ${scaleQuantity(v.ingredients[2].quantity, isPot)} sulfur powder gradually`,
+          'Heat to 100°C and maintain for 1 hour',
+          'Ready when liquid is deep red-brown',
+          'Cool, strain, and store in labeled HDPE container',
+        ];
+      case 'JWA':
+        return [
+          'Wear gloves and eye protection',
+          `Dissolve ${scaleQuantity(v.ingredients[1].quantity, isPot)} caustic soda in ${scaleQuantity(v.ingredients[2].quantity, isPot)} warm water`,
+          'Stir until fully dissolved',
+          `Slowly add ${scaleQuantity(v.ingredients[0].quantity, isPot)} canola oil while stirring vigorously`,
+          'Continue stirring until smooth milky emulsion forms',
+          'No oil separation should be visible',
+          'Store in airtight container — stable for months',
+        ];
       default:
-        return v.ingredients.map(ing => `Add ${ing.quantity} ${ing.name}`);
+        return v.ingredients.map(ing => `Add ${scaleQuantity(ing.quantity, isPot)} ${ing.name}`);
     }
   };
 
@@ -154,6 +176,25 @@ const BrewCard = ({ protocol, initialVariantIndex = 0, zoneColor, zoneName, freq
           'All ingredients mixed in spray tank',
           'Test spray on sample leaves — no burn',
           'Full application — date: ___________',
+        ];
+      case 'JS':
+        return [
+          '⚠️ Full PPE gathered (goggles, gloves, long sleeves)',
+          'Outdoor workspace with ventilation set up',
+          'All chemicals measured and labeled',
+          'Cooking completed — deep red-brown color',
+          'Cooled and strained into HDPE container',
+          'Container labeled with date and dilution ratio',
+          'First application (1:500 dilution) — date: ___________',
+        ];
+      case 'JWA':
+        return [
+          'Gloves and eye protection worn',
+          'Caustic soda dissolved in warm water',
+          'Oil added slowly while stirring',
+          'Smooth milky emulsion confirmed (no separation)',
+          'Stored in airtight container',
+          'First use — date: ___________',
         ];
       default:
         return ['All ingredients sourced', 'Mixed and applied'];
