@@ -18,7 +18,7 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const field = body.field || "growth_habit";
 
-    const VALID_FIELDS = ["growth_habit", "scientific_name", "planting_season", "harvest_days", "root_depth_inches", "min_container_gal"];
+    const VALID_FIELDS = ["growth_habit", "scientific_name", "planting_season", "harvest_days", "root_depth_inches", "min_container_gal", "est_yield_lbs_per_plant", "seed_cost_cents"];
     if (!VALID_FIELDS.includes(field)) {
       throw new Error("Invalid field. Valid: " + VALID_FIELDS.join(", "));
     }
@@ -58,6 +58,8 @@ serve(async (req) => {
       harvest_days: `You are an agronomist. Given crop names, return the typical days to harvest (from transplant/planting to first harvest) for each. Return an integer number of days. Use typical values for the most common cultivar. For perennials that produce in year 2+, use days from spring emergence to harvest in a mature plant. Return via the tool call.`,
       root_depth_inches: `You are a horticulturist. Given crop names, return the typical mature root depth in inches for each. Use integer values. Shallow herbs ~6-12, medium vegetables ~12-24, deep-rooted crops ~24-48, trees ~36-72+. Return via the tool call.`,
       min_container_gal: `You are a container gardening expert. Given crop names, return the minimum container size in gallons needed to grow each crop successfully. Use numeric values (decimals OK). Small herbs ~1-2, medium vegetables ~3-5, large vegetables ~5-10, shrubs ~10-15, small trees ~15-25, large trees ~25+. Return via the tool call.`,
+      est_yield_lbs_per_plant: `You are an agronomist. Given crop names, return the estimated yield in POUNDS per plant over one growing season. Use numeric values (decimals OK). Small herbs ~0.25-0.5, leafy greens ~0.5-2, medium vegetables ~2-5, large vegetables (tomato, squash) ~5-15, fruit trees ~20-100+, cover crops/nitrogen fixers ~0 (they aren't harvested for food). Return via the tool call.`,
+      seed_cost_cents: `You are a seed supplier expert. Given crop names, return the approximate seed or start cost PER PLANT in US cents. Cheap seeds (lettuce, beans) ~5-15 cents, moderate (tomato, pepper starts) ~25-75 cents, expensive (fruit trees, grafted plants) ~500-2000 cents. For crops typically bought as starts/transplants, use the transplant cost. Return an integer. Return via the tool call.`,
     };
 
     // Build tool schema based on field type
@@ -66,12 +68,12 @@ serve(async (req) => {
           index: { type: "integer", description: "The index number from the list" },
           value: { type: "array", items: { type: "string", enum: ["Spring", "Summer", "Fall", "Winter"] } },
         }
-      : (field === "harvest_days" || field === "root_depth_inches")
+      : (field === "harvest_days" || field === "root_depth_inches" || field === "seed_cost_cents")
       ? {
           index: { type: "integer", description: "The index number from the list" },
           value: { type: "integer" },
         }
-      : field === "min_container_gal"
+      : (field === "min_container_gal" || field === "est_yield_lbs_per_plant")
       ? {
           index: { type: "integer", description: "The index number from the list" },
           value: { type: "number" },

@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield, Shuffle, Shovel, Layers } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield, Shuffle, Shovel, Layers, Scale } from 'lucide-react';
 import GrowthHabitBadge from '@/components/crop-oracle/GrowthHabitBadge';
 import TrapCropBadge from '@/components/crop-oracle/TrapCropBadge';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +24,7 @@ import EcoParadigmCard from '@/components/community/EcoParadigmCard';
 import ProSuppliersPanel from '@/components/crop-oracle/ProSuppliersPanel';
 import FoodForestHoleProtocol from '@/components/crop-oracle/FoodForestHoleProtocol';
 import BedLayoutVisualizer from '@/components/crop-oracle/BedLayoutVisualizer';
+import YieldCostEstimator from '@/components/crop-oracle/YieldCostEstimator';
 import TwoWeekDashboard from '@/components/crop-oracle/TwoWeekDashboard';
 import { getZoneAwarePlantingWindows, cropFitsZone } from '@/lib/frostDates';
 import { getCropLayer, getIdealSlotLayers, layerMatchScore, successionScore, checkShading, type ShadingWarning } from '@/lib/growthLayers';
@@ -269,7 +270,7 @@ const CropOracle = () => {
   const [showZonePicker, setShowZonePicker] = useState(false);
   const [showStateDropdown, setShowStateDropdown] = useState(false);
   const [modalInfoOpen, setModalInfoOpen] = useState(false);
-  const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | 'scent' | 'propagation' | 'suppliers' | 'hole' | 'bedlayout' | null>(null);
+  const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | 'scent' | 'propagation' | 'suppliers' | 'hole' | 'bedlayout' | 'yieldcost' | null>(null);
   const [recipeSeed, setRecipeSeed] = useState(0);
   const [showSeasonalCompanions, setShowSeasonalCompanions] = useState(false);
 
@@ -1774,6 +1775,7 @@ const CropOracle = () => {
                     ...(environment === 'food-forest' ? [{ id: 'hole' as const, icon: <TreePine className="w-3.5 h-3.5" />, tip: 'Hole Protocol' }] : []),
                     { id: 'propagation' as const, icon: <Sprout className="w-3.5 h-3.5" />, tip: 'Seed Starting' },
                     { id: 'bedlayout' as const, icon: <Layers className="w-3.5 h-3.5" />, tip: 'Bed Layout' },
+                    { id: 'yieldcost' as const, icon: <Scale className="w-3.5 h-3.5" />, tip: 'Yield & Cost' },
                     ...(proMode ? [{ id: 'suppliers' as const, icon: <Shovel className="w-3.5 h-3.5" />, tip: 'Pro Suppliers' }] : []),
                   ].map(tool => {
                     const isActive = activeToolPanel === tool.id;
@@ -1930,6 +1932,25 @@ const CropOracle = () => {
                       zoneColor={selectedZone.color}
                       bedLengthFt={environment === 'pot' ? 2 : 10}
                       bedWidthFt={environment === 'pot' ? 2 : 2.5}
+                    />
+                  </motion.div>
+                )}
+                {activeToolPanel === 'yieldcost' && chordCard.length > 0 && (
+                  <motion.div
+                    key="yieldcost-panel"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden mb-2"
+                  >
+                    <YieldCostEstimator
+                      crops={chordCard.map(s => s.crop || null)}
+                      slotLabels={chordCard.map(s => s.label)}
+                      zoneColor={selectedZone.color}
+                      bedLengthFt={environment === 'pot' ? 2 : 10}
+                      bedWidthFt={environment === 'pot' ? 2 : 2.5}
+                      environment={environment}
                     />
                   </motion.div>
                 )}

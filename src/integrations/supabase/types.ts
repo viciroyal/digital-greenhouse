@@ -223,6 +223,7 @@ export type Database = {
           description: string | null
           dominant_mineral: string | null
           element: string
+          est_yield_lbs_per_plant: number | null
           focus_tag: string | null
           frequency_hz: number
           growth_habit: string | null
@@ -239,6 +240,7 @@ export type Database = {
           propagation_method: string | null
           root_depth_inches: number | null
           scientific_name: string | null
+          seed_cost_cents: number | null
           soil_protocol_focus: string | null
           spacing_inches: string | null
           updated_at: string
@@ -258,6 +260,7 @@ export type Database = {
           description?: string | null
           dominant_mineral?: string | null
           element: string
+          est_yield_lbs_per_plant?: number | null
           focus_tag?: string | null
           frequency_hz: number
           growth_habit?: string | null
@@ -274,6 +277,7 @@ export type Database = {
           propagation_method?: string | null
           root_depth_inches?: number | null
           scientific_name?: string | null
+          seed_cost_cents?: number | null
           soil_protocol_focus?: string | null
           spacing_inches?: string | null
           updated_at?: string
@@ -293,6 +297,7 @@ export type Database = {
           description?: string | null
           dominant_mineral?: string | null
           element?: string
+          est_yield_lbs_per_plant?: number | null
           focus_tag?: string | null
           frequency_hz?: number
           growth_habit?: string | null
@@ -309,6 +314,7 @@ export type Database = {
           propagation_method?: string | null
           root_depth_inches?: number | null
           scientific_name?: string | null
+          seed_cost_cents?: number | null
           soil_protocol_focus?: string | null
           spacing_inches?: string | null
           updated_at?: string
