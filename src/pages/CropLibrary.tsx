@@ -15,10 +15,16 @@ const CropLibrary = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedZone, setSelectedZone] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedHabit, setSelectedHabit] = useState<string | null>(null);
 
   const categories = useMemo(() => {
     if (!crops) return [];
     return [...new Set(crops.map((c) => c.category))].sort();
+  }, [crops]);
+
+  const habits = useMemo(() => {
+    if (!crops) return [];
+    return [...new Set(crops.map((c) => c.growth_habit).filter(Boolean) as string[])].sort();
   }, [crops]);
 
   const zoneNames = useMemo(() => {
@@ -36,13 +42,14 @@ const CropLibrary = () => {
     return crops.filter((c) => {
       if (selectedZone !== null && c.frequency_hz !== selectedZone) return false;
       if (selectedCategory && c.category !== selectedCategory) return false;
+      if (selectedHabit && c.growth_habit?.toLowerCase() !== selectedHabit.toLowerCase()) return false;
       if (q) {
         const haystack = `${c.common_name || ''} ${c.name} ${c.scientific_name || ''} ${c.zone_name} ${c.category} ${c.growth_habit || ''} ${c.dominant_mineral || ''}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
     });
-  }, [crops, searchQuery, selectedZone, selectedCategory]);
+  }, [crops, searchQuery, selectedZone, selectedCategory, selectedHabit]);
 
   const groupedByZone = useMemo(() =>
     ZONE_ORDER
@@ -124,7 +131,10 @@ const CropLibrary = () => {
             onZoneChange={setSelectedZone}
             selectedCategory={selectedCategory}
             onCategoryChange={setSelectedCategory}
+            selectedHabit={selectedHabit}
+            onHabitChange={setSelectedHabit}
             categories={categories}
+            habits={habits}
             zoneNames={zoneNames}
             resultCount={filteredCrops.length}
             totalCount={totalCrops}
