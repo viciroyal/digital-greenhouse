@@ -27,6 +27,21 @@ const LAST_FROST_BY_ZONE: Record<number, { month: number; day: number; label: st
   13: { month: 1, day: 1,  label: 'Year-round' },
 };
 
+/* ─── First frost date approximations by USDA zone (month, day) ─── */
+const FIRST_FROST_BY_ZONE: Record<number, { month: number; day: number; label: string }> = {
+  3:  { month: 9, day: 15, label: 'Sep 15' },
+  4:  { month: 10, day: 1,  label: 'Oct 1' },
+  5:  { month: 10, day: 15, label: 'Oct 15' },
+  6:  { month: 11, day: 1,  label: 'Nov 1' },
+  7:  { month: 11, day: 15, label: 'Nov 15' },
+  8:  { month: 11, day: 15, label: 'Nov 15' },
+  9:  { month: 12, day: 1,  label: 'Dec 1' },
+  10: { month: 12, day: 15, label: 'Dec 15' },
+  11: { month: 12, day: 31, label: 'Year-round' },
+  12: { month: 12, day: 31, label: 'Year-round' },
+  13: { month: 12, day: 31, label: 'Year-round' },
+};
+
 /* ─── Seed starting timeline entries (weeks before last frost) ─── */
 const SEED_TIMING = [
   { crop: 'Peppers & Eggplant', weeksBefore: 10, icon: '🫑', tray: '50-cell', category: 'warm' },
@@ -37,6 +52,18 @@ const SEED_TIMING = [
   { crop: 'Herbs (Basil, Cilantro)', weeksBefore: 6, icon: '🌿', tray: '72-cell', category: 'warm' },
   { crop: 'Onions & Leeks', weeksBefore: 12, icon: '🧅', tray: '128-cell', category: 'cool' },
   { crop: 'Flowers & Pollinators', weeksBefore: 8, icon: '🌸', tray: '128-cell', category: 'warm' },
+];
+
+/* ─── Fall/winter crop timing (weeks before first frost) ─── */
+const FALL_TIMING = [
+  { crop: 'Garlic (Hardneck)', weeksBefore: 4, icon: '🧄', method: 'Direct sow cloves', note: '4–6 wk before first frost, 4" deep, mulch heavy' },
+  { crop: 'Cover Crop (Crimson Clover)', weeksBefore: 6, icon: '🌾', method: 'Broadcast seed', note: '6–8 wk before frost — fixes nitrogen, protects soil' },
+  { crop: 'Cover Crop (Winter Rye)', weeksBefore: 4, icon: '🌿', method: 'Broadcast seed', note: 'Scavenges nutrients, prevents erosion through winter' },
+  { crop: 'Fall Brassicas (Kale, Collards)', weeksBefore: 12, icon: '🥬', method: '72-cell transplant', note: 'Start indoors 12 wk before frost, transplant at 8 wk' },
+  { crop: 'Fall Lettuce & Greens', weeksBefore: 8, icon: '🥗', method: '72-cell or direct', note: 'Succession sow every 2 weeks for continuous harvest' },
+  { crop: 'Overwintering Onions', weeksBefore: 8, icon: '🧅', method: '128-cell or sets', note: 'Plant sets or starts 8 wk before frost for spring bulbs' },
+  { crop: 'Daikon Radish (Tillage)', weeksBefore: 6, icon: '🥕', method: 'Direct sow', note: 'Bio-drills compacted soil — dies in freeze, no removal needed' },
+  { crop: 'Fava Beans (N-Fixer)', weeksBefore: 4, icon: '🫘', method: 'Direct sow', note: 'Hardy to 10°F — fixes nitrogen, edible tops & beans' },
 ];
 
 const TRAY_SIZES = [
@@ -154,6 +181,34 @@ const PropagationPanel = ({ zoneColor, zoneName, environment, hardinessZone }: P
     }).sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
 
     return { frostLabel: frost.label, lastFrostDate, timings };
+  }, [hardinessZone]);
+
+  /* ─── Compute fall/winter crop dates from first frost date ─── */
+  const fallData = useMemo(() => {
+    if (!hardinessZone) return null;
+    const baseZone = Math.floor(hardinessZone);
+    const frost = FIRST_FROST_BY_ZONE[baseZone];
+    if (!frost) return null;
+
+    const currentYear = new Date().getFullYear();
+    const firstFrostDate = new Date(currentYear, frost.month - 1, frost.day);
+    const now = new Date();
+
+    const timings = FALL_TIMING.map(entry => {
+      const startDate = new Date(firstFrostDate);
+      startDate.setDate(startDate.getDate() - entry.weeksBefore * 7);
+      const daysUntil = Math.ceil((startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+      return {
+        ...entry,
+        startDate,
+        startLabel: startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        daysUntil,
+        status: daysUntil < -14 ? 'passed' as const : daysUntil < 0 ? 'now' as const : daysUntil <= 14 ? 'soon' as const : 'upcoming' as const,
+      };
+    }).sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+
+    return { frostLabel: frost.label, firstFrostDate, timings };
   }, [hardinessZone]);
 
   return (
@@ -319,6 +374,87 @@ const PropagationPanel = ({ zoneColor, zoneName, environment, hardinessZone }: P
                             </span>
                             <span className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
                               {t.weeksBefore}wk before frost · {t.tray}
+                            </span>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <span className="text-[9px] font-mono font-bold block" style={{ color: statusColor }}>
+                              {t.startLabel}
+                            </span>
+                            <span className="text-[7px] font-mono" style={{ color: statusColor }}>
+                              {statusLabel}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* ─── FALL/WINTER CROP TIMELINE (first frost based) ─── */}
+              {fallData && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Leaf className="w-3.5 h-3.5" style={{ color: 'hsl(30 65% 55%)' }} />
+                    <span className="text-[9px] font-mono tracking-widest" style={{ color: 'hsl(30 55% 55%)' }}>
+                      FALL & WINTER PLANTING TIMELINE
+                    </span>
+                  </div>
+                  <div
+                    className="p-2.5 rounded-lg mb-2"
+                    style={{ background: 'hsl(30 25% 8%)', border: '1px solid hsl(30 25% 18%)' }}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <CalendarDays className="w-3 h-3" style={{ color: 'hsl(30 55% 55%)' }} />
+                      <span className="text-[9px] font-mono font-bold" style={{ color: 'hsl(30 60% 60%)' }}>
+                        First Frost: ~{fallData.frostLabel}
+                      </span>
+                      <span className="text-[8px] font-mono ml-auto" style={{ color: 'hsl(0 0% 40%)' }}>
+                        Zone {Math.floor(hardinessZone!)}
+                      </span>
+                    </div>
+                    <p className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>
+                      Count backwards from first frost to time garlic, cover crops & fall transplants.
+                    </p>
+                  </div>
+
+                  <div className="space-y-1">
+                    {fallData.timings.map(t => {
+                      const statusColor =
+                        t.status === 'now' ? 'hsl(45 80% 55%)' :
+                        t.status === 'soon' ? 'hsl(30 70% 55%)' :
+                        t.status === 'passed' ? 'hsl(0 0% 35%)' :
+                        'hsl(0 0% 50%)';
+                      const statusBg =
+                        t.status === 'now' ? 'hsl(45 60% 55% / 0.12)' :
+                        t.status === 'soon' ? 'hsl(30 50% 50% / 0.08)' :
+                        'transparent';
+                      const statusLabel =
+                        t.status === 'now' ? '🔥 START NOW' :
+                        t.status === 'soon' ? '⏳ COMING UP' :
+                        t.status === 'passed' ? '⏪ WINDOW PASSED' :
+                        `${t.daysUntil}d away`;
+
+                      return (
+                        <div
+                          key={t.crop}
+                          className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg"
+                          style={{
+                            background: statusBg || 'hsl(0 0% 7%)',
+                            border: `1px solid ${t.status === 'now' ? 'hsl(45 60% 40%)' : 'hsl(0 0% 12%)'}`,
+                            opacity: t.status === 'passed' ? 0.5 : 1,
+                          }}
+                        >
+                          <span className="text-sm shrink-0">{t.icon}</span>
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[9px] font-mono font-bold block" style={{ color: statusColor }}>
+                              {t.crop}
+                            </span>
+                            <span className="text-[7px] font-mono block" style={{ color: 'hsl(0 0% 40%)' }}>
+                              {t.weeksBefore}wk before frost · {t.method}
+                            </span>
+                            <span className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
+                              {t.note}
                             </span>
                           </div>
                           <div className="text-right shrink-0">
