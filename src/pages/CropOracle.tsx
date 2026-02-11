@@ -216,10 +216,18 @@ const CropOracle = () => {
     'grape', 'fig', 'mulberry', 'persimmon', 'pawpaw', 'apple', 'pear', 'peach',
     'plum', 'cherry', 'avocado', 'jackfruit', 'coconut', 'cacao', 'mango',
     'guava', 'moringa', 'papaya', 'banana', 'pomegranate', 'citrus',
+    'pecan', 'serviceberry', 'gooseberry', 'jostaberry', 'currant', 'goumi',
+    'sea buckthorn', 'spicebush',
   ];
   const NITROGEN_FIXER_KEYWORDS = [
     'clover', 'vetch', 'bean', 'pea', 'cowpea', 'fava', 'pigeon', 'alfalfa',
-    'soybean', 'peanut', 'lupin',
+    'soybean', 'peanut', 'lupin', 'locust', 'autumn olive', 'goumi',
+    'sea buckthorn', 'siberian pea', 'scarlet runner',
+  ];
+  const VINE_LAYER_KEYWORDS = [
+    'kiwi', 'grape', 'passion', 'hops', 'akebia', 'chocolate vine',
+    'morning glory', 'moonflower', 'pole bean', 'runner bean',
+    'hyacinth bean', 'scarlet runner',
   ];
   const GROUND_COVER_KEYWORDS = [
     'clover', 'comfrey', 'strawberry', 'mint', 'thyme', 'oregano', 'creeping',
@@ -235,7 +243,15 @@ const CropOracle = () => {
     const name = (c.common_name || c.name).toLowerCase();
     return c.guild_role?.toLowerCase().includes('nitrogen') ||
       c.category === 'Nitrogen/Bio-Mass' ||
+      c.chord_interval === '5th (Stabilizer)' ||
       NITROGEN_FIXER_KEYWORDS.some(kw => name.includes(kw));
+  };
+
+  const isVineLayer = (c: MasterCrop): boolean => {
+    const name = (c.common_name || c.name).toLowerCase();
+    const note = (c.library_note || '').toLowerCase();
+    return VINE_LAYER_KEYWORDS.some(kw => name.includes(kw)) ||
+      note.includes('vine layer');
   };
 
   const isGroundCover = (c: MasterCrop): boolean => {
@@ -270,15 +286,15 @@ const CropOracle = () => {
     }
 
     if (environment === 'food-forest') {
-      // Prioritize perennials, fruit trees, berry bushes, and nitrogen-fixers
-      const perennials = filtered.filter(c => isFoodForestPerennial(c) || isNitrogenFixer(c) || isGroundCover(c));
+      // Prioritize perennials, fruit trees, berry bushes, nitrogen-fixers, and vines
+      const perennials = filtered.filter(c => isFoodForestPerennial(c) || isNitrogenFixer(c) || isGroundCover(c) || isVineLayer(c));
       if (perennials.length >= 3) {
         filtered = perennials;
       }
       // If not enough perennials in this zone, keep all but sort perennials first
       filtered.sort((a, b) => {
-        const aScore = (isFoodForestPerennial(a) ? 3 : 0) + (isNitrogenFixer(a) ? 2 : 0) + (isGroundCover(a) ? 1 : 0);
-        const bScore = (isFoodForestPerennial(b) ? 3 : 0) + (isNitrogenFixer(b) ? 2 : 0) + (isGroundCover(b) ? 1 : 0);
+        const aScore = (isFoodForestPerennial(a) ? 3 : 0) + (isNitrogenFixer(a) ? 2 : 0) + (isVineLayer(a) ? 1.5 : 0) + (isGroundCover(a) ? 1 : 0);
+        const bScore = (isFoodForestPerennial(b) ? 3 : 0) + (isNitrogenFixer(b) ? 2 : 0) + (isVineLayer(b) ? 1.5 : 0) + (isGroundCover(b) ? 1 : 0);
         return bScore - aScore;
       });
     }
@@ -412,11 +428,15 @@ const CropOracle = () => {
           break;
         case '3rd (Triad)':
           if (isFF) {
-            // Food Forest: understory berry bushes or perennial herbs
+            // Food Forest: understory berry bushes, small trees, perennial herbs
             assign(pickCrop(undefined, c => {
               const name = (c.common_name || c.name).toLowerCase();
-              return (name.includes('berry') || name.includes('comfrey') || name.includes('currant') ||
-                c.category === 'herb') && !usedIds.has(c.id);
+              const note = (c.library_note || '').toLowerCase();
+              return (name.includes('berry') || name.includes('serviceberry') ||
+                name.includes('gooseberry') || name.includes('jostaberry') ||
+                name.includes('currant') || name.includes('spicebush') ||
+                name.includes('comfrey') || note.includes('shrub layer') ||
+                note.includes('understory')) && !usedIds.has(c.id);
             }));
             if (!crop) assign(pickCrop(directMatch, c => c.chord_interval === '3rd (Triad)'));
           } else {
@@ -504,18 +524,13 @@ const CropOracle = () => {
           break;
         case '13th (Top Note)':
           if (isFF) {
-            // Food Forest: canopy vines (grape, passion fruit, kiwi) or tall perennials
-            assign(pickCrop(undefined, c => {
+            // Food Forest: canopy vines (grape, kiwi, passionflower, hops, akebia) or tall perennials
+            assign(pickCrop(undefined, c => isVineLayer(c)));
+            if (!crop) assign(pickCrop(undefined, c => {
               const name = (c.common_name || c.name).toLowerCase();
-              return name.includes('grape') || name.includes('passion') ||
-                name.includes('kiwi') || name.includes('morning glory') ||
-                name.includes('pole bean') || name.includes('hyacinth') ||
-                name.includes('sunflower') || name.includes('moringa');
+              return name.includes('sunflower') || name.includes('moringa') ||
+                (c.category === 'Dye/Fiber/Aromatic' && c.instrument_type === 'Synthesizers');
             }));
-            if (!crop) assign(pickCrop(undefined, c =>
-              c.name.toLowerCase().includes('sunflower') ||
-              (c.category === 'Dye/Fiber/Aromatic' && c.instrument_type === 'Synthesizers')
-            ));
           } else {
             assign(pickCrop(undefined, c =>
               c.name.toLowerCase().includes('sunflower') ||
