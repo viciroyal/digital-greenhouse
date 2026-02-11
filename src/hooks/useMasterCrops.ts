@@ -57,6 +57,8 @@ export interface MasterCrop {
   hardiness_zone_min: number | null;  // Sub-zone: 8.0 = 8a, 8.5 = 8b
   hardiness_zone_max: number | null;  // Sub-zone: 9.0 = 9a, 9.5 = 9b
   growth_habit: string | null; // tree, shrub, vine, herb, underground, bulb, etc.
+  root_depth_inches: number | null;
+  min_container_gal: number | null;
   created_at: string;
   updated_at: string;
 }
