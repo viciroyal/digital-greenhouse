@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Sprout, Droplets, Thermometer, Sun, Clock, Leaf, Snowflake, CalendarDays } from 'lucide-react';
+import { ChevronDown, Sprout, Droplets, Thermometer, Sun, Clock, Leaf, Snowflake, CalendarDays, Beaker } from 'lucide-react';
 import EcoParadigmCard from '@/components/community/EcoParadigmCard';
 import GACommunityResources from '@/components/community/GACommunityResources';
 import PropagationReadiness from '@/components/crop-oracle/PropagationReadiness';
@@ -98,11 +98,24 @@ const TRAY_SIZES = [
   },
 ];
 
+const GERMINATION_MIX = {
+  name: 'Seed Starting Mix (Germination-Grade)',
+  note: 'Sterile, fine-textured, low-nutrient — seedlings need structure, not food. Heavy feeds cause damping-off.',
+  recipe: [
+    { part: '2 parts', ingredient: 'Coco Coir (fine)', purpose: 'Moisture retention without compaction' },
+    { part: '1 part', ingredient: 'Perlite (#3 grade)', purpose: 'Aeration & drainage — prevents damping-off' },
+    { part: '1 part', ingredient: 'Vermiculite (fine)', purpose: 'Holds moisture at seed contact zone' },
+    { part: '¼ part', ingredient: 'Worm Castings (sifted)', purpose: 'Gentle biology — not heavy feeding' },
+    { part: '1 tbsp/gal', ingredient: 'Mycorrhizal Inoculant', purpose: 'Colonize roots from day one' },
+  ],
+  doNot: 'Do NOT use garden compost, potting soil, or raw amendments — too hot for germination. No fertilizer until first true leaves.',
+};
+
 const PROPAGATION_STEPS = [
   {
     step: 1,
-    label: 'FILL & MOISTEN',
-    desc: 'Fill trays with OMRI seed-starting mix. Pre-moisten until it holds shape when squeezed — no dripping.',
+    label: 'MIX & MOISTEN',
+    desc: 'Use a fine germination mix (see recipe below). Pre-moisten until it holds shape when squeezed — no dripping. Never use garden soil or heavy compost for seed starting.',
     icon: <Droplets className="w-3 h-3" />,
     color: 'hsl(200 55% 50%)',
   },
@@ -516,6 +529,39 @@ const PropagationPanel = ({ zoneColor, zoneName, environment, hardinessZone }: P
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* ─── GERMINATION MIX RECIPE ─── */}
+              <div className="p-2.5 rounded-lg" style={{ background: 'hsl(200 15% 7%)', border: '1px solid hsl(200 15% 16%)' }}>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Beaker className="w-3 h-3" style={{ color: 'hsl(200 50% 55%)' }} />
+                  <span className="text-[9px] font-mono font-bold tracking-wide" style={{ color: 'hsl(200 50% 60%)' }}>
+                    {GERMINATION_MIX.name}
+                  </span>
+                </div>
+                <p className="text-[7px] font-mono mb-2 leading-relaxed" style={{ color: 'hsl(0 0% 45%)' }}>
+                  {GERMINATION_MIX.note}
+                </p>
+                <div className="space-y-0.5 mb-2">
+                  {GERMINATION_MIX.recipe.map((r, i) => (
+                    <div key={i} className="flex items-start gap-2 px-2 py-1 rounded" style={{ background: i % 2 === 0 ? 'hsl(0 0% 6%)' : 'transparent' }}>
+                      <span className="text-[8px] font-mono font-bold shrink-0 w-20" style={{ color: 'hsl(45 50% 55%)' }}>
+                        {r.part}
+                      </span>
+                      <span className="text-[8px] font-mono font-bold shrink-0 w-36" style={{ color: 'hsl(0 0% 55%)' }}>
+                        {r.ingredient}
+                      </span>
+                      <span className="text-[7px] font-mono flex-1" style={{ color: 'hsl(0 0% 40%)' }}>
+                        {r.purpose}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="p-1.5 rounded" style={{ background: 'hsl(0 30% 10%)', border: '1px solid hsl(0 25% 18%)' }}>
+                  <span className="text-[7px] font-mono" style={{ color: 'hsl(0 45% 55%)' }}>
+                    ⚠️ {GERMINATION_MIX.doNot}
+                  </span>
                 </div>
               </div>
 
