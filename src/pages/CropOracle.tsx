@@ -1945,6 +1945,29 @@ const CropOracle = () => {
                                     🌾 {slot.crop!.harvest_days}d harvest
                                   </span>
                                 )}
+                                {/* Season mismatch warning */}
+                                {i > 0 && slot.crop && (() => {
+                                  const rootCropCard = chordCard[0]?.crop;
+                                  if (!rootCropCard) return null;
+                                  const rootSeasons = rootCropCard.planting_season || [];
+                                  const slotSeasons = slot.crop!.planting_season || [];
+                                  if (rootSeasons.length === 0 && slotSeasons.length === 0) return null;
+                                  const hasNoData = slotSeasons.length === 0;
+                                  const hasOverlap = rootSeasons.some(s => slotSeasons.includes(s));
+                                  if (hasNoData) return (
+                                    <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                      style={{ background: 'hsl(30 50% 15% / 0.4)', color: 'hsl(30 60% 60%)', border: '1px solid hsl(30 40% 30% / 0.3)' }}>
+                                      ⚠️ No season data
+                                    </span>
+                                  );
+                                  if (!hasOverlap) return (
+                                    <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                      style={{ background: 'hsl(0 50% 15% / 0.4)', color: 'hsl(0 60% 60%)', border: '1px solid hsl(0 40% 30% / 0.3)' }}>
+                                      ⚠️ Season mismatch
+                                    </span>
+                                  );
+                                  return null;
+                                })()}
                               </div>
                             </>
                           ) : (
