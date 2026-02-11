@@ -47,6 +47,17 @@ const INTERVAL_ORDER = [
   { key: '13th (Top Note)', label: 'The Aerial', role: '13th', emoji: '🌻', hint: 'Tall plants that create shade and wind protection above.' },
 ];
 
+/* ─── Food Forest layer labels (override when environment === 'food-forest') ─── */
+const FOOD_FOREST_LAYERS: Record<string, { label: string; emoji: string; hint: string }> = {
+  'Root (Lead)': { label: 'Canopy Tree', emoji: '🌳', hint: 'The tallest layer — fruit or nut trees forming the forest ceiling.' },
+  '3rd (Triad)': { label: 'Understory', emoji: '🫐', hint: 'Berry bushes and small trees beneath the canopy.' },
+  '5th (Stabilizer)': { label: 'N-Fixer', emoji: '🌱', hint: 'Nitrogen-fixing plants that feed the whole ecosystem.' },
+  '7th (Signal)': { label: 'Pollinator', emoji: '🐝', hint: 'Perennial flowers and herbs that attract beneficial insects.' },
+  '9th (Sub-bass)': { label: 'Root Layer', emoji: '🫚', hint: 'Deep-rooted nutrient miners that bring minerals to the surface.' },
+  '11th (Tension)': { label: 'Fungal Net', emoji: '🍄', hint: 'Mycelial networks connecting trees and cycling nutrients underground.' },
+  '13th (Top Note)': { label: 'Vine Layer', emoji: '🍇', hint: 'Climbing vines that use vertical space in the canopy gaps.' },
+};
+
 /* ─── Spacing limits for containers ─── */
 const POT_MAX_SPACING = 12;
 
@@ -199,6 +210,39 @@ const CropOracle = () => {
     return match[2]?.toLowerCase() === 'b' ? base + 0.5 : base;
   };
 
+  /* ─── Food forest perennial detection helpers ─── */
+  const FOOD_FOREST_PERENNIAL_KEYWORDS = [
+    'berry', 'blueberry', 'blackberry', 'raspberry', 'strawberry', 'elderberry',
+    'grape', 'fig', 'mulberry', 'persimmon', 'pawpaw', 'apple', 'pear', 'peach',
+    'plum', 'cherry', 'avocado', 'jackfruit', 'coconut', 'cacao', 'mango',
+    'guava', 'moringa', 'papaya', 'banana', 'pomegranate', 'citrus',
+  ];
+  const NITROGEN_FIXER_KEYWORDS = [
+    'clover', 'vetch', 'bean', 'pea', 'cowpea', 'fava', 'pigeon', 'alfalfa',
+    'soybean', 'peanut', 'lupin',
+  ];
+  const GROUND_COVER_KEYWORDS = [
+    'clover', 'comfrey', 'strawberry', 'mint', 'thyme', 'oregano', 'creeping',
+  ];
+
+  const isFoodForestPerennial = (c: MasterCrop): boolean => {
+    const name = (c.common_name || c.name).toLowerCase();
+    return c.category === 'fruit' ||
+      FOOD_FOREST_PERENNIAL_KEYWORDS.some(kw => name.includes(kw));
+  };
+
+  const isNitrogenFixer = (c: MasterCrop): boolean => {
+    const name = (c.common_name || c.name).toLowerCase();
+    return c.guild_role?.toLowerCase().includes('nitrogen') ||
+      c.category === 'Nitrogen/Bio-Mass' ||
+      NITROGEN_FIXER_KEYWORDS.some(kw => name.includes(kw));
+  };
+
+  const isGroundCover = (c: MasterCrop): boolean => {
+    const name = (c.common_name || c.name).toLowerCase();
+    return GROUND_COVER_KEYWORDS.some(kw => name.includes(kw));
+  };
+
   /* ─── Filter crops by zone + environment ─── */
   const recipeCrops = useMemo(() => {
     if (!allCrops || !selectedZone) return [];
@@ -223,6 +267,20 @@ const CropOracle = () => {
         c.name.toLowerCase().includes('tomato') || c.name.toLowerCase().includes('pepper')
       );
       if (priority.length > 0) filtered = priority;
+    }
+
+    if (environment === 'food-forest') {
+      // Prioritize perennials, fruit trees, berry bushes, and nitrogen-fixers
+      const perennials = filtered.filter(c => isFoodForestPerennial(c) || isNitrogenFixer(c) || isGroundCover(c));
+      if (perennials.length >= 3) {
+        filtered = perennials;
+      }
+      // If not enough perennials in this zone, keep all but sort perennials first
+      filtered.sort((a, b) => {
+        const aScore = (isFoodForestPerennial(a) ? 3 : 0) + (isNitrogenFixer(a) ? 2 : 0) + (isGroundCover(a) ? 1 : 0);
+        const bScore = (isFoodForestPerennial(b) ? 3 : 0) + (isNitrogenFixer(b) ? 2 : 0) + (isGroundCover(b) ? 1 : 0);
+        return bScore - aScore;
+      });
     }
 
     return filtered;
@@ -335,58 +393,140 @@ const CropOracle = () => {
         if (result) { crop = result.crop; isCompanionFill = result.companionMatch; }
       };
 
+      const isFF = environment === 'food-forest';
+
       switch (interval.key) {
         case 'Root (Lead)':
           if (starCrop && !usedIds.has(starCrop.id)) {
             usedIds.add(starCrop.id);
             crop = starCrop;
-            isCompanionFill = false; // Star itself, not a companion
+            isCompanionFill = false;
+          } else if (isFF) {
+            // Food Forest: prefer fruit trees / perennial canopy crops as the Star
+            assign(pickCrop(undefined, c => isFoodForestPerennial(c) && c.chord_interval === 'Root (Lead)'));
+            if (!crop) assign(pickCrop(directMatch, c => isFoodForestPerennial(c)));
+            if (!crop) assign(pickCrop(directMatch, c => c.chord_interval === 'Root (Lead)'));
           } else {
             assign(pickCrop(directMatch, c => c.chord_interval === 'Root (Lead)'));
           }
           break;
         case '3rd (Triad)':
-          assign(pickCrop(directMatch, c => c.chord_interval === '3rd (Triad)'));
+          if (isFF) {
+            // Food Forest: understory berry bushes or perennial herbs
+            assign(pickCrop(undefined, c => {
+              const name = (c.common_name || c.name).toLowerCase();
+              return (name.includes('berry') || name.includes('comfrey') || name.includes('currant') ||
+                c.category === 'herb') && !usedIds.has(c.id);
+            }));
+            if (!crop) assign(pickCrop(directMatch, c => c.chord_interval === '3rd (Triad)'));
+          } else {
+            assign(pickCrop(directMatch, c => c.chord_interval === '3rd (Triad)'));
+          }
           break;
         case '5th (Stabilizer)':
-          assign(pickCrop(directMatch, c => c.chord_interval === '5th (Stabilizer)'));
+          if (isFF) {
+            // Food Forest: nitrogen-fixing understory (clover, beans, vetch)
+            assign(pickCrop(undefined, c => isNitrogenFixer(c)));
+            if (!crop) assign(pickCrop(directMatch, c => c.chord_interval === '5th (Stabilizer)'));
+          } else {
+            assign(pickCrop(directMatch, c => c.chord_interval === '5th (Stabilizer)'));
+          }
           break;
         case '7th (Signal)':
-          assign(pickCrop(directMatch, c => c.chord_interval === '7th (Signal)'));
+          if (isFF) {
+            // Food Forest: pollinator-attracting perennial flowers/herbs
+            assign(pickCrop(undefined, c =>
+              c.category === 'Pollinator' || c.category === 'Dye/Fiber/Aromatic' ||
+              (c.chord_interval === '7th (Signal)' && c.category !== 'vegetable')
+            ));
+            if (!crop) assign(pickCrop(directMatch, c => c.chord_interval === '7th (Signal)'));
+          } else {
+            assign(pickCrop(directMatch, c => c.chord_interval === '7th (Signal)'));
+          }
           break;
         case '9th (Sub-bass)':
-          assign(pickCrop(undefined, c =>
-            c.instrument_type === 'Bass' ||
-            c.name.toLowerCase().includes('potato') ||
-            c.name.toLowerCase().includes('carrot') ||
-            c.name.toLowerCase().includes('beet') ||
-            c.name.toLowerCase().includes('radish') ||
-            c.name.toLowerCase().includes('turmeric') ||
-            c.name.toLowerCase().includes('ginger') ||
-            c.name.toLowerCase().includes('burdock')
-          ));
+          if (isFF) {
+            // Food Forest: deep-rooted nutrient miners (comfrey, dandelion, burdock, turmeric)
+            assign(pickCrop(undefined, c => {
+              const name = (c.common_name || c.name).toLowerCase();
+              return c.guild_role?.toLowerCase().includes('miner') ||
+                name.includes('comfrey') || name.includes('dandelion') ||
+                name.includes('burdock') || name.includes('turmeric') ||
+                name.includes('ginger') || name.includes('sunchoke');
+            }));
+            if (!crop) assign(pickCrop(undefined, c =>
+              c.instrument_type === 'Bass' ||
+              c.name.toLowerCase().includes('potato') ||
+              c.name.toLowerCase().includes('carrot')
+            ));
+          } else {
+            assign(pickCrop(undefined, c =>
+              c.instrument_type === 'Bass' ||
+              c.name.toLowerCase().includes('potato') ||
+              c.name.toLowerCase().includes('carrot') ||
+              c.name.toLowerCase().includes('beet') ||
+              c.name.toLowerCase().includes('radish') ||
+              c.name.toLowerCase().includes('turmeric') ||
+              c.name.toLowerCase().includes('ginger') ||
+              c.name.toLowerCase().includes('burdock')
+            ));
+          }
           break;
         case '11th (Tension)':
-          assign(pickCrop(undefined, c =>
-            c.guild_role?.toLowerCase().includes('sentinel') ||
-            c.name.toLowerCase().includes('garlic') ||
-            c.name.toLowerCase().includes('onion') ||
-            c.name.toLowerCase().includes('chive') ||
-            c.name.toLowerCase().includes('leek') ||
-            c.name.toLowerCase().includes('shallot') ||
-            c.category === 'Fungi'
-          ));
+          if (isFF) {
+            // Food Forest: mycelial network / fungi + perennial alliums
+            assign(pickCrop(undefined, c =>
+              c.category === 'substrate' ||
+              c.guild_role?.toLowerCase().includes('sentinel') ||
+              c.name.toLowerCase().includes('mushroom') ||
+              c.name.toLowerCase().includes('shiitake') ||
+              c.name.toLowerCase().includes('oyster') ||
+              c.name.toLowerCase().includes('reishi') ||
+              c.name.toLowerCase().includes('garlic') ||
+              c.name.toLowerCase().includes('chive')
+            ));
+            if (!crop) assign(pickCrop(undefined, c =>
+              c.guild_role?.toLowerCase().includes('sentinel') ||
+              c.name.toLowerCase().includes('onion') ||
+              c.category === 'Fungi'
+            ));
+          } else {
+            assign(pickCrop(undefined, c =>
+              c.guild_role?.toLowerCase().includes('sentinel') ||
+              c.name.toLowerCase().includes('garlic') ||
+              c.name.toLowerCase().includes('onion') ||
+              c.name.toLowerCase().includes('chive') ||
+              c.name.toLowerCase().includes('leek') ||
+              c.name.toLowerCase().includes('shallot') ||
+              c.category === 'Fungi'
+            ));
+          }
           break;
         case '13th (Top Note)':
-          assign(pickCrop(undefined, c =>
-            c.name.toLowerCase().includes('sunflower') ||
-            c.name.toLowerCase().includes('morning glory') ||
-            c.name.toLowerCase().includes('moonflower') ||
-            c.name.toLowerCase().includes('passion') ||
-            c.name.toLowerCase().includes('nasturtium') ||
-            c.name.toLowerCase().includes('cosmos') ||
-            (c.category === 'Dye/Fiber/Aromatic' && c.instrument_type === 'Synthesizers')
-          ));
+          if (isFF) {
+            // Food Forest: canopy vines (grape, passion fruit, kiwi) or tall perennials
+            assign(pickCrop(undefined, c => {
+              const name = (c.common_name || c.name).toLowerCase();
+              return name.includes('grape') || name.includes('passion') ||
+                name.includes('kiwi') || name.includes('morning glory') ||
+                name.includes('pole bean') || name.includes('hyacinth') ||
+                name.includes('sunflower') || name.includes('moringa');
+            }));
+            if (!crop) assign(pickCrop(undefined, c =>
+              c.name.toLowerCase().includes('sunflower') ||
+              (c.category === 'Dye/Fiber/Aromatic' && c.instrument_type === 'Synthesizers')
+            ));
+          } else {
+            assign(pickCrop(undefined, c =>
+              c.name.toLowerCase().includes('sunflower') ||
+              c.name.toLowerCase().includes('morning glory') ||
+              c.name.toLowerCase().includes('moonflower') ||
+              c.name.toLowerCase().includes('passion') ||
+              c.name.toLowerCase().includes('nasturtium') ||
+              c.name.toLowerCase().includes('cosmos') ||
+              (c.category === 'Dye/Fiber/Aromatic' && c.instrument_type === 'Synthesizers')
+            ));
+          }
           break;
       }
 
@@ -1574,11 +1714,11 @@ const CropOracle = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.08 }}
                       >
-                        <div className="w-10 text-center text-lg">{slot.emoji}</div>
+                        <div className="w-10 text-center text-lg">{environment === 'food-forest' && FOOD_FOREST_LAYERS[slot.key] ? FOOD_FOREST_LAYERS[slot.key].emoji : slot.emoji}</div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-bubble text-sm" style={{ color: 'hsl(40 50% 90%)' }}>
-                              {slot.label}
+                              {environment === 'food-forest' && FOOD_FOREST_LAYERS[slot.key] ? FOOD_FOREST_LAYERS[slot.key].label : slot.label}
                             </span>
                             <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{
                               background: `${selectedZone.color}15`,
@@ -1646,9 +1786,9 @@ const CropOracle = () => {
                               No match in registry
                             </p>
                           )}
-                          {!proMode && slot.hint && (
+                          {!proMode && (environment === 'food-forest' ? FOOD_FOREST_LAYERS[slot.key]?.hint : slot.hint) && (
                             <p className="text-[10px] mt-1 leading-snug" style={{ color: 'hsl(40 30% 50% / 0.6)' }}>
-                              💡 {slot.hint}
+                              💡 {environment === 'food-forest' && FOOD_FOREST_LAYERS[slot.key] ? FOOD_FOREST_LAYERS[slot.key].hint : slot.hint}
                             </p>
                           )}
                         </div>
