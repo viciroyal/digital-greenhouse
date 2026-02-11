@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield, Shuffle, Shovel } from 'lucide-react';
 import GrowthHabitBadge from '@/components/crop-oracle/GrowthHabitBadge';
+import TrapCropBadge from '@/components/crop-oracle/TrapCropBadge';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -1997,6 +1998,7 @@ const CropOracle = () => {
                               {/* Growth Habit & Harvest Indicators */}
                               <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                                 <GrowthHabitBadge habit={slot.crop!.growth_habit} size="sm" />
+                                <TrapCropBadge description={slot.crop!.description} guildRole={slot.crop!.guild_role} size="sm" />
                                 {(() => {
                                   const habit = (slot.crop!.growth_habit || '').toLowerCase();
                                   const needsTrellis = habit === 'vine' || habit === 'epiphyte';
