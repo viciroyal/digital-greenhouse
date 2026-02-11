@@ -480,6 +480,61 @@ const DynamicSoilEngine = () => {
             </p>
           </div>
 
+          {/* ─── LAYERING PROTOCOL ─── */}
+          <div className="mt-4 p-3 rounded-lg" style={{ background: 'hsl(35 15% 8%)', border: '1px solid hsl(35 25% 18%)' }}>
+            <span className="text-[10px] font-mono tracking-widest block mb-3" style={{ color: 'hsl(35 60% 60%)' }}>
+              🧱 LAYERING PROTOCOL — BUILD ORDER
+            </span>
+            <div className="space-y-0">
+              {[
+                { step: 1, label: 'MASTER MIX', desc: 'Apply scaled protocol to bed surface. Rake evenly to 2–3" depth.', color: 'hsl(35 50% 45%)', icon: '🌍', width: '100%' },
+                { step: 2, label: 'COMPOST TOP-DRESS', desc: 'Add ½" aged compost layer. Inoculate with worm castings if available.', color: 'hsl(25 55% 40%)', icon: '🪱', width: '92%' },
+                { step: 3, label: 'SEEDS / TRANSPLANTS', desc: 'Direct sow or transplant into amended bed. Follow spacing protocol.', color: 'hsl(120 45% 40%)', icon: '🌱', width: '84%' },
+                { step: 4, label: 'MULCH LAYER', desc: 'Apply 2–4" of straw, wood chips, or leaf mold. Keep 1" clear of stems.', color: 'hsl(45 50% 38%)', icon: '🍂', width: '76%' },
+                { step: 5, label: 'WATER IN', desc: 'Deep soak to field capacity. Activate biology. Avoid runoff.', color: 'hsl(200 55% 50%)', icon: '💧', width: '68%' },
+              ].map((layer, i) => (
+                <div key={layer.step} className="flex items-stretch gap-0">
+                  {/* Step number + connector line */}
+                  <div className="flex flex-col items-center w-8 shrink-0">
+                    <div
+                      className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-mono font-bold shrink-0"
+                      style={{ background: `${layer.color}30`, color: layer.color, border: `1px solid ${layer.color}50` }}
+                    >
+                      {layer.step}
+                    </div>
+                    {i < 4 && (
+                      <div className="w-px flex-1 min-h-[12px]" style={{ background: 'hsl(0 0% 18%)' }} />
+                    )}
+                  </div>
+                  {/* Layer bar */}
+                  <div className="flex-1 pb-2">
+                    <div
+                      className="px-2.5 py-2 rounded-lg"
+                      style={{
+                        background: `${layer.color}10`,
+                        border: `1px solid ${layer.color}25`,
+                        width: layer.width,
+                      }}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm">{layer.icon}</span>
+                        <span className="text-[10px] font-mono font-bold tracking-wide" style={{ color: layer.color }}>
+                          {layer.label}
+                        </span>
+                      </div>
+                      <p className="text-[8px] font-mono mt-0.5 leading-relaxed" style={{ color: 'hsl(0 0% 50%)' }}>
+                        {layer.desc}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-[8px] font-mono mt-1 pl-8" style={{ color: 'hsl(0 0% 35%)' }}>
+              This is the "tuning the instrument" sequence — each layer builds on the last. Do not skip mulch.
+            </p>
+          </div>
+
           {/* Progress */}
           <div className="mt-4">
             <div className="h-2 rounded-full overflow-hidden" style={{ background: 'hsl(0 0% 15%)' }}>
