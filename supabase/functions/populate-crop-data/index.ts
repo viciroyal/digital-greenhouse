@@ -10,24 +10,9 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Unauthorized");
-
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!);
-    const { data: { user }, error: authError } = await anonClient.auth.getUser(authHeader.replace("Bearer ", ""));
-    if (authError || !user) throw new Error("Unauthorized");
-
-    const { data: roleData } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .maybeSingle();
-    if (!roleData) throw new Error("Admin access required");
+    const supabase = createClient(supabaseUrl, serviceKey);
 
     // Parse which field to populate
     const body = await req.json().catch(() => ({}));
@@ -42,7 +27,7 @@ serve(async (req) => {
     let query = supabase
       .from("master_crops")
       .select("id, name, common_name, category")
-      .order("frequency_hz", { ascending: true })
+      .order("created_at", { ascending: false })
       .limit(50);
 
     if (field === "planting_season") {
@@ -64,7 +49,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const cropList = crops.map(c => `- ${c.common_name || c.name} (category: ${c.category})`).join("\n");
+    const cropList = crops.map((c, i) => `${i}. ${c.common_name || c.name} (category: ${c.category})`).join("\n");
 
     const systemPrompts: Record<string, string> = {
       growth_habit: `You are a horticulturist. Given crop names, classify each with its growth habit. Use ONLY these values: tree, shrub, bush, vine, herb, grass, ground cover, underground, bulb, root, tuber, rhizome, aquatic, succulent, fungus, epiphyte. Pick the single most accurate term. Return via the tool call.`,
@@ -76,16 +61,16 @@ serve(async (req) => {
     // Build tool schema based on field type
     const toolItemProperties: Record<string, unknown> = field === "planting_season"
       ? {
-          common_name: { type: "string" },
+          index: { type: "integer", description: "The index number from the list" },
           value: { type: "array", items: { type: "string", enum: ["Spring", "Summer", "Fall", "Winter"] } },
         }
       : field === "harvest_days"
       ? {
-          common_name: { type: "string" },
+          index: { type: "integer", description: "The index number from the list" },
           value: { type: "integer" },
         }
       : {
-          common_name: { type: "string" },
+          index: { type: "integer", description: "The index number from the list" },
           value: { type: "string" },
         };
 
@@ -115,7 +100,7 @@ serve(async (req) => {
                     items: {
                       type: "object",
                       properties: toolItemProperties,
-                      required: ["common_name", "value"],
+                      required: ["index", "value"],
                       additionalProperties: false,
                     },
                   },
@@ -144,10 +129,8 @@ serve(async (req) => {
 
     let updated = 0;
     for (const entry of entries) {
-      const matchingCrop = crops.find(
-        c => (c.common_name || c.name).toLowerCase() === entry.common_name.toLowerCase()
-      );
-      if (matchingCrop && entry.value) {
+      const matchingCrop = crops[entry.index];
+      if (matchingCrop && entry.value != null) {
         const { error: updateErr } = await supabase
           .from("master_crops")
           .update({ [field]: entry.value })
