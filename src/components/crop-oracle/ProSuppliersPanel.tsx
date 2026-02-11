@@ -28,6 +28,7 @@ const SUPPLIERS: Record<Category, { name: string; url?: string; note: string; sp
     { name: 'UGA Extension', url: 'https://extension.uga.edu', note: 'Free soil testing, pest ID, and county-specific growing guides for GA', specialty: 'Free soil tests' },
     { name: 'Levity Farms', url: 'https://www.levityfarms.com', note: 'Local GA farm offering CSA shares — support regenerative land stewards', specialty: 'GA CSA' },
     { name: 'Standard Feed & Seed', note: '2339 Brannen Rd SE, Atlanta GA 30316 • (404) 241-6922 — local farm supply store', specialty: 'Local farm supply' },
+    { name: 'Gangstas to Growers', url: 'https://www.gangstastogrowers.com', note: 'Worker-owned cooperatives — agriculture opportunities for at-risk & formerly incarcerated youth', specialty: 'Youth ag co-ops' },
   ],
   seeds: [
     { name: 'Georgia Seed & Garden', url: 'https://georgiaseeds.com', note: 'GA-specific growing instructions with heirloom & open-pollinated seed', specialty: 'GA heirloom' },
