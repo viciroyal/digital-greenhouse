@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Sprout, Sun, SunMedium, CloudSun, TreePine, Salad, CookingPot, Flower2, Leaf, Check, Printer, ChevronRight } from 'lucide-react';
 import { useMasterCrops, type MasterCrop } from '@/hooks/useMasterCrops';
+import { companionScore, getSynergyNotes } from '@/lib/companionScoring';
 
 /* ─── WIZARD OPTIONS ─── */
 type SpaceOption = 'windowsill' | 'patio' | 'small-bed' | 'big-yard';
@@ -84,16 +85,20 @@ function pickRecipe(
       // Boost herbs for small spaces
       if ((space === 'windowsill' || space === 'patio') && c.growth_habit === 'herb') score += 3;
       return { crop: c, score };
-    })
-    .sort((a, b) => b.score - a.score);
+    });
 
-  // Enforce diversity: max 1 crop per species (scientific_name) and per category
+  // Sort by base score descending
+  scored.sort((a, b) => b.score - a.score);
+
+  // Greedy pick with companion soft-boost and diversity enforcement
   const picked: MasterCrop[] = [];
   const usedSpecies = new Set<string>();
   const usedCategories = new Map<string, number>();
 
-  for (const { crop } of scored) {
+  for (const entry of scored) {
     if (picked.length >= maxPlants) break;
+
+    const { crop } = entry;
 
     // Deduplicate by scientific name (prevents 4 tomato varieties)
     const species = (crop.scientific_name || crop.name).toLowerCase().trim();
@@ -103,6 +108,11 @@ function pickRecipe(
     const cat = crop.category || 'Other';
     const catCount = usedCategories.get(cat) || 0;
     if (catCount >= 2) continue;
+
+    // Companion soft-boost: score against already-picked crops
+    const compScore = companionScore(crop, picked);
+    // Skip if heavy antagonist penalty
+    if (compScore <= -10) continue;
 
     usedSpecies.add(species);
     usedCategories.set(cat, catCount + 1);
@@ -355,6 +365,7 @@ const FirstGarden = () => {
                 <div className="grid gap-3">
                   {recipe.map((crop, i) => {
                     const instructions = getPlainInstructions(crop, space!);
+                    const synergies = getSynergyNotes(crop, recipe);
                     return (
                       <div
                         key={crop.id}
@@ -396,6 +407,24 @@ const FirstGarden = () => {
                                 </span>
                               )}
                             </div>
+
+                            {/* Companion synergy badges */}
+                            {synergies.length > 0 && (
+                              <div className="flex gap-1.5 mt-1.5 flex-wrap">
+                                {synergies.map((note, k) => (
+                                  <span
+                                    key={k}
+                                    className="text-[9px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                    style={{
+                                      background: note.type === 'companion' ? 'hsl(270 30% 12%)' : 'hsl(0 30% 12%)',
+                                      color: note.type === 'companion' ? 'hsl(270 50% 70%)' : 'hsl(0 50% 65%)',
+                                    }}
+                                  >
+                                    {note.type === 'companion' ? '✦' : '⚠'} {note.message}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
 
                             {/* Instructions */}
                             <ul className="mt-2.5 space-y-1">

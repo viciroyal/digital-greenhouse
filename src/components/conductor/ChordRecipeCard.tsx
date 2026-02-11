@@ -4,6 +4,7 @@ import { Music, Leaf, Shield, Pickaxe, Sparkles, Zap, Layers, ChevronDown, Chevr
 import { ChordRecipe, ChordRecipeInterval } from '@/data/chordRecipes';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { getZoneAwarePlantingWindows, cropFitsZone } from '@/lib/frostDates';
+import { isExplicitCompanion, isAntagonist } from '@/lib/companionScoring';
 
 const INTERVAL_STYLES: Record<string, { icon: React.ReactNode; accent: string }> = {
   '1st':  { icon: <Leaf className="w-3.5 h-3.5" />,     accent: 'hsl(120 50% 50%)' },
@@ -114,6 +115,10 @@ const ChordRecipeCard = ({ recipe, isSelected, onSelect, hardinessZone }: ChordR
         <AnimatePresence initial={false}>
           {visibleIntervals.map((interval, i) => {
             const companionCrop = cropLookup.get(interval.cropName.toLowerCase());
+            // Build list of all resolved crops in the recipe for companion detection
+            const allRecipeCrops = intervals
+              .map(iv => cropLookup.get(iv.cropName.toLowerCase()))
+              .filter((c): c is MasterCrop => !!c);
             return (
               <IntervalRow
                 key={interval.interval}
@@ -122,6 +127,7 @@ const ChordRecipeCard = ({ recipe, isSelected, onSelect, hardinessZone }: ChordR
                 zoneColor={zoneColor}
                 starCrop={starCrop}
                 companionCrop={companionCrop}
+                allRecipeCrops={allRecipeCrops}
                 hardinessZone={hardinessZone}
               />
             );
@@ -199,10 +205,11 @@ interface IntervalRowProps {
   zoneColor: string;
   starCrop?: MasterCrop;
   companionCrop?: MasterCrop;
+  allRecipeCrops?: MasterCrop[];
   hardinessZone?: number | null;
 }
 
-const IntervalRow = ({ interval, index, zoneColor, starCrop, companionCrop, hardinessZone }: IntervalRowProps) => {
+const IntervalRow = ({ interval, index, zoneColor, starCrop, companionCrop, allRecipeCrops = [], hardinessZone }: IntervalRowProps) => {
   const style = INTERVAL_STYLES[interval.interval];
   const accent = style?.accent || 'hsl(0 0% 50%)';
 
@@ -367,6 +374,40 @@ const IntervalRow = ({ interval, index, zoneColor, starCrop, companionCrop, hard
                 🌾 {harvestDiff > 0 ? '+' : ''}{harvestDiff}d vs star
               </span>
             )}
+            {/* Companion synergy badges */}
+            {companionCrop && allRecipeCrops.filter(c => c.id !== companionCrop.id).map(other => {
+              if (isExplicitCompanion(companionCrop, other)) {
+                return (
+                  <span
+                    key={`comp-${other.id}`}
+                    className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold"
+                    style={{
+                      background: 'hsl(270 50% 20% / 0.4)',
+                      border: '1px solid hsl(270 50% 40% / 0.5)',
+                      color: 'hsl(270 50% 70%)',
+                    }}
+                  >
+                    ✦ Companion of {other.common_name || other.name}
+                  </span>
+                );
+              }
+              if (isAntagonist(companionCrop, other)) {
+                return (
+                  <span
+                    key={`ant-${other.id}`}
+                    className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold"
+                    style={{
+                      background: 'hsl(0 50% 20% / 0.4)',
+                      border: '1px solid hsl(0 50% 40% / 0.5)',
+                      color: 'hsl(0 50% 65%)',
+                    }}
+                  >
+                    ⚠ Avoid near {other.common_name || other.name}
+                  </span>
+                );
+              }
+              return null;
+            })}
           </div>
         )}
       </div>

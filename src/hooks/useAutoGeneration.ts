@@ -3,6 +3,7 @@ import { MasterCrop } from '@/hooks/useMasterCrops';
 import { ChordInterval, InoculantType, calculatePlantCount, AERIAL_PLANT_COUNT } from '@/hooks/useGardenBeds';
 import { getZoneRecommendation } from '@/data/jazzVoicingRecommendations';
 import { checkShading, layerMatchScore, getIdealSlotLayers, successionScore, verticalDiversityScore } from '@/lib/growthLayers';
+import { companionScore as calcCompanionScore } from '@/lib/companionScoring';
 
 /**
  * INSTRUMENT-BASED AUTO-GENERATION ENGINE
@@ -325,10 +326,11 @@ export const useAutoGeneration = (
           newInstrument: c.instrument_type && !usedInstruments.has(c.instrument_type) ? 1 : 0,
           layerBonus: layerMatchScore(c, slotKey, idealLayers),
           succession: successionScore(c, placedCrops),
+          companion: calcCompanionScore(c, placedCrops),
         }))
         .sort((a, b) =>
-          (b.compat + b.newInstrument + b.layerBonus + b.succession) -
-          (a.compat + a.newInstrument + a.layerBonus + a.succession)
+          (b.compat + b.newInstrument + b.layerBonus + b.succession + b.companion) -
+          (a.compat + a.newInstrument + a.layerBonus + a.succession + a.companion)
         );
 
       const best = scored[0];
