@@ -47,6 +47,14 @@ const ORGS = [
     url: 'https://growwhereyouare.farm',
   },
   {
+    name: 'Soul Fire Farm',
+    type: 'Afro-Indigenous Land Stewardship',
+    note: 'BIPOC-centered community farm — ending racism in the food system through land justice',
+    color: 'hsl(25 65% 55%)',
+    icon: '🔥',
+    url: 'https://www.soulfirefarm.org',
+  },
+  {
     name: 'Community Farmers Markets',
     type: 'Local Markets & Land Access',
     note: 'Find your local farmers market — support sovereign food systems',
