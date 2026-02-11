@@ -256,16 +256,56 @@ export const useAutoGeneration = (
       return false;
     };
 
+    // HIGH-CANOPY tracking: max 1 high-canopy anchor per bed
+    const HIGH_CANOPY_HABITS = ['tree', 'large shrub'];
+    const hasHighCanopy = placedCrops.some(c =>
+      c.growth_habit && HIGH_CANOPY_HABITS.includes(c.growth_habit.toLowerCase())
+    );
+
+    // SAME-FAMILY extraction helper (uses scientific_name genus)
+    const getGenus = (crop: MasterCrop): string | null => {
+      if (!crop.scientific_name) return null;
+      return crop.scientific_name.split(' ')[0].toLowerCase();
+    };
+
+    // LEGUME / ALLIUM category keywords for nutritional clash
+    const LEGUME_KEYS = ['bean', 'pea', 'lentil', 'chickpea', 'lima', 'clover', 'vetch', 'alfalfa', 'lupin'];
+    const ALLIUM_KEYS = ['onion', 'garlic', 'shallot', 'leek', 'chive', 'scallion'];
+    const placedHasLegume = placedCrops.some(c => LEGUME_KEYS.some(k => (c.common_name || c.name).toLowerCase().includes(k)));
+    const placedHasAllium = placedCrops.some(c => ALLIUM_KEYS.some(k => (c.common_name || c.name).toLowerCase().includes(k)));
+
     const selectBestCrop = (crops: MasterCrop[], slotKey: string): MasterCrop | null => {
-      // Filter out antagonist conflicts and shading problems with already-placed crops
+      // Filter out conflicts using 4-rule prevention system
       const scored = crops
         .filter(c => {
           if (usedIds.has(c.id)) return false;
+
+          // RULE 1 — Nutritional: Legume + Allium clash
           if (isAntagonist(c, placedCrops)) return false;
-          // Reject if any placed crop would severely shade this candidate
+          const cName = (c.common_name || c.name).toLowerCase();
+          const isLegume = LEGUME_KEYS.some(k => cName.includes(k));
+          const isAllium = ALLIUM_KEYS.some(k => cName.includes(k));
+          if (isLegume && placedHasAllium) return false;
+          if (isAllium && placedHasLegume) return false;
+
+          // RULE 2 — Structural: max 1 high-canopy crop per bed
+          if (hasHighCanopy && c.growth_habit && HIGH_CANOPY_HABITS.includes(c.growth_habit.toLowerCase())) return false;
+
+          // RULE 3 — Pathological: same-family heavy feeders need >24" spacing
+          const cGenus = getGenus(c);
+          if (cGenus && c.category === 'Sustenance') {
+            for (const placed of placedCrops) {
+              if (placed.category === 'Sustenance' && getGenus(placed) === cGenus) return false; // same genus heavy feeder → block
+            }
+          }
+
+          // RULE 4 — Vibrational: frequency must match bed zone (already enforced by zoneCrops filter, but double-check)
+          if (c.frequency_hz !== frequencyHz) return false;
+
+          // Shading: reject if any placed crop would severely shade this candidate
           for (const placed of placedCrops) {
             const warning = checkShading(placed, c);
-            if (warning?.severity === 'warning') return false; // heavy shading → skip
+            if (warning?.severity === 'warning') return false;
           }
           return true;
         })
