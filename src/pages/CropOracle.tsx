@@ -1636,7 +1636,7 @@ const CropOracle = () => {
                                     border: '1px solid hsl(140 40% 30% / 0.3)',
                                   }}
                                 >
-                                  🌍 Z{formatSubZone(slot.crop.hardiness_zone_min)}–{formatSubZone(slot.crop.hardiness_zone_max)}
+                                  🌍 Zone {formatSubZone(slot.crop.hardiness_zone_min)}–{formatSubZone(slot.crop.hardiness_zone_max)}
                                 </span>
                               )}
                             </p>
