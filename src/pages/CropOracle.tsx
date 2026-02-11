@@ -331,28 +331,34 @@ const CropOracle = () => {
     return allCrops.filter(fitsHardinessZone).length;
   }, [allCrops, hardinessZone, hardinessSubZone]);
 
+  /* ─── Shared deep search helper ─── */
+  const deepCropMatch = (c: MasterCrop, q: string): boolean => {
+    const fields = [
+      c.common_name, c.name, c.category, c.dominant_mineral,
+      c.guild_role, c.element, c.zone_name, c.cultural_role,
+      c.chord_interval, c.soil_protocol_focus, c.focus_tag,
+      c.instrument_type, c.description,
+    ];
+    if (fields.some(f => f && f.toLowerCase().includes(q))) return true;
+    if (c.companion_crops?.some(cc => cc.toLowerCase().includes(q))) return true;
+    if (c.planting_season?.some(ps => ps.toLowerCase().includes(q))) return true;
+    if (c.crop_guild?.some(cg => cg.toLowerCase().includes(q))) return true;
+    if (String(c.frequency_hz).includes(q)) return true;
+    return false;
+  };
+
   /* ─── Filtered star search ─── */
   const filteredStarCandidates = useMemo(() => {
     if (!starSearchQuery || starSearchQuery.length < 1) return starCandidates.slice(0, 20);
     const q = starSearchQuery.toLowerCase();
-    return starCandidates.filter(c =>
-      (c.common_name && c.common_name.toLowerCase().includes(q)) ||
-      c.name.toLowerCase().includes(q)
-    ).slice(0, 20);
+    return starCandidates.filter(c => deepCropMatch(c, q)).slice(0, 20);
   }, [starCandidates, starSearchQuery]);
 
   /* ─── Crop search across entire registry ─── */
   const searchResults = useMemo(() => {
     if (!allCrops || !searchQuery || searchQuery.length < 2) return [];
     const q = searchQuery.toLowerCase();
-    return allCrops
-      .filter(c =>
-        (c.common_name && c.common_name.toLowerCase().includes(q)) ||
-        c.name.toLowerCase().includes(q) ||
-        (c.category && c.category.toLowerCase().includes(q)) ||
-        (c.dominant_mineral && c.dominant_mineral.toLowerCase().includes(q))
-      )
-      .slice(0, 12);
+    return allCrops.filter(c => deepCropMatch(c, q)).slice(0, 12);
   }, [allCrops, searchQuery]);
 
   /* ─── Build 7-voice chord card ─── */
@@ -1494,7 +1500,7 @@ const CropOracle = () => {
                             type="text"
                             value={starSearchQuery}
                             onChange={e => setStarSearchQuery(e.target.value)}
-                            placeholder={`Search ${starCandidates.length} crops across all zones...`}
+                            placeholder={`Search by name, mineral, guild role, season...`}
                             className="bg-transparent flex-1 text-sm font-body outline-none"
                             style={{ color: 'hsl(0 0% 80%)' }}
                             autoFocus
@@ -1589,7 +1595,10 @@ const CropOracle = () => {
                                     )}
                                   </div>
                                   <p className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
-                                    {cropZone?.name || crop.zone_name} • {crop.category}{crop.chord_interval ? ` • ${crop.chord_interval}` : ''}
+                                    {crop.frequency_hz}Hz • {cropZone?.name || crop.zone_name} • {crop.category}
+                                    {crop.chord_interval ? ` • ${crop.chord_interval}` : ''}
+                                    {crop.dominant_mineral ? ` • ${crop.dominant_mineral}` : ''}
+                                    {crop.guild_role ? ` • ${crop.guild_role}` : ''}
                                     {crop.companion_crops?.length ? ` • ${crop.companion_crops.length} companions` : ''}
                                   </p>
                                 </div>
@@ -2025,7 +2034,7 @@ const CropOracle = () => {
                     onChange={e => setSearchQuery(e.target.value)}
                     placeholder={swapSlotIndex !== null
                       ? `Search to swap ${INTERVAL_ORDER[swapSlotIndex].label}...`
-                      : 'Search crop registry by name, category, or mineral...'
+                      : 'Search by name, category, mineral, guild role, element, season...'
                     }
                     className="bg-transparent flex-1 text-sm font-body outline-none"
                     style={{ color: 'hsl(0 0% 80%)' }}
