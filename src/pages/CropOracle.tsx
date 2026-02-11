@@ -25,6 +25,7 @@ import ProSuppliersPanel from '@/components/crop-oracle/ProSuppliersPanel';
 import FoodForestHoleProtocol from '@/components/crop-oracle/FoodForestHoleProtocol';
 import TwoWeekDashboard from '@/components/crop-oracle/TwoWeekDashboard';
 import { getZoneAwarePlantingWindows, cropFitsZone } from '@/lib/frostDates';
+import { getCropLayer, getIdealSlotLayers, layerMatchScore, successionScore, checkShading, type ShadingWarning } from '@/lib/growthLayers';
 
 /* ─── Zone Data ─── */
 const ZONES = [
@@ -695,7 +696,10 @@ const CropOracle = () => {
       return role === 'sentinel' || ['trap crop', 'pest deterrent', 'pest-deterrent', 'repel', 'deterr'].some(k => desc.includes(k));
     };
 
-    const harmonicScore = (c: MasterCrop, hasSentinelAlready: boolean = false): number => {
+    // Compute ideal slot layers based on Star crop's growth habit
+    const idealLayers = starCrop ? getIdealSlotLayers(starCrop) : {};
+
+    const harmonicScore = (c: MasterCrop, hasSentinelAlready: boolean = false, slotKey?: string): number => {
       let score = 0;
       // Season overlap with star crop (+3 per shared season)
       const cSeasons = (c.planting_season || []).map(s => s.toLowerCase());
@@ -713,17 +717,27 @@ const CropOracle = () => {
       // USDA companion planting boost (+6 bidirectional, +4 one-way)
       if (isBidirectionalCompanion(c)) score += 6;
       else if (isCompanion(c)) score += 4;
-      // Harvest alignment bonus (+1 if within 30 days of star)
-      if (starHarvestDays !== null && c.harvest_days != null) {
-        const diff = Math.abs(c.harvest_days - starHarvestDays);
-        if (diff <= 15) score += 2;
-        else if (diff <= 30) score += 1;
-      }
+
+      // ─── SUCCESSION PLANTING: reward harvest stagger ───
+      score += successionScore(c, placedCropsRef);
+
       // Sentinel/trap crop boost: +4 base, +6 extra if recipe has no sentinel yet
       if (isSentinelOrTrap(c)) {
         score += 4;
         if (!hasSentinelAlready) score += 6;
       }
+
+      // ─── VERTICAL LAYER MATCH: reward crops in ideal layer for this slot ───
+      if (slotKey) {
+        score += layerMatchScore(c, slotKey, idealLayers);
+      }
+
+      // ─── SHADING PENALTY: penalize sun-loving herbs placed with canopy trees ───
+      if (starCrop) {
+        const warning = checkShading(starCrop, c);
+        if (warning?.severity === 'warning') score -= 3;
+      }
+
       // Antagonist penalty: if candidate conflicts with star crop or already-placed crops
       const cName = (c.common_name || c.name).toLowerCase();
       const checkAgainst = [starCrop, ...placedCropsRef].filter((x): x is MasterCrop => x !== null && x.id !== c.id);
@@ -743,10 +757,11 @@ const CropOracle = () => {
     // Seeded rotation: pick from candidates using recipeSeed, preferring harmonically-scored crops
     let pickCounter = 0;
     let hasSentinelInRecipe = starCrop ? isSentinelOrTrap(starCrop) : false;
+    let currentSlotKey = ''; // Track which slot we're filling for layer scoring
     const rotatedPick = (candidates: MasterCrop[]): MasterCrop | undefined => {
       if (candidates.length === 0) return undefined;
       // Sort by harmonic score descending, then use seed to rotate within top-tier
-      const scored = candidates.map(c => ({ crop: c, score: harmonicScore(c, hasSentinelInRecipe) }));
+      const scored = candidates.map(c => ({ crop: c, score: harmonicScore(c, hasSentinelInRecipe, currentSlotKey) }));
       scored.sort((a, b) => b.score - a.score);
       // Pick from the top-scoring tier (all candidates within 1 point of best)
       const bestScore = scored[0].score;
@@ -788,6 +803,7 @@ const CropOracle = () => {
     return INTERVAL_ORDER.map(interval => {
       let crop: MasterCrop | null = null;
       let isCompanionFill = false;
+      currentSlotKey = interval.key; // Set slot context for layer scoring
       const directCandidates = pool.filter(c => !usedIds.has(c.id) && c.chord_interval === interval.key);
       const directMatch = rotatedPick(directCandidates);
 
@@ -946,9 +962,25 @@ const CropOracle = () => {
           break;
       }
 
-      return { ...interval, crop, isCompanionFill };
-    }).map((slot, i) => manualOverrides[i] ? { ...slot, crop: manualOverrides[i], isCompanionFill: false } : slot);
+      const layer = crop ? getCropLayer(crop) : null;
+      return { ...interval, crop, isCompanionFill, layer };
+    }).map((slot, i) => manualOverrides[i] ? { ...slot, crop: manualOverrides[i], isCompanionFill: false, layer: getCropLayer(manualOverrides[i]) } : slot);
   }, [recipeCrops, manualOverrides, starCrop, allCrops, selectedZone, environment, recipeSeed, hardinessZone]);
+
+  /* ─── Shading Warnings ─── */
+  const shadingWarnings = useMemo((): ShadingWarning[] => {
+    const warnings: ShadingWarning[] = [];
+    const filledSlots = chordCard.filter(s => s.crop);
+    for (let i = 0; i < filledSlots.length; i++) {
+      for (let j = i + 1; j < filledSlots.length; j++) {
+        const a = filledSlots[i].crop!;
+        const b = filledSlots[j].crop!;
+        const w = checkShading(a, b) || checkShading(b, a);
+        if (w && !warnings.some(existing => existing.message === w.message)) warnings.push(w);
+      }
+    }
+    return warnings;
+  }, [chordCard]);
 
   /* ─── Modal Signature: derive musical mode from filled intervals ─── */
   const modalSignature = useMemo(() => {
@@ -2512,6 +2544,18 @@ const CropOracle = () => {
                   );
                 })()}
 
+                {/* Shading Warnings */}
+                {shadingWarnings.length > 0 && (
+                  <div className="mx-4 mb-3 rounded-lg px-3 py-2" style={{ background: 'hsl(35 60% 15% / 0.3)', border: '1px solid hsl(35 50% 30% / 0.3)' }}>
+                    <p className="text-[9px] font-mono font-bold mb-1" style={{ color: 'hsl(35 60% 60%)' }}>☀️ SHADING ADVISORY</p>
+                    {shadingWarnings.map((w, idx) => (
+                      <p key={idx} className="text-[8px] font-mono leading-relaxed" style={{ color: w.severity === 'warning' ? 'hsl(35 50% 55%)' : 'hsl(0 0% 50%)' }}>
+                        {w.severity === 'warning' ? '⚠️' : 'ℹ️'} {w.message}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
                 <div className="divide-y" style={{ borderColor: 'hsl(0 0% 10%)' }}>
                   {chordCard.map((slot, i) => {
                     // Beginner mode: only show Triad (Root, 3rd, 5th)
@@ -2624,6 +2668,12 @@ const CropOracle = () => {
                               <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                                 <GrowthHabitBadge habit={slot.crop!.growth_habit} size="sm" />
                                 <TrapCropBadge description={slot.crop!.description} guildRole={slot.crop!.guild_role} size="sm" />
+                                {slot.layer && (
+                                  <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5"
+                                    style={{ background: 'hsl(200 30% 18% / 0.3)', color: 'hsl(200 50% 60%)', border: '1px solid hsl(200 30% 30% / 0.3)' }}>
+                                    📐 {slot.layer.layer} ~{slot.layer.heightFt}ft
+                                  </span>
+                                )}
                                 {starCrop && slot.crop && i > 0 && (() => {
                                   const sName = (starCrop.common_name || starCrop.name).toLowerCase();
                                   const cName = (slot.crop!.common_name || slot.crop!.name).toLowerCase();
