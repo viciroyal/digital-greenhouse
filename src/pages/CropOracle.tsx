@@ -1771,6 +1771,18 @@ const CropOracle = () => {
                   const pctBg = pct >= 80 ? 'hsl(120 50% 20% / 0.3)' : pct >= 50 ? 'hsl(45 60% 20% / 0.3)' : 'hsl(0 50% 20% / 0.3)';
                   const pctBorder = pct >= 80 ? 'hsl(120 50% 35% / 0.4)' : pct >= 50 ? 'hsl(45 60% 35% / 0.4)' : 'hsl(0 50% 35% / 0.4)';
 
+                  // Zone compatibility calculation
+                  const zoneFit = slotsWithCrops.filter(s => {
+                    const c = s.crop!;
+                    return c.hardiness_zone_min != null && c.hardiness_zone_max != null &&
+                      hardinessZone >= c.hardiness_zone_min && hardinessZone <= c.hardiness_zone_max;
+                  });
+                  const zPct = slotsWithCrops.length > 0 ? Math.round((zoneFit.length / slotsWithCrops.length) * 100) : 0;
+                  const zColor = zPct >= 80 ? 'hsl(120 50% 55%)' : zPct >= 50 ? 'hsl(45 70% 55%)' : 'hsl(0 50% 55%)';
+                  const zBg = zPct >= 80 ? 'hsl(120 50% 20% / 0.3)' : zPct >= 50 ? 'hsl(45 60% 20% / 0.3)' : 'hsl(0 50% 20% / 0.3)';
+                  const zBorder = zPct >= 80 ? 'hsl(120 50% 35% / 0.4)' : zPct >= 50 ? 'hsl(45 60% 35% / 0.4)' : 'hsl(0 50% 35% / 0.4)';
+                  const hasZoneData = slotsWithCrops.length > 0 && hardinessZone > 0;
+
                   return (
                     <div
                       className="px-5 py-3 flex items-center gap-3"
@@ -1783,19 +1795,34 @@ const CropOracle = () => {
                       <span className="font-mono text-xs font-bold tracking-wider" style={{ color: selectedZone.color }}>
                         {proMode ? '7-VOICE PLANTING CHORD' : '3-VOICE TRIAD'}
                       </span>
-                      {hasData && (
-                        <span
-                          className="ml-auto text-[9px] font-mono font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1"
-                          style={{
-                            background: pctBg,
-                            color: pctColor,
-                            border: `1px solid ${pctBorder}`,
-                          }}
-                          title={`${compatible.length}/${slotsWithCrops.length} companions share a planting season with the star crop`}
-                        >
-                          📅 {pct}% SEASON SYNC
-                        </span>
-                      )}
+                      <div className="ml-auto flex items-center gap-2">
+                        {hasData && (
+                          <span
+                            className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1"
+                            style={{
+                              background: pctBg,
+                              color: pctColor,
+                              border: `1px solid ${pctBorder}`,
+                            }}
+                            title={`${compatible.length}/${slotsWithCrops.length} companions share a planting season with the star crop`}
+                          >
+                            📅 {pct}% SEASON SYNC
+                          </span>
+                        )}
+                        {hasZoneData && (
+                          <span
+                            className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1"
+                            style={{
+                              background: zBg,
+                              color: zColor,
+                              border: `1px solid ${zBorder}`,
+                            }}
+                            title={`${zoneFit.length}/${slotsWithCrops.length} crops rated for Zone ${hardinessZone % 1 === 0.5 ? Math.floor(hardinessZone) + 'b' : Math.floor(hardinessZone) + 'a'}`}
+                          >
+                            🌡️ {zPct}% ZONE FIT
+                          </span>
+                        )}
+                      </div>
                     </div>
                   );
                 })()}
