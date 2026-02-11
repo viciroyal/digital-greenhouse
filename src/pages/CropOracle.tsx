@@ -715,7 +715,7 @@ const CropOracle = () => {
             }}
           >
             <span className="text-sm">{proMode ? '🎛️' : '🌱'}</span>
-            {proMode ? 'PRO' : 'BEGIN'}
+            {proMode ? 'PRO' : 'AMATEUR'}
           </button>
 
           <button
