@@ -21,6 +21,7 @@ const DevGuide = lazy(() => import("./pages/DevGuide"));
 const TestingSuiteDocs = lazy(() => import("./pages/TestingSuiteDocs"));
 const CropLibrary = lazy(() => import("./pages/CropLibrary"));
 const WeeklyTasks = lazy(() => import("./pages/WeeklyTasks"));
+const FirstGarden = lazy(() => import("./pages/FirstGarden"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
                 <Route path="/testing-docs" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><TestingSuiteDocs /></Suspense>} />
                 <Route path="/crop-library" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><CropLibrary /></Suspense>} />
                 <Route path="/weekly-tasks" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><WeeklyTasks /></Suspense>} />
+                <Route path="/first-garden" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><FirstGarden /></Suspense>} />
                 <Route path="*" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><NotFound /></Suspense>} />
               </Routes>
             </BrowserRouter>
