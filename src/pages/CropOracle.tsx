@@ -297,6 +297,11 @@ const CropOracle = () => {
 
     let filtered = allCrops.filter(c => c.frequency_hz === selectedZone.hz);
 
+    // Trees only visible in food-forest mode
+    if (environment !== 'food-forest') {
+      filtered = filtered.filter(c => !c.growth_habit || c.growth_habit.toLowerCase() !== 'tree');
+    }
+
     // Zone filter: strictly enforce — 100% zone compatibility
     if (hardinessZone) {
       filtered = filtered.filter(fitsHardinessZone);
@@ -346,6 +351,10 @@ const CropOracle = () => {
   const starCandidates = useMemo(() => {
     if (!allCrops) return [];
     let candidates = [...allCrops];
+    // Trees only visible in food-forest mode
+    if (environment !== 'food-forest') {
+      candidates = candidates.filter(c => !c.growth_habit || c.growth_habit.toLowerCase() !== 'tree');
+    }
     if (hardinessZone) {
       candidates = candidates.filter(fitsHardinessZone);
     }
