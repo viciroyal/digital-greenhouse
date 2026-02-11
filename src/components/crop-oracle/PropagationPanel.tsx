@@ -64,6 +64,8 @@ const FALL_TIMING = [
   { crop: 'Overwintering Onions', weeksBefore: 8, icon: '🧅', method: '128-cell or sets', note: 'Plant sets or starts 8 wk before frost for spring bulbs' },
   { crop: 'Daikon Radish (Tillage)', weeksBefore: 6, icon: '🥕', method: 'Direct sow', note: 'Bio-drills compacted soil — dies in freeze, no removal needed' },
   { crop: 'Fava Beans (N-Fixer)', weeksBefore: 4, icon: '🫘', method: 'Direct sow', note: 'Hardy to 10°F — fixes nitrogen, edible tops & beans' },
+  { crop: 'Austrian Winter Peas', weeksBefore: 6, icon: '🟢', method: 'Direct sow', note: 'Cold-hardy N-fixer — sow 6–8 wk before frost, inoculate with rhizobium for max fixation' },
+  { crop: 'Hairy Vetch', weeksBefore: 6, icon: '🌱', method: 'Broadcast seed', note: 'Premier N-fixer, up to 200 lb N/acre — mix with winter rye for best results, mow in spring' },
 ];
 
 const TRAY_SIZES = [
