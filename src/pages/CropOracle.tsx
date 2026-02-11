@@ -388,6 +388,60 @@ const CropOracle = () => {
     }).map((slot, i) => manualOverrides[i] ? { ...slot, crop: manualOverrides[i], isCompanionFill: false } : slot);
   }, [recipeCrops, manualOverrides, starCrop, allCrops, selectedZone, environment]);
 
+  /* ─── Modal Signature: derive musical mode from filled intervals ─── */
+  const modalSignature = useMemo(() => {
+    if (!chordCard || chordCard.length === 0) return null;
+
+    const visibleSlots = proMode ? chordCard : chordCard.slice(0, 3);
+    const filled = new Set(
+      visibleSlots
+        .filter(s => s.crop)
+        .map(s => s.key)
+    );
+    const voiceCount = filled.size;
+    if (voiceCount === 0) return null;
+
+    // Mode mapping based on which zone note the recipe is in + interval coverage
+    // Each zone's note naturally aligns with a mode of the major scale
+    const ZONE_MODES: Record<number, { mode: string; mood: string; symbol: string }> = {
+      396: { mode: 'Ionian', mood: 'Bright Stability', symbol: '♮' },
+      417: { mode: 'Dorian', mood: 'Soulful Resilience', symbol: '♭3' },
+      528: { mode: 'Phrygian', mood: 'Alchemical Fire', symbol: '♭2' },
+      639: { mode: 'Lydian', mood: 'Expansive Heart', symbol: '♯4' },
+      741: { mode: 'Mixolydian', mood: 'Bluesy Expression', symbol: '♭7' },
+      852: { mode: 'Aeolian', mood: 'Deep Vision', symbol: '♭6' },
+      963: { mode: 'Locrian', mood: 'Transcendent Mystery', symbol: '♭5' },
+    };
+
+    const effectiveHz = starCrop ? starCrop.frequency_hz : selectedZone?.hz;
+    const base = effectiveHz ? ZONE_MODES[effectiveHz] : null;
+    if (!base) return null;
+
+    // Complexity suffix based on voice count
+    let complexity = '';
+    if (voiceCount <= 2) complexity = 'Drone';
+    else if (voiceCount === 3) complexity = 'Triad';
+    else if (voiceCount === 4) complexity = '7th';
+    else if (voiceCount === 5) complexity = '9th';
+    else if (voiceCount === 6) complexity = '11th';
+    else complexity = '13th';
+
+    // Shift mood descriptor if certain intervals are present but base is missing
+    let mood = base.mood;
+    if (filled.has('11th (Tension)') && filled.has('7th (Signal)')) {
+      mood = mood.replace(/Stability|Resilience|Fire|Heart|Expression|Vision|Mystery/,
+        m => `${m} + Tension`);
+    }
+
+    return {
+      mode: base.mode,
+      mood,
+      symbol: base.symbol,
+      complexity,
+      voiceCount,
+    };
+  }, [chordCard, selectedZone, starCrop]);
+
   const handleSwapCrop = (crop: MasterCrop) => {
     if (swapSlotIndex === null) return;
     setManualOverrides(prev => ({ ...prev, [swapSlotIndex]: crop }));
@@ -1304,7 +1358,41 @@ const CropOracle = () => {
                   </span>
                 </div>
 
-                {/* Interval rows */}
+                {/* Modal Signature Badge */}
+                {modalSignature && (
+                  <div
+                    className="px-5 py-2 flex items-center gap-2"
+                    style={{
+                      background: `linear-gradient(90deg, ${selectedZone.color}08, transparent)`,
+                      borderBottom: '1px solid hsl(0 0% 8%)',
+                    }}
+                  >
+                    <span
+                      className="text-[9px] font-mono px-2 py-0.5 rounded-full inline-flex items-center gap-1.5"
+                      style={{
+                        background: `${selectedZone.color}10`,
+                        color: `${selectedZone.color}cc`,
+                        border: `1px solid ${selectedZone.color}25`,
+                      }}
+                    >
+                      <span style={{ fontSize: '11px' }}>🎵</span>
+                      {modalSignature.mode} {modalSignature.symbol}
+                    </span>
+                    <span className="text-[8px] font-mono italic" style={{ color: 'hsl(0 0% 40%)' }}>
+                      {modalSignature.mood}
+                    </span>
+                    <span
+                      className="text-[7px] font-mono ml-auto px-1.5 py-0.5 rounded"
+                      style={{
+                        background: 'hsl(0 0% 8%)',
+                        color: 'hsl(0 0% 35%)',
+                      }}
+                    >
+                      {modalSignature.voiceCount}-VOICE {modalSignature.complexity.toUpperCase()}
+                    </span>
+                  </div>
+                )}
+
                 <div className="divide-y" style={{ borderColor: 'hsl(0 0% 10%)' }}>
                   {chordCard.map((slot, i) => {
                     // Beginner mode: only show Triad (Root, 3rd, 5th)
