@@ -93,7 +93,9 @@ bunx vitest --watch`}</Code>
           <p><strong>Test runner:</strong> Vitest 3.x<br />
           <strong>Coverage domains:</strong> Soil calculation, Lunar phase, Crop-zone mapping, Instrument integrity<br />
           <strong>Total test count:</strong> 66+ unit tests across 7 files<br />
-          <strong>Database:</strong> 1,684 crops across 7 Solfeggio zones</p>
+          <strong>Database:</strong> 1,684 crops across 7 Solfeggio zones<br />
+          <strong>Crop Library:</strong> 19-column virtualized table (<code>@tanstack/react-virtual</code>) + 25-column CSV export<br />
+          <strong>Performance:</strong> Row virtualization for zones &gt;30 crops, <code>React.memo()</code> on CropRow, print fallback for PDF</p>
         </Section>
 
         <Section title="TEST FILE MAP">

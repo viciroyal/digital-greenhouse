@@ -113,6 +113,7 @@ const DevGuide = () => {
 │   │   └── GrowthHabitBadge.tsx  # Reusable growth habit pill badge
 │   ├── crop-library/        # Refactored library components
 │   │   ├── CropRow.tsx      # Memoized table row (React.memo)
+│   │   ├── VirtualizedZoneTable.tsx  # @tanstack/react-virtual wrapper
 │   │   ├── csvExport.ts     # CSV generation utility
 │   │   └── constants.ts     # Zone order, table headers
 │   ├── cursor/              # Custom cursor effects
@@ -282,9 +283,10 @@ const CropLibrary = lazy(() => import("./pages/CropLibrary"));
     <CropOracle />
   </Suspense>
 } />`}</Code>
-          <p><strong>Memoization:</strong> <code>CropRow</code> uses <code>React.memo()</code> to prevent re-renders in the 1,684-row library table. Zone grouping uses <code>useMemo</code>.</p>
+          <p><strong>Row virtualization:</strong> <code>VirtualizedZoneTable</code> uses <code>@tanstack/react-virtual</code> to virtualize zones with &gt;30 crops. Only visible rows render in the DOM, maintaining 60fps scrolling across 1,684 entries. A hidden <code>print:table</code> fallback renders all rows for PDF export.</p>
+          <p><strong>Memoization:</strong> <code>CropRow</code> uses <code>React.memo()</code> to prevent re-renders. Zone grouping uses <code>useMemo</code>.</p>
           <p><strong>Query caching:</strong> All crop/amendment queries use <code>staleTime: Infinity</code> since this is static reference data that doesn't change during a session.</p>
-          <p><strong>Pagination:</strong> <code>useMasterCrops</code> fetches all crops using range-based pagination to bypass Supabase's 1,000-row default limit.</p>
+          <p><strong>Pagination:</strong> <code>useMasterCrops</code> fetches all crops using range-based pagination to bypass the 1,000-row default limit.</p>
         </Section>
 
         <Section title="BEST PRACTICES">
