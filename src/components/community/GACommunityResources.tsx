@@ -31,6 +31,14 @@ const ORGS = [
     url: 'https://blacksustainability.org',
   },
   {
+    name: 'Love Is Love Farm',
+    type: 'Community Farm',
+    note: 'Local GA farm rooted in love, land stewardship & community food access',
+    color: 'hsl(340 55% 55%)',
+    icon: '❤️',
+    url: 'https://loveislovefarm.com',
+  },
+  {
     name: 'Community Farmers Markets',
     type: 'Local Markets & Land Access',
     note: 'Find your local farmers market — support sovereign food systems',
