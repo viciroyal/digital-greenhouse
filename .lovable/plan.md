@@ -1,59 +1,67 @@
 
 
-## Add Companion Planting Data for Aromatic Crops
+## Add Root Layer Crops for 741Hz (Expression) Zone
 
-### Overview
-Update the `companion_crops` and `crop_guild` arrays for all 16 new aromatic species in the `master_crops` table. Each aromatic will be linked to the canopy trees, food crops, and guild partners it best protects or enhances within its frequency zone.
+### Problem
+The 741Hz (Expression/Signal) zone has only **one** 9th (Sub-bass) crop: Sweet Potato (Okinawan), which requires hardiness zones 8-11. This leaves a gap for stewards in cooler climates (zones 3-7) when building Food Forest recipes — the 9th slot shows "No match in registry."
 
-### Data Updates (by frequency zone)
+### Solution
+Insert **3 new cold-hardy root layer perennials** into the `master_crops` table at 741Hz with the `9th (Sub-bass)` chord interval:
 
-**396Hz — Foundation**
-| Aromatic | companion_crops | crop_guild |
-|---|---|---|
-| Bee Balm (Scarlet) | Tomatoes, Peppers, Carrots, Beetroot | Desirable Pecan, Pawnee Pecan, Sweet Fern, Sweet Woodruff |
-| Sweet Woodruff | Carrots, Beetroot, Ramps | Desirable Pecan, Pawnee Pecan, Bee Balm, Sweet Fern |
-| Sweet Fern | Tomatoes, Peppers, Blueberry | Desirable Pecan, Pawnee Pecan, Bee Balm, Sweet Woodruff |
+| Crop | Scientific Key | Hardiness Range | Spacing | Why 741Hz |
+|---|---|---|---|---|
+| **Horseradish** | `armoracia_rusticana_741` | 3a - 9b | 18" | Potassium-rich root, strong volatile expression, pest deterrent |
+| **Jerusalem Artichoke** | `helianthus_tuberosus_741` | 3a - 9b | 18" | Tall expressive stalks, inulin-rich tuber, potassium accumulator |
+| **Skirret** | `sium_sisarum` | 5a - 8b | 12" | Historic perennial root vegetable, sweet flavor, shade-tolerant understory root |
 
-**417Hz — Flow**
-| Aromatic | companion_crops | crop_guild |
-|---|---|---|
-| Citronella Grass | Cucumber, Squash, Melon, Celery | Issai Hardy Kiwi, Comfrey, Shiso |
-| Shiso (Red Perilla) | Cucumber, Eggplant, Okra | Issai Hardy Kiwi, Citronella Grass, Comfrey |
+### Important Notes
+- Horseradish already exists at 963Hz (as a sentinel) and Jerusalem Artichoke at 528Hz (as a lead crop). These new entries are **separate records** at 741Hz with different ecological roles (Sub-bass root layer) — this follows the existing pattern where crops appear at multiple frequencies with different roles.
+- All three are true perennials, making them ideal for the Food Forest 9th (Root Layer) slot.
+- Combined with the existing Okinawan Sweet Potato (zones 8-11), these fill the full hardiness spectrum from zone 3a to 11.
 
-**528Hz — Alchemy**
-| Aromatic | companion_crops | crop_guild |
-|---|---|---|
-| Sweet Marjoram | Corn, Pole Beans, Squash, Peppers | Chicago Hardy Fig, Goumi Berry, Honeysuckle, Pyrethrum Daisy |
-| Pyrethrum Daisy | Corn, Cabbage, Broccoli, Kale | Chicago Hardy Fig, Thornless Honey Locust, Sweet Marjoram |
-| Honeysuckle (Japanese) | Corn, Pole Beans, Squash | Chicago Hardy Fig, Celeste Fig, Goumi Berry, Sweet Marjoram |
+### Data for Each Crop
 
-**639Hz — Heart**
-| Aromatic | companion_crops | crop_guild |
-|---|---|---|
-| Lemon Balm | Kale, Broccoli, Cabbage, Lettuce | Serviceberry, Mulberry, Star Jasmine, Catnip |
-| Catnip | Collards, Kale, Cabbage, Squash | Serviceberry, Mulberry, Lemon Balm, Star Jasmine |
-| Star Jasmine | Broccoli, Cabbage, Lettuce | Serviceberry, Mulberry, Lemon Balm, Catnip |
+**Horseradish (741Hz)**
+- Category: Sustenance
+- Chord Interval: 9th (Sub-bass)
+- Guild Role: Miner
+- Focus Tag: EXPRESSION_FOCUS
+- Element: Ether | Zone: Signal | Color: hsl(210 60% 50%)
+- Dominant Mineral: K (Potassium)
+- Brix: 8-14
+- Harvest Days: 150
+- Planting Season: Spring, Fall
+- Companion Crops: Gooseberry, Black Currant, Anise Hyssop
+- Crop Guild: Hinnomaki Red Gooseberry, Titania Black Currant, Mexican Oregano
+- Library Note: "Root Layer — Deep taproot mines potassium and sulfur. Volatile compounds deter soil-boring pests. Perennial root crop for Food Forest understory."
 
-**741Hz — Expression**
-| Aromatic | companion_crops | crop_guild |
-|---|---|---|
-| Anise Hyssop | Gooseberry, Black Currant, Jostaberry | Hinnomaki Red Gooseberry, Titania Black Currant, Mexican Oregano |
-| Mexican Oregano | Gooseberry, Black Currant, Peppers | Hinnomaki Red Gooseberry, Cascade Hops, Anise Hyssop |
+**Jerusalem Artichoke (741Hz)**
+- Category: Sustenance
+- Chord Interval: 9th (Sub-bass)
+- Guild Role: Lead
+- Focus Tag: EXPRESSION_FOCUS
+- Element: Ether | Zone: Signal | Color: hsl(210 60% 50%)
+- Dominant Mineral: K (Potassium)
+- Brix: 10-16
+- Harvest Days: 120
+- Planting Season: Spring
+- Companion Crops: Gooseberry, Black Currant, Jostaberry
+- Crop Guild: Hinnomaki Red Gooseberry, Cascade Hops, Anise Hyssop
+- Library Note: "Root Layer — Inulin-rich tuber, strong potassium accumulator. Tall stalks provide wind break and pollinator habitat. Perennial Food Forest root layer."
 
-**852Hz — Vision**
-| Aromatic | companion_crops | crop_guild |
-|---|---|---|
-| Feverfew | Pawpaw, Turmeric, Ginger | Pennsylvania Golden Pawpaw, Sunflower Pawpaw, Spicebush |
-
-**963Hz — Source**
-| Aromatic | companion_crops | crop_guild |
-|---|---|---|
-| Night-Blooming Jasmine | Persimmon, Elderberry | American Persimmon, York Elderberry, Southernwood |
-| Southernwood | Persimmon, Elderberry, Garlic | American Persimmon, York Elderberry, Night-Blooming Jasmine |
+**Skirret**
+- Category: Sustenance
+- Chord Interval: 9th (Sub-bass)
+- Guild Role: Miner
+- Focus Tag: EXPRESSION_FOCUS
+- Element: Ether | Zone: Signal | Color: hsl(210 60% 50%)
+- Dominant Mineral: K (Potassium)
+- Brix: 12-18
+- Harvest Days: 180
+- Planting Season: Spring, Fall
+- Companion Crops: Gooseberry, Black Currant, Jostaberry
+- Crop Guild: Hinnomaki Red Gooseberry, Titania Black Currant, Anise Hyssop
+- Library Note: "Root Layer — Historic perennial root vegetable. Sweet, shade-tolerant understory root. Ideal Food Forest 9th voice for cool climates."
 
 ### Technical Details
-
-**Single database migration** using UPDATE statements to set `companion_crops` and `crop_guild` arrays for each of the 16 species, matched by their `name` (scientific name key).
-
-No code changes are needed -- the existing `ScentCorridorPanel`, `CompanionEngine`, and `ChordComposer` components already read `companion_crops` and `crop_guild` from the `master_crops` table and will automatically display the new relationships.
-
+Single data insert operation adding 3 rows to `master_crops`. No code changes needed — the Crop Oracle recipe engine already queries by `frequency_hz` and `chord_interval`, so these will automatically populate the 9th (Sub-bass) slot in Food Forest mode.
