@@ -11,10 +11,11 @@ interface JadamPanelProps {
   frequencyHz: number;
   zoneColor: string;
   zoneName: string;
+  environment: string;
 }
 
 /* ─── Zone-Mapped View ─── */
-const ZoneMappedView = ({ frequencyHz, zoneColor }: { frequencyHz: number; zoneColor: string }) => {
+const ZoneMappedView = ({ frequencyHz, zoneColor, environment }: { frequencyHz: number; zoneColor: string; environment: string }) => {
   const mapped = useMemo(() => getProtocolsForZone(frequencyHz), [frequencyHz]);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
@@ -76,7 +77,7 @@ const ZoneMappedView = ({ frequencyHz, zoneColor }: { frequencyHz: number; zoneC
                   exit={{ height: 0 }}
                   className="overflow-hidden"
                 >
-                  <RecipeDetail variant={variant} protocol={protocol} zoneColor={zoneColor} />
+                  <RecipeDetail variant={variant} protocol={protocol} zoneColor={zoneColor} environment={environment} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -88,7 +89,7 @@ const ZoneMappedView = ({ frequencyHz, zoneColor }: { frequencyHz: number; zoneC
 };
 
 /* ─── Full Reference View ─── */
-const FullReferenceView = ({ zoneColor }: { zoneColor: string }) => {
+const FullReferenceView = ({ zoneColor, environment }: { zoneColor: string; environment: string }) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedVariant, setExpandedVariant] = useState<number | null>(null);
 
@@ -199,7 +200,7 @@ const FullReferenceView = ({ zoneColor }: { zoneColor: string }) => {
                                 exit={{ height: 0 }}
                                 className="overflow-hidden"
                               >
-                                <RecipeDetail variant={variant} protocol={protocol} zoneColor={zoneColor} />
+                                <RecipeDetail variant={variant} protocol={protocol} zoneColor={zoneColor} environment={environment} />
                               </motion.div>
                             )}
                           </AnimatePresence>
@@ -238,14 +239,66 @@ const FullReferenceView = ({ zoneColor }: { zoneColor: string }) => {
 };
 
 /* ─── Recipe Detail (shared) ─── */
-const RecipeDetail = ({ variant, protocol, zoneColor }: {
+const RecipeDetail = ({ variant, protocol, zoneColor, environment }: {
   variant: JadamRecipeVariant;
   protocol: JadamProtocol;
   zoneColor: string;
-}) => (
+  environment: string;
+}) => {
+  const isPot = environment === 'pot';
+  // Pot scaling: reduce batch sizes to ~1/30th (1-gallon container equivalent)
+  const scaleFactor = isPot ? 1 / 30 : 1;
+  const scaleLabel = isPot ? '🪴 SCALED FOR 1-GAL CONTAINER' : '🌱 FULL BATCH (30-GAL)';
+
+  const scaleQuantity = (qty: string): string => {
+    if (!isPot) return qty;
+    // Parse numeric values from quantity strings
+    const match = qty.match(/^([\d.]+)\s*(.*)$/);
+    if (!match) return qty;
+    const num = parseFloat(match[1]);
+    const unit = match[2];
+    const scaled = num * scaleFactor;
+    // Convert units for small quantities
+    if (unit.includes('gallon')) {
+      const quarts = scaled * 4;
+      if (quarts < 1) return `${(quarts * 4).toFixed(1)} tbsp`;
+      return `${quarts.toFixed(1)} qt`;
+    }
+    if (unit.includes('lb')) {
+      const oz = scaled * 16;
+      if (oz < 1) return `${(oz * 28.35).toFixed(0)}g`;
+      return `${oz.toFixed(1)} oz`;
+    }
+    if (unit.includes('kg')) {
+      const oz = scaled * 35.274;
+      return `${oz.toFixed(1)} oz`;
+    }
+    if (unit.includes('liter')) {
+      const ml = scaled * 1000;
+      if (ml < 100) return `${ml.toFixed(0)} ml`;
+      return `${(scaled).toFixed(2)} L`;
+    }
+    if (unit.includes('cup') || unit.includes('quart')) {
+      const tbsp = scaled * (unit.includes('quart') ? 64 : 16);
+      if (tbsp < 1) return `${(tbsp * 3).toFixed(1)} tsp`;
+      return `${tbsp.toFixed(1)} tbsp`;
+    }
+    if (scaled < 0.1) return `${(scaled * 1000).toFixed(0)}mg`;
+    return `${scaled.toFixed(2)} ${unit}`;
+  };
+
+  return (
   <div className="px-3 pb-3 space-y-2" style={{ borderTop: `1px solid ${protocol.color}10` }}>
+    {/* Scale indicator */}
+    {isPot && (
+      <div className="rounded px-2 py-1 mt-2" style={{ background: 'hsl(35 60% 15% / 0.4)', border: '1px solid hsl(35 50% 30% / 0.4)' }}>
+        <span className="text-[7px] font-mono tracking-wider" style={{ color: 'hsl(35 70% 55%)' }}>
+          {scaleLabel}
+        </span>
+      </div>
+    )}
     {/* Function */}
-    <div className="pt-2">
+    <div className={isPot ? '' : 'pt-2'}>
       <span className="text-[7px] font-mono tracking-wider" style={{ color: protocol.color }}>
         PRIMARY FUNCTION
       </span>
@@ -269,7 +322,7 @@ const RecipeDetail = ({ variant, protocol, zoneColor }: {
             {ing.name}
           </span>
           <span className="text-[9px] font-mono font-bold" style={{ color: protocol.color }}>
-            {ing.quantity}
+            {scaleQuantity(ing.quantity)}
           </span>
         </div>
       ))}
@@ -336,7 +389,8 @@ const RecipeDetail = ({ variant, protocol, zoneColor }: {
       })}
     </div>
   </div>
-);
+  );
+};
 
 const StatPill = ({ label, value, color }: { label: string; value: string; color: string }) => (
   <div
@@ -349,7 +403,7 @@ const StatPill = ({ label, value, color }: { label: string; value: string; color
 );
 
 /* ─── Main Panel ─── */
-const JadamPanel = ({ frequencyHz, zoneColor, zoneName }: JadamPanelProps) => {
+const JadamPanel = ({ frequencyHz, zoneColor, zoneName, environment }: JadamPanelProps) => {
   const [tab, setTab] = useState<'zone' | 'full' | 'calendar'>('zone');
 
   return (
@@ -378,10 +432,10 @@ const JadamPanel = ({ frequencyHz, zoneColor, zoneName }: JadamPanelProps) => {
 
       {/* Content */}
       {tab === 'zone' && (
-        <ZoneMappedView frequencyHz={frequencyHz} zoneColor={zoneColor} />
+        <ZoneMappedView frequencyHz={frequencyHz} zoneColor={zoneColor} environment={environment} />
       )}
       {tab === 'full' && (
-        <FullReferenceView zoneColor={zoneColor} />
+        <FullReferenceView zoneColor={zoneColor} environment={environment} />
       )}
       {tab === 'calendar' && (
         <JadamCalendar frequencyHz={frequencyHz} zoneColor={zoneColor} zoneName={zoneName} />
