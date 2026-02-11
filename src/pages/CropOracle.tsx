@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -77,6 +77,7 @@ const CropOracle = () => {
   const [showZonePicker, setShowZonePicker] = useState(false);
   const [showStateDropdown, setShowStateDropdown] = useState(false);
   const [modalInfoOpen, setModalInfoOpen] = useState(false);
+  const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | null>(null);
 
   // Fetch saved recipes
   const { data: savedRecipes } = useQuery({
@@ -1149,9 +1150,92 @@ const CropOracle = () => {
                     </button>
                   );
                 })}
+                {/* Tool icons */}
+                <div className="flex items-center gap-1 ml-2">
+                  {[
+                    { id: 'soil' as const, icon: <Beaker className="w-3.5 h-3.5" />, tip: 'Soil Protocol' },
+                    { id: 'calendar' as const, icon: <Calendar className="w-3.5 h-3.5" />, tip: 'Planting Calendar' },
+                    { id: 'modal' as const, icon: <Music className="w-3.5 h-3.5" />, tip: 'Modal Guide' },
+                  ].map(tool => {
+                    const isActive = activeToolPanel === tool.id;
+                    return (
+                      <div key={tool.id} className="relative group">
+                        <button
+                          onClick={() => setActiveToolPanel(isActive ? null : tool.id)}
+                          className="p-1.5 rounded-lg transition-all"
+                          style={{
+                            background: isActive ? `${selectedZone.color}20` : 'hsl(0 0% 8%)',
+                            border: `1.5px solid ${isActive ? selectedZone.color : 'hsl(0 0% 15%)'}`,
+                            color: isActive ? selectedZone.color : 'hsl(0 0% 40%)',
+                            boxShadow: isActive ? `0 0 10px ${selectedZone.color}25` : 'none',
+                          }}
+                          title={tool.tip}
+                        >
+                          {tool.icon}
+                        </button>
+                        {/* Tooltip */}
+                        <span
+                          className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[7px] font-mono tracking-wider whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                          style={{ color: 'hsl(0 0% 40%)' }}
+                        >
+                          {tool.tip}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* ═══ Star Picker ═══ */}
+              {/* ═══ Inline Tool Panels ═══ */}
+              <AnimatePresence mode="wait">
+                {activeToolPanel === 'soil' && (
+                  <motion.div
+                    key="soil-panel"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden mb-2"
+                  >
+                    <SoilLinkPanel
+                      frequencyHz={selectedZone.hz}
+                      environment={environment!}
+                      zoneColor={selectedZone.color}
+                      zoneName={selectedZone.name}
+                    />
+                  </motion.div>
+                )}
+                {activeToolPanel === 'calendar' && chordCard.length > 0 && (
+                  <motion.div
+                    key="calendar-panel"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden mb-2"
+                  >
+                    <PlantingCalendar
+                      crops={chordCard.map(s => s.crop || null)}
+                      labels={chordCard.map(s => s.label)}
+                      zoneColor={selectedZone.color}
+                      hardinessZone={hardinessZone}
+                    />
+                  </motion.div>
+                )}
+                {activeToolPanel === 'modal' && (
+                  <motion.div
+                    key="modal-panel"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden mb-2"
+                  >
+                    <ModalReference />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {<motion.div
                 className="mb-4"
                 initial={{ opacity: 0 }}
@@ -1868,25 +1952,13 @@ const CropOracle = () => {
                 )}
               </motion.div>
 
-              {/* Soil Protocol + Planting Calendar + Print */}
+              {/* Print Button */}
               <motion.div
-                className="mt-6 space-y-3 print-section"
+                className="mt-6 print-section"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.75 }}
               >
-                <SoilLinkPanel
-                  frequencyHz={selectedZone.hz}
-                  environment={environment!}
-                  zoneColor={selectedZone.color}
-                  zoneName={selectedZone.name}
-                />
-                <PlantingCalendar
-                  crops={chordCard.map(s => s.crop || null)}
-                  labels={chordCard.map(s => s.label)}
-                  zoneColor={selectedZone.color}
-                  hardinessZone={hardinessZone}
-                />
                 <button
                   onClick={() => window.print()}
                   className="w-full py-3 rounded-xl font-mono text-[10px] tracking-wider flex items-center justify-center gap-2 transition-all hover:scale-[1.01] no-print"
@@ -1899,16 +1971,6 @@ const CropOracle = () => {
                   <Printer className="w-3.5 h-3.5" />
                   PRINT RECIPE CARD
                 </button>
-              </motion.div>
-
-              {/* Modal Field Guide */}
-              <motion.div
-                className="mt-8"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-              >
-                <ModalReference />
               </motion.div>
 
               {/* Navigation */}

@@ -70,7 +70,7 @@ const MODES = [
 ];
 
 const ModalReference = () => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   return (
     <div
