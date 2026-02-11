@@ -77,6 +77,7 @@ export interface MasterMixComponent {
 export const MASTER_MIX_PROTOCOL: MasterMixComponent[] = [
   // ── TIER 1: CORE (original 8) ──
   { id: 'promix', name: 'Pro-Mix (Peat Base)', role: 'VISION', baseQuarts: 5, roleColor: 'hsl(270 50% 55%)', tier: 'core', nutrientKey: 'Structure', organic: 'OMRI Listed' },
+  { id: 'cococoir', name: 'Coco Coir', role: 'VISION', baseQuarts: 3, roleColor: 'hsl(30 55% 45%)', tier: 'core', nutrientKey: 'Structure + Aeration', organic: 'OMRI Organic' },
   { id: 'alfalfa', name: 'Alfalfa Meal', role: 'ALCHEMY', baseQuarts: 2, roleColor: 'hsl(45 70% 55%)', frequencyBoost: [528], tier: 'core', nutrientKey: 'N', organic: 'OMRI Organic' },
   { id: 'soybean', name: 'Soybean Meal', role: 'ALCHEMY', baseQuarts: 1, roleColor: 'hsl(45 70% 55%)', frequencyBoost: [528], tier: 'core', nutrientKey: 'N', organic: 'Non-GMO Organic' },
   { id: 'kelp', name: 'Kelp Meal', role: 'ANCHOR', baseQuarts: 1, roleColor: 'hsl(180 50% 50%)', frequencyBoost: [396], tier: 'core', nutrientKey: 'K', organic: 'OMRI Listed' },
