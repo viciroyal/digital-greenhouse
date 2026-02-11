@@ -94,7 +94,7 @@ bunx vitest --watch`}</Code>
           <strong>Coverage domains:</strong> Soil calculation, Lunar phase, Crop-zone mapping, Instrument integrity<br />
           <strong>Total test count:</strong> 66+ unit tests across 7 files<br />
           <strong>Database:</strong> 1,684 crops across 7 Solfeggio zones (100% field population)<br />
-          <strong>Crop Library:</strong> 19-column virtualized table (<code>@tanstack/react-virtual</code>) + 25-column CSV export<br />
+          <strong>Crop Library:</strong> 19-column virtualized table (<code>@tanstack/react-virtual</code>) + 27-column CSV export<br />
           <strong>Performance:</strong> Row virtualization for zones &gt;30 crops, <code>React.memo()</code> on CropRow, print fallback for PDF<br />
           <strong>Data fields:</strong> All 6 AI-batch fields fully populated — growth_habit, scientific_name, planting_season, harvest_days, root_depth_inches, min_container_gal</p>
         </Section>

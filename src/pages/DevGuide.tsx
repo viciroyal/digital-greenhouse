@@ -263,12 +263,13 @@ import GrowthHabitBadge from '@/components/crop-oracle/GrowthHabitBadge';
         </Section>
 
         <Section title="CSV EXPORT (CROP LIBRARY)">
-          <p><code>csvExport.ts</code> generates a 25-column CSV export:</p>
+          <p><code>csvExport.ts</code> generates a 27-column CSV export:</p>
           <Code>{`common_name, scientific_name, frequency_hz, zone_name, element, category,
 growth_habit, chord_interval, instrument_type, dominant_mineral, brix_min,
 brix_max, hardiness_zone_min, hardiness_zone_max, harvest_days,
-spacing_inches, planting_season, guild_role, focus_tag, companion_crops,
-crop_guild, soil_protocol_focus, cultural_role, description, library_note`}</Code>
+spacing_inches, root_depth_inches, min_container_gal, planting_season,
+guild_role, focus_tag, companion_crops, crop_guild, soil_protocol_focus,
+cultural_role, description, library_note`}</Code>
           <p>Arrays (companion_crops, crop_guild, planting_season) use semicolon separators. Fields with commas/quotes are properly escaped.</p>
         </Section>
 
