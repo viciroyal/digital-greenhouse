@@ -61,38 +61,44 @@ const INTERVAL_ORDER = [
 const ANTAGONIST_PAIRS: { groupA: string[]; groupB: string[]; reason: string }[] = [
   { groupA: ['onion', 'garlic', 'shallot', 'leek', 'chive', 'scallion'], groupB: ['bean', 'pea', 'lentil', 'chickpea', 'lima'], reason: 'Alliums stunt legume growth via chemical secretions' },
   { groupA: ['tomato'], groupB: ['potato'], reason: 'Both susceptible to the same blight — keep far apart' },
-  { groupA: ['cabbage', 'broccoli', 'kale', 'cauliflower', 'brussels'], groupB: ['tomato'], reason: 'Brassicas and tomatoes compete for calcium & attract shared pests' },
-  { groupA: ['fennel'], groupB: ['tomato', 'bean', 'pepper', 'eggplant', 'carrot'], reason: 'Fennel secretes compounds that inhibit most neighbors' },
+  { groupA: ['tomato'], groupB: ['corn'], reason: 'Corn earworm is identical to tomato fruitworm — proximity amplifies infestations' },
+  { groupA: ['tomato'], groupB: ['fennel'], reason: 'Fennel secretes compounds that inhibit tomato growth' },
+  { groupA: ['cabbage', 'broccoli', 'kale', 'cauliflower', 'brussels'], groupB: ['tomato', 'pepper', 'strawberry'], reason: 'Brassicas compete for calcium with these crops & attract shared pests' },
+  { groupA: ['fennel'], groupB: ['bean', 'pepper', 'eggplant', 'carrot'], reason: 'Fennel secretes compounds that inhibit most neighbors' },
   { groupA: ['walnut', 'black walnut'], groupB: ['tomato', 'pepper', 'eggplant', 'potato', 'blueberry'], reason: 'Juglone toxicity from walnut roots' },
-  { groupA: ['dill', 'coriander', 'cilantro'], groupB: ['carrot'], reason: 'Umbellifers cross-pollinate with carrots, reducing yield and seed quality' },
+  { groupA: ['dill', 'coriander', 'cilantro', 'parsnip'], groupB: ['carrot'], reason: 'Umbellifers cross-pollinate with carrots, reducing yield and seed quality' },
   { groupA: ['sage'], groupB: ['cucumber'], reason: 'Sage inhibits cucumber growth' },
   { groupA: ['mint'], groupB: ['parsley'], reason: 'Mint overwhelms parsley through aggressive root competition' },
   { groupA: ['sunflower'], groupB: ['potato'], reason: 'Sunflowers release allelopathic compounds that inhibit potato growth' },
-  { groupA: ['corn'], groupB: ['tomato'], reason: 'Corn earworm is identical to tomato fruitworm — proximity amplifies infestations' },
+  { groupA: ['potato'], groupB: ['squash', 'cucumber'], reason: 'Shared susceptibility to blight and competition for soil nutrients' },
+  { groupA: ['bean'], groupB: ['pepper'], reason: 'Beans can shade peppers and compete for similar nutrients' },
+  { groupA: ['corn'], groupB: ['celery'], reason: 'Corn shading stunts celery growth' },
+  { groupA: ['lettuce'], groupB: ['parsley'], reason: 'Parsley can bolt lettuce prematurely when planted nearby' },
+  { groupA: ['onion'], groupB: ['asparagus'], reason: 'Onions inhibit asparagus growth through root secretions' },
 ];
 
 /** Bodyguard crops: pest-specific protectors to boost in scoring */
 const BODYGUARD_MAP: Record<string, { guard: string[]; pest: string }> = {
-  tomato: { guard: ['marigold'], pest: 'Hornworms & Blight' },
+  tomato: { guard: ['borage', 'marigold'], pest: 'Hornworms & Blight' },
   corn: { guard: ['dill'], pest: 'Corn Earworm (attracts parasitic wasps)' },
   potato: { guard: ['tansy', 'catnip'], pest: 'Potato Beetle' },
   bean: { guard: ['nasturtium'], pest: 'Aphids' },
-  carrot: { guard: ['chive', 'leek'], pest: 'Carrot Fly' },
-  broccoli: { guard: ['thyme', 'sage'], pest: 'Cabbage Moth' },
-  lettuce: { guard: ['mint', 'calendula'], pest: 'Slugs & Snails' },
+  carrot: { guard: ['sage', 'rosemary', 'chive', 'leek'], pest: 'Carrot Fly' },
+  broccoli: { guard: ['thyme', 'sage', 'nasturtium'], pest: 'Cabbage Moth' },
+  lettuce: { guard: ['poached egg plant', 'alyssum', 'mint', 'calendula'], pest: 'Slugs & Snails' },
   onion: { guard: ['marigold'], pest: 'Onion Maggot' },
 };
 
 /** Placement rules: spatial guidance for bed layout */
 const PLACEMENT_RULES: Record<string, string> = {
-  tomato: 'Place south of Corn; avoid Potato row',
-  corn: 'North-most row to prevent shading',
-  potato: 'Deep-root layer; isolated from Blight cousins',
-  bean: 'Nitrogen fixer; interplant with Heavy Feeders',
-  carrot: 'Middle-root layer; use Lettuce for shade',
-  broccoli: 'Heavy feeder; pair with Nitrogen fixers',
-  lettuce: 'South-most row; use as "Living Mulch"',
-  onion: 'The "Allium Shield" border plant',
+  tomato: 'Keep away from Corn/Potatoes (shared pests)',
+  corn: 'North row; serves as trellis for beans',
+  potato: 'Deep-root; separate from Tomatoes to avoid blight',
+  bean: 'Nitrogen fixer; avoid Alliums (stunts growth)',
+  carrot: 'Mid-root; use Onions to mask scent from flies',
+  broccoli: 'Heavy feeder; pair with early Beets',
+  lettuce: 'South row; benefits from shade of tall Corn',
+  onion: 'Border plant; masks other crop scents',
 };
 
 const SYNERGY_PATTERNS: { keywords: string[]; badge: string; tip: string }[] = [
