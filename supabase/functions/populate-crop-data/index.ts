@@ -33,16 +33,26 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const field = body.field || "growth_habit";
 
-    if (field !== "growth_habit" && field !== "scientific_name") {
-      throw new Error("Invalid field");
+    const VALID_FIELDS = ["growth_habit", "scientific_name", "planting_season", "harvest_days"];
+    if (!VALID_FIELDS.includes(field)) {
+      throw new Error("Invalid field. Valid: " + VALID_FIELDS.join(", "));
     }
 
-    const { data: crops, error: fetchErr } = await supabase
+    // For planting_season, null OR empty array means missing
+    let query = supabase
       .from("master_crops")
       .select("id, name, common_name, category")
-      .is(field, null)
       .order("frequency_hz", { ascending: true })
       .limit(50);
+
+    if (field === "planting_season") {
+      // Filter where planting_season is null or empty
+      query = query.or("planting_season.is.null,planting_season.eq.{}");
+    } else {
+      query = query.is(field, null);
+    }
+
+    const { data: crops, error: fetchErr } = await query;
 
     if (fetchErr) throw fetchErr;
     if (!crops || crops.length === 0) {
@@ -59,9 +69,25 @@ serve(async (req) => {
     const systemPrompts: Record<string, string> = {
       growth_habit: `You are a horticulturist. Given crop names, classify each with its growth habit. Use ONLY these values: tree, shrub, bush, vine, herb, grass, ground cover, underground, bulb, root, tuber, rhizome, aquatic, succulent, fungus, epiphyte. Pick the single most accurate term. Return via the tool call.`,
       scientific_name: `You are a botanist. Given crop names, return the correct binomial scientific name (genus + species) for each. Use the most commonly cultivated species. Return via the tool call.`,
+      planting_season: `You are an agronomist. Given crop names, return the planting seasons for each. Use ONLY these season values: "Spring", "Summer", "Fall", "Winter". Return an array of 1-4 seasons when the crop can be planted. Most vegetables are Spring; cool-season crops may include Fall; perennials may include multiple. Return via the tool call.`,
+      harvest_days: `You are an agronomist. Given crop names, return the typical days to harvest (from transplant/planting to first harvest) for each. Return an integer number of days. Use typical values for the most common cultivar. For perennials that produce in year 2+, use days from spring emergence to harvest in a mature plant. Return via the tool call.`,
     };
 
-    const valueField = field === "growth_habit" ? "value" : "scientific_name";
+    // Build tool schema based on field type
+    const toolItemProperties: Record<string, unknown> = field === "planting_season"
+      ? {
+          common_name: { type: "string" },
+          value: { type: "array", items: { type: "string", enum: ["Spring", "Summer", "Fall", "Winter"] } },
+        }
+      : field === "harvest_days"
+      ? {
+          common_name: { type: "string" },
+          value: { type: "integer" },
+        }
+      : {
+          common_name: { type: "string" },
+          value: { type: "string" },
+        };
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -88,10 +114,7 @@ serve(async (req) => {
                     type: "array",
                     items: {
                       type: "object",
-                      properties: {
-                        common_name: { type: "string" },
-                        value: { type: "string" },
-                      },
+                      properties: toolItemProperties,
                       required: ["common_name", "value"],
                       additionalProperties: false,
                     },
@@ -133,10 +156,16 @@ serve(async (req) => {
       }
     }
 
-    const { count } = await supabase
+    let countQuery = supabase
       .from("master_crops")
-      .select("id", { count: "exact", head: true })
-      .is(field, null);
+      .select("id", { count: "exact", head: true });
+
+    if (field === "planting_season") {
+      countQuery = countQuery.or("planting_season.is.null,planting_season.eq.{}");
+    } else {
+      countQuery = countQuery.is(field, null);
+    }
+    const { count } = await countQuery;
 
     return new Response(JSON.stringify({ updated, remaining: count ?? 0, batch_size: crops.length, field }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
