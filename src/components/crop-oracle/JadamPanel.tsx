@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, ChevronDown, ChevronRight, Beaker, FlaskConical } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronRight, Beaker, FlaskConical, CalendarDays } from 'lucide-react';
+import JadamCalendar from './JadamCalendar';
 import {
   JADAM_PROTOCOLS, getProtocolsForZone, ZONE_LABELS,
   type JadamProtocol, type JadamRecipeVariant,
@@ -349,7 +350,7 @@ const StatPill = ({ label, value, color }: { label: string; value: string; color
 
 /* ─── Main Panel ─── */
 const JadamPanel = ({ frequencyHz, zoneColor, zoneName }: JadamPanelProps) => {
-  const [tab, setTab] = useState<'zone' | 'full'>('zone');
+  const [tab, setTab] = useState<'zone' | 'full' | 'calendar'>('zone');
 
   return (
     <div className="space-y-2">
@@ -357,7 +358,8 @@ const JadamPanel = ({ frequencyHz, zoneColor, zoneName }: JadamPanelProps) => {
       <div className="flex gap-1">
         {[
           { id: 'zone' as const, label: 'ZONE RECIPES', icon: <Beaker className="w-3 h-3" /> },
-          { id: 'full' as const, label: 'FULL REFERENCE', icon: <FlaskConical className="w-3 h-3" /> },
+          { id: 'full' as const, label: 'FULL REF', icon: <FlaskConical className="w-3 h-3" /> },
+          { id: 'calendar' as const, label: 'CALENDAR', icon: <CalendarDays className="w-3 h-3" /> },
         ].map(t => (
           <button
             key={t.id}
@@ -375,10 +377,14 @@ const JadamPanel = ({ frequencyHz, zoneColor, zoneName }: JadamPanelProps) => {
       </div>
 
       {/* Content */}
-      {tab === 'zone' ? (
+      {tab === 'zone' && (
         <ZoneMappedView frequencyHz={frequencyHz} zoneColor={zoneColor} />
-      ) : (
+      )}
+      {tab === 'full' && (
         <FullReferenceView zoneColor={zoneColor} />
+      )}
+      {tab === 'calendar' && (
+        <JadamCalendar frequencyHz={frequencyHz} zoneColor={zoneColor} zoneName={zoneName} />
       )}
 
       {/* Joseon (Morning Calm) attribution */}
