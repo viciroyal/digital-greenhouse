@@ -53,8 +53,8 @@ export interface MasterCrop {
   brix_target_min: number | null;
   brix_target_max: number | null;
   instrument_type: string | null; // Musical instrument: Electric Guitar, Percussion, Horn Section, Bass, Synthesizers
-  hardiness_zone_min: number | null;
-  hardiness_zone_max: number | null;
+  hardiness_zone_min: number | null;  // Sub-zone: 8.0 = 8a, 8.5 = 8b
+  hardiness_zone_max: number | null;  // Sub-zone: 9.0 = 9a, 9.5 = 9b
   created_at: string;
   updated_at: string;
 }
