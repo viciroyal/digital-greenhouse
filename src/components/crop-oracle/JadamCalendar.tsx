@@ -9,6 +9,7 @@ interface JadamCalendarProps {
   frequencyHz: number;
   zoneColor: string;
   zoneName: string;
+  environment: string;
 }
 
 interface JadamTiming {
@@ -67,7 +68,7 @@ const BREW_BUTTONS: { id: JadamProtocolId; gradient: [string, string]; borderCol
   { id: 'JNP', gradient: ['hsl(0 40% 20%)', 'hsl(0 40% 28%)'], borderColor: 'hsl(0 40% 35%)', textColor: 'hsl(0 55% 65%)' },
 ];
 
-const JadamCalendar = ({ frequencyHz, zoneColor, zoneName }: JadamCalendarProps) => {
+const JadamCalendar = ({ frequencyHz, zoneColor, zoneName, environment }: JadamCalendarProps) => {
   const [activeBrewId, setActiveBrewId] = useState<JadamProtocolId | null>(null);
   const lunar = useMemo(() => getLunarPhase(), []);
   const timings = LUNAR_JADAM_MAP[lunar.plantingType];
@@ -298,6 +299,7 @@ const JadamCalendar = ({ frequencyHz, zoneColor, zoneName }: JadamCalendarProps)
           zoneColor={zoneColor}
           zoneName={zoneName}
           frequencyHz={frequencyHz}
+          environment={environment}
           onClose={() => setActiveBrewId(null)}
         />
       )}

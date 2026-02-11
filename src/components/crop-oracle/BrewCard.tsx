@@ -9,10 +9,62 @@ interface BrewCardProps {
   zoneColor: string;
   zoneName: string;
   frequencyHz: number;
+  environment: string;
   onClose: () => void;
 }
 
-const BrewCard = ({ protocol, initialVariantIndex = 0, zoneColor, zoneName, frequencyHz, onClose }: BrewCardProps) => {
+/**
+ * Scales a quantity string by a factor, converting units for readability.
+ * E.g. "30 gallons" at 1/30 → "1.0 qt", "10 lbs" at 1/30 → "5.3 oz"
+ */
+const scaleQuantity = (qty: string, isPot: boolean): string => {
+  if (!isPot) return qty;
+  const match = qty.match(/^([\d.]+)\s*(.*)/);
+  if (!match) return qty;
+  const num = parseFloat(match[1]);
+  const unit = match[2].toLowerCase().trim();
+  const scaleFactor = 1 / 30;
+  const scaled = num * scaleFactor;
+
+  if (unit.includes('gallon')) {
+    const quarts = scaled * 4;
+    if (quarts < 0.25) return `${(quarts * 4).toFixed(1)} tbsp`;
+    if (quarts < 1) return `${(quarts * 2).toFixed(1)} cups`;
+    return `${quarts.toFixed(1)} qt`;
+  }
+  if (unit.includes('liter')) {
+    const ml = scaled * 1000;
+    if (ml < 10) return `${ml.toFixed(1)} ml`;
+    return `${Math.round(ml)} ml`;
+  }
+  if (unit.includes('lb')) {
+    const oz = scaled * 16;
+    if (oz < 1) return `${(oz * 28.35).toFixed(0)} g`;
+    return `${oz.toFixed(1)} oz`;
+  }
+  if (unit.includes('kg')) {
+    const g = scaled * 1000;
+    return `${Math.round(g)} g`;
+  }
+  if (unit.match(/^g\b/) || unit.includes('gram')) {
+    const g = scaled;
+    return g < 1 ? `${(g * 1000).toFixed(0)} mg` : `${g.toFixed(1)} g`;
+  }
+  if (unit.includes('cup')) {
+    const tbsp = scaled * 16;
+    return tbsp < 1 ? `${(tbsp * 3).toFixed(1)} tsp` : `${tbsp.toFixed(1)} tbsp`;
+  }
+  if (unit.includes('tbsp')) {
+    const tsp = scaled * 3;
+    return tsp < 1 ? `${(tsp * 5).toFixed(1)} ml` : `${tsp.toFixed(1)} tsp`;
+  }
+  // Dimensionless counts (e.g. "1 medium") — keep as-is
+  if (num <= 2 && !unit.match(/\d/)) return qty;
+  return `${scaled.toFixed(1)} ${match[2]}`;
+};
+
+const BrewCard = ({ protocol, initialVariantIndex = 0, zoneColor, zoneName, frequencyHz, environment, onClose }: BrewCardProps) => {
+  const isPot = environment === 'pot';
   const [variantIndex, setVariantIndex] = useState(initialVariantIndex);
   const variant = protocol.variants[variantIndex];
   const cardRef = useRef<HTMLDivElement>(null);
@@ -143,6 +195,7 @@ const BrewCard = ({ protocol, initialVariantIndex = 0, zoneColor, zoneName, freq
         .footer { text-align: center; font-size: 8px; color: #bbb; margin-top: 16px; letter-spacing: 1px; }
         .checkbox-row { display: flex; align-items: center; gap: 6px; font-size: 10px; padding: 3px 0; color: #444; }
         .checkbox { width: 12px; height: 12px; border: 1px solid #999; border-radius: 2px; }
+        .env-badge { text-align: center; padding: 6px; border-radius: 6px; font-size: 10px; font-weight: bold; letter-spacing: 1px; margin-bottom: 12px; }
         @media print { body { padding: 0; } .card { border: 1px solid #ccc; } }
       </style></head><body>
       <div class="card">
@@ -151,6 +204,7 @@ const BrewCard = ({ protocol, initialVariantIndex = 0, zoneColor, zoneName, freq
           <div class="subtitle">${protocol.fullName} · ${protocol.koreanName}</div>
           <div class="subtitle" style="margin-top:2px">${variant.name}</div>
         </div>
+        ${isPot ? '<div class="env-badge" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7">🪴 SCALED FOR 1-GAL CONTAINER</div>' : '<div class="env-badge" style="background:#e3f2fd;color:#1565c0;border:1px solid #90caf9">🌱 FULL BATCH (30-GAL)</div>'}
         <div class="meta">
           <div class="meta-item">
             <div class="meta-label">Brew Date</div>
@@ -166,11 +220,11 @@ const BrewCard = ({ protocol, initialVariantIndex = 0, zoneColor, zoneName, freq
           </div>
         </div>
         <div class="section">
-          <div class="section-title">Ingredients</div>
+          <div class="section-title">Ingredients${isPot ? ' (scaled 1/30)' : ''}</div>
           ${variant.ingredients.map(ing => `
             <div class="ingredient">
               <span>${ing.name}</span>
-              <strong>${ing.quantity}</strong>
+              <strong>${scaleQuantity(ing.quantity, isPot)}</strong>
             </div>
             ${ing.note ? `<div class="ingredient-note">↳ ${ing.note}</div>` : ''}
           `).join('')}
@@ -224,7 +278,7 @@ const BrewCard = ({ protocol, initialVariantIndex = 0, zoneColor, zoneName, freq
     `);
     printWindow.document.close();
     setTimeout(() => printWindow.print(), 300);
-  }, [today, lunar, frequencyHz, zoneName, variant, protocol, steps, checklist, fermentRange, isInstant, readyStr, readyMaxStr]);
+  }, [today, lunar, frequencyHz, zoneName, variant, protocol, steps, checklist, fermentRange, isInstant, readyStr, readyMaxStr, isPot]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.8)' }}>
@@ -301,6 +355,19 @@ const BrewCard = ({ protocol, initialVariantIndex = 0, zoneColor, zoneName, freq
             </div>
           )}
 
+          {/* Environment Badge */}
+          <div
+            className="rounded-lg px-2.5 py-1.5 text-center"
+            style={{
+              background: isPot ? 'hsl(120 30% 12%)' : 'hsl(200 30% 12%)',
+              border: `1px solid ${isPot ? 'hsl(120 30% 25%)' : 'hsl(200 30% 25%)'}`,
+            }}
+          >
+            <span className="text-[9px] font-mono font-bold tracking-wider" style={{ color: isPot ? 'hsl(120 45% 55%)' : 'hsl(200 45% 55%)' }}>
+              {isPot ? '🪴 SCALED FOR 1-GAL CONTAINER' : '🌱 FULL BATCH (30-GAL)'}
+            </span>
+          </div>
+
           {/* Lunar + Zone Meta */}
           <div className="grid grid-cols-3 gap-1.5">
             {[
@@ -317,12 +384,14 @@ const BrewCard = ({ protocol, initialVariantIndex = 0, zoneColor, zoneName, freq
 
           {/* Ingredients */}
           <div>
-            <span className="text-[7px] font-mono tracking-wider block mb-1" style={{ color: protocol.color }}>INGREDIENTS</span>
+            <span className="text-[7px] font-mono tracking-wider block mb-1" style={{ color: protocol.color }}>
+              INGREDIENTS{isPot ? ' (SCALED 1/30)' : ''}
+            </span>
             {variant.ingredients.map((ing, i) => (
               <div key={i}>
                 <div className="flex items-center gap-2 py-1.5 px-2 rounded" style={{ background: i % 2 === 0 ? 'hsl(0 0% 4%)' : 'transparent' }}>
                   <span className="text-[10px] font-mono flex-1" style={{ color: 'hsl(0 0% 60%)' }}>{ing.name}</span>
-                  <span className="text-[10px] font-mono font-bold" style={{ color: protocol.color }}>{ing.quantity}</span>
+                  <span className="text-[10px] font-mono font-bold" style={{ color: protocol.color }}>{scaleQuantity(ing.quantity, isPot)}</span>
                 </div>
                 {ing.note && (
                   <p className="text-[8px] font-mono italic px-2 pb-1" style={{ color: 'hsl(0 0% 35%)' }}>↳ {ing.note}</p>
