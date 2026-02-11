@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Ruler, RefreshCw, CheckCircle, Beaker, Shield, Leaf } from 'lucide-react';
+import { Ruler, RefreshCw, CheckCircle, Beaker, Shield, Leaf, ArrowUp, ArrowDown } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { LearnMoreButton } from '@/components/almanac';
@@ -8,6 +8,7 @@ import EnvironmentSelector from './soil/EnvironmentSelector';
 import PotMixCalculator from './soil/PotMixCalculator';
 import HarmonizationPanel from './soil/HarmonizationPanel';
 import SavedSoilConfigs from './soil/SavedSoilConfigs';
+import SoilTestInput, { type SoilTestData, EMPTY_SOIL_TEST, diagnoseSoilTest, getAmendmentAdjustments } from './soil/SoilTestInput';
 import {
   type EnvironmentType,
   MASTER_MIX_PROTOCOL,
@@ -30,6 +31,7 @@ const DynamicSoilEngine = () => {
   const [bedLength, setBedLength] = useState(60);
   const [selectedHz, setSelectedHz] = useState<number | null>(null);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
+  const [soilTest, setSoilTest] = useState<SoilTestData>({ ...EMPTY_SOIL_TEST });
 
   const useMasterMix = environment !== 'pot';
 
@@ -38,14 +40,28 @@ const DynamicSoilEngine = () => {
     return { currentArea: Math.round(area * 10) / 10, scaleFactor: area / BASE_AREA_SQ_FT };
   }, [bedWidth, bedLength]);
 
+  // Soil test adjustments
+  const soilDiagnoses = useMemo(() => diagnoseSoilTest(soilTest), [soilTest]);
+  const soilAdjustments = useMemo(() => getAmendmentAdjustments(soilDiagnoses), [soilDiagnoses]);
+  const hasSoilData = Object.values(soilTest).some(v => v !== null);
+
   const scaledProtocol = useMemo(() => {
     return MASTER_MIX_PROTOCOL.map((item) => {
       const isBoosted = selectedHz && item.frequencyBoost?.includes(selectedHz);
       const baseAmount = isBoosted ? item.baseQuarts * 2 : item.baseQuarts;
-      const scaled = baseAmount * scaleFactor;
-      return { ...item, scaledQuarts: scaled, display: formatQuantity(scaled), isBoosted };
+      // Apply soil test adjustment
+      const adjustment = soilAdjustments[item.id];
+      const adjustedAmount = adjustment ? baseAmount * adjustment.multiplier : baseAmount;
+      const scaled = adjustedAmount * scaleFactor;
+      return {
+        ...item,
+        scaledQuarts: scaled,
+        display: formatQuantity(scaled),
+        isBoosted,
+        soilAdjustment: adjustment || null,
+      };
     });
-  }, [scaleFactor, selectedHz]);
+  }, [scaleFactor, selectedHz, soilAdjustments]);
 
   const toggleCheck = (id: string) => {
     const newChecked = { ...checkedItems, [id]: !checkedItems[id] };
@@ -271,6 +287,9 @@ const DynamicSoilEngine = () => {
               <HarmonizationPanel selectedHz={selectedHz} />
             </div>
 
+            {/* Soil Test Data Input */}
+            <SoilTestInput soilTest={soilTest} onChange={setSoilTest} />
+
             {/* Environment-Specific Soil Recommendation */}
             <div className="mt-4 p-3 rounded-lg" style={{ background: 'hsl(120 15% 10%)', border: '1px solid hsl(120 25% 25%)' }}>
               <span className="text-[10px] font-mono tracking-widest block mb-1" style={{ color: 'hsl(120 50% 55%)' }}>
@@ -376,14 +395,34 @@ const DynamicSoilEngine = () => {
                                 2×
                               </span>
                             )}
+                            {item.soilAdjustment && (
+                              <span className="text-[8px] font-mono font-bold px-1 py-0.5 rounded shrink-0 flex items-center gap-0.5"
+                                style={{
+                                  background: item.soilAdjustment.multiplier > 1 ? 'hsl(0 40% 18%)' : 'hsl(200 30% 15%)',
+                                  color: item.soilAdjustment.multiplier > 1 ? 'hsl(0 60% 65%)' : 'hsl(200 55% 65%)',
+                                }}>
+                                {item.soilAdjustment.multiplier > 1
+                                  ? <><ArrowUp className="w-2.5 h-2.5" />{item.soilAdjustment.multiplier}×</>
+                                  : <><ArrowDown className="w-2.5 h-2.5" />{item.soilAdjustment.multiplier}×</>
+                                }
+                              </span>
+                            )}
                           </div>
-                          <div className="flex items-center gap-1.5 mt-0.5">
+                          <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                             <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
                               {item.nutrientKey}
                             </span>
                             <span className="text-[7px] font-mono px-1 rounded" style={{ background: 'hsl(120 15% 12%)', color: 'hsl(120 40% 55%)' }}>
                               {item.organic}
                             </span>
+                            {item.soilAdjustment && (
+                              <span className="text-[7px] font-mono px-1 rounded" style={{
+                                background: item.soilAdjustment.multiplier > 1 ? 'hsl(0 30% 12%)' : 'hsl(200 20% 12%)',
+                                color: item.soilAdjustment.multiplier > 1 ? 'hsl(0 50% 55%)' : 'hsl(200 40% 55%)',
+                              }}>
+                                {item.soilAdjustment.reason}
+                              </span>
+                            )}
                           </div>
                         </div>
 
