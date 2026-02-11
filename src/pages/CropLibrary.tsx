@@ -12,6 +12,13 @@ const formatSubZone = (val: number | null): string => {
 
 const ZONE_ORDER = [396, 417, 528, 639, 741, 852, 963];
 
+const HABIT_EMOJI: Record<string, string> = {
+  tree: '🌳', shrub: '🫐', bush: '🌿', vine: '🧗', herb: '🌱',
+  grass: '🌾', 'ground cover': '🍀', underground: '⬇️', bulb: '🧄',
+  root: '🥕', tuber: '🥔', rhizome: '🫚', aquatic: '💧',
+  succulent: '🪴', fungus: '🍄', epiphyte: '🌺',
+};
+
 const CropRow = ({ crop }: { crop: MasterCrop }) => (
   <tr className="border-b border-border/30 text-[10px] leading-tight print:text-[9px]">
     <td className="py-1 px-1.5 font-bold">{crop.common_name || crop.name}</td>
@@ -20,6 +27,14 @@ const CropRow = ({ crop }: { crop: MasterCrop }) => (
     <td className="py-1 px-1.5">{crop.zone_name}</td>
     <td className="py-1 px-1.5">{crop.element}</td>
     <td className="py-1 px-1.5">{crop.category}</td>
+    <td className="py-1 px-1.5">
+      {crop.growth_habit ? (
+        <span className="inline-flex items-center gap-0.5">
+          <span>{HABIT_EMOJI[crop.growth_habit.toLowerCase()] || '🌿'}</span>
+          <span className="capitalize">{crop.growth_habit}</span>
+        </span>
+      ) : '–'}
+    </td>
     <td className="py-1 px-1.5">{crop.chord_interval || '–'}</td>
     <td className="py-1 px-1.5">{crop.instrument_type || '–'}</td>
     <td className="py-1 px-1.5">{crop.dominant_mineral || '–'}</td>
@@ -51,7 +66,7 @@ const escapeCsvField = (value: string): string => {
 const generateCsv = (crops: MasterCrop[]): string => {
   const headers = [
     'common_name', 'scientific_name', 'frequency_hz', 'zone_name', 'element', 'category',
-    'chord_interval', 'instrument_type', 'dominant_mineral', 'brix_min', 'brix_max',
+    'growth_habit', 'chord_interval', 'instrument_type', 'dominant_mineral', 'brix_min', 'brix_max',
     'hardiness_zone_min', 'hardiness_zone_max', 'harvest_days', 'spacing_inches',
     'planting_season', 'guild_role', 'focus_tag', 'companion_crops', 'crop_guild',
     'soil_protocol_focus', 'cultural_role', 'description', 'library_note',
@@ -64,6 +79,7 @@ const generateCsv = (crops: MasterCrop[]): string => {
     c.zone_name,
     c.element,
     c.category,
+    c.growth_habit || '',
     c.chord_interval || '',
     c.instrument_type || '',
     c.dominant_mineral || '',
@@ -193,6 +209,7 @@ const CropLibrary = () => {
                     <th className="py-1 px-1.5">Zone</th>
                     <th className="py-1 px-1.5">Element</th>
                     <th className="py-1 px-1.5">Category</th>
+                    <th className="py-1 px-1.5">Habit</th>
                     <th className="py-1 px-1.5">Chord</th>
                     <th className="py-1 px-1.5">Instrument</th>
                     <th className="py-1 px-1.5">Mineral</th>

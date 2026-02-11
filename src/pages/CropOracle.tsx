@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield, Shuffle, Shovel } from 'lucide-react';
+import GrowthHabitBadge from '@/components/crop-oracle/GrowthHabitBadge';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -1650,13 +1651,14 @@ const CropOracle = () => {
                                       </span>
                                     )}
                                   </div>
-                                  <p className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
-                                    {crop.frequency_hz}Hz • {cropZone?.name || crop.zone_name} • {crop.category}
-                                    {crop.chord_interval ? ` • ${crop.chord_interval}` : ''}
-                                    {crop.dominant_mineral ? ` • ${crop.dominant_mineral}` : ''}
-                                    {crop.guild_role ? ` • ${crop.guild_role}` : ''}
-                                    {crop.companion_crops?.length ? ` • ${crop.companion_crops.length} companions` : ''}
-                                  </p>
+                                  <div className="flex items-center gap-1 flex-wrap mt-0.5">
+                                    <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                                      {crop.frequency_hz}Hz • {cropZone?.name || crop.zone_name} • {crop.category}
+                                      {crop.chord_interval ? ` • ${crop.chord_interval}` : ''}
+                                      {crop.dominant_mineral ? ` • ${crop.dominant_mineral}` : ''}
+                                    </span>
+                                    <GrowthHabitBadge habit={crop.growth_habit} size="sm" />
+                                  </div>
                                 </div>
                               </button>
                             );
@@ -1922,51 +1924,23 @@ const CropOracle = () => {
                               </p>
                               {/* Growth Habit & Harvest Indicators */}
                               <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                                <GrowthHabitBadge habit={slot.crop!.growth_habit} size="sm" />
                                 {(() => {
-                                  const cat = (slot.crop!.category || '').toLowerCase();
-                                  const name = (slot.crop!.common_name || slot.crop!.name || '').toLowerCase();
-                                  const guildRole = (slot.crop!.guild_role || '').toLowerCase();
-
-                                  // Determine growth position
-                                  const isBelow = cat === 'root' || cat === 'tuber' || cat === 'bulb' || cat === 'allium'
-                                    || name.includes('carrot') || name.includes('beet') || name.includes('potato')
-                                    || name.includes('radish') || name.includes('turnip') || name.includes('garlic')
-                                    || name.includes('onion') || name.includes('ginger') || name.includes('turmeric');
-
-                                  const isVine = cat === 'vine' || cat === 'cucurbit'
-                                    || name.includes('tomato') || name.includes('cucumber') || name.includes('squash')
-                                    || name.includes('melon') || name.includes('bean') || name.includes('pea')
-                                    || name.includes('grape') || name.includes('kiwi') || name.includes('passion')
-                                    || name.includes('gourd');
-
-                                  const needsTrellis = isVine || name.includes('pole') || name.includes('indeterminate')
-                                    || name.includes('climbing') || name.includes('runner');
-
-                                  const growthIcon = isBelow ? '⬇️' : isVine ? '🧗' : '⬆️';
-                                  const growthLabel = isBelow ? 'Below Ground' : isVine ? 'Vine / Climbing' : 'Above Ground';
-                                  const growthColor = isBelow ? 'hsl(25 50% 50%)' : isVine ? 'hsl(160 45% 50%)' : 'hsl(120 45% 50%)';
-
-                                  return (
-                                    <>
-                                      <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
-                                        style={{ background: `${growthColor}15`, color: growthColor, border: `1px solid ${growthColor}25` }}>
-                                        {growthIcon} {growthLabel}
-                                      </span>
-                                      {needsTrellis && (
-                                        <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
-                                          style={{ background: 'hsl(270 40% 20% / 0.3)', color: 'hsl(270 50% 65%)', border: '1px solid hsl(270 40% 35% / 0.3)' }}>
-                                          🪜 Trellis
-                                        </span>
-                                      )}
-                                      {slot.crop!.harvest_days && (
-                                        <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
-                                          style={{ background: 'hsl(45 40% 18% / 0.3)', color: 'hsl(45 60% 60%)', border: '1px solid hsl(45 40% 30% / 0.3)' }}>
-                                          🌾 {slot.crop!.harvest_days}d harvest
-                                        </span>
-                                      )}
-                                    </>
-                                  );
+                                  const habit = (slot.crop!.growth_habit || '').toLowerCase();
+                                  const needsTrellis = habit === 'vine' || habit === 'epiphyte';
+                                  return needsTrellis ? (
+                                    <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                      style={{ background: 'hsl(270 40% 20% / 0.3)', color: 'hsl(270 50% 65%)', border: '1px solid hsl(270 40% 35% / 0.3)' }}>
+                                      🪜 Trellis
+                                    </span>
+                                  ) : null;
                                 })()}
+                                {slot.crop!.harvest_days && (
+                                  <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                    style={{ background: 'hsl(45 40% 18% / 0.3)', color: 'hsl(45 60% 60%)', border: '1px solid hsl(45 40% 30% / 0.3)' }}>
+                                    🌾 {slot.crop!.harvest_days}d harvest
+                                  </span>
+                                )}
                               </div>
                             </>
                           ) : (
@@ -2204,11 +2178,13 @@ const CropOracle = () => {
                                 </span>
                               )}
                             </div>
-                            <p className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
-                              {crop.frequency_hz}Hz • {zoneData?.name || crop.zone_name} • {crop.category}
-                              {crop.chord_interval && ` • ${crop.chord_interval}`}
-                              {crop.dominant_mineral && ` • ${crop.dominant_mineral}`}
-                            </p>
+                            <div className="flex items-center gap-1 flex-wrap mt-0.5">
+                              <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                                {crop.frequency_hz}Hz • {zoneData?.name || crop.zone_name} • {crop.category}
+                                {crop.chord_interval && ` • ${crop.chord_interval}`}
+                              </span>
+                              <GrowthHabitBadge habit={crop.growth_habit} size="sm" />
+                            </div>
                           </div>
                           {crop.spacing_inches && (
                             <span className="text-[9px] font-mono shrink-0" style={{ color: 'hsl(0 0% 30%)' }}>
