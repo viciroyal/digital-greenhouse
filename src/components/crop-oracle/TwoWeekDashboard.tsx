@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Sprout, Scissors, Beaker, Calendar, Clock } from 'lucide-react';
+import { ChevronDown, Sprout, Scissors, Beaker, Calendar, Clock, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -151,6 +152,11 @@ const TwoWeekDashboard = () => {
               HARVEST NOW
             </span>
           )}
+          <Link to="/weekly-tasks" className="text-[8px] font-mono px-2 py-0.5 rounded-full hover:opacity-80 transition-opacity"
+            style={{ background: 'hsl(140 30% 12%)', color: 'hsl(140 50% 55%)', border: '1px solid hsl(140 30% 25%)' }}
+            onClick={(e) => e.stopPropagation()}>
+            <ExternalLink className="w-2.5 h-2.5 inline mr-0.5" /> FULL CALENDAR
+          </Link>
           <ChevronDown
             className="w-3.5 h-3.5 transition-transform"
             style={{
