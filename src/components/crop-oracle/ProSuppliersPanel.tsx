@@ -29,6 +29,10 @@ const SUPPLIERS: Record<Category, { name: string; url?: string; note: string; sp
     { name: 'Levity Farms', url: 'https://www.levityfarms.com', note: 'Local GA farm offering CSA shares — support regenerative land stewards', specialty: 'GA CSA' },
     { name: 'Standard Feed & Seed', note: '2339 Brannen Rd SE, Atlanta GA 30316 • (404) 241-6922 — local farm supply store', specialty: 'Local farm supply' },
     { name: 'Gangstas to Growers', url: 'https://www.gangstastogrowers.com', note: 'Worker-owned cooperatives — agriculture opportunities for at-risk & formerly incarcerated youth', specialty: 'Youth ag co-ops' },
+    { name: 'BluRoots Foundation', url: 'https://blurootsfoundation.org', note: 'Community gardening, food access & wellness education through local partnerships', specialty: 'Wellness & gardens' },
+    { name: 'Athens Land Trust', url: 'https://athenslandtrust.org', note: 'Farmer network, community gardens & CNG-certified farm support across GA', specialty: 'Land conservation' },
+    { name: 'West GA Farmers Co-op', url: 'https://growwestga.coop', note: 'Founded 1966 — sustainable agriculture cooperative serving West Georgia', specialty: 'Farmer co-op' },
+    { name: 'The Common Market GA', url: 'https://www.thecommonmarket.org', note: 'Values-based food distribution connecting local farms to Atlanta institutions', specialty: 'Food hub' },
   ],
   seeds: [
     { name: 'Georgia Seed & Garden', url: 'https://georgiaseeds.com', note: 'GA-specific growing instructions with heirloom & open-pollinated seed', specialty: 'GA heirloom' },
