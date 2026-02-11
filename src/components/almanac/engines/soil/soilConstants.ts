@@ -52,7 +52,8 @@ export interface PotMixComponent {
 }
 
 export const POT_MIX_RECIPE: PotMixComponent[] = [
-  { id: 'potting_base', name: 'OMRI Organic Potting Mix', role: 'BASE', percentage: 50, color: 'hsl(35 50% 40%)', note: 'Certified organic peat/coir base' },
+  { id: 'potting_base', name: 'OMRI Organic Potting Mix', role: 'BASE', percentage: 35, color: 'hsl(35 50% 40%)', note: 'Certified organic peat base' },
+  { id: 'coco_coir', name: 'Coco Coir', role: 'AERATION', percentage: 15, color: 'hsl(30 55% 45%)', note: 'Renewable, pH-neutral water retention & aeration' },
   { id: 'compost', name: 'Aged Compost', role: 'FERTILITY', percentage: 20, color: 'hsl(25 60% 35%)', note: 'Well-finished, screened ¼ inch' },
   { id: 'worm_castings', name: 'Worm Castings', role: 'BIOLOGY', percentage: 15, color: 'hsl(35 40% 30%)', note: 'Living microbial inoculant' },
   { id: 'perlite', name: 'Perlite', role: 'DRAINAGE', percentage: 10, color: 'hsl(0 0% 80%)', note: 'Prevents compaction & root rot' },
