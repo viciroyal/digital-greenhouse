@@ -39,6 +39,14 @@ const ORGS = [
     url: 'https://loveislovefarm.com',
   },
   {
+    name: 'Grow Where You Are',
+    type: 'Urban Farm & Education',
+    note: 'Rooted in GA — growing food, community & resilience where you stand',
+    color: 'hsl(90 45% 50%)',
+    icon: '🌱',
+    url: 'https://growwhereyouare.farm',
+  },
+  {
     name: 'Community Farmers Markets',
     type: 'Local Markets & Land Access',
     note: 'Find your local farmers market — support sovereign food systems',
