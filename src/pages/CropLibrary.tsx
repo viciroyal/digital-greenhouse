@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useMasterCrops } from '@/hooks/useMasterCrops';
 import { Printer, Leaf, ArrowLeft, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import VirtualizedZoneTable from '@/components/crop-library/VirtualizedZoneTable';
+import CropLibraryFilters from '@/components/crop-library/CropLibraryFilters';
 import { generateCsv } from '@/components/crop-library/csvExport';
 import { ZONE_ORDER } from '@/components/crop-library/constants';
 
@@ -11,19 +12,53 @@ const CropLibrary = () => {
   const { data: crops, isLoading, error } = useMasterCrops();
   const { toast } = useToast();
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedZone, setSelectedZone] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const categories = useMemo(() => {
+    if (!crops) return [];
+    return [...new Set(crops.map((c) => c.category))].sort();
+  }, [crops]);
+
+  const zoneNames = useMemo(() => {
+    if (!crops) return {} as Record<number, string>;
+    const map: Record<number, string> = {};
+    for (const c of crops) {
+      if (!map[c.frequency_hz]) map[c.frequency_hz] = c.zone_name;
+    }
+    return map;
+  }, [crops]);
+
+  const filteredCrops = useMemo(() => {
+    if (!crops) return [];
+    const q = searchQuery.toLowerCase().trim();
+    return crops.filter((c) => {
+      if (selectedZone !== null && c.frequency_hz !== selectedZone) return false;
+      if (selectedCategory && c.category !== selectedCategory) return false;
+      if (q) {
+        const haystack = `${c.common_name || ''} ${c.name} ${c.scientific_name || ''} ${c.zone_name} ${c.category} ${c.growth_habit || ''} ${c.dominant_mineral || ''}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [crops, searchQuery, selectedZone, selectedCategory]);
+
   const groupedByZone = useMemo(() =>
-    ZONE_ORDER.map((hz) => {
-      const zoneCrops = (crops || []).filter((c) => c.frequency_hz === hz);
-      const sample = zoneCrops[0];
-      return {
-        hz,
-        name: sample?.zone_name ?? `${hz}Hz`,
-        color: sample?.zone_color ?? '#888',
-        element: sample?.element ?? '',
-        crops: zoneCrops,
-      };
-    }),
-    [crops]
+    ZONE_ORDER
+      .map((hz) => {
+        const zoneCrops = filteredCrops.filter((c) => c.frequency_hz === hz);
+        const sample = zoneCrops[0] || (crops || []).find((c) => c.frequency_hz === hz);
+        return {
+          hz,
+          name: sample?.zone_name ?? `${hz}Hz`,
+          color: sample?.zone_color ?? '#888',
+          element: sample?.element ?? '',
+          crops: zoneCrops,
+        };
+      })
+      .filter((z) => z.crops.length > 0),
+    [filteredCrops, crops]
   );
 
   const totalCrops = crops?.length ?? 0;
@@ -80,6 +115,22 @@ const CropLibrary = () => {
           </p>
         </div>
 
+        {/* Filters */}
+        {!isLoading && !error && (
+          <CropLibraryFilters
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            selectedZone={selectedZone}
+            onZoneChange={setSelectedZone}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            categories={categories}
+            zoneNames={zoneNames}
+            resultCount={filteredCrops.length}
+            totalCount={totalCrops}
+          />
+        )}
+
         {isLoading && (
           <p className="text-center font-apothecary text-muted-foreground py-12">Loading crop library…</p>
         )}
@@ -109,6 +160,13 @@ const CropLibrary = () => {
             <VirtualizedZoneTable crops={zone.crops} />
           </section>
         ))}
+
+        {/* No results */}
+        {!isLoading && !error && filteredCrops.length === 0 && totalCrops > 0 && (
+          <p className="text-center font-apothecary text-muted-foreground py-12">
+            No crops match your filters. Try broadening your search.
+          </p>
+        )}
 
         {/* Footer */}
         <div className="text-center mt-8 print:mt-4 font-apothecary text-[10px] text-muted-foreground print:text-black/50">
