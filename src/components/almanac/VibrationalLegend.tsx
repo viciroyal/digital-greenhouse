@@ -20,13 +20,13 @@ export interface FrequencyData {
 
 // Fallback frequency data when database is empty
 export const frequencies: FrequencyData[] = [
-  { hz: 396, name: 'ROOT PULSE', color: 'hsl(0 70% 50%)', description: 'Liberation from fear. Foundation crops that anchor the soil.', element: 'Earth', crops: [] },
-  { hz: 417, name: 'STONE HUM', color: 'hsl(30 70% 50%)', description: 'Facilitating change. Mineral-rich crops that break stagnation.', element: 'Stone', crops: [] },
-  { hz: 528, name: 'THE SONGLINE', color: 'hsl(120 60% 45%)', description: 'DNA repair. Transformation frequency for leafy abundance.', element: 'Life', crops: [] },
-  { hz: 639, name: 'GOLD FLOW', color: 'hsl(51 100% 50%)', description: 'Harmonizing relationships. Sweet crops that connect communities.', element: 'Gold', crops: [] },
-  { hz: 741, name: 'VOICE CHANNEL', color: 'hsl(195 80% 50%)', description: 'Awakening intuition. Aromatic crops that speak to the senses.', element: 'Air', crops: [] },
-  { hz: 852, name: 'THIRD EYE', color: 'hsl(270 70% 55%)', description: 'Spiritual order. Medicinal crops that open perception.', element: 'Spirit', crops: [] },
-  { hz: 963, name: 'SOURCE CODE', color: 'hsl(0 0% 85%)', description: 'Divine connection. Seed-saving crops that carry the code forward.', element: 'Light', crops: [] },
+  { hz: 396, name: 'ROOT PULSE', color: 'hsl(0 60% 50%)', description: 'Liberation from fear. Foundation crops that anchor the soil.', element: 'Earth', crops: [] },
+  { hz: 417, name: 'STONE HUM', color: 'hsl(30 70% 50%)', description: 'Facilitating change. Mineral-rich crops that break stagnation.', element: 'Water', crops: [] },
+  { hz: 528, name: 'THE SONGLINE', color: 'hsl(51 80% 50%)', description: 'DNA repair. Transformation frequency for leafy abundance.', element: 'Fire', crops: [] },
+  { hz: 639, name: 'GOLD FLOW', color: 'hsl(120 50% 45%)', description: 'Harmonizing relationships. Sweet crops that connect communities.', element: 'Air', crops: [] },
+  { hz: 741, name: 'VOICE CHANNEL', color: 'hsl(210 60% 50%)', description: 'Awakening intuition. Aromatic crops that speak to the senses.', element: 'Ether', crops: [] },
+  { hz: 852, name: 'THIRD EYE', color: 'hsl(270 50% 50%)', description: 'Spiritual order. Medicinal crops that open perception.', element: 'Light', crops: [] },
+  { hz: 963, name: 'SOURCE CODE', color: 'hsl(300 50% 50%)', description: 'Divine connection. Seed-saving crops that carry the code forward.', element: 'Spirit', crops: [] },
 ];
 
 const frequencyDescriptions: Record<number, string> = {
