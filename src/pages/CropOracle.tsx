@@ -23,6 +23,7 @@ import PropagationPanel from '@/components/crop-oracle/PropagationPanel';
 import EcoParadigmCard from '@/components/community/EcoParadigmCard';
 import ProSuppliersPanel from '@/components/crop-oracle/ProSuppliersPanel';
 import FoodForestHoleProtocol from '@/components/crop-oracle/FoodForestHoleProtocol';
+import CustomPairingPanel from '@/components/crop-oracle/CustomPairingPanel';
 
 
 import TwoWeekDashboard from '@/components/crop-oracle/TwoWeekDashboard';
@@ -271,7 +272,7 @@ const CropOracle = () => {
   const [showZonePicker, setShowZonePicker] = useState(false);
   const [showStateDropdown, setShowStateDropdown] = useState(false);
   const [modalInfoOpen, setModalInfoOpen] = useState(false);
-  const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | 'scent' | 'propagation' | 'suppliers' | 'hole' | null>(null);
+  const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | 'scent' | 'propagation' | 'suppliers' | 'hole' | 'pairing' | null>(null);
   const [recipeSeed, setRecipeSeed] = useState(0);
   const [showSeasonalCompanions, setShowSeasonalCompanions] = useState(false);
   const [seasonFilter, setSeasonFilter] = useState<string | null>(null);
@@ -1867,7 +1868,7 @@ const CropOracle = () => {
                     ...((environment === 'food-forest' || proMode) ? [{ id: 'scent' as const, icon: <Shield className="w-3.5 h-3.5" />, tip: 'Scent Corridor' }] : []),
                     ...(environment === 'food-forest' ? [{ id: 'hole' as const, icon: <TreePine className="w-3.5 h-3.5" />, tip: 'Hole Protocol' }] : []),
                     { id: 'propagation' as const, icon: <Sprout className="w-3.5 h-3.5" />, tip: 'Seed Starting' },
-                    
+                    { id: 'pairing' as const, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/><circle cx="9" cy="9" r="2"/><circle cx="15" cy="15" r="2"/><path d="M9 15l6-6"/></svg>, tip: 'Custom Pairings' },
                     ...(proMode ? [{ id: 'suppliers' as const, icon: <Shovel className="w-3.5 h-3.5" />, tip: 'Pro Suppliers' }] : []),
                   ].map(tool => {
                     const isActive = activeToolPanel === tool.id;
@@ -2006,6 +2007,22 @@ const CropOracle = () => {
                     <ProSuppliersPanel
                       zoneColor={selectedZone.color}
                       zoneName={selectedZone.name}
+                    />
+                  </motion.div>
+                )}
+                {activeToolPanel === 'pairing' && (
+                  <motion.div
+                    key="pairing-panel"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden mb-2"
+                  >
+                    <CustomPairingPanel
+                      zoneColor={selectedZone.color}
+                      zoneName={selectedZone.name}
+                      availableCrops={recipeCrops}
                     />
                   </motion.div>
                 )}
