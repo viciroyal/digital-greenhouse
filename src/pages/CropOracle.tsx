@@ -1863,24 +1863,74 @@ const CropOracle = () => {
                             )}
                           </div>
                           {slot.crop ? (
-                            <p className="text-xs font-body mt-0.5 flex items-center gap-1 flex-wrap" style={{ color: 'hsl(0 0% 65%)' }}>
-                              {slot.crop.common_name || slot.crop.name}
-                              {slot.crop.spacing_inches && (
-                                <span style={{ color: 'hsl(0 0% 35%)' }}> • {slot.crop.spacing_inches}" spacing</span>
-                              )}
-                              {slot.crop.hardiness_zone_min != null && slot.crop.hardiness_zone_max != null && (
-                                <span
-                                  className="text-[8px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5"
-                                  style={{
-                                    background: 'hsl(140 30% 15% / 0.4)',
-                                    color: 'hsl(140 50% 60%)',
-                                    border: '1px solid hsl(140 40% 30% / 0.3)',
-                                  }}
-                                >
-                                  🌍 Zone {formatSubZone(slot.crop.hardiness_zone_min)}–{formatSubZone(slot.crop.hardiness_zone_max)}
-                                </span>
-                              )}
-                            </p>
+                            <>
+                              <p className="text-xs font-body mt-0.5 flex items-center gap-1 flex-wrap" style={{ color: 'hsl(0 0% 65%)' }}>
+                                {slot.crop.common_name || slot.crop.name}
+                                {slot.crop.spacing_inches && (
+                                  <span style={{ color: 'hsl(0 0% 35%)' }}> • {slot.crop.spacing_inches}" spacing</span>
+                                )}
+                                {slot.crop.hardiness_zone_min != null && slot.crop.hardiness_zone_max != null && (
+                                  <span
+                                    className="text-[8px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5"
+                                    style={{
+                                      background: 'hsl(140 30% 15% / 0.4)',
+                                      color: 'hsl(140 50% 60%)',
+                                      border: '1px solid hsl(140 40% 30% / 0.3)',
+                                    }}
+                                  >
+                                    🌍 Zone {formatSubZone(slot.crop.hardiness_zone_min)}–{formatSubZone(slot.crop.hardiness_zone_max)}
+                                  </span>
+                                )}
+                              </p>
+                              {/* Growth Habit & Harvest Indicators */}
+                              <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                                {(() => {
+                                  const cat = (slot.crop!.category || '').toLowerCase();
+                                  const name = (slot.crop!.common_name || slot.crop!.name || '').toLowerCase();
+                                  const guildRole = (slot.crop!.guild_role || '').toLowerCase();
+
+                                  // Determine growth position
+                                  const isBelow = cat === 'root' || cat === 'tuber' || cat === 'bulb' || cat === 'allium'
+                                    || name.includes('carrot') || name.includes('beet') || name.includes('potato')
+                                    || name.includes('radish') || name.includes('turnip') || name.includes('garlic')
+                                    || name.includes('onion') || name.includes('ginger') || name.includes('turmeric');
+
+                                  const isVine = cat === 'vine' || cat === 'cucurbit'
+                                    || name.includes('tomato') || name.includes('cucumber') || name.includes('squash')
+                                    || name.includes('melon') || name.includes('bean') || name.includes('pea')
+                                    || name.includes('grape') || name.includes('kiwi') || name.includes('passion')
+                                    || name.includes('gourd');
+
+                                  const needsTrellis = isVine || name.includes('pole') || name.includes('indeterminate')
+                                    || name.includes('climbing') || name.includes('runner');
+
+                                  const growthIcon = isBelow ? '⬇️' : isVine ? '🧗' : '⬆️';
+                                  const growthLabel = isBelow ? 'Below Ground' : isVine ? 'Vine / Climbing' : 'Above Ground';
+                                  const growthColor = isBelow ? 'hsl(25 50% 50%)' : isVine ? 'hsl(160 45% 50%)' : 'hsl(120 45% 50%)';
+
+                                  return (
+                                    <>
+                                      <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                        style={{ background: `${growthColor}15`, color: growthColor, border: `1px solid ${growthColor}25` }}>
+                                        {growthIcon} {growthLabel}
+                                      </span>
+                                      {needsTrellis && (
+                                        <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                          style={{ background: 'hsl(270 40% 20% / 0.3)', color: 'hsl(270 50% 65%)', border: '1px solid hsl(270 40% 35% / 0.3)' }}>
+                                          🪜 Trellis
+                                        </span>
+                                      )}
+                                      {slot.crop!.harvest_days && (
+                                        <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                          style={{ background: 'hsl(45 40% 18% / 0.3)', color: 'hsl(45 60% 60%)', border: '1px solid hsl(45 40% 30% / 0.3)' }}>
+                                          🌾 {slot.crop!.harvest_days}d harvest
+                                        </span>
+                                      )}
+                                    </>
+                                  );
+                                })()}
+                              </div>
+                            </>
                           ) : (
                             <p className="text-xs font-mono italic mt-0.5" style={{ color: 'hsl(0 0% 25%)' }}>
                               No match in registry
