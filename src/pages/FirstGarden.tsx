@@ -295,6 +295,17 @@ const FirstGarden = () => {
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
+
+              {/* Skip to Advanced */}
+              <div className="mt-6 text-center">
+                <button
+                  onClick={() => navigate('/crop-oracle')}
+                  className="text-[11px] font-mono tracking-wider transition-colors hover:underline"
+                  style={{ color: 'hsl(0 0% 35%)' }}
+                >
+                  Skip to Advanced Studio →
+                </button>
+              </div>
             </motion.div>
           )}
 
