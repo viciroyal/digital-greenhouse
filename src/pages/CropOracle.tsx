@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -33,6 +33,7 @@ const ENVIRONMENTS = [
   { id: 'raised-bed', label: 'Raised Bed', icon: <Leaf className="w-6 h-6" />, subtitle: 'Backyard / Garden', description: 'Standard guild planting in raised beds' },
   { id: 'farm', label: 'Farm', icon: <Tractor className="w-6 h-6" />, subtitle: 'Acreage / Row Crops', description: 'High-volume row cropping and field production' },
   { id: 'high-tunnel', label: 'High Tunnel', icon: <HomeIcon className="w-6 h-6" />, subtitle: 'Protected Culture', description: 'Season extension with climate control' },
+  { id: 'food-forest', label: 'Food Forest', icon: <TreePine className="w-6 h-6" />, subtitle: 'Perennial Polyculture', description: 'Multi-layer perennial food ecosystem with canopy, understory, and ground cover' },
 ];
 
 /* ─── Chord interval display order ─── */
@@ -972,7 +973,7 @@ const CropOracle = () => {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {ENVIRONMENTS.filter(env => proMode || (env.id !== 'farm' && env.id !== 'high-tunnel')).map(env => (
+                {ENVIRONMENTS.filter(env => proMode || (env.id !== 'farm' && env.id !== 'high-tunnel' && env.id !== 'food-forest')).map(env => (
                   <motion.button
                     key={env.id}
                     onClick={() => { setEnvironment(env.id); setStep(2); }}
@@ -1692,7 +1693,7 @@ const CropOracle = () => {
                   }}
                 >
                   <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 30%)' }}>
-                    {environment === 'pot' ? '🪴 CONTAINER' : environment === 'farm' ? '🚜 FARM' : environment === 'high-tunnel' ? '🏠 HIGH TUNNEL' : '🌱 RAISED BED'} MODE
+                    {environment === 'pot' ? '🪴 CONTAINER' : environment === 'farm' ? '🚜 FARM' : environment === 'high-tunnel' ? '🏠 HIGH TUNNEL' : environment === 'food-forest' ? '🌳 FOOD FOREST' : '🌱 RAISED BED'} MODE
                   </span>
                   <div className="flex items-center gap-3">
                     <div
@@ -2033,7 +2034,7 @@ const CropOracle = () => {
                       const zone = ZONES.find(z => z.hz === recipe.zone_hz);
                       const chordSlots = Array.isArray(recipe.chord_data) ? recipe.chord_data as Array<{ label?: string; crop_name?: string | null; role?: string }> : [];
                       const filledCount = chordSlots.filter(s => s.crop_name).length;
-                      const envLabel = recipe.environment === 'pot' ? '🪴' : recipe.environment === 'farm' ? '🚜' : recipe.environment === 'high-tunnel' ? '🏠' : '🌱';
+                      const envLabel = recipe.environment === 'pot' ? '🪴' : recipe.environment === 'farm' ? '🚜' : recipe.environment === 'high-tunnel' ? '🏠' : recipe.environment === 'food-forest' ? '🌳' : '🌱';
 
                       return (
                         <motion.div
