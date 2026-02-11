@@ -429,7 +429,14 @@ const CropOracle = () => {
       return candidateListsStar || starListsCandidate;
     };
 
-    const harmonicScore = (c: MasterCrop): number => {
+    // Helper: is this crop a sentinel/trap crop?
+    const isSentinelOrTrap = (c: MasterCrop): boolean => {
+      const role = (c.guild_role || '').toLowerCase();
+      const desc = (c.description || '').toLowerCase();
+      return role === 'sentinel' || ['trap crop', 'pest deterrent', 'pest-deterrent', 'repel', 'deterr'].some(k => desc.includes(k));
+    };
+
+    const harmonicScore = (c: MasterCrop, hasSentinelAlready: boolean = false): number => {
       let score = 0;
       // Season overlap with star crop (+3 per shared season)
       const cSeasons = (c.planting_season || []).map(s => s.toLowerCase());
@@ -451,21 +458,29 @@ const CropOracle = () => {
         if (diff <= 15) score += 2;
         else if (diff <= 30) score += 1;
       }
+      // Sentinel/trap crop boost: +4 base, +6 extra if recipe has no sentinel yet
+      if (isSentinelOrTrap(c)) {
+        score += 4;
+        if (!hasSentinelAlready) score += 6;
+      }
       return score;
     };
 
     // Seeded rotation: pick from candidates using recipeSeed, preferring harmonically-scored crops
     let pickCounter = 0;
+    let hasSentinelInRecipe = starCrop ? isSentinelOrTrap(starCrop) : false;
     const rotatedPick = (candidates: MasterCrop[]): MasterCrop | undefined => {
       if (candidates.length === 0) return undefined;
       // Sort by harmonic score descending, then use seed to rotate within top-tier
-      const scored = candidates.map(c => ({ crop: c, score: harmonicScore(c) }));
+      const scored = candidates.map(c => ({ crop: c, score: harmonicScore(c, hasSentinelInRecipe) }));
       scored.sort((a, b) => b.score - a.score);
       // Pick from the top-scoring tier (all candidates within 1 point of best)
       const bestScore = scored[0].score;
       const topTier = scored.filter(s => s.score >= bestScore - 1);
       const idx = (recipeSeed + pickCounter++) % topTier.length;
-      return topTier[idx].crop;
+      const picked = topTier[idx].crop;
+      if (picked && isSentinelOrTrap(picked)) hasSentinelInRecipe = true;
+      return picked;
     };
 
     const pickCrop = (
