@@ -485,13 +485,16 @@ const CropOracle = () => {
           break;
         case '9th (Sub-bass)':
           if (isFF) {
-            // Food Forest: deep-rooted nutrient miners (comfrey, dandelion, burdock, turmeric)
-            assign(pickCrop(undefined, c => {
+            // Food Forest: first try crops explicitly tagged as 9th (Sub-bass)
+            assign(pickCrop(undefined, c => c.chord_interval === '9th (Sub-bass)'));
+            // Then deep-rooted nutrient miners (comfrey, dandelion, burdock, turmeric)
+            if (!crop) assign(pickCrop(undefined, c => {
               const name = (c.common_name || c.name).toLowerCase();
               return c.guild_role?.toLowerCase().includes('miner') ||
                 name.includes('comfrey') || name.includes('dandelion') ||
                 name.includes('burdock') || name.includes('turmeric') ||
-                name.includes('ginger') || name.includes('sunchoke');
+                name.includes('ginger') || name.includes('sunchoke') ||
+                name.includes('jerusalem artichoke');
             }));
             if (!crop) assign(pickCrop(undefined, c =>
               c.instrument_type === 'Bass' ||
