@@ -295,11 +295,16 @@ export const useAutoGeneration = (
           // RULE 2 — Structural: max 1 high-canopy crop per bed
           if (hasHighCanopy && c.growth_habit && HIGH_CANOPY_HABITS.includes(c.growth_habit.toLowerCase())) return false;
 
-          // RULE 3 — Pathological: same-family heavy feeders need >24" spacing
+          // RULE 3 — Pathological: same-family heavy feeders allowed only if spacing > 24"
           const cGenus = getGenus(c);
           if (cGenus && c.category === 'Sustenance') {
+            const cSpacing = c.spacing_inches ? parseFloat(c.spacing_inches) : 0;
             for (const placed of placedCrops) {
-              if (placed.category === 'Sustenance' && getGenus(placed) === cGenus) return false; // same genus heavy feeder → block
+              if (placed.category === 'Sustenance' && getGenus(placed) === cGenus) {
+                // Allow if BOTH crops have spacing > 24 inches (sufficient distance)
+                const placedSpacing = placed.spacing_inches ? parseFloat(placed.spacing_inches) : 0;
+                if (cSpacing <= 24 || placedSpacing <= 24) return false;
+              }
             }
           }
 
