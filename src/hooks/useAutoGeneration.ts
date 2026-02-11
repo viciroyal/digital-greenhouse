@@ -223,10 +223,18 @@ export const useAutoGeneration = (
       { groupA: ['sage'], groupB: ['cucumber'] },
       { groupA: ['mint'], groupB: ['parsley'] },
       { groupA: ['sunflower'], groupB: ['potato'] },
-      { groupA: ['potato'], groupB: ['squash', 'cucumber'] },
+      { groupA: ['potato'], groupB: ['squash', 'cucumber', 'zucchini', 'pumpkin'] },
       { groupA: ['bean'], groupB: ['pepper'] },
       { groupA: ['corn'], groupB: ['celery'] },
       { groupA: ['onion'], groupB: ['asparagus'] },
+      { groupA: ['pepper'], groupB: ['fennel'] },
+      { groupA: ['pepper'], groupB: ['kohlrabi'] },
+      { groupA: ['squash', 'zucchini', 'pumpkin'], groupB: ['potato'] },
+      { groupA: ['cucumber'], groupB: ['potato'] },
+      { groupA: ['cucumber', 'squash', 'zucchini'], groupB: ['melon'] },
+      { groupA: ['eggplant'], groupB: ['fennel'] },
+      { groupA: ['eggplant'], groupB: ['pepper'] },
+      { groupA: ['celery'], groupB: ['parsnip', 'parsley'] },
     ];
 
     const isAntagonist = (candidate: MasterCrop, placed: MasterCrop[]): boolean => {
