@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Circle, Lightbulb, Cloud, Loader2 } from 'lucide-react';
+import { CheckCircle2, Circle, Lightbulb, Cloud, Loader2, RotateCcw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface SupplyItem {
@@ -190,6 +190,12 @@ const PropagationReadiness = ({ zoneColor }: PropagationReadinessProps) => {
     });
   };
 
+  const resetAll = () => {
+    const empty = new Set<string>();
+    setCheckedItems(empty);
+    saveToDb(empty);
+  };
+
   const totalWeight = SUPPLY_CHECKLIST.reduce((s, i) => s + i.weight, 0);
   const earnedWeight = SUPPLY_CHECKLIST.filter(i => checkedItems.has(i.id)).reduce((s, i) => s + i.weight, 0);
   const score = Math.round((earnedWeight / totalWeight) * 100);
@@ -222,6 +228,16 @@ const PropagationReadiness = ({ zoneColor }: PropagationReadinessProps) => {
             {syncing ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <Cloud className="w-2.5 h-2.5" />}
             {syncing ? 'saving…' : 'synced'}
           </span>
+        )}
+        {checkedItems.size > 0 && (
+          <button
+            onClick={resetAll}
+            className="flex items-center gap-1 text-[7px] font-mono px-1.5 py-0.5 rounded transition-colors hover:opacity-80"
+            style={{ color: 'hsl(0 50% 55%)', background: 'hsl(0 30% 12%)', border: '1px solid hsl(0 25% 20%)' }}
+          >
+            <RotateCcw className="w-2.5 h-2.5" />
+            reset
+          </button>
         )}
       </div>
 
