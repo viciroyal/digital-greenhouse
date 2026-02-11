@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -67,6 +67,8 @@ const CropOracle = () => {
   const [deletingRecipeId, setDeletingRecipeId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [proMode, setProMode] = useState(false);
+  const [hardinessZone, setHardinessZone] = useState<number | null>(null);
+  const [showZonePicker, setShowZonePicker] = useState(false);
 
   // Fetch saved recipes
   const { data: savedRecipes } = useQuery({
@@ -163,11 +165,23 @@ const CropOracle = () => {
     }
   };
 
+  /* ─── Hardiness zone filter helper ─── */
+  const fitsHardinessZone = (c: MasterCrop): boolean => {
+    if (!hardinessZone) return true;
+    const crop = c as any;
+    if (crop.hardiness_zone_min == null || crop.hardiness_zone_max == null) return true; // no data = show
+    return hardinessZone >= crop.hardiness_zone_min && hardinessZone <= crop.hardiness_zone_max;
+  };
+
   /* ─── Filter crops by zone + environment ─── */
   const recipeCrops = useMemo(() => {
     if (!allCrops || !selectedZone) return [];
 
     let filtered = allCrops.filter(c => c.frequency_hz === selectedZone.hz);
+
+    if (hardinessZone) {
+      filtered = filtered.filter(fitsHardinessZone);
+    }
 
     if (environment === 'pot') {
       filtered = filtered.filter(c => {
@@ -186,12 +200,15 @@ const CropOracle = () => {
     }
 
     return filtered;
-  }, [allCrops, selectedZone, environment]);
+  }, [allCrops, selectedZone, environment, hardinessZone]);
 
   /* ─── Star crop candidates (ANY crop from ANY zone can be the Star) ─── */
   const starCandidates = useMemo(() => {
     if (!allCrops) return [];
     let candidates = [...allCrops];
+    if (hardinessZone) {
+      candidates = candidates.filter(fitsHardinessZone);
+    }
     if (environment === 'pot') {
       candidates = candidates.filter(c => {
         const spacing = c.spacing_inches ? parseInt(c.spacing_inches) : 6;
@@ -199,7 +216,7 @@ const CropOracle = () => {
       });
     }
     return candidates.sort((a, b) => (a.common_name || a.name).localeCompare(b.common_name || b.name));
-  }, [allCrops, environment]);
+  }, [allCrops, environment, hardinessZone]);
 
   /* ─── Filtered star search ─── */
   const filteredStarCandidates = useMemo(() => {
@@ -637,6 +654,67 @@ const CropOracle = () => {
               </button>
             );
           })}
+        </div>
+
+        {/* USDA Hardiness Zone Picker */}
+        <div
+          className="rounded-xl px-3 py-2 mt-2 flex items-center gap-2 overflow-x-auto"
+          style={{
+            background: 'hsl(0 0% 5% / 0.8)',
+            border: `1px solid ${hardinessZone ? 'hsl(140 40% 25%)' : 'hsl(0 0% 12%)'}`,
+          }}
+        >
+          <button
+            onClick={() => setShowZonePicker(!showZonePicker)}
+            className="flex items-center gap-1.5 shrink-0"
+          >
+            <MapPin className="w-3 h-3" style={{ color: hardinessZone ? 'hsl(140 60% 55%)' : 'hsl(0 0% 35%)' }} />
+            <span className="text-[8px] font-mono tracking-widest" style={{ color: hardinessZone ? 'hsl(140 50% 60%)' : 'hsl(0 0% 35%)' }}>
+              {hardinessZone ? `USDA ${hardinessZone}` : 'GROW ZONE'}
+            </span>
+            <ChevronDown className="w-2.5 h-2.5" style={{ color: 'hsl(0 0% 35%)', transform: showZonePicker ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+          </button>
+
+          {!showZonePicker && hardinessZone && (
+            <button
+              onClick={() => { setHardinessZone(null); toast({ title: 'Zone filter cleared', description: 'Showing all crops.' }); }}
+              className="flex items-center gap-1 px-2 py-0.5 rounded-full shrink-0"
+              style={{ background: 'hsl(0 30% 15%)', border: '1px solid hsl(0 40% 30%)' }}
+            >
+              <X className="w-2.5 h-2.5" style={{ color: 'hsl(0 50% 55%)' }} />
+              <span className="text-[8px] font-mono" style={{ color: 'hsl(0 50% 60%)' }}>CLEAR</span>
+            </button>
+          )}
+
+          {showZonePicker && (
+            <div className="flex items-center gap-1 flex-wrap">
+              {Array.from({ length: 13 }, (_, i) => i + 1).map(z => {
+                const isActive = hardinessZone === z;
+                return (
+                  <button
+                    key={z}
+                    onClick={() => {
+                      setHardinessZone(isActive ? null : z);
+                      setShowZonePicker(false);
+                      toast({
+                        title: isActive ? 'Zone filter cleared' : `🌍 USDA Zone ${z} selected`,
+                        description: isActive ? 'Showing all crops.' : `Crops filtered for hardiness zone ${z}.`,
+                      });
+                    }}
+                    className="w-7 h-7 rounded-full font-mono text-[10px] font-bold transition-all shrink-0"
+                    style={{
+                      background: isActive ? 'hsl(140 40% 20%)' : 'hsl(0 0% 8%)',
+                      border: `1.5px solid ${isActive ? 'hsl(140 60% 45%)' : 'hsl(0 0% 18%)'}`,
+                      color: isActive ? 'hsl(140 70% 65%)' : 'hsl(0 0% 50%)',
+                      boxShadow: isActive ? '0 0 8px hsl(140 50% 35% / 0.3)' : 'none',
+                    }}
+                  >
+                    {z}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </motion.div>
 
