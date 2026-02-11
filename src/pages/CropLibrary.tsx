@@ -1,6 +1,7 @@
 import { useMasterCrops, type MasterCrop } from '@/hooks/useMasterCrops';
-import { Printer, Leaf, ArrowLeft } from 'lucide-react';
+import { Printer, Leaf, ArrowLeft, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 const formatSubZone = (val: number | null): string => {
   if (val === null) return '–';
@@ -40,8 +41,55 @@ const CropRow = ({ crop }: { crop: MasterCrop }) => (
   </tr>
 );
 
+const escapeCsvField = (value: string): string => {
+  if (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes(';')) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+};
+
+const generateCsv = (crops: MasterCrop[]): string => {
+  const headers = [
+    'common_name', 'latin_name', 'frequency_hz', 'zone_name', 'element', 'category',
+    'chord_interval', 'instrument_type', 'dominant_mineral', 'brix_min', 'brix_max',
+    'hardiness_zone_min', 'hardiness_zone_max', 'harvest_days', 'spacing_inches',
+    'planting_season', 'guild_role', 'focus_tag', 'companion_crops', 'crop_guild',
+    'soil_protocol_focus', 'cultural_role', 'description', 'library_note',
+  ];
+
+  const rows = crops.map(c => [
+    c.common_name || c.name,
+    c.name,
+    String(c.frequency_hz),
+    c.zone_name,
+    c.element,
+    c.category,
+    c.chord_interval || '',
+    c.instrument_type || '',
+    c.dominant_mineral || '',
+    c.brix_target_min != null ? String(c.brix_target_min) : '',
+    c.brix_target_max != null ? String(c.brix_target_max) : '',
+    c.hardiness_zone_min != null ? String(c.hardiness_zone_min) : '',
+    c.hardiness_zone_max != null ? String(c.hardiness_zone_max) : '',
+    c.harvest_days != null ? String(c.harvest_days) : '',
+    c.spacing_inches || '',
+    (c.planting_season || []).join('; '),
+    c.guild_role || '',
+    c.focus_tag || '',
+    (c.companion_crops || []).join('; '),
+    (c.crop_guild || []).join('; '),
+    c.soil_protocol_focus || '',
+    c.cultural_role || '',
+    c.description || '',
+    c.library_note || '',
+  ].map(escapeCsvField));
+
+  return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+};
+
 const CropLibrary = () => {
   const { data: crops, isLoading, error } = useMasterCrops();
+  const { toast } = useToast();
 
   const groupedByZone = ZONE_ORDER.map((hz) => {
     const zoneCrops = (crops || []).filter((c) => c.frequency_hz === hz);
@@ -57,6 +105,19 @@ const CropLibrary = () => {
 
   const totalCrops = crops?.length ?? 0;
 
+  const handleDownloadCsv = () => {
+    if (!crops || crops.length === 0) return;
+    const csv = generateCsv(crops);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pharmboi-crop-registry-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: `${crops.length} crops exported`, description: 'CSV downloaded with all connections.' });
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground p-4 print:p-2 print:bg-white print:text-black">
       {/* Header */}
@@ -66,13 +127,23 @@ const CropLibrary = () => {
             <ArrowLeft className="w-4 h-4" />
             <span className="font-apothecary text-xs">Back to Crop Oracle</span>
           </Link>
-          <button
-            onClick={() => window.print()}
-            className="gem-button px-4 py-2 text-sm font-apothecary text-primary-foreground flex items-center gap-2"
-          >
-            <Printer className="w-4 h-4" />
-            Print / Export PDF
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDownloadCsv}
+              disabled={!crops || crops.length === 0}
+              className="gem-button px-4 py-2 text-sm font-apothecary text-primary-foreground flex items-center gap-2 disabled:opacity-50"
+            >
+              <Download className="w-4 h-4" />
+              Export CSV
+            </button>
+            <button
+              onClick={() => window.print()}
+              className="gem-button px-4 py-2 text-sm font-apothecary text-primary-foreground flex items-center gap-2"
+            >
+              <Printer className="w-4 h-4" />
+              Print / Export PDF
+            </button>
+          </div>
         </div>
 
         {/* Title */}
