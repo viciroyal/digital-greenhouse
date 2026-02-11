@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Sprout, Droplets, Thermometer, Sun, Clock, Leaf, Snowflake, CalendarDays } from 'lucide-react';
 import EcoParadigmCard from '@/components/community/EcoParadigmCard';
 import GACommunityResources from '@/components/community/GACommunityResources';
+import PropagationReadiness from '@/components/crop-oracle/PropagationReadiness';
 
 interface PropagationPanelProps {
   zoneColor: string;
@@ -427,6 +428,9 @@ const PropagationPanel = ({ zoneColor, zoneName, environment, hardinessZone }: P
                   ))}
                 </ul>
               </div>
+
+              {/* ─── READINESS CHECK ─── */}
+              <PropagationReadiness zoneColor={zoneColor} />
 
               {/* ─── ECO-PARADIGM & GA COMMUNITY ─── */}
               <EcoParadigmCard variant="inline" />
