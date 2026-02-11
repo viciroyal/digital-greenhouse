@@ -57,6 +57,66 @@ const INTERVAL_ORDER = [
   { key: '13th (Top Note)', label: 'The Aerial', role: '13th', emoji: '🌻', hint: 'Tall plants that create shade and wind protection above.' },
 ];
 
+/* ─── Antagonist & Synergy Rules ─── */
+const ANTAGONIST_PAIRS: { groupA: string[]; groupB: string[]; reason: string }[] = [
+  { groupA: ['onion', 'garlic', 'shallot', 'leek', 'chive', 'scallion'], groupB: ['bean', 'pea', 'lentil', 'chickpea', 'lima'], reason: 'Alliums stunt legume growth via chemical secretions' },
+  { groupA: ['tomato'], groupB: ['potato'], reason: 'Both susceptible to the same blight — keep far apart' },
+  { groupA: ['cabbage', 'broccoli', 'kale', 'cauliflower', 'brussels'], groupB: ['tomato'], reason: 'Brassicas and tomatoes compete for calcium & attract shared pests' },
+  { groupA: ['fennel'], groupB: ['tomato', 'bean', 'pepper', 'eggplant', 'carrot'], reason: 'Fennel secretes compounds that inhibit most neighbors' },
+  { groupA: ['walnut', 'black walnut'], groupB: ['tomato', 'pepper', 'eggplant', 'potato', 'blueberry'], reason: 'Juglone toxicity from walnut roots' },
+  { groupA: ['dill'], groupB: ['carrot'], reason: 'Dill cross-pollinates with carrots, reducing seed quality' },
+];
+
+const SYNERGY_PATTERNS: { keywords: string[]; badge: string; tip: string }[] = [
+  { keywords: ['corn', 'bean', 'squash'], badge: '🌾 THREE SISTERS', tip: 'Corn provides a trellis for beans, beans fix nitrogen, squash shades soil & deters pests.' },
+  { keywords: ['tomato', 'basil'], badge: '🍅 CLASSIC PAIR', tip: 'Basil repels aphids and whiteflies while improving tomato flavor.' },
+  { keywords: ['carrot', 'onion'], badge: '🛡️ PEST SHIELD', tip: 'Carrots repel onion flies; onions repel carrot flies.' },
+  { keywords: ['strawberry', 'borage'], badge: '🐝 POLLINATOR BOOST', tip: 'Borage attracts pollinators and is believed to improve strawberry yield.' },
+];
+
+const cropMatchesGroup = (crop: MasterCrop, group: string[]): boolean => {
+  const name = (crop.common_name || crop.name).toLowerCase();
+  return group.some(k => name.includes(k));
+};
+
+const findAntagonisms = (crops: (MasterCrop | null)[]): { cropA: string; cropB: string; reason: string }[] => {
+  const warnings: { cropA: string; cropB: string; reason: string }[] = [];
+  const valid = crops.filter((c): c is MasterCrop => c !== null);
+  for (const rule of ANTAGONIST_PAIRS) {
+    const matchesA = valid.filter(c => cropMatchesGroup(c, rule.groupA));
+    const matchesB = valid.filter(c => cropMatchesGroup(c, rule.groupB));
+    for (const a of matchesA) {
+      for (const b of matchesB) {
+        if (a.id !== b.id) warnings.push({ cropA: a.common_name || a.name, cropB: b.common_name || b.name, reason: rule.reason });
+      }
+    }
+  }
+  return warnings;
+};
+
+const findSynergies = (crops: (MasterCrop | null)[]): { badge: string; tip: string }[] => {
+  const valid = crops.filter((c): c is MasterCrop => c !== null);
+  const names = valid.map(c => (c.common_name || c.name).toLowerCase());
+  return SYNERGY_PATTERNS.filter(pat =>
+    pat.keywords.every(k => names.some(n => n.includes(k)))
+  );
+};
+
+const isAntagonistWith = (crop: MasterCrop, others: (MasterCrop | null)[]): string | null => {
+  const valid = others.filter((c): c is MasterCrop => c !== null && c.id !== crop.id);
+  for (const rule of ANTAGONIST_PAIRS) {
+    if (cropMatchesGroup(crop, rule.groupA)) {
+      const enemy = valid.find(c => cropMatchesGroup(c, rule.groupB));
+      if (enemy) return `⚔️ ${rule.reason}`;
+    }
+    if (cropMatchesGroup(crop, rule.groupB)) {
+      const enemy = valid.find(c => cropMatchesGroup(c, rule.groupA));
+      if (enemy) return `⚔️ ${rule.reason}`;
+    }
+  }
+  return null;
+};
+
 /* ─── Food Forest layer labels (override when environment === 'food-forest') ─── */
 const FOOD_FOREST_LAYERS: Record<string, { label: string; emoji: string; hint: string }> = {
   'Root (Lead)': { label: 'Canopy Tree', emoji: '🌳', hint: 'The tallest layer — fruit or nut trees forming the forest ceiling.' },
@@ -554,6 +614,18 @@ const CropOracle = () => {
       if (isSentinelOrTrap(c)) {
         score += 4;
         if (!hasSentinelAlready) score += 6;
+      }
+      // Antagonist penalty: if candidate conflicts with star crop or already-placed crops
+      if (starCrop) {
+        for (const rule of ANTAGONIST_PAIRS) {
+          const starName = (starCrop.common_name || starCrop.name).toLowerCase();
+          const cName = (c.common_name || c.name).toLowerCase();
+          const starInA = rule.groupA.some(k => starName.includes(k));
+          const starInB = rule.groupB.some(k => starName.includes(k));
+          const cInA = rule.groupA.some(k => cName.includes(k));
+          const cInB = rule.groupB.some(k => cName.includes(k));
+          if ((starInA && cInB) || (starInB && cInA)) score -= 12;
+        }
       }
       return score;
     };
@@ -2244,6 +2316,44 @@ const CropOracle = () => {
                   </div>
                 )}
 
+                {/* Synergy & Antagonist Summary */}
+                {(() => {
+                  const recipeCropsForCheck = chordCard.map(s => s.crop);
+                  const antagonisms = findAntagonisms(recipeCropsForCheck);
+                  const synergies = findSynergies(recipeCropsForCheck);
+                  if (antagonisms.length === 0 && synergies.length === 0) return null;
+                  return (
+                    <div className="px-5 py-2 flex flex-wrap gap-2" style={{ background: 'hsl(0 0% 3%)', borderBottom: '1px solid hsl(0 0% 10%)' }}>
+                      {synergies.map((s, idx) => (
+                        <Tooltip key={`syn-${idx}`}>
+                          <TooltipTrigger asChild>
+                            <span className="text-[8px] font-mono font-bold px-2 py-1 rounded cursor-help"
+                              style={{ background: 'hsl(145 50% 18% / 0.4)', color: 'hsl(145 70% 55%)', border: '1px solid hsl(145 50% 35% / 0.3)' }}>
+                              {s.badge}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="max-w-xs text-xs">
+                            <p>{s.tip}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ))}
+                      {antagonisms.map((a, idx) => (
+                        <Tooltip key={`ant-${idx}`}>
+                          <TooltipTrigger asChild>
+                            <span className="text-[8px] font-mono font-bold px-2 py-1 rounded cursor-help"
+                              style={{ background: 'hsl(0 60% 15% / 0.5)', color: 'hsl(0 70% 60%)', border: '1px solid hsl(0 50% 35% / 0.4)' }}>
+                              ⚔️ {a.cropA} vs {a.cropB}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="max-w-xs text-xs">
+                            <p>{a.reason}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ))}
+                    </div>
+                  );
+                })()}
+
                 <div className="divide-y" style={{ borderColor: 'hsl(0 0% 10%)' }}>
                   {chordCard.map((slot, i) => {
                     // Beginner mode: only show Triad (Root, 3rd, 5th)
@@ -2426,6 +2536,17 @@ const CropOracle = () => {
                                     </span>
                                   );
                                   return null;
+                                })()}
+                                {/* Antagonist warning per crop */}
+                                {slot.crop && (() => {
+                                  const warning = isAntagonistWith(slot.crop!, chordCard.map(s => s.crop));
+                                  if (!warning) return null;
+                                  return (
+                                    <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                      style={{ background: 'hsl(0 60% 15% / 0.5)', color: 'hsl(0 70% 60%)', border: '1px solid hsl(0 50% 35% / 0.4)' }}>
+                                      {warning}
+                                    </span>
+                                  );
                                 })()}
                               </div>
                             </>
