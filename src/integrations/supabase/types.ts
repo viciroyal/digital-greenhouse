@@ -226,6 +226,8 @@ export type Database = {
           focus_tag: string | null
           frequency_hz: number
           guild_role: string | null
+          hardiness_zone_max: number | null
+          hardiness_zone_min: number | null
           harvest_days: number | null
           id: string
           instrument_type: string | null
@@ -254,6 +256,8 @@ export type Database = {
           focus_tag?: string | null
           frequency_hz: number
           guild_role?: string | null
+          hardiness_zone_max?: number | null
+          hardiness_zone_min?: number | null
           harvest_days?: number | null
           id?: string
           instrument_type?: string | null
@@ -282,6 +286,8 @@ export type Database = {
           focus_tag?: string | null
           frequency_hz?: number
           guild_role?: string | null
+          hardiness_zone_max?: number | null
+          hardiness_zone_min?: number | null
           harvest_days?: number | null
           id?: string
           instrument_type?: string | null
