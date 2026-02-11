@@ -56,6 +56,7 @@ export interface MasterCrop {
   instrument_type: string | null; // Musical instrument: Electric Guitar, Percussion, Horn Section, Bass, Synthesizers
   hardiness_zone_min: number | null;  // Sub-zone: 8.0 = 8a, 8.5 = 8b
   hardiness_zone_max: number | null;  // Sub-zone: 9.0 = 9a, 9.5 = 9b
+  growth_habit: string | null; // tree, shrub, vine, herb, underground, bulb, etc.
   created_at: string;
   updated_at: string;
 }
