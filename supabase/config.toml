@@ -2,3 +2,6 @@ project_id = "hskewohbngatoqzlvlef"
 
 [functions.populate-scientific-names]
 verify_jwt = false
+
+[functions.populate-crop-data]
+verify_jwt = false
