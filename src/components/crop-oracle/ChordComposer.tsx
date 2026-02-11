@@ -22,7 +22,7 @@ import { toast } from 'sonner';
 /* ─── Constants ─── */
 const ZONE_COLORS: Record<number, string> = {
   396: '#FF0000', 417: '#FF7F00', 528: '#FFFF00',
-  639: '#00FF00', 741: '#0000FF', 852: '#4B0082', 963: '#8B00FF',
+  639: '#00FF00', 741: '#0000FF', 852: '#9B59B6', 963: '#8B00FF',
 };
 
 const NOTE_MAP: Record<number, string> = {
