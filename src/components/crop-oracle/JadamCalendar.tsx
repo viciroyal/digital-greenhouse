@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import BrewJmsCard from './BrewJmsCard';
 import { motion } from 'framer-motion';
 import { Calendar, Moon, Sun, Sprout, Leaf, AlertTriangle } from 'lucide-react';
 import { getLunarPhase, type LunarPhaseData, type PlantingType } from '@/hooks/useLunarPhase';
@@ -69,6 +70,7 @@ const PRIORITY_META = {
 };
 
 const JadamCalendar = ({ frequencyHz, zoneColor, zoneName }: JadamCalendarProps) => {
+  const [showBrewCard, setShowBrewCard] = useState(false);
   const lunar = useMemo(() => getLunarPhase(), []);
   const timings = LUNAR_JADAM_MAP[lunar.plantingType];
   const csaFocus = CSA_JADAM_FOCUS[lunar.seasonalMovement.phase];
@@ -262,6 +264,28 @@ const JadamCalendar = ({ frequencyHz, zoneColor, zoneName }: JadamCalendarProps)
           ))}
         </div>
       </div>
+      {/* Brew JMS Now Button */}
+      <button
+        onClick={() => setShowBrewCard(true)}
+        className="w-full py-2.5 rounded-lg flex items-center justify-center gap-2 text-[10px] font-mono font-bold tracking-wider transition-all hover:brightness-110"
+        style={{
+          background: `linear-gradient(135deg, hsl(120 45% 20%), hsl(120 45% 30%))`,
+          border: '1px solid hsl(120 45% 35%)',
+          color: 'hsl(120 45% 70%)',
+        }}
+      >
+        🦠 BREW JMS NOW
+      </button>
+
+      {/* Brew Card Modal */}
+      {showBrewCard && (
+        <BrewJmsCard
+          zoneColor={zoneColor}
+          zoneName={zoneName}
+          frequencyHz={frequencyHz}
+          onClose={() => setShowBrewCard(false)}
+        />
+      )}
     </div>
   );
 };
