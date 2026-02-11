@@ -1477,6 +1477,7 @@ const CropOracle = () => {
                       zoneColor={selectedZone.color}
                       zoneName={selectedZone.name}
                       environment={environment || undefined}
+                      hardinessZone={hardinessZone}
                     />
                   </motion.div>
                 )}
