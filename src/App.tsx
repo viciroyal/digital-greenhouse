@@ -44,7 +44,10 @@ const App = () => (
             <img
               src={sovereignEmblem}
               alt="Sovereign Emblem"
-              className="fixed bottom-4 left-4 w-12 h-auto opacity-70 hover:opacity-100 transition-opacity pointer-events-none z-50"
+              className="fixed bottom-4 left-4 w-16 h-auto opacity-75 hover:opacity-100 transition-all duration-500 pointer-events-none z-50"
+              style={{
+                filter: 'drop-shadow(0 0 6px hsl(120 45% 40% / 0.5)) drop-shadow(0 0 14px hsl(35 60% 45% / 0.3)) drop-shadow(0 0 24px hsl(0 55% 50% / 0.15))',
+              }}
             />
           </TooltipProvider>
         </FieldModeProvider>
