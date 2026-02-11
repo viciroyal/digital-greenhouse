@@ -19,7 +19,7 @@ const ZONES = [
   { hz: 528, name: 'Alchemy', vibe: 'Energy', color: '#FFFF00', note: 'E', description: 'Solar power, nitrogen, growth core' },
   { hz: 639, name: 'Heart', vibe: 'Heart', color: '#00FF00', note: 'F', description: 'Connection, mycorrhizal sync, calcium' },
   { hz: 741, name: 'Signal', vibe: 'Expression', color: '#0000FF', note: 'G', description: 'Potassium, Brix validation, alchemy' },
-  { hz: 852, name: 'Vision', vibe: 'Vision', color: '#4B0082', note: 'A', description: 'Medicinal density, silica, insight' },
+  { hz: 852, name: 'Vision', vibe: 'Vision', color: '#9B59B6', note: 'A', description: 'Medicinal density, silica, insight' },
   { hz: 963, name: 'Source', vibe: 'Protection', color: '#8B00FF', note: 'B', description: 'Garlic shield, sulfur, seed sanctuary' },
 ];
 
@@ -579,6 +579,64 @@ const CropOracle = () => {
               </div>
             )}
           </div>
+        </div>
+      </motion.div>
+
+      {/* ═══ Zone Quick-Selector ═══ */}
+      <motion.div
+        className="mx-auto max-w-2xl px-4 mt-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.15 }}
+      >
+        <div
+          className="rounded-xl px-3 py-2 flex items-center gap-2 overflow-x-auto"
+          style={{
+            background: 'hsl(0 0% 5% / 0.8)',
+            border: '1px solid hsl(0 0% 12%)',
+          }}
+        >
+          <span className="text-[8px] font-mono tracking-widest shrink-0" style={{ color: 'hsl(0 0% 35%)' }}>
+            ZONE
+          </span>
+          {ZONES.map(zone => {
+            const isActive = selectedZone?.hz === zone.hz;
+            return (
+              <button
+                key={zone.hz}
+                onClick={() => {
+                  if (!environment) setEnvironment('raised-bed');
+                  setSelectedZone(zone);
+                  setSeasonalOverride(false);
+                  setManualOverrides({});
+                  setStarCrop(null);
+                  setIsSaved(false);
+                  setStep(3);
+                }}
+                className="flex items-center gap-1 px-2 py-1 rounded-full shrink-0 transition-all"
+                style={{
+                  background: isActive ? `${zone.color}20` : 'transparent',
+                  border: `1.5px solid ${isActive ? zone.color : 'hsl(0 0% 15%)'}`,
+                  boxShadow: isActive ? `0 0 10px ${zone.color}30` : 'none',
+                }}
+                title={`${zone.note} — ${zone.name} (${zone.hz}Hz)`}
+              >
+                <div
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{
+                    background: zone.color,
+                    boxShadow: `0 0 6px ${zone.color}60`,
+                  }}
+                />
+                <span
+                  className="text-[10px] font-mono font-bold"
+                  style={{ color: isActive ? zone.color : 'hsl(0 0% 45%)' }}
+                >
+                  {zone.note}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </motion.div>
 

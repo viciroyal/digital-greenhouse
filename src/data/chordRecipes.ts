@@ -196,7 +196,7 @@ export const CHORD_RECIPES: ChordRecipe[] = [
   {
     frequencyHz: 852,
     zoneName: 'Vision',
-    zoneColor: '#4B0082',
+    zoneColor: '#9B59B6',
     chordName: 'The Vision 13th',
     intervals: [
       { interval: '1st', role: 'Root / Canopy',         cropName: 'Eggplant (Black Beauty)', emoji: '🍆' },
@@ -211,7 +211,7 @@ export const CHORD_RECIPES: ChordRecipe[] = [
   {
     frequencyHz: 852,
     zoneName: 'Vision',
-    zoneColor: '#4B0082',
+    zoneColor: '#9B59B6',
     chordName: 'The Indigo Shield 13th',
     intervals: [
       { interval: '1st', role: 'Root / Canopy',         cropName: 'Eggplant (Black Beauty)', emoji: '🍆' },

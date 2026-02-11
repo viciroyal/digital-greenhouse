@@ -13,7 +13,7 @@ const ZONES = [
   { hz: 528, name: 'Alchemy', vibe: 'Energy', color: '#FFFF00', note: 'E' },
   { hz: 639, name: 'Heart', vibe: 'Heart', color: '#00FF00', note: 'F' },
   { hz: 741, name: 'Signal', vibe: 'Expression', color: '#0000FF', note: 'G' },
-  { hz: 852, name: 'Vision', vibe: 'Vision', color: '#4B0082', note: 'A' },
+  { hz: 852, name: 'Vision', vibe: 'Vision', color: '#9B59B6', note: 'A' },
   { hz: 963, name: 'Source', vibe: 'Protection', color: '#8B00FF', note: 'B' },
 ];
 
