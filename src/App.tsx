@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,15 +9,18 @@ import { AudioBiomeProvider } from "@/contexts/AudioBiomeContext";
 import { FieldModeProvider } from "@/contexts/FieldModeContext";
 import sovereignEmblem from "@/assets/sovereign-emblem.png";
 
+// Eagerly load the landing page for instant first paint
 import Index from "./pages/Index";
-import CropOracle from "./pages/CropOracle";
-import Auth from "./pages/Auth";
-import Profile from "./pages/Profile";
-import UserGuide from "./pages/UserGuide";
-import DevGuide from "./pages/DevGuide";
-import TestingSuiteDocs from "./pages/TestingSuiteDocs";
-import CropLibrary from "./pages/CropLibrary";
-import NotFound from "./pages/NotFound";
+
+// Lazy-load all secondary routes
+const CropOracle = lazy(() => import("./pages/CropOracle"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Profile = lazy(() => import("./pages/Profile"));
+const UserGuide = lazy(() => import("./pages/UserGuide"));
+const DevGuide = lazy(() => import("./pages/DevGuide"));
+const TestingSuiteDocs = lazy(() => import("./pages/TestingSuiteDocs"));
+const CropLibrary = lazy(() => import("./pages/CropLibrary"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
@@ -31,14 +35,14 @@ const App = () => (
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/crop-oracle" element={<CropOracle />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/user-guide" element={<UserGuide />} />
-                <Route path="/dev-guide" element={<DevGuide />} />
-                <Route path="/testing-docs" element={<TestingSuiteDocs />} />
-                <Route path="/crop-library" element={<CropLibrary />} />
-                <Route path="*" element={<NotFound />} />
+                <Route path="/crop-oracle" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><CropOracle /></Suspense>} />
+                <Route path="/auth" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><Auth /></Suspense>} />
+                <Route path="/profile" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><Profile /></Suspense>} />
+                <Route path="/user-guide" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><UserGuide /></Suspense>} />
+                <Route path="/dev-guide" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><DevGuide /></Suspense>} />
+                <Route path="/testing-docs" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><TestingSuiteDocs /></Suspense>} />
+                <Route path="/crop-library" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><CropLibrary /></Suspense>} />
+                <Route path="*" element={<Suspense fallback={<div className="min-h-screen bg-background" />}><NotFound /></Suspense>} />
               </Routes>
             </BrowserRouter>
             <img

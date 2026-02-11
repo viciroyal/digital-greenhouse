@@ -131,7 +131,7 @@ export const useMasterCrops = () => {
 
       return allCrops;
     },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    staleTime: Infinity, // Static reference data — no refetching during session
   });
 };
 
@@ -154,7 +154,7 @@ export const useCropsByFrequency = (frequencyHz: number | null) => {
       return (data as MasterCrop[]) || [];
     },
     enabled: !!frequencyHz,
-    staleTime: 1000 * 60 * 5,
+    staleTime: Infinity,
   });
 };
 
@@ -173,7 +173,7 @@ export const useSoilAmendments = () => {
       if (error) throw error;
       return (data as SoilAmendment[]) || [];
     },
-    staleTime: 1000 * 60 * 10, // Cache for 10 minutes
+    staleTime: Infinity, // Static reference data
   });
 };
 

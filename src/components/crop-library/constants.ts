@@ -1,0 +1,23 @@
+export const ZONE_ORDER = [396, 417, 528, 639, 741, 852, 963];
+
+export const TABLE_HEADERS = [
+  { label: 'Common Name', align: '' },
+  { label: 'Scientific Name', align: '' },
+  { label: 'Hz', align: 'text-center' },
+  { label: 'Zone', align: '' },
+  { label: 'Element', align: '' },
+  { label: 'Category', align: '' },
+  { label: 'Habit', align: '' },
+  { label: 'Chord', align: '' },
+  { label: 'Instrument', align: '' },
+  { label: 'Mineral', align: '' },
+  { label: 'Brix', align: 'text-center' },
+  { label: 'Hardiness', align: 'text-center' },
+  { label: 'Days', align: 'text-center' },
+  { label: 'Spacing', align: '' },
+  { label: 'Season', align: '' },
+  { label: 'Guild', align: '' },
+  { label: 'Focus', align: '' },
+  { label: 'Companions', align: '' },
+  { label: 'Crop Guild', align: '' },
+] as const;
