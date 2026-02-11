@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -15,6 +15,7 @@ import { STATE_HARDINESS_ZONES, US_STATES } from '@/data/stateHardinessZones';
 import ModalReference from '@/components/crop-oracle/ModalReference';
 import SoilLinkPanel from '@/components/crop-oracle/SoilLinkPanel';
 import PlantingCalendar from '@/components/crop-oracle/PlantingCalendar';
+import ScentCorridorPanel from '@/components/crop-oracle/ScentCorridorPanel';
 
 /* ─── Zone Data ─── */
 const ZONES = [
@@ -89,7 +90,7 @@ const CropOracle = () => {
   const [showZonePicker, setShowZonePicker] = useState(false);
   const [showStateDropdown, setShowStateDropdown] = useState(false);
   const [modalInfoOpen, setModalInfoOpen] = useState(false);
-  const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | null>(null);
+  const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | 'scent' | null>(null);
 
   // Fetch saved recipes
   const { data: savedRecipes } = useQuery({
@@ -1318,6 +1319,7 @@ const CropOracle = () => {
                     { id: 'soil' as const, icon: <Beaker className="w-3.5 h-3.5" />, tip: 'Soil Protocol' },
                     { id: 'calendar' as const, icon: <Calendar className="w-3.5 h-3.5" />, tip: 'Planting Calendar' },
                     { id: 'modal' as const, icon: <Music className="w-3.5 h-3.5" />, tip: 'Modal Guide' },
+                    ...((environment === 'food-forest' || proMode) ? [{ id: 'scent' as const, icon: <Shield className="w-3.5 h-3.5" />, tip: 'Scent Corridor' }] : []),
                   ].map(tool => {
                     const isActive = activeToolPanel === tool.id;
                     return (
@@ -1394,6 +1396,24 @@ const CropOracle = () => {
                     className="overflow-hidden mb-2"
                   >
                     <ModalReference />
+                  </motion.div>
+                )}
+                {activeToolPanel === 'scent' && allCrops && (
+                  <motion.div
+                    key="scent-panel"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden mb-2"
+                  >
+                    <ScentCorridorPanel
+                      frequencyHz={selectedZone.hz}
+                      zoneColor={selectedZone.color}
+                      zoneName={selectedZone.name}
+                      chordCrops={chordCard.map(s => s.crop || null)}
+                      allCrops={allCrops}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>
