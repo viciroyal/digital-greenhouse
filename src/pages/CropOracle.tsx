@@ -676,7 +676,7 @@ const CropOracle = () => {
               <MapPin className="w-3 h-3" style={{ color: hardinessZone ? 'hsl(140 60% 55%)' : 'hsl(0 0% 35%)' }} />
               <span className="text-[8px] font-mono tracking-widest" style={{ color: hardinessZone ? 'hsl(140 50% 60%)' : 'hsl(0 0% 35%)' }}>
                 {hardinessZone
-                  ? `USDA ${hardinessSubZone || hardinessZone}${selectedState ? ` · ${selectedState}` : ''}`
+                  ? `USDA ${hardinessSubZone || hardinessZone}${selectedState ? ` · ${STATE_HARDINESS_ZONES[selectedState]?.abbr || selectedState}` : ''}`
                   : 'GROW ZONE'}
               </span>
               <ChevronDown className="w-2.5 h-2.5" style={{ color: 'hsl(0 0% 35%)', transform: showZonePicker ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
@@ -780,7 +780,7 @@ const CropOracle = () => {
                         }}
                         title={`${state} — ${info.label}`}
                       >
-                        {state.length > 10 ? state.slice(0, 2).toUpperCase() : state}
+                        {info.abbr}
                         <span className="ml-1 opacity-60">{info.subZone}</span>
                       </button>
                     );
