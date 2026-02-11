@@ -1,110 +1,59 @@
 
+## Aromatic Scent Corridor Visualization
 
-# Security Remediation: user_roles Table RLS Policies
+### Overview
+Add a new "Scent Corridor" panel to the Crop Oracle's utility toolbar (alongside Soil Protocol, Planting Calendar, and Modal Guide). This panel visualizes which aromatic, pest-deterrent, and fragrance species create biological barriers around the current food forest guild recipe.
 
-## Overview
-The security scan identified 2 warning-level issues related to the `user_roles` table that need to be addressed with explicit RLS policies.
+### What It Shows
+The panel will display a concentric ring diagram (styled as a retro-synth radar display) representing the three aromatic layers that surround a food forest guild:
 
-## Current State
-The `user_roles` table currently has:
-- **SELECT policies**: Users can view their own roles; admins can view all roles
-- **Missing policies**: No explicit INSERT, UPDATE, or DELETE policies
+1. **Inner Ring — Culinary Aromatics**: Herbs like Bee Balm, Shiso, Sweet Marjoram, Lemon Balm that serve dual culinary/pest-confusing roles
+2. **Middle Ring — Pest Deterrent Barrier**: Sentinel species like Citronella Grass, Pyrethrum Daisy, Catnip, Feverfew that form biological exclusion zones
+3. **Outer Ring — Fragrance Corridor**: Pollinator-attracting species like Star Jasmine, Honeysuckle, Sweet Woodruff, Anise Hyssop that draw beneficial insects
 
-While RLS defaults to "deny all" when no policy exists, explicit policies provide:
-1. Clear documentation of access rules
-2. Protection against accidental policy misconfigurations
-3. Explicit control over who can manage user roles
+Each ring shows species available in the current frequency zone, with zone-colored accents and icons indicating their deterrent targets (mosquito, aphid, deer, etc.).
 
-## Security Issues to Fix
+### User Experience
+- A new **Shield icon** button appears in the toolbar next to Beaker/Calendar/Music (only visible in Food Forest mode or Pro mode)
+- Clicking it opens an inline panel below the frequency bar
+- The panel queries `master_crops` for entries with aromatic-related `library_note` tags
+- Species already present in the current chord recipe are highlighted with a checkmark
+- Users can tap any aromatic species to swap it into an open chord slot
 
-### Issue 1: Missing INSERT/UPDATE/DELETE Policies
-**Finding**: "User Roles Could Be Modified Without Proper Authorization"
-**Risk**: Without explicit policies, role management intent is unclear
-**Solution**: Add admin-only policies for INSERT, UPDATE, and DELETE operations
+### Technical Details
 
-### Issue 2: Potential Exposure to Unauthenticated Users
-**Finding**: "User Role Information Could Be Exposed to Unauthorized Users"
-**Risk**: Current SELECT policies don't explicitly restrict anonymous access
-**Solution**: Add `TO authenticated` clause to existing SELECT policies to ensure only logged-in users can access role data
+**1. New Component: `src/components/crop-oracle/ScentCorridorPanel.tsx`**
+- Receives props: `frequencyHz`, `zoneColor`, `zoneName`, `chordCrops` (current recipe crops), `allCrops`, `onSwapRequest`
+- Filters `allCrops` by frequency zone and aromatic classification using `library_note` patterns (`'Aromatic'`, `'Pest Barrier'`, `'Fragrance'`, `'Ground Cover'`) and `category === 'Dye/Fiber/Aromatic'`
+- Groups species into three tiers: Culinary, Pest-Deterrent, Fragrance
+- Each species row shows: name, role tag (Sentinel/Enhancer/Signal), deterrent target if applicable, and whether it's already in the recipe
+- Collapsible accordion sections for each tier
 
-## Implementation Plan
+**2. Modify `src/pages/CropOracle.tsx`**
+- Add `'scent'` to the `activeToolPanel` union type: `'soil' | 'calendar' | 'modal' | 'scent'`
+- Add a Shield (lucide) icon button to the toolbar array, conditionally shown when `environment === 'food-forest'` or `proMode`
+- Add the `ScentCorridorPanel` render block inside the `AnimatePresence` for tool panels
+- Import the new component and the `Shield` icon from lucide-react
 
-### Step 1: Create Database Migration
-Add a new migration file with the following RLS policies:
+**3. Panel Layout (matching retro-synth aesthetic)**
+- Dark background (`hsl(0 0% 5%)`) with zone-colored border accents
+- Three collapsible sections with zone-colored headers:
+  - "CULINARY AROMATICS" with a leaf icon
+  - "PEST DETERRENT BARRIER" with a shield icon  
+  - "FRAGRANCE CORRIDOR" with a flower icon
+- Each species rendered as a compact row with:
+  - Aromatic type badge (Culinary / Sentinel / Fragrance)
+  - Species name in mono font
+  - Deterrent target tag if available (extracted from `library_note`)
+  - Checkmark if already in the current chord recipe
+  - Zone badge showing frequency
+- Footer showing coverage stats: "3/5 aromatic roles filled" with a simple progress indicator
 
-```text
-+----------------------------------+
-|     user_roles RLS Policies      |
-+----------------------------------+
-| SELECT (existing, to be updated) |
-| - Users: own roles only          |
-| - Admins: all roles              |
-| - Require authenticated role     |
-+----------------------------------+
-| INSERT (new)                     |
-| - Admins only                    |
-+----------------------------------+
-| UPDATE (new)                     |
-| - Admins only                    |
-+----------------------------------+
-| DELETE (new)                     |
-| - Admins only                    |
-+----------------------------------+
-```
+**4. Data Classification Logic**
+Species classification based on existing `library_note` and `category` fields:
+- **Culinary**: `library_note` contains "Aromatic Layer" (not "Pest") AND (`guild_role` = 'Enhancer')
+- **Pest-Deterrent**: `library_note` contains "Pest Barrier" OR `guild_role` = 'Sentinel'
+- **Fragrance**: `library_note` contains "Fragrance" OR "Ground Cover" OR "Pollinator"
+- Falls back to `category === 'Dye/Fiber/Aromatic'` for uncategorized aromatics
 
-### Step 2: SQL Migration Details
-The migration will:
-1. Drop existing SELECT policies
-2. Recreate SELECT policies with explicit `TO authenticated` restriction
-3. Add admin-only INSERT policy using `has_role()` function
-4. Add admin-only UPDATE policy using `has_role()` function
-5. Add admin-only DELETE policy using `has_role()` function
-
----
-
-## Technical Details
-
-### SQL Migration Code
-```sql
--- Drop existing SELECT policies to recreate with explicit auth requirement
-DROP POLICY IF EXISTS "Users can view their own roles" ON public.user_roles;
-DROP POLICY IF EXISTS "Admins can view all roles" ON public.user_roles;
-
--- Recreate SELECT policies with explicit TO authenticated
-CREATE POLICY "Users can view their own roles"
-  ON public.user_roles FOR SELECT
-  TO authenticated
-  USING (user_id = auth.uid());
-
-CREATE POLICY "Admins can view all roles"
-  ON public.user_roles FOR SELECT
-  TO authenticated
-  USING (public.has_role(auth.uid(), 'admin'));
-
--- Add admin-only INSERT policy
-CREATE POLICY "Only admins can insert user roles"
-  ON public.user_roles FOR INSERT
-  TO authenticated
-  WITH CHECK (public.has_role(auth.uid(), 'admin'));
-
--- Add admin-only UPDATE policy
-CREATE POLICY "Only admins can update user roles"
-  ON public.user_roles FOR UPDATE
-  TO authenticated
-  USING (public.has_role(auth.uid(), 'admin'));
-
--- Add admin-only DELETE policy
-CREATE POLICY "Only admins can delete user roles"
-  ON public.user_roles FOR DELETE
-  TO authenticated
-  USING (public.has_role(auth.uid(), 'admin'));
-```
-
-### Files to Create/Modify
-| File | Action |
-|------|--------|
-| `supabase/migrations/[timestamp]_user_roles_rls.sql` | Create new migration |
-
-### No Code Changes Required
-The existing `useAdminRole` hook and pages using it (HogonReview, AncestralPath) will continue to work as expected since they only read from the `user_roles` table.
-
+No database changes are needed since the classification data already exists in `library_note` fields from the recent migrations.
