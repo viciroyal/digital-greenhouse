@@ -12,6 +12,7 @@ import EshuLoader from '@/components/EshuLoader';
 import { useWeatherAlert } from '@/hooks/useWeatherAlert';
 import MiniMusicPlayer from '@/components/audio/MiniMusicPlayer';
 import { STATE_HARDINESS_ZONES, US_STATES } from '@/data/stateHardinessZones';
+import ModalReference from '@/components/crop-oracle/ModalReference';
 
 /* ─── Zone Data ─── */
 const ZONES = [
@@ -1803,6 +1804,16 @@ const CropOracle = () => {
                     SIGN IN TO SAVE RECIPE
                   </button>
                 )}
+              </motion.div>
+
+              {/* Modal Field Guide */}
+              <motion.div
+                className="mt-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+              >
+                <ModalReference />
               </motion.div>
 
               {/* Navigation */}
