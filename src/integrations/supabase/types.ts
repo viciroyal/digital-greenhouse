@@ -225,6 +225,7 @@ export type Database = {
           element: string
           focus_tag: string | null
           frequency_hz: number
+          growth_habit: string | null
           guild_role: string | null
           hardiness_zone_max: number | null
           hardiness_zone_min: number | null
@@ -255,6 +256,7 @@ export type Database = {
           element: string
           focus_tag?: string | null
           frequency_hz: number
+          growth_habit?: string | null
           guild_role?: string | null
           hardiness_zone_max?: number | null
           hardiness_zone_min?: number | null
@@ -285,6 +287,7 @@ export type Database = {
           element?: string
           focus_tag?: string | null
           frequency_hz?: number
+          growth_habit?: string | null
           guild_role?: string | null
           hardiness_zone_max?: number | null
           hardiness_zone_min?: number | null
