@@ -44,6 +44,8 @@ const CropRow = memo(({ crop }: { crop: MasterCrop }) => (
     </td>
     <td className="py-1 px-1.5 text-center">{crop.harvest_days ?? '–'}</td>
     <td className="py-1 px-1.5">{crop.spacing_inches || '–'}</td>
+    <td className="py-1 px-1.5 text-center">{crop.root_depth_inches ?? '–'}</td>
+    <td className="py-1 px-1.5 text-center">{crop.min_container_gal ?? '–'}</td>
     <td className="py-1 px-1.5">{crop.planting_season?.join(', ') || '–'}</td>
     <td className="py-1 px-1.5">{crop.guild_role || '–'}</td>
     <td className="py-1 px-1.5">{crop.focus_tag?.replace('_FOCUS', '') || '–'}</td>
