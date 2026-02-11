@@ -207,10 +207,48 @@ export const useAutoGeneration = (
     if (rootCrop.instrument_type) usedInstruments.add(rootCrop.instrument_type);
     usedIds.add(rootCrop.id);
 
+    // Track placed crops for antagonist checking
+    const placedCrops: MasterCrop[] = [rootCrop];
+
+    // Antagonist pairs for filtering
+    const ANTAGONIST_PAIRS = [
+      { groupA: ['onion', 'garlic', 'shallot', 'leek', 'chive', 'scallion'], groupB: ['bean', 'pea', 'lentil', 'chickpea', 'lima'] },
+      { groupA: ['tomato'], groupB: ['potato'] },
+      { groupA: ['tomato'], groupB: ['corn'] },
+      { groupA: ['tomato'], groupB: ['fennel'] },
+      { groupA: ['cabbage', 'broccoli', 'kale', 'cauliflower', 'brussels'], groupB: ['tomato', 'pepper', 'strawberry'] },
+      { groupA: ['fennel'], groupB: ['bean', 'pepper', 'eggplant', 'carrot'] },
+      { groupA: ['walnut', 'black walnut'], groupB: ['tomato', 'pepper', 'eggplant', 'potato', 'blueberry'] },
+      { groupA: ['dill', 'coriander', 'cilantro', 'parsnip'], groupB: ['carrot'] },
+      { groupA: ['sage'], groupB: ['cucumber'] },
+      { groupA: ['mint'], groupB: ['parsley'] },
+      { groupA: ['sunflower'], groupB: ['potato'] },
+      { groupA: ['potato'], groupB: ['squash', 'cucumber'] },
+      { groupA: ['bean'], groupB: ['pepper'] },
+      { groupA: ['corn'], groupB: ['celery'] },
+      { groupA: ['onion'], groupB: ['asparagus'] },
+    ];
+
+    const isAntagonist = (candidate: MasterCrop, placed: MasterCrop[]): boolean => {
+      const cName = (candidate.common_name || candidate.name).toLowerCase();
+      for (const other of placed) {
+        const oName = (other.common_name || other.name).toLowerCase();
+        for (const rule of ANTAGONIST_PAIRS) {
+          const cInA = rule.groupA.some(k => cName.includes(k));
+          const cInB = rule.groupB.some(k => cName.includes(k));
+          const oInA = rule.groupA.some(k => oName.includes(k));
+          const oInB = rule.groupB.some(k => oName.includes(k));
+          if ((cInA && oInB) || (cInB && oInA)) return true;
+        }
+      }
+      return false;
+    };
+
     const selectBestCrop = (crops: MasterCrop[]): MasterCrop | null => {
       // Sort by compatibility score (desc), then prefer different instrument
+      // Filter out antagonist conflicts with already-placed crops
       const scored = crops
-        .filter(c => !usedIds.has(c.id))
+        .filter(c => !usedIds.has(c.id) && !isAntagonist(c, placedCrops))
         .map(c => ({
           crop: c,
           compat: compatibilityScore(c),
@@ -222,6 +260,7 @@ export const useAutoGeneration = (
       if (!best) return null;
       if (best.crop.instrument_type) usedInstruments.add(best.crop.instrument_type);
       usedIds.add(best.crop.id);
+      placedCrops.push(best.crop);
       return best.crop;
     };
 

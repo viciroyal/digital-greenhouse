@@ -616,6 +616,7 @@ const CropOracle = () => {
     pool = seasonGated.length >= 7 ? seasonGated : zoneGated.length >= 3 ? zoneGated : zoneOnly;
 
     const usedIds = new Set<string>();
+    const placedCropsRef: MasterCrop[] = []; // Track placed crops for antagonist checking
 
     // Star crop's companion names for prioritization
     const companionNames = (starCrop?.companion_crops || []).map(n => n.toLowerCase());
@@ -675,15 +676,16 @@ const CropOracle = () => {
         if (!hasSentinelAlready) score += 6;
       }
       // Antagonist penalty: if candidate conflicts with star crop or already-placed crops
-      if (starCrop) {
+      const cName = (c.common_name || c.name).toLowerCase();
+      const checkAgainst = [starCrop, ...placedCropsRef].filter((x): x is MasterCrop => x !== null && x.id !== c.id);
+      for (const other of checkAgainst) {
+        const oName = (other.common_name || other.name).toLowerCase();
         for (const rule of ANTAGONIST_PAIRS) {
-          const starName = (starCrop.common_name || starCrop.name).toLowerCase();
-          const cName = (c.common_name || c.name).toLowerCase();
-          const starInA = rule.groupA.some(k => starName.includes(k));
-          const starInB = rule.groupB.some(k => starName.includes(k));
           const cInA = rule.groupA.some(k => cName.includes(k));
           const cInB = rule.groupB.some(k => cName.includes(k));
-          if ((starInA && cInB) || (starInB && cInA)) score -= 12;
+          const oInA = rule.groupA.some(k => oName.includes(k));
+          const oInB = rule.groupB.some(k => oName.includes(k));
+          if ((cInA && oInB) || (cInB && oInA)) score -= 20; // Heavy penalty per conflict
         }
       }
       return score;
@@ -741,7 +743,7 @@ const CropOracle = () => {
       const directMatch = rotatedPick(directCandidates);
 
       const assign = (result: { crop: MasterCrop; companionMatch: boolean } | null) => {
-        if (result) { crop = result.crop; isCompanionFill = result.companionMatch; }
+        if (result) { crop = result.crop; isCompanionFill = result.companionMatch; placedCropsRef.push(result.crop); }
       };
 
       const isFF = environment === 'food-forest';
@@ -752,6 +754,7 @@ const CropOracle = () => {
             usedIds.add(starCrop.id);
             crop = starCrop;
             isCompanionFill = false;
+            placedCropsRef.push(starCrop);
           } else if (isFF) {
             // Food Forest: prefer fruit trees / perennial canopy crops as the Star
             assign(pickCrop(undefined, c => isFoodForestPerennial(c) && c.chord_interval === 'Root (Lead)'));
