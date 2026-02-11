@@ -336,7 +336,7 @@ export const trackData: TrackData[] = [
   {
     row: 10,
     track: 'M.O.E.',
-    featuring: 'Benjamin J. Davidow',
+    featuring: undefined,
     chakra: 'Vision',
     frequency: '852Hz',
     mineral: 'Copper',
