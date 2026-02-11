@@ -490,7 +490,7 @@ const DynamicSoilEngine = () => {
                 { step: 1, label: 'MASTER MIX', desc: 'Apply scaled protocol to bed surface. Rake evenly to 2–3" depth.', color: 'hsl(35 50% 45%)', icon: '🌍', width: '100%' },
                 { step: 2, label: 'COMPOST TOP-DRESS', desc: 'Add ½" aged compost layer. Inoculate with worm castings if available.', color: 'hsl(25 55% 40%)', icon: '🪱', width: '92%' },
                 { step: 3, label: 'SEEDS / TRANSPLANTS', desc: 'Direct sow or transplant into amended bed. Follow spacing protocol.', color: 'hsl(120 45% 40%)', icon: '🌱', width: '84%' },
-                { step: 4, label: 'MULCH LAYER', desc: 'Apply 2–4" of straw, wood chips, or leaf mold. Keep 1" clear of stems.', color: 'hsl(45 50% 38%)', icon: '🍂', width: '76%' },
+                { step: 4, label: 'MULCH LAYER', desc: 'Apply 2–4" of alfalfa hay (preferred — slow-release N + triacontanol), straw, or leaf mold. Keep 1" clear of stems.', color: 'hsl(45 50% 38%)', icon: '🍂', width: '76%' },
                 { step: 5, label: 'WATER IN', desc: 'Deep soak to field capacity. Activate biology. Avoid runoff.', color: 'hsl(200 55% 50%)', icon: '💧', width: '68%' },
               ].map((layer, i) => (
                 <div key={layer.step} className="flex items-stretch gap-0">
