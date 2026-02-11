@@ -21,6 +21,7 @@ import PropagationPanel from '@/components/crop-oracle/PropagationPanel';
 import EcoParadigmCard from '@/components/community/EcoParadigmCard';
 import ProSuppliersPanel from '@/components/crop-oracle/ProSuppliersPanel';
 import FoodForestHoleProtocol from '@/components/crop-oracle/FoodForestHoleProtocol';
+import TwoWeekDashboard from '@/components/crop-oracle/TwoWeekDashboard';
 
 /* ─── Zone Data ─── */
 const ZONES = [
@@ -1138,6 +1139,9 @@ const CropOracle = () => {
           </motion.div>
         ))}
       </AnimatePresence>
+
+      {/* 2-Week Task Dashboard */}
+      <TwoWeekDashboard />
 
       {/* Spacer for fixed header */}
       <div className="h-2" />
