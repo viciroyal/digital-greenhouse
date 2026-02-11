@@ -154,63 +154,98 @@ const ChordComposer = ({
 
     const bedWidthInches = (selectedBed.bed_width_ft || 2.5) * 12;
 
-    // Helper: check if a crop's spacing fits the bed width
     const fitsInBed = (crop: MasterCrop): boolean => {
       const spacing = parseFloat(crop.spacing_inches || '0');
       return spacing > 0 && spacing <= bedWidthInches;
     };
 
-    // Get the Root crop's companion list (if Root is filled)
+    // Get the Root crop for season/harvest reference
     const rootPlanting = chordStatus['Root (Lead)'];
     const rootCropData = rootPlanting?.crop;
     const rootFullCrop = rootCropData
       ? allCrops.find(c => c.id === rootCropData.id)
       : null;
     const companionNames = rootFullCrop?.companion_crops || [];
+    const rootSeasons = rootFullCrop?.planting_season || [];
+    const rootHarvest = rootFullCrop?.harvest_days ?? null;
 
-    // Get the chord recipe for this zone
+    /** Score a candidate for season/harvest compatibility with root */
+    const seasonScore = (crop: MasterCrop): number => {
+      if (!rootFullCrop) return 0;
+      let score = 0;
+      const cropSeasons = crop.planting_season || [];
+      for (const s of cropSeasons) {
+        if (rootSeasons.includes(s)) score += 2;
+      }
+      if (rootHarvest !== null && crop.harvest_days !== null) {
+        const diff = Math.abs(crop.harvest_days - rootHarvest);
+        if (diff <= 15) score += 2;
+        else if (diff <= 30) score += 1;
+      }
+      return score;
+    };
+
+    const usedIds = new Set<string>();
+    // Exclude already-planted crops
+    for (const iv of CHORD_INTERVALS) {
+      const p = chordStatus[iv];
+      if (p?.crop) usedIds.add(p.crop.id);
+    }
+
     const recipes = CHORD_RECIPES.filter(r => r.frequencyHz === activeFrequency);
 
     for (const interval of emptyIntervals) {
       let found: MasterCrop | undefined;
       let source: 'companion' | 'recipe' = 'companion';
 
-      // 1. Try companion guild first (must fit bed width)
+      // 1. Try companion guild first, sorted by season compatibility
       if (companionNames.length > 0) {
-        for (const name of companionNames) {
-          const match = allCrops.find(c =>
+        const companionMatches = companionNames
+          .map(name => allCrops.find(c =>
+            !usedIds.has(c.id) &&
             (c.common_name?.toLowerCase() === name.toLowerCase() ||
              c.name.toLowerCase() === name.toLowerCase()) &&
             c.chord_interval === interval &&
             fitsInBed(c)
-          );
-          if (match) { found = match; break; }
-        }
+          ))
+          .filter(Boolean) as MasterCrop[];
+        
+        // Sort by season compatibility
+        companionMatches.sort((a, b) => seasonScore(b) - seasonScore(a));
+        found = companionMatches[0];
       }
 
-      // 2. Fallback to chord recipes — search ALL matching recipes for this zone
+      // 2. Fallback to chord recipes, prefer season-compatible matches
       if (!found && recipes.length > 0) {
         let matchedRecipeName = '';
+        const recipeCandidates: { crop: MasterCrop; recipeName: string }[] = [];
         for (const recipe of recipes) {
           const recipeInterval = recipe.intervals.find(
             ri => RECIPE_INTERVAL_MAP[ri.interval] === interval
           );
           if (recipeInterval) {
             const recipeMatch = allCrops.find(c =>
+              !usedIds.has(c.id) &&
               (c.common_name?.toLowerCase() === recipeInterval.cropName.toLowerCase() ||
               c.name.toLowerCase() === recipeInterval.cropName.toLowerCase()) &&
               fitsInBed(c)
             );
             if (recipeMatch) {
-              found = recipeMatch;
-              source = 'recipe';
-              matchedRecipeName = recipe.chordName;
-              break;
+              recipeCandidates.push({ crop: recipeMatch, recipeName: recipe.chordName });
             }
           }
         }
 
+        if (recipeCandidates.length > 0) {
+          // Sort by season compatibility
+          recipeCandidates.sort((a, b) => seasonScore(b.crop) - seasonScore(a.crop));
+          found = recipeCandidates[0].crop;
+          source = 'recipe';
+          matchedRecipeName = recipeCandidates[0].recipeName;
+        }
+
         if (found) {
+          usedIds.add(found.id);
           suggestions.push({
             interval,
             crop: found,
@@ -222,6 +257,7 @@ const ChordComposer = ({
       }
 
       if (found) {
+        usedIds.add(found.id);
         suggestions.push({
           interval,
           crop: found,

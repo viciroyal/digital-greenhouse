@@ -180,26 +180,49 @@ export const useAutoGeneration = (
   const generateChord = useCallback((): AutoGenerationResult | null => {
     if (!rootCrop) return null;
 
+    const rootSeasons = rootCrop.planting_season || [];
+    const rootHarvest = rootCrop.harvest_days ?? null;
+
+    /** Score a candidate crop for seasonal/harvest compatibility with the root */
+    const compatibilityScore = (crop: MasterCrop): number => {
+      let score = 0;
+      // +2 per shared planting season
+      const cropSeasons = crop.planting_season || [];
+      for (const s of cropSeasons) {
+        if (rootSeasons.includes(s)) score += 2;
+      }
+      // +1 if harvest_days within ±30 of root, +2 if within ±15
+      if (rootHarvest !== null && crop.harvest_days !== null) {
+        const diff = Math.abs(crop.harvest_days - rootHarvest);
+        if (diff <= 15) score += 2;
+        else if (diff <= 30) score += 1;
+      }
+      return score;
+    };
+
     // Select best matches for each interval
-    // Prefer crops with different instrument types for variety
+    // Prefer crops with similar seasons, close harvest times, and different instruments
     const usedInstruments = new Set<string>();
-    if (rootCrop.instrument_type) {
-      usedInstruments.add(rootCrop.instrument_type);
-    }
+    const usedIds = new Set<string>();
+    if (rootCrop.instrument_type) usedInstruments.add(rootCrop.instrument_type);
+    usedIds.add(rootCrop.id);
 
     const selectBestCrop = (crops: MasterCrop[]): MasterCrop | null => {
-      // First try to find a crop with a different instrument type
-      const differentInstrument = crops.find(c => 
-        c.instrument_type && !usedInstruments.has(c.instrument_type)
-      );
-      if (differentInstrument) {
-        if (differentInstrument.instrument_type) {
-          usedInstruments.add(differentInstrument.instrument_type);
-        }
-        return differentInstrument;
-      }
-      // Fallback to first available
-      return crops[0] || null;
+      // Sort by compatibility score (desc), then prefer different instrument
+      const scored = crops
+        .filter(c => !usedIds.has(c.id))
+        .map(c => ({
+          crop: c,
+          compat: compatibilityScore(c),
+          newInstrument: c.instrument_type && !usedInstruments.has(c.instrument_type) ? 1 : 0,
+        }))
+        .sort((a, b) => (b.compat + b.newInstrument) - (a.compat + a.newInstrument));
+
+      const best = scored[0];
+      if (!best) return null;
+      if (best.crop.instrument_type) usedInstruments.add(best.crop.instrument_type);
+      usedIds.add(best.crop.id);
+      return best.crop;
     };
 
     const third = selectBestCrop(cropsByInterval.third);
