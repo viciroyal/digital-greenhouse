@@ -77,44 +77,52 @@ const DevGuide = () => {
           DEVELOPER GUIDE
         </h1>
         <p className="text-center font-['Space_Mono'] text-xs mb-8" style={{ color: 'hsl(0 0% 45%)' }}>
-          Technical documentation • File structure • Best practices
+          Technical documentation • File structure • Best practices • v2.0
         </p>
 
         <Section title="ARCHITECTURE OVERVIEW">
           <p>The app follows <strong>"The Mullet Strategy"</strong>: a creative landing page (World 1 / The Stage) and a functional 3-step crop planning wizard (World 2 / The Studio).</p>
           <p><strong>Stack:</strong> React 18 + Vite + TypeScript + Tailwind CSS + Framer Motion + Lovable Cloud (Supabase)</p>
-          <p><strong>State:</strong> React Query for server state, useState for local UI state. No Redux or Zustand needed.</p>
+          <p><strong>State:</strong> React Query for server state (Infinity staleTime for static crop data), useState for local UI state. No Redux or Zustand needed.</p>
           <p><strong>Environments:</strong> Pot, Raised Bed, Farm (Pro), High Tunnel (Pro), Food Forest (Pro). Each environment applies custom recipe filtering logic.</p>
+          <p><strong>Performance:</strong> All secondary routes use <code>React.lazy()</code> for code splitting. Only the landing page (Index) loads eagerly for instant first paint. CropRow components use <code>React.memo()</code> to prevent unnecessary re-renders in large lists.</p>
         </Section>
 
         <Section title="FILE STRUCTURE">
           <Code>{`src/
-├── pages/              # Route-level components
-│   ├── Index.tsx        # Landing page (The Stage)
-│   ├── CropOracle.tsx   # 3-step wizard (The Studio) — MAIN feature
-│   ├── CropLibrary.tsx  # Full crop registry + CSV export
-│   ├── Auth.tsx         # Login / signup
-│   ├── UserGuide.tsx    # User manual
-│   ├── DevGuide.tsx     # Developer docs
-│   └── NotFound.tsx     # 404 page
+├── pages/                  # Route-level components (lazy-loaded except Index)
+│   ├── Index.tsx            # Landing page (The Stage) — eagerly loaded
+│   ├── CropOracle.tsx       # 3-step wizard (The Studio) — MAIN feature
+│   ├── CropLibrary.tsx      # Full crop registry + CSV export
+│   ├── Auth.tsx             # Login / signup
+│   ├── Profile.tsx          # Steward dashboard
+│   ├── UserGuide.tsx        # User manual
+│   ├── DevGuide.tsx         # Developer docs
+│   ├── TestingSuiteDocs.tsx  # Testing documentation
+│   └── NotFound.tsx         # 404 page
 ├── components/
-│   ├── ui/              # shadcn/ui primitives (button, card, dialog...)
-│   ├── almanac/         # Field Almanac engines (12 science engines)
-│   │   └── engines/     # Soil, Vitality, Resonance, Companion, etc.
-│   ├── ancestral/       # Ancestral path components (learning modules)
-│   ├── audio/           # Music player, sound system
-│   ├── bio-digital/     # Bioluminescent veins, Brix meters, overlays
-│   ├── cosmogram/       # Grand Cosmogram visualization
-│   ├── conductor/       # Bed grid, chord sheets
-│   ├── crop-oracle/     # Sub-components for the Crop Oracle
-│   ├── cursor/          # Custom cursor effects
-│   ├── navigation/      # Chakra spine nav
-│   ├── portal/          # Keyhole entry, pledge modal
-│   ├── profile/         # Steward dashboard, blessings
-│   ├── scrollytelling/  # Parallax scroll effects
-│   ├── shop/            # E-commerce components
-│   ├── track-detail/    # Track detail quadrants
-│   └── community/       # Resonant chamber
+│   ├── ui/                  # shadcn/ui primitives (button, card, dialog...)
+│   ├── almanac/             # Field Almanac engines (12 science engines)
+│   │   └── engines/         # Soil, Vitality, Resonance, Companion, etc.
+│   ├── ancestral/           # Ancestral path components (learning modules)
+│   ├── audio/               # Music player, sound system
+│   ├── bio-digital/         # Bioluminescent veins, Brix meters, overlays
+│   ├── cosmogram/           # Grand Cosmogram visualization
+│   ├── conductor/           # Bed grid, chord sheets
+│   ├── crop-oracle/         # Sub-components for the Crop Oracle
+│   │   └── GrowthHabitBadge.tsx  # Reusable growth habit pill badge
+│   ├── crop-library/        # Refactored library components
+│   │   ├── CropRow.tsx      # Memoized table row (React.memo)
+│   │   ├── csvExport.ts     # CSV generation utility
+│   │   └── constants.ts     # Zone order, table headers
+│   ├── cursor/              # Custom cursor effects
+│   ├── navigation/          # Chakra spine nav
+│   ├── portal/              # Keyhole entry, pledge modal
+│   ├── profile/             # Steward dashboard, blessings
+│   ├── scrollytelling/      # Parallax scroll effects
+│   ├── shop/                # E-commerce components
+│   ├── track-detail/        # Track detail quadrants
+│   └── community/           # Resonant chamber
 ├── hooks/
 │   ├── useMasterCrops.ts    # Central data hook — single source of truth
 │   ├── useGardenBeds.ts     # Garden bed CRUD + Jazz Voicing engine
@@ -123,11 +131,11 @@ const DevGuide = () => {
 │   ├── useWeatherAlert.ts   # Weather warning system
 │   └── useAdminRole.ts      # Role-based access control
 ├── data/
-│   ├── trackData.ts         # Album track → frequency zone mapping
-│   ├── cropInstrumentMapping.ts  # Crop category → instrument type
+│   ├── trackData.ts             # Album track → frequency zone mapping
+│   ├── cropInstrumentMapping.ts # Crop category → instrument type
 │   ├── jazzVoicingRecommendations.ts  # 11th/13th interval data
-│   ├── almanacData.ts       # Field almanac content
-│   ├── chordRecipes.ts      # Chord composition rules
+│   ├── almanacData.ts           # Field almanac content
+│   ├── chordRecipes.ts          # Chord composition rules
 │   └── harmonicZoneProtocol.ts  # Zone dependency rules
 ├── contexts/
 │   ├── CircadianContext.tsx  # Day/night theme switching
@@ -145,13 +153,19 @@ const DevGuide = () => {
 └── test/                    # Test files
     ├── setup.ts
     ├── example.test.ts
-    ├── birthchart.test.ts
-    └── jazzVoicingFungi.test.ts`}</Code>
+    ├── soilCalculator.test.ts
+    ├── lunarPhase.test.ts
+    ├── cropOracle.test.ts
+    ├── zoneProtocol.test.ts
+    ├── jazzVoicingFungi.test.ts
+    └── birthchart.test.ts`}</Code>
         </Section>
 
         <Section title="DATABASE SCHEMA">
           <p>All data lives in Lovable Cloud (Supabase). Key tables:</p>
-          <Code>{`master_crops       — 695+ crops with frequency_hz, zone, Brix targets, chord_interval, spacing
+          <Code>{`master_crops       — 1,684 crops with frequency_hz, zone, Brix targets, chord_interval,
+                     spacing, growth_habit, root_depth_inches, min_container_gal,
+                     scientific_name, hardiness zones, planting_season, harvest_days
 garden_beds        — User garden beds with zone assignment, Brix readings, inoculants
 bed_plantings      — Crops planted in specific beds with guild roles
 saved_recipes      — User-saved chord recipes (environment + zone + chord data)
@@ -164,17 +178,51 @@ user_module_progress  — Module unlock tracking
 seven_pillars_status  — Infrastructure pillar tracking
 user_roles         — Admin/moderator/user roles`}</Code>
           <p><strong>Key relationship:</strong> master_crops.frequency_hz links to garden_beds.frequency_hz. The useMasterCrops hook is the single source of truth for all crop data.</p>
+          <p><strong>Zone colors:</strong> All zone_color values are normalized to canonical hex: #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #8B00FF.</p>
+          <p><strong>Zone names:</strong> Normalized to single words: Foundation, Flow, Alchemy, Heart, Signal, Vision, Source (no "/ Element" suffixes).</p>
+        </Section>
+
+        <Section title="MASTER CROP FIELDS">
+          <p>Each crop in master_crops has the following fields:</p>
+          <Code>{`name               — Internal identifier
+common_name        — Display name (e.g., "Cherokee Purple Tomato")
+scientific_name    — Binomial name (e.g., "Solanum lycopersicum")
+frequency_hz       — Solfeggio zone: 396, 417, 528, 639, 741, 852, 963
+zone_name          — Foundation, Flow, Alchemy, Heart, Signal, Vision, Source
+zone_color         — Canonical hex: #FF0000 through #8B00FF
+element            — Earth, Water, Fire, Air, Ether, Light, Spirit
+category           — Sustenance, Sentinel/Miner, Nitrogen/Bio-Mass, Dye/Fiber/Aromatic
+chord_interval     — Root (Lead), 3rd (Triad), 5th (Stabilizer), 7th (Signal)
+focus_tag          — ROOT_FOCUS through SOURCE_FOCUS
+growth_habit       — tree, shrub, bush, vine, herb, grass, ground cover, underground,
+                     bulb, root, tuber, rhizome, aquatic, succulent, fungus, epiphyte
+root_depth_inches  — Typical mature root depth (integer, 6-72+)
+min_container_gal  — Minimum container size in gallons (numeric, 1-25+)
+instrument_type    — Electric Guitar, Percussion, Horn Section, Bass, Synthesizers
+dominant_mineral   — Phosphorus, Calcium, Potassium, etc.
+brix_target_min/max — Brix refractometer target range
+hardiness_zone_min/max — USDA zones with sub-zones (8.0=8a, 8.5=8b)
+harvest_days       — Days to first harvest
+spacing_inches     — Plant spacing requirement
+planting_season    — Array: ["Spring", "Summer", "Fall", "Winter"]
+companion_crops    — Array of companion plant names
+crop_guild         — Array of guild members
+guild_role         — Lead, Sentinel, Miner, Enhancer
+soil_protocol_focus — Zone-specific soil strategy
+cultural_role      — Cultural/traditional significance
+library_note       — Additional notes
+description        — Detailed description`}</Code>
         </Section>
 
         <Section title="THE 7-ZONE OCTAVE SYSTEM">
           <p>All crops are organized by Solfeggio frequency. This is the core domain model:</p>
-          <Code>{`396Hz (C) — Foundation / Root — Red    — Phosphorus
-417Hz (D) — Flow / Vine      — Orange — Hydrogen/Carbon
-528Hz (E) — Alchemy / Solar  — Yellow — Nitrogen
-639Hz (F) — Heart            — Green  — Calcium
-741Hz (G) — Signal           — Blue   — Potassium
-852Hz (A) — Vision           — Indigo — Silica
-963Hz (B) — Source           — Violet — Sulfur`}</Code>
+          <Code>{`396Hz (C) — Foundation — Red (#FF0000)    — Earth  — Phosphorus  — 250 crops
+417Hz (D) — Flow       — Orange (#FF7F00) — Water  — H/Carbon    — 175 crops
+528Hz (E) — Alchemy    — Yellow (#FFFF00) — Fire   — Nitrogen    — 243 crops
+639Hz (F) — Heart      — Green (#00FF00)  — Air    — Calcium     — 271 crops
+741Hz (G) — Signal     — Blue (#0000FF)   — Ether  — Potassium   — 312 crops
+852Hz (A) — Vision     — Indigo (#4B0082) — Light  — Silica      — 249 crops
+963Hz (B) — Source     — Violet (#8B00FF) — Spirit — Sulfur      — 184 crops`}</Code>
         </Section>
 
         <Section title="CHORD INTERVAL SYSTEM">
@@ -200,14 +248,43 @@ user_roles         — Admin/moderator/user roles`}</Code>
           <p>Filtering: perennials, fruit trees, and nitrogen-fixers are sorted to top of pool. Labels, emojis, and hints override via <code>FOOD_FOREST_LAYERS</code> constant.</p>
         </Section>
 
+        <Section title="GROWTH HABIT SYSTEM">
+          <p>The <code>GrowthHabitBadge</code> component renders a colored pill with emoji for each crop's growth habit:</p>
+          <Code>{`16 supported habits:
+tree, shrub, bush, vine, herb, grass, ground cover, underground,
+bulb, root, tuber, rhizome, aquatic, succulent, fungus, epiphyte
+
+Usage:
+import GrowthHabitBadge from '@/components/crop-oracle/GrowthHabitBadge';
+<GrowthHabitBadge habit={crop.growth_habit} size="sm" />`}</Code>
+          <p>The badge auto-maps habits to emojis (🌳 tree, 🍄 fungus, 🧗 vine, etc.) and HSL-based colors.</p>
+        </Section>
+
         <Section title="CSV EXPORT (CROP LIBRARY)">
-          <p><code>CropLibrary.tsx</code> includes a <code>generateCsv()</code> function that exports all 24 columns:</p>
-          <Code>{`common_name, latin_name, frequency_hz, zone_name, element, category,
-chord_interval, instrument_type, dominant_mineral, brix_min, brix_max,
-hardiness_zone_min, hardiness_zone_max, harvest_days, spacing_inches,
-planting_season, guild_role, focus_tag, companion_crops, crop_guild,
-soil_protocol_focus, cultural_role, description, library_note`}</Code>
+          <p><code>csvExport.ts</code> generates a 25-column CSV export:</p>
+          <Code>{`common_name, scientific_name, frequency_hz, zone_name, element, category,
+growth_habit, chord_interval, instrument_type, dominant_mineral, brix_min,
+brix_max, hardiness_zone_min, hardiness_zone_max, harvest_days,
+spacing_inches, planting_season, guild_role, focus_tag, companion_crops,
+crop_guild, soil_protocol_focus, cultural_role, description, library_note`}</Code>
           <p>Arrays (companion_crops, crop_guild, planting_season) use semicolon separators. Fields with commas/quotes are properly escaped.</p>
+        </Section>
+
+        <Section title="PERFORMANCE ARCHITECTURE">
+          <p><strong>Route splitting:</strong> All secondary pages use <code>React.lazy()</code> with <code>Suspense</code> fallbacks. Only Index.tsx loads eagerly.</p>
+          <Code>{`// App.tsx
+const CropOracle = lazy(() => import("./pages/CropOracle"));
+const CropLibrary = lazy(() => import("./pages/CropLibrary"));
+// ... all other routes
+
+<Route path="/crop-oracle" element={
+  <Suspense fallback={<div className="min-h-screen bg-background" />}>
+    <CropOracle />
+  </Suspense>
+} />`}</Code>
+          <p><strong>Memoization:</strong> <code>CropRow</code> uses <code>React.memo()</code> to prevent re-renders in the 1,684-row library table. Zone grouping uses <code>useMemo</code>.</p>
+          <p><strong>Query caching:</strong> All crop/amendment queries use <code>staleTime: Infinity</code> since this is static reference data that doesn't change during a session.</p>
+          <p><strong>Pagination:</strong> <code>useMasterCrops</code> fetches all crops using range-based pagination to bypass Supabase's 1,000-row default limit.</p>
         </Section>
 
         <Section title="BEST PRACTICES">
@@ -233,8 +310,9 @@ style={{ color: '#ff0000' }}`}</Code>
           <p><strong>4. Use useMasterCrops for crop data:</strong></p>
           <Code>{`import { useMasterCrops } from '@/hooks/useMasterCrops';
 const { data: crops, isLoading } = useMasterCrops();`}</Code>
-          <p><strong>5. Keep CropOracle.tsx lean:</strong> Extract sub-components into <code>src/components/crop-oracle/</code> when sections exceed ~100 lines.</p>
-          <p><strong>6. Font usage:</strong></p>
+          <p><strong>5. Component decomposition:</strong> Extract sub-components into dedicated directories when sections exceed ~100 lines. Example: <code>crop-library/CropRow.tsx</code>, <code>crop-library/csvExport.ts</code>.</p>
+          <p><strong>6. Memoize list items:</strong> Any component rendered inside a large list (100+ items) should use <code>React.memo()</code>.</p>
+          <p><strong>7. Font usage:</strong></p>
           <ul className="list-disc pl-5 space-y-1">
             <li><code>Chewy</code> — Organic headers, playful titles</li>
             <li><code>Space Mono</code> — Body text, technical data</li>
@@ -245,20 +323,38 @@ const { data: crops, isLoading } = useMasterCrops();`}</Code>
         <Section title="ADDING A NEW CROP">
           <Code>{`-- Insert via Lovable Cloud SQL:
 INSERT INTO master_crops (
-  name, common_name, frequency_hz, zone_name, zone_color,
-  element, category, chord_interval, focus_tag,
-  spacing_inches, harvest_days
+  name, common_name, scientific_name, frequency_hz, zone_name, zone_color,
+  element, category, chord_interval, focus_tag, growth_habit,
+  root_depth_inches, min_container_gal, spacing_inches, harvest_days
 ) VALUES (
-  'Pepper (Carolina Reaper)', 'Carolina Reaper', 
-  396, 'Root', '#FF0000', 'Earth', 'Sustenance',
-  'Root (Lead)', 'ROOT_FOCUS', '24', 90
+  'Pepper (Carolina Reaper)', 'Carolina Reaper', 'Capsicum chinense',
+  396, 'Foundation', '#FF0000', 'Earth', 'Sustenance',
+  'Root (Lead)', 'ROOT_FOCUS', 'herb', 18, 5, '24', 90
 );`}</Code>
         </Section>
 
         <Section title="ADDING A NEW PAGE / ROUTE">
           <Code>{`// 1. Create src/pages/MyPage.tsx
-// 2. Add route in src/App.tsx:
-<Route path="/my-page" element={<MyPage />} />`}</Code>
+// 2. Add lazy import in src/App.tsx:
+const MyPage = lazy(() => import("./pages/MyPage"));
+
+// 3. Add route with Suspense:
+<Route path="/my-page" element={
+  <Suspense fallback={<div className="min-h-screen bg-background" />}>
+    <MyPage />
+  </Suspense>
+} />`}</Code>
+        </Section>
+
+        <Section title="EDGE FUNCTIONS">
+          <p>Backend functions live in <code>supabase/functions/</code>:</p>
+          <Code>{`supabase/functions/
+├── griot-oracle/index.ts       — AI advisor (Lovable AI gateway)
+├── populate-crop-data/index.ts — Batch AI data population
+├── populate-scientific-names/  — Scientific name population (legacy)`}</Code>
+          <p>Edge functions deploy automatically. The <code>populate-crop-data</code> function supports batch-filling fields: <code>growth_habit</code>, <code>scientific_name</code>, <code>planting_season</code>, <code>harvest_days</code>, <code>root_depth_inches</code>, <code>min_container_gal</code>.</p>
+          <Code>{`// Usage: POST /populate-crop-data
+{ "field": "growth_habit" }  // Fills 50 crops per batch`}</Code>
         </Section>
 
         <Section title="TESTING">
@@ -267,41 +363,27 @@ INSERT INTO master_crops (
 bun run test
 
 # Key test files:
-src/test/soilCalculator.test.ts   — Soil mix math
-src/test/lunarPhase.test.ts       — Moon phase accuracy
+src/test/soilCalculator.test.ts   — Soil mix math (17 tests)
+src/test/lunarPhase.test.ts       — Moon phase accuracy (12 tests)
+src/test/cropOracle.test.ts       — Zone mapping & chords (11 tests)
+src/test/zoneProtocol.test.ts     — Instrument integrity (8 tests)
 src/test/jazzVoicingFungi.test.ts — Fungi mapping
-src/test/birthchart.test.ts       — Astro calculator
-src/test/zoneProtocol.test.ts     — Zone data integrity`}</Code>
+src/test/birthchart.test.ts       — Astro calculator`}</Code>
           <p><strong>Test naming:</strong> <code>[feature].test.ts</code> for pure logic, <code>[Component].test.tsx</code> for UI.</p>
-        </Section>
-
-        <Section title="EDGE FUNCTIONS">
-          <p>Backend functions live in <code>supabase/functions/</code>:</p>
-          <Code>{`supabase/functions/
-└── griot-oracle/index.ts  — AI advisor (Lovable AI gateway)`}</Code>
-          <p>Edge functions deploy automatically. Use <code>LOVABLE_API_KEY</code> (auto-provisioned) for AI calls.</p>
-        </Section>
-
-        <Section title="PERFORMANCE TIPS">
-          <ul className="list-disc pl-5 space-y-1">
-            <li>React Query caches crop data for 5 min (<code>staleTime</code>) — don't refetch unnecessarily</li>
-            <li>Use <code>useMemo</code> for expensive filtering (see CropOracle zone filtering)</li>
-            <li>Lazy-load heavy components with <code>React.lazy()</code></li>
-            <li>Images in <code>src/assets/</code> get bundled; use <code>public/</code> for static refs</li>
-          </ul>
         </Section>
 
         <Section title="SECURITY">
           <ul className="list-disc pl-5 space-y-1">
             <li>All tables have RLS policies — user data is scoped by <code>auth.uid()</code></li>
+            <li>Public tables (master_crops, garden_beds, lessons, modules) are read-only for non-admins</li>
             <li>Never expose private API keys in client code</li>
-            <li><code>user_roles</code> table gates admin features</li>
+            <li><code>user_roles</code> table gates admin features via <code>has_role()</code> function</li>
             <li>Edge functions validate auth tokens server-side</li>
           </ul>
         </Section>
 
         <p className="text-center font-['Space_Mono'] text-[10px] mt-8" style={{ color: 'hsl(0 0% 30%)' }}>
-          PharmBoi Developer Guide • v1.0 • {new Date().toISOString().split('T')[0]}
+          PharmBoi Developer Guide • v2.0 • {new Date().toISOString().split('T')[0]}
         </p>
       </main>
     </div>
