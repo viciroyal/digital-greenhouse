@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield, Shuffle, Shovel } from 'lucide-react';
 import GrowthHabitBadge from '@/components/crop-oracle/GrowthHabitBadge';
@@ -2054,17 +2055,54 @@ const CropOracle = () => {
                       </span>
                       <div className="ml-auto flex items-center gap-2">
                         {hasData && (
-                          <span
-                            className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1"
-                            style={{
-                              background: pctBg,
-                              color: pctColor,
-                              border: `1px solid ${pctBorder}`,
-                            }}
-                            title={`${compatible.length}/${slotsWithCrops.length} companions share a planting season with the star crop`}
-                          >
-                            📅 {pct}% SEASON SYNC
-                          </span>
+                          <TooltipProvider delayDuration={200}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span
+                                  className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 cursor-help"
+                                  style={{
+                                    background: pctBg,
+                                    color: pctColor,
+                                    border: `1px solid ${pctBorder}`,
+                                  }}
+                                >
+                                  📅 {pct}% SEASON SYNC
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent
+                                side="bottom"
+                                className="max-w-[280px] p-3"
+                                style={{ background: 'hsl(0 0% 8%)', border: '1px solid hsl(0 0% 20%)', color: 'hsl(0 0% 75%)' }}
+                              >
+                                <p className="font-mono text-[10px] font-bold mb-2" style={{ color: pctColor }}>
+                                  SEASON SYNC — {compatible.length}/{slotsWithCrops.length} voices aligned
+                                </p>
+                                <p className="text-[9px] font-mono mb-2 opacity-60">
+                                  Star: {rootCrop?.common_name || rootCrop?.name} ({rootSeasons.join(', ') || 'N/A'})
+                                </p>
+                                <div className="space-y-1">
+                                  {slotsWithCrops.map((s, idx) => {
+                                    const cs = s.crop!.planting_season || [];
+                                    const isMatch = rootSeasons.length > 0 && cs.length > 0 && rootSeasons.some(rs => cs.includes(rs));
+                                    const cropName = s.crop!.common_name || s.crop!.name;
+                                    const isFF = environment === 'food-forest';
+                                    const layerInfo = isFF && FOOD_FOREST_LAYERS[s.key] ? FOOD_FOREST_LAYERS[s.key] : INTERVAL_ORDER.find(io => io.key === s.key);
+                                    const slotLabel = layerInfo ? ('label' in layerInfo ? layerInfo.label : s.label) : s.label;
+                                    return (
+                                      <div key={idx} className="flex items-center gap-1.5 text-[9px] font-mono">
+                                        <span>{isMatch ? '✅' : '⚠️'}</span>
+                                        <span className="opacity-50 w-[60px] truncate">{slotLabel}</span>
+                                        <span className="truncate" style={{ color: isMatch ? 'hsl(120 50% 60%)' : 'hsl(0 50% 60%)' }}>
+                                          {cropName}
+                                        </span>
+                                        <span className="opacity-40 ml-auto text-[8px]">{cs.join(', ') || '—'}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         )}
                         {hasZoneData && (
                           <span
