@@ -1720,11 +1720,11 @@ const CropOracle = () => {
               >
                 {/* Header strip */}
                 {(() => {
-                  // Compute season compatibility % across visible voices
+                  // Compute season compatibility % across ALL 7 voices
                   const rootCrop = chordCard[0]?.crop;
                   const rootSeasons = rootCrop?.planting_season || [];
-                  const visibleSlots = proMode ? chordCard.slice(1) : chordCard.slice(1, 3);
-                  const slotsWithCrops = visibleSlots.filter(s => s.crop);
+                  const allCompanions = chordCard.slice(1);
+                  const slotsWithCrops = allCompanions.filter(s => s.crop);
                   const compatible = slotsWithCrops.filter(s => {
                     const cs = s.crop!.planting_season || [];
                     if (rootSeasons.length === 0 || cs.length === 0) return false;
