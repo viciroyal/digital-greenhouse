@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Calendar, Loader2, LogOut, Check, FlaskConical } from 'lucide-react';
+import { ArrowLeft, User, Mail, Calendar, Loader2, LogOut, Check, FlaskConical, Sprout } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -99,9 +99,9 @@ const Profile = () => {
     setHasChanges(value !== originalName);
   };
 
-  const handlePopulateScientificNames = async () => {
+  const handlePopulateCropData = async (field: 'scientific_name' | 'growth_habit', label: string) => {
     setIsPopulating(true);
-    setPopulateStatus('Starting...');
+    setPopulateStatus(`Starting ${label}...`);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
@@ -110,7 +110,7 @@ const Profile = () => {
       let totalUpdated = 0;
       while (remaining > 0) {
         const resp = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/populate-scientific-names`,
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/populate-crop-data`,
           {
             method: 'POST',
             headers: {
@@ -118,18 +118,18 @@ const Profile = () => {
               'Content-Type': 'application/json',
               apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             },
-            body: '{}',
+            body: JSON.stringify({ field }),
           }
         );
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'Failed');
         totalUpdated += data.updated || 0;
         remaining = data.remaining || 0;
-        setPopulateStatus(`Updated ${totalUpdated} crops, ${remaining} remaining...`);
+        setPopulateStatus(`${label}: ${totalUpdated} updated, ${remaining} remaining...`);
         if (remaining === 0) break;
       }
-      setPopulateStatus(`Done! ${totalUpdated} crops updated.`);
-      toast({ title: 'Scientific names populated', description: `${totalUpdated} crops updated.` });
+      setPopulateStatus(`Done! ${totalUpdated} ${label} updated.`);
+      toast({ title: `${label} populated`, description: `${totalUpdated} crops updated.` });
     } catch (error: any) {
       setPopulateStatus(null);
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
@@ -369,7 +369,7 @@ const Profile = () => {
                   <div className="flex-1 h-px" style={{ background: 'hsl(0 0% 20%)' }} />
                 </div>
                 <Button
-                  onClick={handlePopulateScientificNames}
+                  onClick={() => handlePopulateCropData('scientific_name', 'Scientific Names')}
                   variant="outline"
                   className="w-full py-5 font-body tracking-wider"
                   style={{
@@ -379,15 +379,38 @@ const Profile = () => {
                   }}
                   disabled={isPopulating}
                 >
-                  {isPopulating ? (
+                  {isPopulating && populateStatus?.includes('Scientific') ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      {populateStatus || 'Populating...'}
+                      {populateStatus}
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
                       <FlaskConical className="w-4 h-4" />
                       POPULATE SCIENTIFIC NAMES
+                    </span>
+                  )}
+                </Button>
+                <Button
+                  onClick={() => handlePopulateCropData('growth_habit', 'Growth Habits')}
+                  variant="outline"
+                  className="w-full py-5 font-body tracking-wider"
+                  style={{
+                    background: 'hsl(140 20% 10%)',
+                    border: '1px solid hsl(140 40% 25%)',
+                    color: 'hsl(140 55% 55%)',
+                  }}
+                  disabled={isPopulating}
+                >
+                  {isPopulating && populateStatus?.includes('Growth') ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {populateStatus}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Sprout className="w-4 h-4" />
+                      POPULATE GROWTH HABITS
                     </span>
                   )}
                 </Button>
