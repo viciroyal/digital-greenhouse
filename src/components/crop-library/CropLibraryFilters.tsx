@@ -8,7 +8,10 @@ interface Props {
   onZoneChange: (hz: number | null) => void;
   selectedCategory: string | null;
   onCategoryChange: (cat: string | null) => void;
+  selectedHabit: string | null;
+  onHabitChange: (habit: string | null) => void;
   categories: string[];
+  habits: string[];
   zoneNames: Record<number, string>;
   resultCount: number;
   totalCount: number;
@@ -18,15 +21,17 @@ const CropLibraryFilters = ({
   searchQuery, onSearchChange,
   selectedZone, onZoneChange,
   selectedCategory, onCategoryChange,
-  categories, zoneNames,
+  selectedHabit, onHabitChange,
+  categories, habits, zoneNames,
   resultCount, totalCount,
 }: Props) => {
-  const hasFilters = searchQuery || selectedZone !== null || selectedCategory !== null;
+  const hasFilters = searchQuery || selectedZone !== null || selectedCategory !== null || selectedHabit !== null;
 
   const clearAll = () => {
     onSearchChange('');
     onZoneChange(null);
     onCategoryChange(null);
+    onHabitChange(null);
   };
 
   return (
@@ -69,6 +74,18 @@ const CropLibraryFilters = ({
         <option value="">All Categories</option>
         {categories.map((cat) => (
           <option key={cat} value={cat}>{cat}</option>
+        ))}
+      </select>
+
+      {/* Growth Habit filter */}
+      <select
+        value={selectedHabit ?? ''}
+        onChange={(e) => onHabitChange(e.target.value || null)}
+        className="text-xs font-apothecary bg-background border border-border rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary/50"
+      >
+        <option value="">All Habits</option>
+        {habits.map((h) => (
+          <option key={h} value={h} className="capitalize">{h}</option>
         ))}
       </select>
 
