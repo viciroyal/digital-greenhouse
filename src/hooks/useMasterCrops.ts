@@ -50,6 +50,7 @@ export interface MasterCrop {
   spacing_inches: string | null;
   library_note: string | null;
   description: string | null;
+  scientific_name: string | null;
   brix_target_min: number | null;
   brix_target_max: number | null;
   instrument_type: string | null; // Musical instrument: Electric Guitar, Percussion, Horn Section, Bass, Synthesizers

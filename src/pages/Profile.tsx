@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Calendar, Loader2, LogOut, Check } from 'lucide-react';
+import { ArrowLeft, User, Mail, Calendar, Loader2, LogOut, Check, FlaskConical } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAdminRole } from '@/hooks/useAdminRole';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,7 +12,10 @@ import { Label } from '@/components/ui/label';
 const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAdmin } = useAdminRole();
   const [isLoading, setIsLoading] = useState(true);
+  const [isPopulating, setIsPopulating] = useState(false);
+  const [populateStatus, setPopulateStatus] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [displayName, setDisplayName] = useState('');
@@ -93,6 +97,45 @@ const Profile = () => {
   const handleNameChange = (value: string) => {
     setDisplayName(value);
     setHasChanges(value !== originalName);
+  };
+
+  const handlePopulateScientificNames = async () => {
+    setIsPopulating(true);
+    setPopulateStatus('Starting...');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      let remaining = 1;
+      let totalUpdated = 0;
+      while (remaining > 0) {
+        const resp = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/populate-scientific-names`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+              'Content-Type': 'application/json',
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: '{}',
+          }
+        );
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Failed');
+        totalUpdated += data.updated || 0;
+        remaining = data.remaining || 0;
+        setPopulateStatus(`Updated ${totalUpdated} crops, ${remaining} remaining...`);
+        if (remaining === 0) break;
+      }
+      setPopulateStatus(`Done! ${totalUpdated} crops updated.`);
+      toast({ title: 'Scientific names populated', description: `${totalUpdated} crops updated.` });
+    } catch (error: any) {
+      setPopulateStatus(null);
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsPopulating(false);
+    }
   };
 
   const inputStyle = {
@@ -316,6 +359,45 @@ const Profile = () => {
                 </span>
               )}
             </Button>
+
+            {/* Admin Tools */}
+            {isAdmin && (
+              <>
+                <div className="flex items-center gap-4 pt-2">
+                  <div className="flex-1 h-px" style={{ background: 'hsl(0 0% 20%)' }} />
+                  <span className="text-[9px] font-mono tracking-widest" style={{ color: 'hsl(0 0% 35%)' }}>ADMIN</span>
+                  <div className="flex-1 h-px" style={{ background: 'hsl(0 0% 20%)' }} />
+                </div>
+                <Button
+                  onClick={handlePopulateScientificNames}
+                  variant="outline"
+                  className="w-full py-5 font-body tracking-wider"
+                  style={{
+                    background: 'hsl(200 20% 10%)',
+                    border: '1px solid hsl(200 40% 30%)',
+                    color: 'hsl(200 60% 65%)',
+                  }}
+                  disabled={isPopulating}
+                >
+                  {isPopulating ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {populateStatus || 'Populating...'}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <FlaskConical className="w-4 h-4" />
+                      POPULATE SCIENTIFIC NAMES
+                    </span>
+                  )}
+                </Button>
+                {populateStatus && !isPopulating && (
+                  <p className="text-[9px] font-mono text-center" style={{ color: 'hsl(120 40% 50%)' }}>
+                    ✓ {populateStatus}
+                  </p>
+                )}
+              </>
+            )}
           </div>
         </div>
       </motion.div>

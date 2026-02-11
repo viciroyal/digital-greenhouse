@@ -237,6 +237,7 @@ export type Database = {
           name: string
           planting_season: string[] | null
           root_depth_inches: number | null
+          scientific_name: string | null
           soil_protocol_focus: string | null
           spacing_inches: string | null
           updated_at: string
@@ -270,6 +271,7 @@ export type Database = {
           name: string
           planting_season?: string[] | null
           root_depth_inches?: number | null
+          scientific_name?: string | null
           soil_protocol_focus?: string | null
           spacing_inches?: string | null
           updated_at?: string
@@ -303,6 +305,7 @@ export type Database = {
           name?: string
           planting_season?: string[] | null
           root_depth_inches?: number | null
+          scientific_name?: string | null
           soil_protocol_focus?: string | null
           spacing_inches?: string | null
           updated_at?: string
