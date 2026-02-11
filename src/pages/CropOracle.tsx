@@ -169,12 +169,28 @@ const CropOracle = () => {
     }
   };
 
-  /* ─── Hardiness zone filter helper ─── */
+  /* ─── Sub-zone formatting helper (8.0 → "8a", 8.5 → "8b") ─── */
+  const formatSubZone = (val: number): string => {
+    const base = Math.floor(val);
+    const sub = val % 1 >= 0.5 ? 'b' : 'a';
+    return `${base}${sub}`;
+  };
+
+  /* ─── Hardiness zone filter helper (now sub-zone aware) ─── */
   const fitsHardinessZone = (c: MasterCrop): boolean => {
     if (!hardinessZone) return true;
-    const crop = c as any;
-    if (crop.hardiness_zone_min == null || crop.hardiness_zone_max == null) return true; // no data = show
-    return hardinessZone >= crop.hardiness_zone_min && hardinessZone <= crop.hardiness_zone_max;
+    if (c.hardiness_zone_min == null || c.hardiness_zone_max == null) return true;
+    // Use sub-zone numeric value for precise filtering
+    const filterVal = hardinessSubZone ? parseSubZoneValue(hardinessSubZone) : hardinessZone;
+    return filterVal >= c.hardiness_zone_min && filterVal <= c.hardiness_zone_max;
+  };
+
+  /** Parse sub-zone string to numeric (e.g. "8b" → 8.5, "8a" → 8.0, "8" → 8.0) */
+  const parseSubZoneValue = (sz: string): number => {
+    const match = sz.match(/^(\d+)(a|b)?$/i);
+    if (!match) return hardinessZone || 0;
+    const base = parseInt(match[1]);
+    return match[2]?.toLowerCase() === 'b' ? base + 0.5 : base;
   };
 
   /* ─── Filter crops by zone + environment ─── */
@@ -711,34 +727,37 @@ const CropOracle = () => {
             )}
 
             {showZonePicker && (
-              <div className="flex items-center gap-1 flex-wrap">
-                {Array.from({ length: 13 }, (_, i) => i + 1).map(z => {
-                  const isActive = hardinessZone === z;
-                  return (
-                    <button
-                      key={z}
-                      onClick={() => {
-                        setHardinessZone(isActive ? null : z);
-                        setHardinessSubZone(isActive ? null : String(z));
-                        setSelectedState(null);
-                        setShowZonePicker(false);
-                        toast({
-                          title: isActive ? 'Zone filter cleared' : `🌍 USDA Zone ${z} selected`,
-                          description: isActive ? 'Showing all crops.' : `Crops filtered for hardiness zone ${z}.`,
-                        });
-                      }}
-                      className="w-7 h-7 rounded-full font-mono text-[10px] font-bold transition-all shrink-0"
-                      style={{
-                        background: isActive ? 'hsl(140 40% 20%)' : 'hsl(0 0% 8%)',
-                        border: `1.5px solid ${isActive ? 'hsl(140 60% 45%)' : 'hsl(0 0% 18%)'}`,
-                        color: isActive ? 'hsl(140 70% 65%)' : 'hsl(0 0% 50%)',
-                        boxShadow: isActive ? '0 0 8px hsl(140 50% 35% / 0.3)' : 'none',
-                      }}
-                    >
-                      {z}
-                    </button>
-                  );
-                })}
+              <div className="flex items-center gap-0.5 flex-wrap">
+                {Array.from({ length: 13 }, (_, i) => i + 1).flatMap(z => 
+                  ['a', 'b'].map(sub => {
+                    const subZoneStr = `${z}${sub}`;
+                    const isActive = hardinessSubZone === subZoneStr;
+                    return (
+                      <button
+                        key={subZoneStr}
+                        onClick={() => {
+                          setHardinessZone(isActive ? null : z);
+                          setHardinessSubZone(isActive ? null : subZoneStr);
+                          setSelectedState(null);
+                          setShowZonePicker(false);
+                          toast({
+                            title: isActive ? 'Zone filter cleared' : `🌍 USDA Zone ${subZoneStr} selected`,
+                            description: isActive ? 'Showing all crops.' : `Crops filtered for hardiness zone ${subZoneStr}.`,
+                          });
+                        }}
+                        className="px-1.5 py-1 rounded font-mono text-[9px] font-bold transition-all shrink-0"
+                        style={{
+                          background: isActive ? 'hsl(140 40% 20%)' : 'hsl(0 0% 8%)',
+                          border: `1px solid ${isActive ? 'hsl(140 60% 45%)' : 'hsl(0 0% 18%)'}`,
+                          color: isActive ? 'hsl(140 70% 65%)' : 'hsl(0 0% 50%)',
+                          boxShadow: isActive ? '0 0 8px hsl(140 50% 35% / 0.3)' : 'none',
+                        }}
+                      >
+                        {subZoneStr}
+                      </button>
+                    );
+                  })
+                )}
               </div>
             )}
           </div>
@@ -1364,7 +1383,7 @@ const CropOracle = () => {
                                     border: '1px solid hsl(140 40% 30% / 0.3)',
                                   }}
                                 >
-                                  🌍 Z{slot.crop.hardiness_zone_min}–{slot.crop.hardiness_zone_max}
+                                  🌍 Z{formatSubZone(slot.crop.hardiness_zone_min)}–{formatSubZone(slot.crop.hardiness_zone_max)}
                                 </span>
                               )}
                             </p>
