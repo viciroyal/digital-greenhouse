@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
@@ -13,6 +13,8 @@ import { useWeatherAlert } from '@/hooks/useWeatherAlert';
 import MiniMusicPlayer from '@/components/audio/MiniMusicPlayer';
 import { STATE_HARDINESS_ZONES, US_STATES } from '@/data/stateHardinessZones';
 import ModalReference from '@/components/crop-oracle/ModalReference';
+import SoilLinkPanel from '@/components/crop-oracle/SoilLinkPanel';
+import PlantingCalendar from '@/components/crop-oracle/PlantingCalendar';
 
 /* ─── Zone Data ─── */
 const ZONES = [
@@ -1864,6 +1866,39 @@ const CropOracle = () => {
                     SIGN IN TO SAVE RECIPE
                   </button>
                 )}
+              </motion.div>
+
+              {/* Soil Protocol + Planting Calendar + Print */}
+              <motion.div
+                className="mt-6 space-y-3 print-section"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.75 }}
+              >
+                <SoilLinkPanel
+                  frequencyHz={selectedZone.hz}
+                  environment={environment!}
+                  zoneColor={selectedZone.color}
+                  zoneName={selectedZone.name}
+                />
+                <PlantingCalendar
+                  crops={chordCard.map(s => s.crop || null)}
+                  labels={chordCard.map(s => s.label)}
+                  zoneColor={selectedZone.color}
+                  hardinessZone={hardinessZone}
+                />
+                <button
+                  onClick={() => window.print()}
+                  className="w-full py-3 rounded-xl font-mono text-[10px] tracking-wider flex items-center justify-center gap-2 transition-all hover:scale-[1.01] no-print"
+                  style={{
+                    background: 'hsl(0 0% 6%)',
+                    border: '1px solid hsl(0 0% 15%)',
+                    color: 'hsl(0 0% 45%)',
+                  }}
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  PRINT RECIPE CARD
+                </button>
               </motion.div>
 
               {/* Modal Field Guide */}

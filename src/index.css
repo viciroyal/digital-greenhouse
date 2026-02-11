@@ -570,3 +570,30 @@
     color: hsl(40 40% 80%);
   }
 }
+
+/* ─── Print Styles ─── */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11px;
+  }
+  .no-print,
+  nav,
+  header,
+  footer,
+  .fixed,
+  button:not(.print-section *) {
+    display: none !important;
+  }
+  .print-section {
+    break-inside: avoid;
+  }
+  .print-section * {
+    color: black !important;
+    border-color: #ccc !important;
+    background: white !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
