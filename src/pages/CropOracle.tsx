@@ -2384,6 +2384,19 @@ const CropOracle = () => {
                                     🌾 {slot.crop!.harvest_days}d harvest
                                   </span>
                                 )}
+                                {/* In-season badge */}
+                                {slot.crop && isInCurrentSeason(slot.crop) && (
+                                  <span className="text-[7px] font-mono font-bold px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                    style={{ background: 'hsl(145 50% 18% / 0.4)', color: 'hsl(145 70% 55%)', border: '1px solid hsl(145 50% 35% / 0.4)' }}>
+                                    ✅ IN SEASON
+                                  </span>
+                                )}
+                                {slot.crop && !isInCurrentSeason(slot.crop) && (slot.crop.planting_season?.length ?? 0) > 0 && (
+                                  <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                    style={{ background: 'hsl(0 40% 15% / 0.3)', color: 'hsl(0 50% 50%)', border: '1px solid hsl(0 30% 25% / 0.3)' }}>
+                                    🕐 OFF SEASON
+                                  </span>
+                                )}
                                 {/* Zone-aware planting window */}
                                 {slot.crop!.planting_season && slot.crop!.planting_season.length > 0 && hardinessZone && (
                                   <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
