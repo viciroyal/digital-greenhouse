@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Music, Leaf, Shield, Pickaxe, Sparkles, Zap, Layers, ChevronDown, ChevronUp } from 'lucide-react';
+import { Music, Leaf, Shield, Pickaxe, Sparkles, Zap, Layers, ChevronDown, ChevronUp, CalendarCheck, AlertTriangle } from 'lucide-react';
 import { ChordRecipe, ChordRecipeInterval } from '@/data/chordRecipes';
+import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 
 const INTERVAL_STYLES: Record<string, { icon: React.ReactNode; accent: string }> = {
   '1st':  { icon: <Leaf className="w-3.5 h-3.5" />,     accent: 'hsl(120 50% 50%)' },
@@ -22,6 +23,22 @@ interface ChordRecipeCardProps {
 const ChordRecipeCard = ({ recipe, isSelected, onSelect }: ChordRecipeCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const { frequencyHz, zoneName, zoneColor, chordName, intervals } = recipe;
+  const { data: allCrops } = useMasterCrops();
+
+  // Build lookup: crop name (lowercased) -> MasterCrop
+  const cropLookup = useMemo(() => {
+    if (!allCrops) return new Map<string, MasterCrop>();
+    const map = new Map<string, MasterCrop>();
+    for (const c of allCrops) {
+      if (c.common_name) map.set(c.common_name.toLowerCase(), c);
+      map.set(c.name.toLowerCase(), c);
+    }
+    return map;
+  }, [allCrops]);
+
+  // Find the Star (1st) crop data
+  const starInterval = intervals.find(iv => iv.interval === '1st');
+  const starCrop = starInterval ? cropLookup.get(starInterval.cropName.toLowerCase()) : undefined;
 
   // Show first 4 intervals collapsed, all 7 expanded
   const visibleIntervals = expanded ? intervals : intervals.slice(0, 4);
@@ -93,9 +110,19 @@ const ChordRecipeCard = ({ recipe, isSelected, onSelect }: ChordRecipeCardProps)
       {/* Intervals Grid */}
       <div className="p-3 space-y-1.5">
         <AnimatePresence initial={false}>
-          {visibleIntervals.map((interval, i) => (
-            <IntervalRow key={interval.interval} interval={interval} index={i} zoneColor={zoneColor} />
-          ))}
+          {visibleIntervals.map((interval, i) => {
+            const companionCrop = cropLookup.get(interval.cropName.toLowerCase());
+            return (
+              <IntervalRow
+                key={interval.interval}
+                interval={interval}
+                index={i}
+                zoneColor={zoneColor}
+                starCrop={starCrop}
+                companionCrop={companionCrop}
+              />
+            );
+          })}
         </AnimatePresence>
 
         {/* Expand / Collapse Toggle */}
@@ -167,11 +194,26 @@ interface IntervalRowProps {
   interval: ChordRecipeInterval;
   index: number;
   zoneColor: string;
+  starCrop?: MasterCrop;
+  companionCrop?: MasterCrop;
 }
 
-const IntervalRow = ({ interval, index, zoneColor }: IntervalRowProps) => {
+const IntervalRow = ({ interval, index, zoneColor, starCrop, companionCrop }: IntervalRowProps) => {
   const style = INTERVAL_STYLES[interval.interval];
   const accent = style?.accent || 'hsl(0 0% 50%)';
+
+  // Season overlap logic (skip for 1st interval — it IS the star)
+  const isStar = interval.interval === '1st';
+  const starSeasons = starCrop?.planting_season || [];
+  const compSeasons = companionCrop?.planting_season || [];
+  const sharedSeasons = starSeasons.filter(s => compSeasons.includes(s));
+  const starHarvest = starCrop?.harvest_days ?? null;
+  const compHarvest = companionCrop?.harvest_days ?? null;
+  const harvestDiff = starHarvest !== null && compHarvest !== null ? compHarvest - starHarvest : null;
+
+  const hasSeasonData = !isStar && starSeasons.length > 0 && compSeasons.length > 0;
+  const noSeasonData = !isStar && (starSeasons.length === 0 || compSeasons.length === 0);
+  const seasonMismatch = hasSeasonData && sharedSeasons.length === 0;
 
   return (
     <motion.div
@@ -206,6 +248,79 @@ const IntervalRow = ({ interval, index, zoneColor }: IntervalRowProps) => {
         <span className="text-xs font-bold truncate block" style={{ color: 'hsl(0 0% 75%)' }}>
           {interval.cropName}
         </span>
+
+        {/* Season/Harvest alignment badges */}
+        {!isStar && (
+          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+            {hasSeasonData && sharedSeasons.length > 0 && (
+              <span
+                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold"
+                style={{
+                  background: 'hsl(120 50% 20% / 0.4)',
+                  border: '1px solid hsl(120 50% 40% / 0.5)',
+                  color: 'hsl(120 50% 65%)',
+                }}
+                title={`Shared seasons: ${sharedSeasons.join(', ')}`}
+              >
+                <CalendarCheck className="w-2.5 h-2.5" />
+                {sharedSeasons.join(', ')}
+              </span>
+            )}
+            {seasonMismatch && (
+              <span
+                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold"
+                style={{
+                  background: 'hsl(0 60% 20% / 0.4)',
+                  border: '1px solid hsl(0 60% 40% / 0.5)',
+                  color: 'hsl(0 60% 65%)',
+                }}
+                title="No shared planting season with Star crop"
+              >
+                <AlertTriangle className="w-2.5 h-2.5" />
+                No season overlap
+              </span>
+            )}
+            {noSeasonData && (
+              <span
+                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold"
+                style={{
+                  background: 'hsl(40 60% 20% / 0.3)',
+                  border: '1px solid hsl(40 60% 40% / 0.4)',
+                  color: 'hsl(40 60% 55%)',
+                }}
+              >
+                ⚠ Season data pending
+              </span>
+            )}
+            {harvestDiff !== null && (
+              <span
+                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold"
+                style={{
+                  background: Math.abs(harvestDiff) <= 15
+                    ? 'hsl(120 50% 20% / 0.3)'
+                    : Math.abs(harvestDiff) <= 30
+                    ? 'hsl(45 60% 20% / 0.3)'
+                    : 'hsl(0 0% 20% / 0.3)',
+                  border: `1px solid ${
+                    Math.abs(harvestDiff) <= 15
+                      ? 'hsl(120 50% 40% / 0.4)'
+                      : Math.abs(harvestDiff) <= 30
+                      ? 'hsl(45 60% 40% / 0.4)'
+                      : 'hsl(0 0% 30% / 0.4)'
+                  }`,
+                  color: Math.abs(harvestDiff) <= 15
+                    ? 'hsl(120 50% 60%)'
+                    : Math.abs(harvestDiff) <= 30
+                    ? 'hsl(45 60% 60%)'
+                    : 'hsl(0 0% 50%)',
+                }}
+                title={`Harvest: ${compHarvest}d vs Star ${starHarvest}d`}
+              >
+                🌾 {harvestDiff > 0 ? '+' : ''}{harvestDiff}d vs star
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Emoji */}
