@@ -3,9 +3,9 @@ import { useMasterCrops } from '@/hooks/useMasterCrops';
 import { Printer, Leaf, ArrowLeft, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import CropRow from '@/components/crop-library/CropRow';
+import VirtualizedZoneTable from '@/components/crop-library/VirtualizedZoneTable';
 import { generateCsv } from '@/components/crop-library/csvExport';
-import { ZONE_ORDER, TABLE_HEADERS } from '@/components/crop-library/constants';
+import { ZONE_ORDER } from '@/components/crop-library/constants';
 
 const CropLibrary = () => {
   const { data: crops, isLoading, error } = useMasterCrops();
@@ -106,22 +106,7 @@ const CropLibrary = () => {
               </span>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="text-[9px] font-apothecary uppercase tracking-wider text-muted-foreground print:text-black/60 border-b-2 border-border/50">
-                    {TABLE_HEADERS.map((h) => (
-                      <th key={h.label} className={`py-1 px-1.5 ${h.align}`}>{h.label}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {zone.crops.map((crop) => (
-                    <CropRow key={crop.id} crop={crop} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <VirtualizedZoneTable crops={zone.crops} />
           </section>
         ))}
 
