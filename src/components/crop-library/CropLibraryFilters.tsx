@@ -85,7 +85,7 @@ const CropLibraryFilters = ({
       >
         <option value="">All Habits</option>
         {habits.map((h) => (
-          <option key={h} value={h} className="capitalize">{h}</option>
+          <option key={h} value={h}>{h.charAt(0).toUpperCase() + h.slice(1)}</option>
         ))}
       </select>
 
