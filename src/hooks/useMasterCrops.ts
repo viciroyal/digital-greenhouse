@@ -103,14 +103,31 @@ export const useMasterCrops = () => {
   return useQuery({
     queryKey: ['master-crops'],
     queryFn: async (): Promise<MasterCrop[]> => {
-      const { data, error } = await supabase
-        .from('master_crops')
-        .select('*')
-        .order('frequency_hz', { ascending: true })
-        .order('common_name', { ascending: true });
+      // Fetch all crops using pagination to bypass the 1000-row default limit
+      const allCrops: MasterCrop[] = [];
+      const pageSize = 1000;
+      let from = 0;
+      let hasMore = true;
 
-      if (error) throw error;
-      return (data as MasterCrop[]) || [];
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from('master_crops')
+          .select('*')
+          .order('frequency_hz', { ascending: true })
+          .order('common_name', { ascending: true })
+          .range(from, from + pageSize - 1);
+
+        if (error) throw error;
+        if (data) {
+          allCrops.push(...(data as MasterCrop[]));
+          hasMore = data.length === pageSize;
+          from += pageSize;
+        } else {
+          hasMore = false;
+        }
+      }
+
+      return allCrops;
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
