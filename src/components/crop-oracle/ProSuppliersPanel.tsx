@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Droplets, FlaskConical, Bug, Shovel, ExternalLink, Globe } from 'lucide-react';
+import { ChevronDown, Droplets, FlaskConical, Bug, Shovel, ExternalLink, Globe, Leaf } from 'lucide-react';
 
 interface ProSuppliersPanelProps {
   zoneColor: string;
   zoneName: string;
 }
 
-type Category = 'gaLocal' | 'seeds' | 'irrigation' | 'soilLabs' | 'inputs' | 'biocontrol';
+type Category = 'gaLocal' | 'seeds' | 'coverCrops' | 'irrigation' | 'soilLabs' | 'inputs' | 'biocontrol';
 
 const CATEGORIES: { id: Category; label: string; icon: React.ReactNode; color: string }[] = [
   { id: 'gaLocal', label: 'GA LOCAL', icon: <Globe className="w-3.5 h-3.5" />, color: 'hsl(340 55% 55%)' },
   { id: 'seeds', label: 'SEEDS & STARTS', icon: <Shovel className="w-3.5 h-3.5" />, color: 'hsl(80 50% 50%)' },
+  { id: 'coverCrops', label: 'COVER CROPS', icon: <Leaf className="w-3.5 h-3.5" />, color: 'hsl(100 45% 45%)' },
   { id: 'irrigation', label: 'IRRIGATION & DRIP', icon: <Droplets className="w-3.5 h-3.5" />, color: 'hsl(200 55% 50%)' },
   { id: 'soilLabs', label: 'SOIL TESTING LABS', icon: <FlaskConical className="w-3.5 h-3.5" />, color: 'hsl(45 60% 55%)' },
   { id: 'inputs', label: 'ORGANIC INPUTS', icon: <Shovel className="w-3.5 h-3.5" />, color: 'hsl(120 40% 50%)' },
@@ -58,6 +59,13 @@ const SUPPLIERS: Record<Category, { name: string; url: string; note: string; spe
     { name: 'Koppert Biological', url: 'https://www.koppert.com', note: 'Commercial biocontrol — predatory mites, parasitic wasps', specialty: 'Commercial IPM' },
     { name: 'Insect Lore / BIOLINE', url: 'https://www.biolineagrosciences.com', note: 'Greenhouse-grade biocontrol for high tunnel production', specialty: 'High tunnel IPM' },
     { name: 'Peaceful Valley (PVFS)', url: 'https://www.groworganic.com', note: 'Beneficial insects, organic sprays, cover crop seed', specialty: 'Organic supply' },
+  ],
+  coverCrops: [
+    { name: 'Green Cover Seed', url: 'https://www.greencoverseed.com', note: 'Multi-species cover crop mixes, soil health blends & SmartMix calculator', specialty: 'Custom mixes' },
+    { name: 'Southern Cover Crops', url: 'https://southerncovercrops.com', note: 'SE-adapted cover crop seed — crimson clover, sunn hemp, cowpeas & more', specialty: 'Southern varieties' },
+    { name: 'Albert Lea Seed', url: 'https://www.alseed.com', note: 'Cover crop seed, pollinator mixes & organic options with bulk pricing', specialty: 'Bulk cover seed' },
+    { name: 'Welter Seed & Honey', url: 'https://www.welterseed.com', note: 'Cover crops, native grasses & wildflower mixes for pollinator habitat', specialty: 'Pollinator habitat' },
+    { name: 'King\'s AgriSeeds', url: 'https://www.kingsagriseeds.com', note: 'High-performance cover crop blends, forage mixes & no-till solutions', specialty: 'No-till blends' },
   ],
 };
 
