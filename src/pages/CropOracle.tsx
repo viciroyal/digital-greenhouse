@@ -16,6 +16,7 @@ import ModalReference from '@/components/crop-oracle/ModalReference';
 import SoilLinkPanel from '@/components/crop-oracle/SoilLinkPanel';
 import PlantingCalendar from '@/components/crop-oracle/PlantingCalendar';
 import ScentCorridorPanel from '@/components/crop-oracle/ScentCorridorPanel';
+import PropagationPanel from '@/components/crop-oracle/PropagationPanel';
 
 /* ─── Zone Data ─── */
 const ZONES = [
@@ -90,7 +91,7 @@ const CropOracle = () => {
   const [showZonePicker, setShowZonePicker] = useState(false);
   const [showStateDropdown, setShowStateDropdown] = useState(false);
   const [modalInfoOpen, setModalInfoOpen] = useState(false);
-  const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | 'scent' | null>(null);
+  const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | 'scent' | 'propagation' | null>(null);
   const [recipeSeed, setRecipeSeed] = useState(0);
 
   // Fetch saved recipes
@@ -1358,6 +1359,7 @@ const CropOracle = () => {
                     { id: 'calendar' as const, icon: <Calendar className="w-3.5 h-3.5" />, tip: 'Planting Calendar' },
                     { id: 'modal' as const, icon: <Music className="w-3.5 h-3.5" />, tip: 'Modal Guide' },
                     ...((environment === 'food-forest' || proMode) ? [{ id: 'scent' as const, icon: <Shield className="w-3.5 h-3.5" />, tip: 'Scent Corridor' }] : []),
+                    ...(environment === 'high-tunnel' ? [{ id: 'propagation' as const, icon: <Sprout className="w-3.5 h-3.5" />, tip: 'Seed Starting' }] : []),
                   ].map(tool => {
                     const isActive = activeToolPanel === tool.id;
                     return (
@@ -1451,6 +1453,21 @@ const CropOracle = () => {
                       zoneName={selectedZone.name}
                       chordCrops={chordCard.map(s => s.crop || null)}
                       allCrops={allCrops}
+                    />
+                  </motion.div>
+                )}
+                {activeToolPanel === 'propagation' && (
+                  <motion.div
+                    key="propagation-panel"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden mb-2"
+                  >
+                    <PropagationPanel
+                      zoneColor={selectedZone.color}
+                      zoneName={selectedZone.name}
                     />
                   </motion.div>
                 )}
