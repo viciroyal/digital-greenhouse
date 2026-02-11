@@ -64,14 +64,28 @@ const ANTAGONIST_PAIRS: { groupA: string[]; groupB: string[]; reason: string }[]
   { groupA: ['cabbage', 'broccoli', 'kale', 'cauliflower', 'brussels'], groupB: ['tomato'], reason: 'Brassicas and tomatoes compete for calcium & attract shared pests' },
   { groupA: ['fennel'], groupB: ['tomato', 'bean', 'pepper', 'eggplant', 'carrot'], reason: 'Fennel secretes compounds that inhibit most neighbors' },
   { groupA: ['walnut', 'black walnut'], groupB: ['tomato', 'pepper', 'eggplant', 'potato', 'blueberry'], reason: 'Juglone toxicity from walnut roots' },
-  { groupA: ['dill'], groupB: ['carrot'], reason: 'Dill cross-pollinates with carrots, reducing seed quality' },
+  { groupA: ['dill', 'coriander', 'cilantro'], groupB: ['carrot'], reason: 'Umbellifers cross-pollinate with carrots, reducing yield and seed quality' },
+  { groupA: ['sage'], groupB: ['cucumber'], reason: 'Sage inhibits cucumber growth' },
+  { groupA: ['mint'], groupB: ['parsley'], reason: 'Mint overwhelms parsley through aggressive root competition' },
+  { groupA: ['sunflower'], groupB: ['potato'], reason: 'Sunflowers release allelopathic compounds that inhibit potato growth' },
 ];
 
 const SYNERGY_PATTERNS: { keywords: string[]; badge: string; tip: string }[] = [
   { keywords: ['corn', 'bean', 'squash'], badge: '🌾 THREE SISTERS', tip: 'Corn provides a trellis for beans, beans fix nitrogen, squash shades soil & deters pests.' },
-  { keywords: ['tomato', 'basil'], badge: '🍅 CLASSIC PAIR', tip: 'Basil repels aphids and whiteflies while improving tomato flavor.' },
-  { keywords: ['carrot', 'onion'], badge: '🛡️ PEST SHIELD', tip: 'Carrots repel onion flies; onions repel carrot flies.' },
+  { keywords: ['tomato', 'basil'], badge: '🍅 CLASSIC PAIR', tip: 'Basil repels whiteflies, mosquitoes, spider mites & aphids while improving tomato flavor and pollination.' },
+  { keywords: ['carrot', 'onion'], badge: '🛡️ PEST SHIELD', tip: 'Carrots repel onion flies; onions repel carrot rust fly.' },
+  { keywords: ['carrot', 'rosemary'], badge: '🛡️ CARROT FLY SHIELD', tip: 'Rosemary repels carrot fly with its aromatic oils.' },
+  { keywords: ['carrot', 'sage'], badge: '🛡️ CARROT FLY SHIELD', tip: 'Sage repels carrot fly with its strong scent.' },
   { keywords: ['strawberry', 'borage'], badge: '🐝 POLLINATOR BOOST', tip: 'Borage attracts pollinators and is believed to improve strawberry yield.' },
+  { keywords: ['tomato', 'asparagus'], badge: '🧬 NEMATODE SHIELD', tip: 'Asparagus repels root-knot nematodes that attack tomato roots.' },
+  { keywords: ['tomato', 'borage'], badge: '🐛 HORNWORM GUARD', tip: 'Borage repels tomato hornworms and improves tomato vigor.' },
+  { keywords: ['cucumber', 'nasturtium'], badge: '🪲 BEETLE TRAP', tip: 'Nasturtiums serve as trap crops for cucumber beetles, luring them away.' },
+  { keywords: ['cucumber', 'dill'], badge: '🦟 APHID SHIELD', tip: 'Dill protects cucumbers against aphids and mites.' },
+  { keywords: ['lettuce', 'chive'], badge: '🧅 SCENT MASK', tip: 'Chives mask lettuce scent, deterring aphids and other pests.' },
+  { keywords: ['potato', 'horseradish'], badge: '🪲 BEETLE WARD', tip: 'Horseradish planted at corners of potato patches wards off Colorado potato beetles.' },
+  { keywords: ['bean', 'nasturtium'], badge: '🪤 APHID TRAP', tip: 'Nasturtiums act as trap plants, enticing aphids away from beans.' },
+  { keywords: ['cabbage', 'nasturtium'], badge: '🪤 PEST DECOY', tip: 'Nasturtiums deter beetles and aphids from brassicas.' },
+  { keywords: ['spinach', 'strawberry'], badge: '🤝 SHADE FRIENDS', tip: 'Spinach and strawberries share similar growing conditions and benefit from proximity.' },
 ];
 
 const cropMatchesGroup = (crop: MasterCrop, group: string[]): boolean => {
