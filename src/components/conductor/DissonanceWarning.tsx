@@ -1,12 +1,19 @@
 import { motion } from 'framer-motion';
-import { AlertTriangle, XCircle, Music } from 'lucide-react';
-import { DissonanceCheck } from '@/hooks/useAutoGeneration';
+import { AlertTriangle, XCircle, Music, Leaf, TreePine, Bug, Waves } from 'lucide-react';
+import { DissonanceCheck, ConflictType } from '@/hooks/useAutoGeneration';
 
 interface DissonanceWarningProps {
   check: DissonanceCheck;
   onDismiss?: () => void;
   onProceed?: () => void;
 }
+
+const CONFLICT_BADGE: Record<ConflictType, { icon: typeof Leaf; color: string; label: string }> = {
+  Nutritional: { icon: Leaf, color: 'hsl(120 50% 45%)', label: 'NUTRITIONAL' },
+  Structural: { icon: TreePine, color: 'hsl(30 70% 50%)', label: 'STRUCTURAL' },
+  Pathological: { icon: Bug, color: 'hsl(0 60% 50%)', label: 'PATHOLOGICAL' },
+  Vibrational: { icon: Waves, color: 'hsl(270 60% 55%)', label: 'VIBRATIONAL' },
+};
 
 const DissonanceWarning = ({ check, onDismiss, onProceed }: DissonanceWarningProps) => {
   if (!check.isDissonant) return null;
@@ -16,6 +23,9 @@ const DissonanceWarning = ({ check, onDismiss, onProceed }: DissonanceWarningPro
   const borderColor = isError ? 'hsl(0 60% 45%)' : 'hsl(45 70% 50%)';
   const textColor = isError ? 'hsl(0 70% 60%)' : 'hsl(45 80% 60%)';
   const Icon = isError ? XCircle : AlertTriangle;
+
+  const badge = check.conflictType ? CONFLICT_BADGE[check.conflictType] : null;
+  const BadgeIcon = badge?.icon;
 
   return (
     <motion.div
@@ -43,6 +53,23 @@ const DissonanceWarning = ({ check, onDismiss, onProceed }: DissonanceWarningPro
         <span className="text-sm font-mono font-bold tracking-wider" style={{ color: textColor }}>
           DISSONANCE DETECTED
         </span>
+
+        {/* Conflict Type Badge */}
+        {badge && BadgeIcon && (
+          <motion.span
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-widest"
+            style={{
+              background: `${badge.color}20`,
+              border: `1px solid ${badge.color}80`,
+              color: badge.color,
+            }}
+          >
+            <BadgeIcon className="w-3 h-3" />
+            {badge.label}
+          </motion.span>
+        )}
       </div>
 
       {/* Message */}
@@ -69,7 +96,7 @@ const DissonanceWarning = ({ check, onDismiss, onProceed }: DissonanceWarningPro
                 key={i}
                 className="w-1 rounded-full"
                 style={{ 
-                  background: textColor,
+                  background: badge?.color || textColor,
                   height: `${10 + Math.random() * 20}px`,
                 }}
                 animate={{ 
@@ -81,7 +108,7 @@ const DissonanceWarning = ({ check, onDismiss, onProceed }: DissonanceWarningPro
             ))}
           </motion.div>
           <span className="text-[10px] font-mono ml-2" style={{ color: 'hsl(0 0% 50%)' }}>
-            FREQUENCY CLASH
+            {badge ? `${badge.label} CLASH` : 'FREQUENCY CLASH'}
           </span>
           <motion.div
             className="flex gap-1"

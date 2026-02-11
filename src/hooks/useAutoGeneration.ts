@@ -113,10 +113,13 @@ export interface AutoGenerationResult {
  * Check for dissonance - frequency mismatch warning
  * Jazz Mode: allows inter-zone planting if crops share the same guild/category
  */
+export type ConflictType = 'Nutritional' | 'Structural' | 'Pathological' | 'Vibrational';
+
 export interface DissonanceCheck {
   isDissonant: boolean;
   message: string;
   severity: 'warning' | 'error';
+  conflictType?: ConflictType;
 }
 
 export const checkDissonance = (
@@ -144,7 +147,8 @@ export const checkDissonance = (
     return {
       isDissonant: true,
       message: `⚠️ DISSONANCE WARNING: "${crop.name}" (${crop.frequency_hz}Hz) is out of tune with this bed (${bedFrequencyHz}Hz). This ${interval} may cause harmonic interference.`,
-      severity: jazzMode ? 'warning' : 'warning',
+      severity: 'warning',
+      conflictType: 'Vibrational' as ConflictType,
     };
   }
   return {
