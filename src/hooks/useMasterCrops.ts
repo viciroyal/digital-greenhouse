@@ -60,6 +60,8 @@ export interface MasterCrop {
   root_depth_inches: number | null;
   min_container_gal: number | null;
   propagation_method: string | null; // 'direct_sow', 'transplant', 'both'
+  est_yield_lbs_per_plant: number | null;
+  seed_cost_cents: number | null;
   created_at: string;
   updated_at: string;
 }
