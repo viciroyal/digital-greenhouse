@@ -235,7 +235,12 @@ const CropOracle = () => {
 
   const isFoodForestPerennial = (c: MasterCrop): boolean => {
     const name = (c.common_name || c.name).toLowerCase();
+    const note = (c.library_note || '').toLowerCase();
+    // Exclude nightshades/peppers that false-match (e.g. "Sugar Rush Peach" matching "peach")
+    const isNightshade = c.category === 'Nightshade' || name.includes('pepper') || name.includes('tomato') || name.includes('eggplant');
+    if (isNightshade) return false;
     return c.category === 'fruit' ||
+      note.includes('food forest') ||
       FOOD_FOREST_PERENNIAL_KEYWORDS.some(kw => name.includes(kw));
   };
 
@@ -454,10 +459,11 @@ const CropOracle = () => {
           break;
         case '7th (Signal)':
           if (isFF) {
-            // Food Forest: pollinator-attracting perennial flowers/herbs
+            // Food Forest: pollinator-attracting perennial flowers/herbs/ornamentals
             assign(pickCrop(undefined, c =>
+              c.chord_interval === '7th (Signal)' ||
               c.category === 'Pollinator' || c.category === 'Dye/Fiber/Aromatic' ||
-              (c.chord_interval === '7th (Signal)' && c.category !== 'vegetable')
+              c.category === 'Ornamental' || c.category === 'flower'
             ));
             if (!crop) assign(pickCrop(directMatch, c => c.chord_interval === '7th (Signal)'));
           } else {
@@ -495,21 +501,21 @@ const CropOracle = () => {
         case '11th (Tension)':
           if (isFF) {
             // Food Forest: mycelial network / fungi + perennial alliums
-            assign(pickCrop(undefined, c =>
-              c.category === 'substrate' ||
-              c.guild_role?.toLowerCase().includes('sentinel') ||
-              c.name.toLowerCase().includes('mushroom') ||
-              c.name.toLowerCase().includes('shiitake') ||
-              c.name.toLowerCase().includes('oyster') ||
-              c.name.toLowerCase().includes('reishi') ||
-              c.name.toLowerCase().includes('garlic') ||
-              c.name.toLowerCase().includes('chive')
-            ));
-            if (!crop) assign(pickCrop(undefined, c =>
-              c.guild_role?.toLowerCase().includes('sentinel') ||
-              c.name.toLowerCase().includes('onion') ||
-              c.category === 'Fungi'
-            ));
+            assign(pickCrop(undefined, c => {
+              const n = (c.common_name || c.name).toLowerCase();
+              return c.category === 'substrate' || c.category === 'Fungi' ||
+                c.guild_role?.toLowerCase().includes('sentinel') ||
+                n.includes('mushroom') || n.includes('shiitake') ||
+                n.includes('oyster') || n.includes('reishi') ||
+                n.includes('turkey tail') || n.includes('wine cap') ||
+                n.includes('woodear') || n.includes('lion') ||
+                n.includes('garlic') || n.includes('chive');
+            }));
+            if (!crop) assign(pickCrop(undefined, c => {
+              const n = (c.common_name || c.name).toLowerCase();
+              return c.guild_role?.toLowerCase().includes('sentinel') ||
+                n.includes('onion') || c.category === 'Fungi';
+            }));
           } else {
             assign(pickCrop(undefined, c =>
               c.guild_role?.toLowerCase().includes('sentinel') ||
