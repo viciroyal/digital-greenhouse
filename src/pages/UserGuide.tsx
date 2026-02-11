@@ -97,8 +97,9 @@ const UserGuide = () => {
           <ul className="list-disc pl-5 space-y-1">
             <li><strong>Pot</strong> — For small containers on a patio or balcony</li>
             <li><strong>Raised Bed</strong> — Standard backyard garden boxes</li>
-            <li><strong>Farm</strong> — Big fields with rows of crops</li>
-            <li><strong>High Tunnel</strong> — A covered greenhouse structure</li>
+            <li><strong>Farm</strong> — Big fields with rows of crops (Pro Mode)</li>
+            <li><strong>High Tunnel</strong> — A covered greenhouse structure (Pro Mode)</li>
+            <li><strong>Food Forest</strong> — A multi-layer perennial ecosystem with fruit trees, berry bushes, and ground cover (Pro Mode)</li>
           </ul>
           <p><strong>Step 2: Pick Your Frequency (Key)</strong></p>
           <p>Choose a musical key (C through B). Each key maps to a frequency zone:</p>
@@ -129,6 +130,21 @@ const UserGuide = () => {
             <li>🌻 <strong>The Aerial</strong> — Tall plants providing shade above</li>
           </ul>
           <p>Pro Mode gives you a complete 7-layer garden — like a jazz chord with all the notes!</p>
+          <p>Pro Mode also unlocks the <strong>Farm</strong>, <strong>High Tunnel</strong>, and <strong>Food Forest</strong> environments.</p>
+        </Section>
+
+        <Section title="Food Forest Mode" emoji="🌳">
+          <p>The <strong>Food Forest</strong> environment creates recipes using a layered perennial ecosystem model:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>🌳 <strong>Canopy Tree</strong> — Fruit or nut trees forming the forest ceiling</li>
+            <li>🫐 <strong>Understory</strong> — Berry bushes and small trees beneath the canopy</li>
+            <li>🌱 <strong>N-Fixer</strong> — Nitrogen-fixing plants that feed the whole ecosystem</li>
+            <li>🐝 <strong>Pollinator</strong> — Perennial flowers and herbs for beneficial insects</li>
+            <li>🫚 <strong>Root Layer</strong> — Deep-rooted nutrient miners</li>
+            <li>🍄 <strong>Fungal Net</strong> — Mycelial networks connecting trees underground</li>
+            <li>🍇 <strong>Vine Layer</strong> — Climbing vines filling canopy gaps</li>
+          </ul>
+          <p>The system prioritizes perennial crops, fruit trees, and nitrogen-fixing understory plants automatically.</p>
         </Section>
 
         <Section title="Setting a Star Crop" emoji="⭐">
@@ -163,12 +179,23 @@ const UserGuide = () => {
           <p>The mini music player at the bottom plays tracks from the PharmBoi album. Each track corresponds to a frequency zone — listen while you plan!</p>
         </Section>
 
+        <Section title="Crop Library & CSV Export" emoji="📊">
+          <p>Visit the <strong>Crop Library</strong> (/crop-library) to see every crop in the registry organized by frequency zone.</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Click <strong>"Export CSV"</strong> to download the full registry as a spreadsheet</li>
+            <li>The CSV includes all 24 data columns: companions, guilds, soil protocols, Brix targets, hardiness zones, and more</li>
+            <li>Click <strong>"Print / Export PDF"</strong> to save a printable reference</li>
+          </ul>
+        </Section>
+
         <Section title="Quick Tips" emoji="💡">
           <ul className="list-disc pl-5 space-y-1">
             <li>Start with <strong>Raised Bed</strong> and <strong>Key of F (Heart/639Hz)</strong> if you're new — it's the friendliest zone!</li>
+            <li>Try <strong>Food Forest</strong> mode if you want to plan a perennial garden with fruit trees!</li>
             <li>Use the <strong>search bar</strong> in swap mode to find specific crops fast</li>
             <li>Companion badges (🤝) mean crops help each other — try to keep them!</li>
             <li>The 🌙 moon icon turns green when it's a good time to plant that crop</li>
+            <li>Export your crop data as CSV from the <strong>Crop Library</strong> for offline planning</li>
           </ul>
         </Section>
 
