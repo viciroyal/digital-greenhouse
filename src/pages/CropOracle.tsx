@@ -2251,6 +2251,18 @@ const CropOracle = () => {
                               <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                                 <GrowthHabitBadge habit={slot.crop!.growth_habit} size="sm" />
                                 <TrapCropBadge description={slot.crop!.description} guildRole={slot.crop!.guild_role} size="sm" />
+                                {starCrop && slot.crop && i > 0 && (() => {
+                                  const sName = (starCrop.common_name || starCrop.name).toLowerCase();
+                                  const cName = (slot.crop!.common_name || slot.crop!.name).toLowerCase();
+                                  const starLists = (starCrop.companion_crops || []).map(n => n.toLowerCase()).some(cn => cName.includes(cn) || cn.includes(cName.split('(')[0].trim()));
+                                  const cLists = (slot.crop!.companion_crops || []).map(n => n.toLowerCase()).some(cn => sName.includes(cn) || cn.includes(sName.split('(')[0].trim()));
+                                  return (starLists || cLists) ? (
+                                    <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5"
+                                      style={{ background: 'hsl(330 50% 25% / 0.3)', color: 'hsl(330 60% 65%)', border: '1px solid hsl(330 40% 35% / 0.3)' }}>
+                                      💚 USDA COMPANION
+                                    </span>
+                                  ) : null;
+                                })()}
                                 {(() => {
                                   const habit = (slot.crop!.growth_habit || '').toLowerCase();
                                   const needsTrellis = habit === 'vine' || habit === 'epiphyte';
