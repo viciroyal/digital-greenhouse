@@ -12,7 +12,7 @@ interface SoilLinkPanelProps {
 }
 
 const SoilLinkPanel = ({ frequencyHz, environment, zoneColor, zoneName }: SoilLinkPanelProps) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   const { data: amendments } = useQuery({
     queryKey: ['soil-amendments'],

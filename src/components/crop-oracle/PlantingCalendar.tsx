@@ -26,7 +26,7 @@ const SEASON_TO_MONTHS: Record<string, number[]> = {
 };
 
 const PlantingCalendar = ({ crops, labels, zoneColor, hardinessZone }: PlantingCalendarProps) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   const rows = useMemo(() => {
     return crops
