@@ -70,11 +70,23 @@ const ANTAGONIST_PAIRS: { groupA: string[]; groupB: string[]; reason: string }[]
   { groupA: ['sage'], groupB: ['cucumber'], reason: 'Sage inhibits cucumber growth' },
   { groupA: ['mint'], groupB: ['parsley'], reason: 'Mint overwhelms parsley through aggressive root competition' },
   { groupA: ['sunflower'], groupB: ['potato'], reason: 'Sunflowers release allelopathic compounds that inhibit potato growth' },
-  { groupA: ['potato'], groupB: ['squash', 'cucumber'], reason: 'Shared susceptibility to blight and competition for soil nutrients' },
+  { groupA: ['potato'], groupB: ['squash', 'cucumber', 'zucchini', 'pumpkin'], reason: 'Shared susceptibility to blight and competition for soil nutrients' },
   { groupA: ['bean'], groupB: ['pepper'], reason: 'Beans can shade peppers and compete for similar nutrients' },
   { groupA: ['corn'], groupB: ['celery'], reason: 'Corn shading stunts celery growth' },
   { groupA: ['lettuce'], groupB: ['parsley'], reason: 'Parsley can bolt lettuce prematurely when planted nearby' },
   { groupA: ['onion'], groupB: ['asparagus'], reason: 'Onions inhibit asparagus growth through root secretions' },
+  // New: Pepper conflicts
+  { groupA: ['pepper'], groupB: ['fennel'], reason: 'Fennel inhibits pepper growth through root secretions' },
+  { groupA: ['pepper'], groupB: ['kohlrabi'], reason: 'Kohlrabi stunts pepper growth through nutrient competition' },
+  // New: Squash/Cucumber conflicts
+  { groupA: ['squash', 'zucchini', 'pumpkin'], groupB: ['potato'], reason: 'Squash and potatoes share blight susceptibility and compete for nutrients' },
+  { groupA: ['cucumber'], groupB: ['potato'], reason: 'Potatoes spread blight to cucumbers; both attract similar pests' },
+  { groupA: ['cucumber', 'squash', 'zucchini'], groupB: ['melon'], reason: 'Cucurbits cross-pollinate when planted too close, reducing fruit quality' },
+  // New: Eggplant conflicts
+  { groupA: ['eggplant'], groupB: ['fennel'], reason: 'Fennel root secretions inhibit eggplant growth' },
+  { groupA: ['eggplant'], groupB: ['pepper'], reason: 'Both are solanaceous heavy feeders competing for the same nutrients' },
+  // New: Celery conflicts
+  { groupA: ['celery'], groupB: ['parsnip', 'parsley'], reason: 'Same family (Apiaceae) — shared pests and diseases amplify when adjacent' },
 ];
 
 /** Bodyguard crops: pest-specific protectors to boost in scoring */
@@ -87,6 +99,13 @@ const BODYGUARD_MAP: Record<string, { guard: string[]; pest: string }> = {
   broccoli: { guard: ['thyme', 'sage', 'nasturtium'], pest: 'Cabbage Moth' },
   lettuce: { guard: ['poached egg plant', 'alyssum', 'mint', 'calendula'], pest: 'Slugs & Snails' },
   onion: { guard: ['marigold'], pest: 'Onion Maggot' },
+  pepper: { guard: ['basil', 'marigold', 'nasturtium'], pest: 'Aphids & Flea Beetles' },
+  squash: { guard: ['nasturtium', 'marigold', 'radish'], pest: 'Squash Vine Borer & Cucumber Beetles' },
+  cucumber: { guard: ['nasturtium', 'radish', 'tansy'], pest: 'Cucumber Beetles & Aphids' },
+  zucchini: { guard: ['nasturtium', 'marigold', 'borage'], pest: 'Squash Vine Borer & Squash Bugs' },
+  eggplant: { guard: ['marigold', 'nasturtium', 'catnip'], pest: 'Flea Beetles & Colorado Potato Beetle' },
+  celery: { guard: ['nasturtium', 'marigold', 'cosmos'], pest: 'Aphids & Leaf Miners' },
+  pumpkin: { guard: ['nasturtium', 'marigold', 'oregano'], pest: 'Squash Vine Borer & Squash Bugs' },
 };
 
 /** Placement rules: spatial guidance for bed layout */
@@ -99,6 +118,13 @@ const PLACEMENT_RULES: Record<string, string> = {
   broccoli: 'Heavy feeder; pair with early Beets',
   lettuce: 'South row; benefits from shade of tall Corn',
   onion: 'Border plant; masks other crop scents',
+  pepper: 'Sheltered center; pair with Basil for pest masking & flavor boost',
+  squash: 'Spread outer edges; leaves shade soil as living mulch',
+  cucumber: 'Trellis east side; pair with Dill & Nasturtium for beetle defense',
+  zucchini: 'South-facing with space to sprawl; interplant with Borage for pollination',
+  eggplant: 'Warm center bed; pair with Marigold border for flea beetle defense',
+  celery: 'Partial shade; pair with Tomato or Leek for mutual pest masking',
+  pumpkin: 'North end to sprawl; use Nasturtium border for vine borer defense',
 };
 
 const SYNERGY_PATTERNS: { keywords: string[]; badge: string; tip: string }[] = [
@@ -131,6 +157,29 @@ const SYNERGY_PATTERNS: { keywords: string[]; badge: string; tip: string }[] = [
   { keywords: ['onion', 'carrot'], badge: '🛡️ PEST SHIELD', tip: 'Onions repel carrot rust fly; carrots repel onion flies.' },
   { keywords: ['cabbage', 'nasturtium'], badge: '🪤 PEST DECOY', tip: 'Nasturtiums deter beetles and aphids from brassicas.' },
   { keywords: ['spinach', 'strawberry'], badge: '🤝 SHADE FRIENDS', tip: 'Spinach and strawberries share similar growing conditions and benefit from proximity.' },
+  // Pepper synergies
+  { keywords: ['pepper', 'basil'], badge: '🌿 FLAVOR BOOST', tip: 'Basil repels aphids & thrips while improving pepper flavor through volatile oils.' },
+  { keywords: ['pepper', 'tomato'], badge: '🔥 SOLANACEAE DUO', tip: 'Tomatoes and peppers thrive together — similar nutrient needs, shared pest defense.' },
+  { keywords: ['pepper', 'carrot'], badge: '🥕 ROOT LOOSEN', tip: 'Carrots loosen soil for pepper roots and utilize different soil depths.' },
+  { keywords: ['pepper', 'onion'], badge: '🧅 PEST MASK', tip: 'Onion scent masks pepper from aphids and flea beetles.' },
+  // Squash & Cucumber synergies
+  { keywords: ['squash', 'nasturtium'], badge: '🪤 BORER TRAP', tip: 'Nasturtiums lure squash vine borers and cucumber beetles away.' },
+  { keywords: ['squash', 'borage'], badge: '🐝 POLLINATOR CALL', tip: 'Borage attracts bees critical for squash pollination.' },
+  { keywords: ['cucumber', 'bean'], badge: '🫘 NITROGEN FEED', tip: 'Beans fix nitrogen that heavy-feeding cucumbers crave.' },
+  { keywords: ['cucumber', 'sunflower'], badge: '🌻 TRELLIS & SHADE', tip: 'Sunflower stalks serve as natural trellises for cucumber vines.' },
+  { keywords: ['zucchini', 'borage'], badge: '🐝 SQUASH SYNC', tip: 'Borage dramatically improves zucchini pollination and deters squash worms.' },
+  { keywords: ['zucchini', 'nasturtium'], badge: '🪤 BUG DECOY', tip: 'Nasturtiums trap squash bugs and beetles away from zucchini.' },
+  // Eggplant synergies
+  { keywords: ['eggplant', 'basil'], badge: '🌿 FLEA SHIELD', tip: 'Basil repels flea beetles — the #1 eggplant pest.' },
+  { keywords: ['eggplant', 'marigold'], badge: '💛 NEMATODE GUARD', tip: 'Marigolds repel root-knot nematodes that devastate eggplant.' },
+  { keywords: ['eggplant', 'bean'], badge: '🫘 NITROGEN GIFT', tip: 'Beans fix nitrogen for heavy-feeding eggplant; eggplant repels Mexican bean beetles.' },
+  // Celery synergies
+  { keywords: ['celery', 'tomato'], badge: '🍅 MUTUAL MASK', tip: 'Celery repels tomato hornworms; tomatoes deter celery leaf miners.' },
+  { keywords: ['celery', 'leek'], badge: '🧅 PEST CONFUSE', tip: 'Leeks and celery confuse each other\'s pests through scent masking.' },
+  { keywords: ['celery', 'bean'], badge: '🫘 SHADE & FIX', tip: 'Beans provide light shade celery loves and fix nitrogen for its heavy appetite.' },
+  // Pumpkin synergies
+  { keywords: ['pumpkin', 'corn'], badge: '🌾 SISTERS PAIR', tip: 'Corn provides structure; pumpkin vines shade soil — Two Sisters combo.' },
+  { keywords: ['pumpkin', 'nasturtium'], badge: '🪤 BORER DEFENSE', tip: 'Nasturtiums trap vine borers and attract predatory insects.' },
 ];
 
 const cropMatchesGroup = (crop: MasterCrop, group: string[]): boolean => {
