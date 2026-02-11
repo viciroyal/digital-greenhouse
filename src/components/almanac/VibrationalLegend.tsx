@@ -163,32 +163,49 @@ const VibrationalLegend = ({ onSelectFrequency, selectedFrequency }: Vibrational
                     {freq.description}
                   </p>
                   
-                  {/* Crop preview from database */}
-                  {freq.crops && freq.crops.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {freq.crops.slice(0, 3).map((crop) => (
-                        <span
-                          key={crop.id}
-                          className="text-[10px] font-mono px-2 py-0.5 rounded"
-                          style={{
-                            background: 'hsl(0 0% 15%)',
-                            color: 'hsl(0 0% 60%)',
-                            border: '1px solid hsl(0 0% 25%)',
-                          }}
-                        >
-                          {crop.common_name || crop.name}
-                        </span>
-                      ))}
-                      {freq.crops.length > 3 && (
-                        <span
-                          className="text-[10px] font-mono px-2 py-0.5"
-                          style={{ color: 'hsl(0 0% 50%)' }}
-                        >
-                          +{freq.crops.length - 3} more
-                        </span>
-                      )}
-                    </div>
-                  )}
+                  {/* Seasonal Heatmap */}
+                  {freq.crops && freq.crops.length > 0 && (() => {
+                    const total = freq.crops.length;
+                    const seasons = [
+                      { key: 'Spring', emoji: '🌸', hue: 140 },
+                      { key: 'Summer', emoji: '☀️', hue: 45 },
+                      { key: 'Fall', emoji: '🍂', hue: 30 },
+                      { key: 'Winter', emoji: '❄️', hue: 210 },
+                    ];
+                    const counts = seasons.map(s => ({
+                      ...s,
+                      count: freq.crops!.filter(c =>
+                        (c.planting_season || []).some(p => p.toLowerCase() === s.key.toLowerCase())
+                      ).length,
+                    }));
+                    const maxCount = Math.max(...counts.map(c => c.count), 1);
+                    return (
+                      <div className="flex items-center gap-1.5 mt-1">
+                        {counts.map(s => {
+                          const intensity = Math.round((s.count / maxCount) * 100);
+                          const alpha = Math.max(0.12, s.count / maxCount);
+                          return (
+                            <div key={s.key} className="flex items-center gap-1" title={`${s.key}: ${s.count} of ${total} crops`}>
+                              <span className="text-[9px]">{s.emoji}</span>
+                              <div className="relative w-14 h-3 rounded-full overflow-hidden" style={{ background: 'hsl(0 0% 12%)' }}>
+                                <div
+                                  className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
+                                  style={{
+                                    width: `${intensity}%`,
+                                    background: `hsl(${s.hue} 70% 50% / ${alpha})`,
+                                    boxShadow: s.count > 0 ? `0 0 6px hsl(${s.hue} 70% 50% / 0.3)` : 'none',
+                                  }}
+                                />
+                              </div>
+                              <span className="text-[8px] font-mono w-5 text-right" style={{ color: 'hsl(0 0% 50%)' }}>
+                                {s.count}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
                   
                   {cropCount === 0 && !isLoading && zones.length === 0 && (
                     <span className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
