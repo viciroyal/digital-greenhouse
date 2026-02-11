@@ -188,19 +188,20 @@ export const useAutoGeneration = (
     const rootSeasons = rootCrop.planting_season || [];
     const rootHarvest = rootCrop.harvest_days ?? null;
 
-    /** Score a candidate crop for seasonal/harvest compatibility with the root */
+    /** Score a candidate crop for seasonal/harvest compatibility with the root.
+     *  Weighted heavily (~80% of total ranking) to ensure in-season sync dominates pairing. */
     const compatibilityScore = (crop: MasterCrop): number => {
       let score = 0;
-      // +2 per shared planting season
+      // +10 per shared planting season (high weight for seasonal alignment)
       const cropSeasons = crop.planting_season || [];
       for (const s of cropSeasons) {
-        if (rootSeasons.includes(s)) score += 2;
+        if (rootSeasons.includes(s)) score += 10;
       }
-      // +1 if harvest_days within ±30 of root, +2 if within ±15
+      // +8 if harvest_days within ±15 of root, +4 if within ±30
       if (rootHarvest !== null && crop.harvest_days !== null) {
         const diff = Math.abs(crop.harvest_days - rootHarvest);
-        if (diff <= 15) score += 2;
-        else if (diff <= 30) score += 1;
+        if (diff <= 15) score += 8;
+        else if (diff <= 30) score += 4;
       }
       return score;
     };
