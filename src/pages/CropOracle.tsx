@@ -421,7 +421,8 @@ const CropOracle = () => {
     return INTERVAL_ORDER.map(interval => {
       let crop: MasterCrop | null = null;
       let isCompanionFill = false;
-      const directMatch = pool.find(c => !usedIds.has(c.id) && c.chord_interval === interval.key);
+      const directCandidates = pool.filter(c => !usedIds.has(c.id) && c.chord_interval === interval.key);
+      const directMatch = rotatedPick(directCandidates);
 
       const assign = (result: { crop: MasterCrop; companionMatch: boolean } | null) => {
         if (result) { crop = result.crop; isCompanionFill = result.companionMatch; }
