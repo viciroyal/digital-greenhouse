@@ -403,7 +403,9 @@ const CropOracle = () => {
         if (lunarReady) score += 3;
         if (zoneOk) score += 2;
         else score -= 5;
-        return { crop: c, score, sharedSeasons, isCompanionMatch, harvestAlign, lunarReady, zoneOk };
+        const maxScore = 23; // 9 season + 6 companion + 3 harvest + 3 lunar + 2 zone
+        const compatibility = Math.min(100, Math.round((score / maxScore) * 100));
+        return { crop: c, score, compatibility, sharedSeasons, isCompanionMatch, harvestAlign, lunarReady, zoneOk };
       })
       .filter(r => r.score > 0 && r.zoneOk)
       .sort((a, b) => b.score - a.score)
@@ -1838,7 +1840,7 @@ const CropOracle = () => {
                         className="overflow-hidden"
                       >
                         <div className="divide-y max-h-64 overflow-y-auto" style={{ borderColor: 'hsl(0 0% 10%)' }}>
-                          {seasonalCompanions.map(({ crop, sharedSeasons, isCompanionMatch, harvestAlign, lunarReady }) => {
+                          {seasonalCompanions.map(({ crop, compatibility, sharedSeasons, isCompanionMatch, harvestAlign, lunarReady }) => {
                             const cropZone = ZONES.find(z => z.hz === crop.frequency_hz);
                             return (
                               <button
@@ -1855,10 +1857,17 @@ const CropOracle = () => {
                                 onMouseEnter={e => { e.currentTarget.style.background = `${cropZone?.color || 'hsl(120 50% 55%)'}08`; }}
                                 onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
                               >
-                                <div
-                                  className="w-2.5 h-2.5 rounded-full shrink-0"
-                                  style={{ background: cropZone?.color || 'hsl(0 0% 30%)' }}
-                                />
+                                <div className="flex flex-col items-center shrink-0 gap-0.5">
+                                  <div
+                                    className="w-2.5 h-2.5 rounded-full"
+                                    style={{ background: cropZone?.color || 'hsl(0 0% 30%)' }}
+                                  />
+                                  <span className="text-[8px] font-mono font-bold" style={{
+                                    color: compatibility >= 70 ? 'hsl(120 55% 55%)' : compatibility >= 40 ? 'hsl(45 70% 55%)' : 'hsl(0 0% 45%)',
+                                  }}>
+                                    {compatibility}%
+                                  </span>
+                                </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-1.5 flex-wrap">
                                     <span className="text-xs font-body truncate" style={{ color: 'hsl(0 0% 80%)' }}>
