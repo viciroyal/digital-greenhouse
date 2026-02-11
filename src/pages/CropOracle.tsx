@@ -300,9 +300,8 @@ const CropOracle = () => {
       filtered = filtered.filter(fitsHardinessZone);
     }
 
-    // Season filter: only show crops plantable in the current season
-    const seasonFiltered = filtered.filter(isInCurrentSeason);
-    filtered = seasonFiltered.length >= 3 ? seasonFiltered : filtered;
+    // Season filter: strictly enforce — only crops plantable NOW
+    filtered = filtered.filter(isInCurrentSeason);
 
     if (environment === 'pot') {
       filtered = filtered.filter(c => {
@@ -344,9 +343,8 @@ const CropOracle = () => {
     if (hardinessZone) {
       candidates = candidates.filter(fitsHardinessZone);
     }
-    // Season filter
-    const seasonFiltered = candidates.filter(isInCurrentSeason);
-    candidates = seasonFiltered.length >= 10 ? seasonFiltered : candidates;
+    // Strict season filter
+    candidates = candidates.filter(isInCurrentSeason);
     if (environment === 'pot') {
       candidates = candidates.filter(c => {
         const spacing = c.spacing_inches ? parseInt(c.spacing_inches) : 6;
@@ -473,10 +471,8 @@ const CropOracle = () => {
       return seasons.includes(currentSeason);
     };
 
-    // Apply the gate — zone + season + star-season compatibility
-    const gatedPool = pool.filter(c => isZoneCompatible(c) && isSeasonCompatible(c) && isInSeason(c));
-    pool = gatedPool.length >= 3 ? gatedPool : pool.filter(c => isZoneCompatible(c) && isInSeason(c));
-    if (pool.length < 3) pool = gatedPool.length > 0 ? gatedPool : pool;
+    // Strict gate — only zone-compatible AND in-season crops (no fallback)
+    pool = pool.filter(c => isZoneCompatible(c) && isInSeason(c) && isSeasonCompatible(c));
 
     const usedIds = new Set<string>();
 
