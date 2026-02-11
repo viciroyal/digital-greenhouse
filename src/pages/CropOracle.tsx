@@ -1719,18 +1719,53 @@ const CropOracle = () => {
                 }}
               >
                 {/* Header strip */}
-                <div
-                  className="px-5 py-3 flex items-center gap-3"
-                  style={{
-                    background: `linear-gradient(90deg, ${selectedZone.color}15, transparent)`,
-                    borderBottom: `1px solid ${selectedZone.color}20`,
-                  }}
-                >
-                  <Sparkles className="w-4 h-4" style={{ color: selectedZone.color }} />
-                  <span className="font-mono text-xs font-bold tracking-wider" style={{ color: selectedZone.color }}>
-                    {proMode ? '7-VOICE PLANTING CHORD' : '3-VOICE TRIAD'}
-                  </span>
-                </div>
+                {(() => {
+                  // Compute season compatibility % across visible voices
+                  const rootCrop = chordCard[0]?.crop;
+                  const rootSeasons = rootCrop?.planting_season || [];
+                  const visibleSlots = proMode ? chordCard.slice(1) : chordCard.slice(1, 3);
+                  const slotsWithCrops = visibleSlots.filter(s => s.crop);
+                  const compatible = slotsWithCrops.filter(s => {
+                    const cs = s.crop!.planting_season || [];
+                    if (rootSeasons.length === 0 || cs.length === 0) return false;
+                    return rootSeasons.some(rs => cs.includes(rs));
+                  });
+                  const pct = slotsWithCrops.length > 0
+                    ? Math.round((compatible.length / slotsWithCrops.length) * 100)
+                    : 0;
+                  const hasData = rootSeasons.length > 0 && slotsWithCrops.length > 0;
+                  const pctColor = pct >= 80 ? 'hsl(120 50% 55%)' : pct >= 50 ? 'hsl(45 70% 55%)' : 'hsl(0 50% 55%)';
+                  const pctBg = pct >= 80 ? 'hsl(120 50% 20% / 0.3)' : pct >= 50 ? 'hsl(45 60% 20% / 0.3)' : 'hsl(0 50% 20% / 0.3)';
+                  const pctBorder = pct >= 80 ? 'hsl(120 50% 35% / 0.4)' : pct >= 50 ? 'hsl(45 60% 35% / 0.4)' : 'hsl(0 50% 35% / 0.4)';
+
+                  return (
+                    <div
+                      className="px-5 py-3 flex items-center gap-3"
+                      style={{
+                        background: `linear-gradient(90deg, ${selectedZone.color}15, transparent)`,
+                        borderBottom: `1px solid ${selectedZone.color}20`,
+                      }}
+                    >
+                      <Sparkles className="w-4 h-4" style={{ color: selectedZone.color }} />
+                      <span className="font-mono text-xs font-bold tracking-wider" style={{ color: selectedZone.color }}>
+                        {proMode ? '7-VOICE PLANTING CHORD' : '3-VOICE TRIAD'}
+                      </span>
+                      {hasData && (
+                        <span
+                          className="ml-auto text-[9px] font-mono font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1"
+                          style={{
+                            background: pctBg,
+                            color: pctColor,
+                            border: `1px solid ${pctBorder}`,
+                          }}
+                          title={`${compatible.length}/${slotsWithCrops.length} companions share a planting season with the star crop`}
+                        >
+                          📅 {pct}% SEASON SYNC
+                        </span>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {/* Modal Signature Badge — expandable */}
                 {modalSignature && (
