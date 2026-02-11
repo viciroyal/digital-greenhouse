@@ -1751,38 +1751,68 @@ const CropOracle = () => {
               </div>
 
               {/* ═══ Season Filter Chips ═══ */}
-              <div className="flex items-center justify-center gap-1.5 mb-3 flex-wrap">
-                <span className="text-[9px] font-mono tracking-widest mr-1" style={{ color: 'hsl(0 0% 35%)' }}>
-                  SEASON:
-                </span>
-                {[
-                  { id: null, label: 'All', emoji: '🌍' },
-                  { id: 'Spring', label: 'Spring', emoji: '🌸' },
-                  { id: 'Summer', label: 'Summer', emoji: '☀️' },
-                  { id: 'Fall', label: 'Fall', emoji: '🍂' },
-                  { id: 'Winter', label: 'Winter', emoji: '❄️' },
-                ].map(s => {
-                  const isActive = seasonFilter === s.id;
-                  return (
-                    <button
-                      key={s.label}
-                      onClick={() => {
-                        setSeasonFilter(s.id);
-                        setRecipeSeed(prev => prev + 1);
-                      }}
-                      className="px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wider transition-all"
-                      style={{
-                        background: isActive ? `${selectedZone.color}20` : 'hsl(0 0% 8%)',
-                        border: `1.5px solid ${isActive ? selectedZone.color : 'hsl(0 0% 18%)'}`,
-                        color: isActive ? selectedZone.color : 'hsl(0 0% 45%)',
-                        boxShadow: isActive ? `0 0 8px ${selectedZone.color}15` : 'none',
-                      }}
-                    >
-                      {s.emoji} {s.label}
-                    </button>
-                  );
-                })}
-              </div>
+              {(() => {
+                // Compute base pool (zone + environment + hardiness, but NO season filter)
+                let basePool = (allCrops || []).filter(c => c.frequency_hz === selectedZone.hz);
+                if (environment !== 'food-forest') {
+                  basePool = basePool.filter(c => !c.growth_habit || c.growth_habit.toLowerCase() !== 'tree');
+                }
+                if (hardinessZone) {
+                  basePool = basePool.filter(fitsHardinessZone);
+                }
+                const countForSeason = (season: string | null) => {
+                  if (!season) return basePool.length;
+                  const sf = season.toLowerCase();
+                  return basePool.filter(c => {
+                    const seasons = (c.planting_season || []).map(s => s.toLowerCase());
+                    return seasons.length === 0 || seasons.includes(sf) || seasons.includes('year-round');
+                  }).length;
+                };
+                return (
+                  <div className="flex items-center justify-center gap-1.5 mb-3 flex-wrap">
+                    <span className="text-[9px] font-mono tracking-widest mr-1" style={{ color: 'hsl(0 0% 35%)' }}>
+                      SEASON:
+                    </span>
+                    {[
+                      { id: null, label: 'All', emoji: '🌍' },
+                      { id: 'Spring', label: 'Spring', emoji: '🌸' },
+                      { id: 'Summer', label: 'Summer', emoji: '☀️' },
+                      { id: 'Fall', label: 'Fall', emoji: '🍂' },
+                      { id: 'Winter', label: 'Winter', emoji: '❄️' },
+                    ].map(s => {
+                      const isActive = seasonFilter === s.id;
+                      const count = countForSeason(s.id);
+                      return (
+                        <button
+                          key={s.label}
+                          onClick={() => {
+                            setSeasonFilter(s.id);
+                            setRecipeSeed(prev => prev + 1);
+                          }}
+                          className="px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wider transition-all flex items-center gap-1"
+                          style={{
+                            background: isActive ? `${selectedZone.color}20` : 'hsl(0 0% 8%)',
+                            border: `1.5px solid ${isActive ? selectedZone.color : 'hsl(0 0% 18%)'}`,
+                            color: isActive ? selectedZone.color : 'hsl(0 0% 45%)',
+                            boxShadow: isActive ? `0 0 8px ${selectedZone.color}15` : 'none',
+                          }}
+                        >
+                          {s.emoji} {s.label}
+                          <span
+                            className="text-[8px] font-mono px-1 py-px rounded-full ml-0.5"
+                            style={{
+                              background: isActive ? `${selectedZone.color}30` : 'hsl(0 0% 14%)',
+                              color: isActive ? selectedZone.color : 'hsl(0 0% 40%)',
+                            }}
+                          >
+                            {count}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
 
               {/* ═══ Inline Key Changer ═══ */}
               <div className="flex items-center justify-center gap-1.5 mb-4 flex-wrap">
