@@ -2146,19 +2146,26 @@ const CropOracle = () => {
                     const isReady = slot.crop
                       ? isCropLunarReady(slot.crop.category, slot.crop.common_name || slot.crop.name, lunar.plantingType)
                       : false;
+                    const outsideZone = !!(slot.crop && hardinessZone &&
+                      slot.crop.hardiness_zone_min != null && slot.crop.hardiness_zone_max != null &&
+                      !cropFitsZone(slot.crop.hardiness_zone_min, slot.crop.hardiness_zone_max, hardinessZone));
                     return (
                       <motion.button
                         key={slot.key}
                         className="px-5 py-4 flex items-center gap-4 w-full text-left transition-all"
                         style={{
-                          background: swapSlotIndex === i
-                            ? `${selectedZone.color}10`
-                            : 'transparent',
+                          background: outsideZone
+                            ? 'hsl(0 40% 12% / 0.5)'
+                            : swapSlotIndex === i
+                              ? `${selectedZone.color}10`
+                              : 'transparent',
                           outline: swapSlotIndex === i
                             ? `2px solid ${selectedZone.color}60`
-                            : 'none',
+                            : outsideZone
+                              ? '2px solid hsl(0 50% 30% / 0.4)'
+                              : 'none',
                           outlineOffset: '-2px',
-                          borderRadius: swapSlotIndex === i ? '8px' : '0',
+                          borderRadius: (swapSlotIndex === i || outsideZone) ? '8px' : '0',
                         }}
                         onClick={() => {
                           if (swapSlotIndex === i) {
