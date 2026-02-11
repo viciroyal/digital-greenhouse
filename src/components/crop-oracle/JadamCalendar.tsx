@@ -66,6 +66,8 @@ const BREW_BUTTONS: { id: JadamProtocolId; gradient: [string, string]; borderCol
   { id: 'JMS', gradient: ['hsl(120 45% 20%)', 'hsl(120 45% 30%)'], borderColor: 'hsl(120 45% 35%)', textColor: 'hsl(120 45% 70%)' },
   { id: 'JLF', gradient: ['hsl(35 50% 20%)', 'hsl(35 50% 30%)'], borderColor: 'hsl(35 50% 40%)', textColor: 'hsl(35 70% 65%)' },
   { id: 'JNP', gradient: ['hsl(0 40% 20%)', 'hsl(0 40% 28%)'], borderColor: 'hsl(0 40% 35%)', textColor: 'hsl(0 55% 65%)' },
+  { id: 'JS', gradient: ['hsl(50 50% 18%)', 'hsl(50 50% 26%)'], borderColor: 'hsl(50 50% 35%)', textColor: 'hsl(50 80% 60%)' },
+  { id: 'JWA', gradient: ['hsl(200 35% 18%)', 'hsl(200 35% 26%)'], borderColor: 'hsl(200 35% 35%)', textColor: 'hsl(200 50% 60%)' },
 ];
 
 const JadamCalendar = ({ frequencyHz, zoneColor, zoneName, environment }: JadamCalendarProps) => {
