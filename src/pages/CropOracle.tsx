@@ -384,7 +384,28 @@ const CropOracle = () => {
         return spacing <= POT_MAX_SPACING;
       });
     }
-    
+
+    // ─── 90% Compatibility Gate ───
+    // Pre-filter pool: only keep crops that fit the user's hardiness zone
+    // AND share at least one planting season with the star crop (when data exists).
+    const starSeasons = (starCrop?.planting_season || []).map(s => s.toLowerCase());
+    const starHarvestDays = starCrop?.harvest_days ?? null;
+
+    const isZoneCompatible = (c: MasterCrop): boolean => {
+      if (!hardinessZone || c.hardiness_zone_min == null || c.hardiness_zone_max == null) return true;
+      return hardinessZone >= c.hardiness_zone_min && hardinessZone <= c.hardiness_zone_max;
+    };
+    const isSeasonCompatible = (c: MasterCrop): boolean => {
+      if (starSeasons.length === 0) return true;
+      const cSeasons = (c.planting_season || []).map(s => s.toLowerCase());
+      if (cSeasons.length === 0) return true; // no data = don't exclude
+      return starSeasons.some(s => cSeasons.includes(s));
+    };
+
+    // Apply the gate — keep a fallback to the full pool if too few crops pass
+    const gatedPool = pool.filter(c => isZoneCompatible(c) && isSeasonCompatible(c));
+    pool = gatedPool.length >= 3 ? gatedPool : pool;
+
     const usedIds = new Set<string>();
 
     // Star crop's companion names for prioritization
@@ -396,9 +417,17 @@ const CropOracle = () => {
       return companionNames.some(cn => name.includes(cn) || cn.includes(name.split('(')[0].trim()));
     };
 
-    // Season + zone harmony scoring for candidate ranking
-    const starSeasons = (starCrop?.planting_season || []).map(s => s.toLowerCase());
-    const starHarvestDays = starCrop?.harvest_days ?? null;
+    // Bidirectional USDA companion check: does the candidate also list the star crop?
+    const isBidirectionalCompanion = (c: MasterCrop): boolean => {
+      if (!starCrop) return false;
+      const starName = (starCrop.common_name || starCrop.name).toLowerCase();
+      const candidateCompanions = (c.companion_crops || []).map(n => n.toLowerCase());
+      // candidate lists star crop
+      const candidateListsStar = candidateCompanions.some(cn => starName.includes(cn) || cn.includes(starName.split('(')[0].trim()));
+      // star lists candidate
+      const starListsCandidate = isCompanion(c);
+      return candidateListsStar || starListsCandidate;
+    };
 
     const harmonicScore = (c: MasterCrop): number => {
       let score = 0;
@@ -408,11 +437,14 @@ const CropOracle = () => {
       score += sharedSeasons.length * 3;
       // Bonus if ANY season data exists (+1)
       if (cSeasons.length > 0) score += 1;
-      // Zone compatibility (+2 if crop fits user's zone)
+      // Zone compatibility (+5 if crop fits user's zone, heavy penalty if not)
       if (hardinessZone && c.hardiness_zone_min != null && c.hardiness_zone_max != null) {
-        if (hardinessZone >= c.hardiness_zone_min && hardinessZone <= c.hardiness_zone_max) score += 2;
-        else score -= 3; // penalize zone-incompatible crops
+        if (hardinessZone >= c.hardiness_zone_min && hardinessZone <= c.hardiness_zone_max) score += 5;
+        else score -= 8; // strong penalty for zone-incompatible crops
       }
+      // USDA companion planting boost (+6 bidirectional, +4 one-way)
+      if (isBidirectionalCompanion(c)) score += 6;
+      else if (isCompanion(c)) score += 4;
       // Harvest alignment bonus (+1 if within 30 days of star)
       if (starHarvestDays !== null && c.harvest_days != null) {
         const diff = Math.abs(c.harvest_days - starHarvestDays);
