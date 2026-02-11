@@ -134,6 +134,14 @@ const ORGS = [
     icon: '🧑‍🌾',
     url: null,
   },
+  {
+    name: 'Food, Clothing, Shelter',
+    type: 'Documentary Film',
+    note: 'The Ripple Effect — exploring how food, land & community intersect in the movement for justice',
+    color: 'hsl(0 50% 55%)',
+    icon: '🎬',
+    url: 'https://www.amazon.com/Food-Clothing-Shelter-Ripple-Effect/dp/B079RTBNGL',
+  },
 ];
 
 const GACommunityResources = ({ variant = 'full' }: GACommunityResourcesProps) => {
