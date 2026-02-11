@@ -74,6 +74,7 @@ const CropOracle = () => {
   const [selectedState, setSelectedState] = useState<string | null>(null);
   const [showZonePicker, setShowZonePicker] = useState(false);
   const [showStateDropdown, setShowStateDropdown] = useState(false);
+  const [modalInfoOpen, setModalInfoOpen] = useState(false);
 
   // Fetch saved recipes
   const { data: savedRecipes } = useQuery({
@@ -1359,38 +1360,97 @@ const CropOracle = () => {
                   </span>
                 </div>
 
-                {/* Modal Signature Badge */}
+                {/* Modal Signature Badge — expandable */}
                 {modalSignature && (
                   <div
-                    className="px-5 py-2 flex items-center gap-2"
-                    style={{
-                      background: `linear-gradient(90deg, ${selectedZone.color}08, transparent)`,
-                      borderBottom: '1px solid hsl(0 0% 8%)',
-                    }}
+                    className="cursor-pointer select-none"
+                    onClick={() => setModalInfoOpen(prev => !prev)}
                   >
-                    <span
-                      className="text-[9px] font-mono px-2 py-0.5 rounded-full inline-flex items-center gap-1.5"
+                    <div
+                      className="px-5 py-2 flex items-center gap-2"
                       style={{
-                        background: `${selectedZone.color}10`,
-                        color: `${selectedZone.color}cc`,
-                        border: `1px solid ${selectedZone.color}25`,
+                        background: `linear-gradient(90deg, ${selectedZone.color}08, transparent)`,
+                        borderBottom: modalInfoOpen ? 'none' : '1px solid hsl(0 0% 8%)',
                       }}
                     >
-                      <span style={{ fontSize: '11px' }}>🎵</span>
-                      {modalSignature.mode} {modalSignature.symbol}
-                    </span>
-                    <span className="text-[8px] font-mono italic" style={{ color: 'hsl(0 0% 40%)' }}>
-                      {modalSignature.mood}
-                    </span>
-                    <span
-                      className="text-[7px] font-mono ml-auto px-1.5 py-0.5 rounded"
-                      style={{
-                        background: 'hsl(0 0% 8%)',
-                        color: 'hsl(0 0% 35%)',
-                      }}
-                    >
-                      {modalSignature.voiceCount}-VOICE {modalSignature.complexity.toUpperCase()}
-                    </span>
+                      <span
+                        className="text-[9px] font-mono px-2 py-0.5 rounded-full inline-flex items-center gap-1.5"
+                        style={{
+                          background: `${selectedZone.color}10`,
+                          color: `${selectedZone.color}cc`,
+                          border: `1px solid ${selectedZone.color}25`,
+                        }}
+                      >
+                        <span style={{ fontSize: '11px' }}>🎵</span>
+                        {modalSignature.mode} {modalSignature.symbol}
+                      </span>
+                      <span className="text-[8px] font-mono italic" style={{ color: 'hsl(0 0% 40%)' }}>
+                        {modalSignature.mood}
+                      </span>
+                      <span
+                        className="text-[7px] font-mono ml-auto px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                        style={{
+                          background: 'hsl(0 0% 8%)',
+                          color: 'hsl(0 0% 35%)',
+                        }}
+                      >
+                        {modalSignature.voiceCount}-VOICE {modalSignature.complexity.toUpperCase()}
+                        <ChevronDown
+                          className="w-2.5 h-2.5 transition-transform"
+                          style={{
+                            transform: modalInfoOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                            color: 'hsl(0 0% 35%)',
+                          }}
+                        />
+                      </span>
+                    </div>
+                    <AnimatePresence>
+                      {modalInfoOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                          <div
+                            className="px-5 pb-3 pt-1 space-y-2"
+                            style={{ borderBottom: '1px solid hsl(0 0% 8%)' }}
+                          >
+                            <p className="text-[10px] font-mono leading-relaxed" style={{ color: 'hsl(0 0% 55%)' }}>
+                              <span style={{ color: `${selectedZone.color}bb` }}>
+                                {modalSignature.mode} mode
+                              </span>{' '}
+                              {modalSignature.mode === 'Ionian' && 'is the natural major scale — the brightest, most resolved sound. Your garden radiates stable, confident energy. Every crop has a clear role, like a sunny day with no clouds.'}
+                              {modalSignature.mode === 'Dorian' && 'blends minor warmth with a raised 6th — soulful resilience. Your garden has depth and perseverance, like crops that thrive through adversity and come back stronger.'}
+                              {modalSignature.mode === 'Phrygian' && 'starts with a flat 2nd — immediate tension and transformation. Your garden channels alchemical fire, converting raw elements into gold through intense metabolic energy.'}
+                              {modalSignature.mode === 'Lydian' && 'floats on a raised 4th — dreamy, expansive, ethereal. Your garden breathes connection, with mycorrhizal networks bridging every plant into a unified, heartfelt ecosystem.'}
+                              {modalSignature.mode === 'Mixolydian' && 'adds a flat 7th to major — dominant and expressive. Your garden projects outward like a beacon, with aromatic signals drawing pollinators and repelling pests.'}
+                              {modalSignature.mode === 'Aeolian' && 'is the natural minor — introspective and ancient. Your garden turns inward, cultivating medicinal density and alkaloid richness that requires patience and vision.'}
+                              {modalSignature.mode === 'Locrian' && 'holds a diminished 5th — the most unstable, mysterious mode. Your garden guards the threshold with sulfur shields and allium sentinels, protecting the source code of seeds.'}
+                            </p>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span
+                                className="text-[8px] font-mono px-1.5 py-0.5 rounded"
+                                style={{
+                                  background: `${selectedZone.color}10`,
+                                  color: `${selectedZone.color}90`,
+                                  border: `1px solid ${selectedZone.color}20`,
+                                }}
+                              >
+                                CHARACTERISTIC: {modalSignature.symbol}
+                              </span>
+                              <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
+                                {modalSignature.voiceCount === 7 ? 'Full ensemble — all 7 voices singing' :
+                                 modalSignature.voiceCount >= 5 ? 'Rich voicing — add more voices for full harmony' :
+                                 modalSignature.voiceCount >= 3 ? 'Core triad established — expand for deeper resonance' :
+                                 'Sparse voicing — add crops to build harmonic depth'}
+                              </span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 )}
 
