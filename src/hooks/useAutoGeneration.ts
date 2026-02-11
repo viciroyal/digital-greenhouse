@@ -2,6 +2,7 @@ import { useMemo, useCallback } from 'react';
 import { MasterCrop } from '@/hooks/useMasterCrops';
 import { ChordInterval, InoculantType, calculatePlantCount, AERIAL_PLANT_COUNT } from '@/hooks/useGardenBeds';
 import { getZoneRecommendation } from '@/data/jazzVoicingRecommendations';
+import { checkShading, layerMatchScore, getIdealSlotLayers, successionScore, verticalDiversityScore } from '@/lib/growthLayers';
 
 /**
  * INSTRUMENT-BASED AUTO-GENERATION ENGINE
@@ -210,6 +211,9 @@ export const useAutoGeneration = (
     // Track placed crops for antagonist checking
     const placedCrops: MasterCrop[] = [rootCrop];
 
+    // Pre-compute ideal slot layers based on root crop's growth layer
+    const idealLayers = getIdealSlotLayers(rootCrop);
+
     // Antagonist pairs for filtering
     const ANTAGONIST_PAIRS = [
       { groupA: ['onion', 'garlic', 'shallot', 'leek', 'chive', 'scallion'], groupB: ['bean', 'pea', 'lentil', 'chickpea', 'lima'] },
@@ -252,17 +256,30 @@ export const useAutoGeneration = (
       return false;
     };
 
-    const selectBestCrop = (crops: MasterCrop[]): MasterCrop | null => {
-      // Sort by compatibility score (desc), then prefer different instrument
-      // Filter out antagonist conflicts with already-placed crops
+    const selectBestCrop = (crops: MasterCrop[], slotKey: string): MasterCrop | null => {
+      // Filter out antagonist conflicts and shading problems with already-placed crops
       const scored = crops
-        .filter(c => !usedIds.has(c.id) && !isAntagonist(c, placedCrops))
+        .filter(c => {
+          if (usedIds.has(c.id)) return false;
+          if (isAntagonist(c, placedCrops)) return false;
+          // Reject if any placed crop would severely shade this candidate
+          for (const placed of placedCrops) {
+            const warning = checkShading(placed, c);
+            if (warning?.severity === 'warning') return false; // heavy shading → skip
+          }
+          return true;
+        })
         .map(c => ({
           crop: c,
           compat: compatibilityScore(c),
           newInstrument: c.instrument_type && !usedInstruments.has(c.instrument_type) ? 1 : 0,
+          layerBonus: layerMatchScore(c, slotKey, idealLayers),
+          succession: successionScore(c, placedCrops),
         }))
-        .sort((a, b) => (b.compat + b.newInstrument) - (a.compat + a.newInstrument));
+        .sort((a, b) =>
+          (b.compat + b.newInstrument + b.layerBonus + b.succession) -
+          (a.compat + a.newInstrument + a.layerBonus + a.succession)
+        );
 
       const best = scored[0];
       if (!best) return null;
@@ -272,9 +289,9 @@ export const useAutoGeneration = (
       return best.crop;
     };
 
-    const third = selectBestCrop(cropsByInterval.third);
-    const fifth = selectBestCrop(cropsByInterval.fifth);
-    const seventh = selectBestCrop(cropsByInterval.seventh);
+    const third = selectBestCrop(cropsByInterval.third, '3rd (Triad)');
+    const fifth = selectBestCrop(cropsByInterval.fifth, '5th (Stabilizer)');
+    const seventh = selectBestCrop(cropsByInterval.seventh, '7th (Signal)');
 
     // Get zone recommendation for 11th and 13th
     const zoneRec = getZoneRecommendation(frequencyHz);
