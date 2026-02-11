@@ -1728,6 +1728,7 @@ const CropOracle = () => {
                                       {crop.dominant_mineral ? ` • ${crop.dominant_mineral}` : ''}
                                     </span>
                                     <GrowthHabitBadge habit={crop.growth_habit} size="sm" />
+                                    <TrapCropBadge description={crop.description} guildRole={crop.guild_role} size="sm" />
                                   </div>
                                 </div>
                               </button>
@@ -2347,6 +2348,7 @@ const CropOracle = () => {
                                 {crop.chord_interval && ` • ${crop.chord_interval}`}
                               </span>
                               <GrowthHabitBadge habit={crop.growth_habit} size="sm" />
+                              <TrapCropBadge description={crop.description} guildRole={crop.guild_role} size="sm" />
                             </div>
                           </div>
                           {crop.spacing_inches && (
