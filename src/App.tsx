@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CircadianProvider } from "@/contexts/CircadianContext";
 import { AudioBiomeProvider } from "@/contexts/AudioBiomeContext";
 import { FieldModeProvider } from "@/contexts/FieldModeContext";
+import sovereignEmblem from "@/assets/sovereign-emblem.png";
 
 import Index from "./pages/Index";
 import CropOracle from "./pages/CropOracle";
@@ -40,6 +41,11 @@ const App = () => (
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
+            <img
+              src={sovereignEmblem}
+              alt="Sovereign Emblem"
+              className="fixed bottom-4 left-4 w-12 h-auto opacity-70 hover:opacity-100 transition-opacity pointer-events-none z-50"
+            />
           </TooltipProvider>
         </FieldModeProvider>
       </AudioBiomeProvider>
