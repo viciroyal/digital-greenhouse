@@ -233,8 +233,10 @@ export type Database = {
           id: string
           instrument_type: string | null
           library_note: string | null
+          min_container_gal: number | null
           name: string
           planting_season: string[] | null
+          root_depth_inches: number | null
           soil_protocol_focus: string | null
           spacing_inches: string | null
           updated_at: string
@@ -264,8 +266,10 @@ export type Database = {
           id?: string
           instrument_type?: string | null
           library_note?: string | null
+          min_container_gal?: number | null
           name: string
           planting_season?: string[] | null
+          root_depth_inches?: number | null
           soil_protocol_focus?: string | null
           spacing_inches?: string | null
           updated_at?: string
@@ -295,8 +299,10 @@ export type Database = {
           id?: string
           instrument_type?: string | null
           library_note?: string | null
+          min_container_gal?: number | null
           name?: string
           planting_season?: string[] | null
+          root_depth_inches?: number | null
           soil_protocol_focus?: string | null
           spacing_inches?: string | null
           updated_at?: string

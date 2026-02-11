@@ -19,6 +19,7 @@ import ScentCorridorPanel from '@/components/crop-oracle/ScentCorridorPanel';
 import PropagationPanel from '@/components/crop-oracle/PropagationPanel';
 import EcoParadigmCard from '@/components/community/EcoParadigmCard';
 import ProSuppliersPanel from '@/components/crop-oracle/ProSuppliersPanel';
+import FoodForestHoleProtocol from '@/components/crop-oracle/FoodForestHoleProtocol';
 
 /* ─── Zone Data ─── */
 const ZONES = [
@@ -93,7 +94,7 @@ const CropOracle = () => {
   const [showZonePicker, setShowZonePicker] = useState(false);
   const [showStateDropdown, setShowStateDropdown] = useState(false);
   const [modalInfoOpen, setModalInfoOpen] = useState(false);
-  const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | 'scent' | 'propagation' | 'suppliers' | null>(null);
+  const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | 'scent' | 'propagation' | 'suppliers' | 'hole' | null>(null);
   const [recipeSeed, setRecipeSeed] = useState(0);
 
   // Fetch saved recipes
@@ -1366,6 +1367,7 @@ const CropOracle = () => {
                     { id: 'calendar' as const, icon: <Calendar className="w-3.5 h-3.5" />, tip: 'Planting Calendar' },
                     { id: 'modal' as const, icon: <Music className="w-3.5 h-3.5" />, tip: 'Modal Guide' },
                     ...((environment === 'food-forest' || proMode) ? [{ id: 'scent' as const, icon: <Shield className="w-3.5 h-3.5" />, tip: 'Scent Corridor' }] : []),
+                    ...(environment === 'food-forest' ? [{ id: 'hole' as const, icon: <TreePine className="w-3.5 h-3.5" />, tip: 'Hole Protocol' }] : []),
                     { id: 'propagation' as const, icon: <Sprout className="w-3.5 h-3.5" />, tip: 'Seed Starting' },
                     ...(proMode ? [{ id: 'suppliers' as const, icon: <Shovel className="w-3.5 h-3.5" />, tip: 'Pro Suppliers' }] : []),
                   ].map(tool => {
@@ -1479,6 +1481,18 @@ const CropOracle = () => {
                       environment={environment || undefined}
                       hardinessZone={hardinessZone}
                     />
+                  </motion.div>
+                )}
+                {activeToolPanel === 'hole' && (
+                  <motion.div
+                    key="hole-panel"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden mb-2"
+                  >
+                    <FoodForestHoleProtocol zoneColor={selectedZone.color} />
                   </motion.div>
                 )}
                 {activeToolPanel === 'suppliers' && (
