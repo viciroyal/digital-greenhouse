@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Circle, Lightbulb } from 'lucide-react';
+import { CheckCircle2, Circle, Lightbulb, Cloud, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SupplyItem {
   id: string;
@@ -126,12 +127,65 @@ interface PropagationReadinessProps {
 const PropagationReadiness = ({ zoneColor }: PropagationReadinessProps) => {
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set());
   const [expandedTip, setExpandedTip] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Load user session + saved checklist
+  useEffect(() => {
+    const loadChecklist = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) { setLoaded(true); return; }
+      setUserId(session.user.id);
+
+      const { data } = await supabase
+        .from('readiness_checklist')
+        .select('checked_items')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      if (data?.checked_items) {
+        setCheckedItems(new Set(data.checked_items));
+      }
+      setLoaded(true);
+    };
+    loadChecklist();
+  }, []);
+
+  // Debounced save to database
+  const saveToDb = useCallback((items: Set<string>) => {
+    if (!userId) return;
+    if (saveTimeout.current) clearTimeout(saveTimeout.current);
+    saveTimeout.current = setTimeout(async () => {
+      setSyncing(true);
+      const arr = Array.from(items);
+      const { data: existing } = await supabase
+        .from('readiness_checklist')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (existing) {
+        await supabase
+          .from('readiness_checklist')
+          .update({ checked_items: arr, updated_at: new Date().toISOString() })
+          .eq('user_id', userId);
+      } else {
+        await supabase
+          .from('readiness_checklist')
+          .insert({ user_id: userId, checked_items: arr });
+      }
+      setSyncing(false);
+    }, 800);
+  }, [userId]);
 
   const toggle = (id: string) => {
     setCheckedItems(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
+      saveToDb(next);
       return next;
     });
   };
@@ -163,6 +217,12 @@ const PropagationReadiness = ({ zoneColor }: PropagationReadinessProps) => {
         <span className="text-[9px] font-mono tracking-widest" style={{ color: 'hsl(45 60% 55%)' }}>
           READINESS CHECK — WHAT DO YOU HAVE?
         </span>
+        {userId && (
+          <span className="ml-auto flex items-center gap-1 text-[7px] font-mono" style={{ color: syncing ? 'hsl(45 60% 55%)' : 'hsl(120 35% 45%)' }}>
+            {syncing ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <Cloud className="w-2.5 h-2.5" />}
+            {syncing ? 'saving…' : 'synced'}
+          </span>
+        )}
       </div>
 
       <p className="text-[8px] font-mono mb-3 leading-relaxed" style={{ color: 'hsl(0 0% 45%)' }}>
