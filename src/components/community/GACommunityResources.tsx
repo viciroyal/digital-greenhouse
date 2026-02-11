@@ -12,7 +12,7 @@ const ORGS = [
     note: 'Ethiopian & Eritrean agricultural heritage network in Georgia',
     color: 'hsl(45 60% 55%)',
     icon: '🌍',
-    url: null,
+    url: 'https://habeshainc.org',
   },
   {
     name: 'Collectively Sustainable',
@@ -20,7 +20,7 @@ const ORGS = [
     note: 'Black-led sustainability education & community organizing',
     color: 'hsl(160 50% 50%)',
     icon: '♻️',
-    url: null,
+    url: 'https://www.collectivelysustainable.org',
   },
   {
     name: 'Black Sustainability',
