@@ -205,13 +205,24 @@ const UserGuide = () => {
         </Section>
 
         <Section title="Crop Library & CSV Export" emoji="📊">
-          <p>Visit the <strong>Crop Library</strong> (/crop-library) to see all <strong>1,684 crops</strong> organized by frequency zone.</p>
+          <p>Visit the <strong>Crop Library</strong> (/crop-library) to see all <strong>1,684 crops</strong> organized by frequency zone in a high-density, printable table.</p>
+          <p><strong>Table Columns (19):</strong></p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Common Name, Scientific Name, Hz, Zone, Element, Category</li>
+            <li>Growth Habit (with emoji badge), Chord Interval, Instrument Type</li>
+            <li>Dominant Mineral, Brix Range, Hardiness Zone (sub-zone a/b format)</li>
+            <li>Harvest Days, Spacing, Planting Season, Guild Role, Focus Tag</li>
+            <li>Companion Crops, Crop Guild</li>
+          </ul>
+          <p><strong>CSV Export (25 columns):</strong> Adds soil_protocol_focus, cultural_role, description, and library_note beyond what the table shows. Array fields (companions, guilds, seasons) use semicolon separators.</p>
+          <p><strong>Actions:</strong></p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Click <strong>"Export CSV"</strong> to download the full registry as a spreadsheet</li>
-            <li>The CSV includes <strong>25 data columns</strong>: companions, guilds, soil protocols, Brix targets, hardiness zones, growth habit, and more</li>
             <li>Click <strong>"Print / Export PDF"</strong> to save a printable reference</li>
             <li>Each crop displays its <strong>growth habit badge</strong> (🌳 Tree, 🌱 Herb, 🍄 Fungus, etc.)</li>
+            <li>Crops are grouped by zone with color-coded headers and count badges</li>
           </ul>
+          <p><strong>Performance:</strong> Table uses <code>React.memo()</code> on every row to stay smooth with 1,684 entries. Routes are lazy-loaded so the library only downloads when you visit it.</p>
         </Section>
 
         <Section title="Quick Tips" emoji="💡">
