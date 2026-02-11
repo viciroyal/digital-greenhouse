@@ -77,7 +77,7 @@ const TestingSuiteDocs = () => {
           TESTING SUITE DOCUMENTATION
         </h1>
         <p className="text-center font-['Space_Mono'] text-xs mb-8" style={{ color: 'hsl(0 0% 45%)' }}>
-          Technical reference • Vitest • 66+ automated tests
+          Technical reference • Vitest • 66+ automated tests • v2.0
         </p>
 
         <Section title="OVERVIEW">
@@ -92,12 +92,13 @@ bunx vitest run src/test/soilCalculator.test.ts
 bunx vitest --watch`}</Code>
           <p><strong>Test runner:</strong> Vitest 3.x<br />
           <strong>Coverage domains:</strong> Soil calculation, Lunar phase, Crop-zone mapping, Instrument integrity<br />
-          <strong>Total test count:</strong> 66+ unit tests across 6 files</p>
+          <strong>Total test count:</strong> 66+ unit tests across 7 files<br />
+          <strong>Database:</strong> 1,684 crops across 7 Solfeggio zones</p>
         </Section>
 
         <Section title="TEST FILE MAP">
           <Code>{`src/test/
-├── setup.ts                    — Vitest setup (environment config)
+├── setup.ts                    — Vitest setup (jsdom environment config)
 ├── soilCalculator.test.ts      — Soil Mix math & scaling (17 tests)
 ├── lunarPhase.test.ts          — Moon phase accuracy & gating (12 tests)
 ├── cropOracle.test.ts          — Zone mapping & chord intervals (11 tests)
@@ -177,7 +178,7 @@ describe('Chord Interval System')
   ✓ each interval has a unique label and emoji
 
 describe('Environment Configuration')
-  ✓ has 4 environment options
+  ✓ has 5 environment options (pot, raised-bed, farm, high-tunnel, food-forest)
   ✓ pot max spacing is 12 inches
 
 describe('Crop Filtering Logic')
@@ -206,30 +207,51 @@ describe('7-Zone Octave Completeness')
 
         <Section title="DATA CONTRACTS">
           <p>The tests enforce these critical data contracts:</p>
-          <Code>{`┌─────────────────────┬────────────────────────────────────┐
-│ Contract            │ Enforcement                        │
-├─────────────────────┼────────────────────────────────────┤
-│ 7 Solfeggio zones   │ Exact set: 396,417,528,639,741,    │
-│                     │ 852,963                             │
-├─────────────────────┼────────────────────────────────────┤
-│ Musical octave      │ Notes C→B in ascending Hz order     │
-├─────────────────────┼────────────────────────────────────┤
-│ 8 soil components   │ Master Mix Protocol length = 8      │
-├─────────────────────┼────────────────────────────────────┤
-│ 150 sq ft reference │ BASE_AREA_SQ_FT = 150              │
-├─────────────────────┼────────────────────────────────────┤
-│ Pot Mix = 100%      │ Sum of all percentages = 100        │
-├─────────────────────┼────────────────────────────────────┤
-│ 4 planting types    │ leaf, fruit, harvest, root           │
-├─────────────────────┼────────────────────────────────────┤
-│ 7 chord intervals   │ Root,3rd,5th,7th,9th,11th,13th      │
-├─────────────────────┼────────────────────────────────────┤
-│ 4 environments      │ pot, raised-bed, farm, high-tunnel  │
-├─────────────────────┼────────────────────────────────────┤
-│ Pot spacing limit   │ POT_MAX_SPACING = 12 inches         │
-├─────────────────────┼────────────────────────────────────┤
-│ HSL color format    │ All zone colors match /^hsl\(/       │
-└─────────────────────┴────────────────────────────────────┘`}</Code>
+          <Code>{`┌──────────────────────┬─────────────────────────────────────┐
+│ Contract             │ Enforcement                         │
+├──────────────────────┼─────────────────────────────────────┤
+│ 7 Solfeggio zones    │ Exact set: 396,417,528,639,741,     │
+│                      │ 852,963                              │
+├──────────────────────┼─────────────────────────────────────┤
+│ Musical octave       │ Notes C→B in ascending Hz order      │
+├──────────────────────┼─────────────────────────────────────┤
+│ 8 soil components    │ Master Mix Protocol length = 8       │
+├──────────────────────┼─────────────────────────────────────┤
+│ 150 sq ft reference  │ BASE_AREA_SQ_FT = 150               │
+├──────────────────────┼─────────────────────────────────────┤
+│ Pot Mix = 100%       │ Sum of all percentages = 100         │
+├──────────────────────┼─────────────────────────────────────┤
+│ 4 planting types     │ leaf, fruit, harvest, root           │
+├──────────────────────┼─────────────────────────────────────┤
+│ 7 chord intervals    │ Root,3rd,5th,7th,9th,11th,13th      │
+├──────────────────────┼─────────────────────────────────────┤
+│ 5 environments       │ pot, raised-bed, farm, high-tunnel,  │
+│                      │ food-forest                          │
+├──────────────────────┼─────────────────────────────────────┤
+│ Pot spacing limit    │ POT_MAX_SPACING = 12 inches          │
+├──────────────────────┼─────────────────────────────────────┤
+│ HSL color format     │ All zone colors match /^hsl\\(/       │
+├──────────────────────┼─────────────────────────────────────┤
+│ 16 growth habits     │ tree, shrub, bush, vine, herb, etc.  │
+├──────────────────────┼─────────────────────────────────────┤
+│ Canonical zone colors│ 7 hex values: #FF0000 → #8B00FF      │
+├──────────────────────┼─────────────────────────────────────┤
+│ 1,684 total crops    │ All zones populated, no gaps          │
+└──────────────────────┴─────────────────────────────────────┘`}</Code>
+        </Section>
+
+        <Section title="EDGE FUNCTION TESTS">
+          <p>The <code>populate-crop-data</code> edge function supports batch AI population for 6 fields:</p>
+          <Code>{`Supported fields:
+  growth_habit       — 16 plant habit categories
+  scientific_name    — Binomial nomenclature (genus + species)
+  planting_season    — Array of ["Spring", "Summer", "Fall", "Winter"]
+  harvest_days       — Integer days to first harvest
+  root_depth_inches  — Integer root depth in inches
+  min_container_gal  — Numeric minimum container size in gallons
+
+Each batch processes 50 crops using Lovable AI tool-calling.
+Fields are populated only for crops where the value is NULL.`}</Code>
         </Section>
 
         <Section title="ADDING NEW TESTS">
@@ -254,6 +276,7 @@ describe('My Feature', () => {
             <li>Use mock data that mirrors the real database schema</li>
             <li>Validate data contracts (exact counts, valid ranges, required fields)</li>
             <li>Test boundary conditions (empty arrays, null inputs, edge frequencies)</li>
+            <li>Include growth_habit and container sizing in crop fixture data</li>
           </ul>
         </Section>
 
@@ -273,7 +296,7 @@ steps:
         </Section>
 
         <p className="text-center font-['Space_Mono'] text-[10px] mt-8" style={{ color: 'hsl(0 0% 30%)' }}>
-          PharmBoi Testing Suite Docs • v1.0 • {new Date().toISOString().split('T')[0]}
+          PharmBoi Testing Suite Docs • v2.0 • {new Date().toISOString().split('T')[0]}
         </p>
       </main>
     </div>

@@ -84,6 +84,7 @@ const UserGuide = () => {
         <Section title="What Is This App?" emoji="🤔">
           <p>PharmBoi is a <strong>garden planning tool</strong> that helps you figure out what to plant, where to plant it, and how to take care of your soil. Think of it like a recipe book — but for growing food!</p>
           <p>The app uses <strong>music ideas</strong> (like keys on a piano) to organize plants into groups called <strong>"Zones."</strong> Each zone has a color and a purpose, just like notes in a song work together.</p>
+          <p>The registry contains <strong>1,684 crops</strong> across 7 Solfeggio frequency zones — from tomatoes and herbs to fruit trees and medicinal mushrooms.</p>
         </Section>
 
         <Section title="The Home Page (The Stage)" emoji="🎤">
@@ -147,6 +148,30 @@ const UserGuide = () => {
           <p>The system prioritizes perennial crops, fruit trees, and nitrogen-fixing understory plants automatically.</p>
         </Section>
 
+        <Section title="Growth Habit Badges" emoji="🏷️">
+          <p>Every crop shows a <strong>growth habit badge</strong> — a small colored pill that tells you what kind of plant it is:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>🌳 <strong>Tree</strong> — Large perennial plants (fruit trees, nut trees)</li>
+            <li>🫐 <strong>Shrub</strong> — Berry bushes and small woody plants</li>
+            <li>🧗 <strong>Vine</strong> — Climbing plants (grapes, passionflower, kiwi)</li>
+            <li>🌱 <strong>Herb</strong> — Most vegetables and herbs</li>
+            <li>🥕 <strong>Root</strong> / 🥔 <strong>Tuber</strong> / 🧄 <strong>Bulb</strong> — Underground crops</li>
+            <li>🍄 <strong>Fungus</strong> — Mushrooms and mycelial organisms</li>
+            <li>💧 <strong>Aquatic</strong> — Water-loving plants (watercress, rice)</li>
+            <li>🌺 <strong>Epiphyte</strong> — Air plants that grow on other plants</li>
+          </ul>
+          <p>These badges help you quickly identify what kind of space each crop needs!</p>
+        </Section>
+
+        <Section title="Container Sizing" emoji="🪴">
+          <p>Every crop now includes <strong>root depth</strong> and <strong>minimum container size</strong> data:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>Root Depth (inches)</strong> — How deep the roots go. Shallow herbs are 6-12", deep trees 36-72"+</li>
+            <li><strong>Min Container (gallons)</strong> — The smallest pot that will work. Small herbs need 1-2 gal, trees need 15-25+ gal</li>
+          </ul>
+          <p>When you choose <strong>Pot</strong> environment, the app uses this data to filter out crops that won't fit!</p>
+        </Section>
+
         <Section title="Setting a Star Crop" emoji="⭐">
           <p>Don't like the auto-picked main crop? Click <strong>"Pick Star"</strong> to search and choose your own favorite. The rest of the recipe will rebuild around your Star.</p>
         </Section>
@@ -180,11 +205,12 @@ const UserGuide = () => {
         </Section>
 
         <Section title="Crop Library & CSV Export" emoji="📊">
-          <p>Visit the <strong>Crop Library</strong> (/crop-library) to see every crop in the registry organized by frequency zone.</p>
+          <p>Visit the <strong>Crop Library</strong> (/crop-library) to see all <strong>1,684 crops</strong> organized by frequency zone.</p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Click <strong>"Export CSV"</strong> to download the full registry as a spreadsheet</li>
-            <li>The CSV includes all 24 data columns: companions, guilds, soil protocols, Brix targets, hardiness zones, and more</li>
+            <li>The CSV includes <strong>25 data columns</strong>: companions, guilds, soil protocols, Brix targets, hardiness zones, growth habit, and more</li>
             <li>Click <strong>"Print / Export PDF"</strong> to save a printable reference</li>
+            <li>Each crop displays its <strong>growth habit badge</strong> (🌳 Tree, 🌱 Herb, 🍄 Fungus, etc.)</li>
           </ul>
         </Section>
 
@@ -193,6 +219,8 @@ const UserGuide = () => {
             <li>Start with <strong>Raised Bed</strong> and <strong>Key of F (Heart/639Hz)</strong> if you're new — it's the friendliest zone!</li>
             <li>Try <strong>Food Forest</strong> mode if you want to plan a perennial garden with fruit trees!</li>
             <li>Use the <strong>search bar</strong> in swap mode to find specific crops fast</li>
+            <li>Look for the <strong>growth habit badge</strong> to know if a crop is a tree, vine, herb, or fungus</li>
+            <li>Check <strong>container size</strong> before picking crops for pots — not all crops fit in small containers!</li>
             <li>Companion badges (🤝) mean crops help each other — try to keep them!</li>
             <li>The 🌙 moon icon turns green when it's a good time to plant that crop</li>
             <li>Export your crop data as CSV from the <strong>Crop Library</strong> for offline planning</li>
