@@ -1359,7 +1359,7 @@ const CropOracle = () => {
                     { id: 'calendar' as const, icon: <Calendar className="w-3.5 h-3.5" />, tip: 'Planting Calendar' },
                     { id: 'modal' as const, icon: <Music className="w-3.5 h-3.5" />, tip: 'Modal Guide' },
                     ...((environment === 'food-forest' || proMode) ? [{ id: 'scent' as const, icon: <Shield className="w-3.5 h-3.5" />, tip: 'Scent Corridor' }] : []),
-                    ...(environment === 'high-tunnel' ? [{ id: 'propagation' as const, icon: <Sprout className="w-3.5 h-3.5" />, tip: 'Seed Starting' }] : []),
+                    { id: 'propagation' as const, icon: <Sprout className="w-3.5 h-3.5" />, tip: 'Seed Starting' },
                   ].map(tool => {
                     const isActive = activeToolPanel === tool.id;
                     return (
@@ -1468,6 +1468,7 @@ const CropOracle = () => {
                     <PropagationPanel
                       zoneColor={selectedZone.color}
                       zoneName={selectedZone.name}
+                      environment={environment || undefined}
                     />
                   </motion.div>
                 )}

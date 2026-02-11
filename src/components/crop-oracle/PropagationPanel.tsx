@@ -5,6 +5,7 @@ import { ChevronDown, Sprout, Droplets, Thermometer, Sun, Clock, Leaf } from 'lu
 interface PropagationPanelProps {
   zoneColor: string;
   zoneName: string;
+  environment?: string;
 }
 
 const TRAY_SIZES = [
@@ -12,7 +13,7 @@ const TRAY_SIZES = [
     cells: 50,
     label: '50-Cell',
     cellSize: '2"×2"',
-    bestFor: 'Large transplants — tomatoes, peppers, eggplant, squash',
+    bestFor: 'Large transplants — tomatoes, peppers, eggplant, squash. Ideal for farm & high tunnel.',
     weeksInTray: '4–6 weeks',
     rootDepth: 'Deep taproot crops',
     icon: '🫑',
@@ -21,7 +22,7 @@ const TRAY_SIZES = [
     cells: 72,
     label: '72-Cell',
     cellSize: '1.5"×1.5"',
-    bestFor: 'Standard transplants — brassicas, herbs, lettuce, chard',
+    bestFor: 'Standard transplants — brassicas, herbs, lettuce, chard. Great all-around choice.',
     weeksInTray: '3–5 weeks',
     rootDepth: 'Medium root crops',
     icon: '🥬',
@@ -30,7 +31,7 @@ const TRAY_SIZES = [
     cells: 128,
     label: '128-Cell',
     cellSize: '1"×1"',
-    bestFor: 'Micro starts — onions, leeks, flowers, microgreens',
+    bestFor: 'Micro starts — onions, leeks, flowers, microgreens. Perfect for containers & windowsills.',
     weeksInTray: '2–4 weeks',
     rootDepth: 'Shallow / fibrous roots',
     icon: '🌿',
@@ -91,9 +92,11 @@ const SEED_SOURCES = [
   { name: 'Local Seed Library', type: 'Community', note: 'Locally-adapted, free exchange' },
 ];
 
-const PropagationPanel = ({ zoneColor, zoneName }: PropagationPanelProps) => {
+const PropagationPanel = ({ zoneColor, zoneName, environment }: PropagationPanelProps) => {
   const [open, setOpen] = useState(true);
-  const [selectedTray, setSelectedTray] = useState(1); // index into TRAY_SIZES
+  // Smart default: pot/container → 128-cell, farm/high-tunnel → 50-cell, else → 72-cell
+  const defaultTray = environment === 'pot' ? 2 : (environment === 'farm' || environment === 'high-tunnel') ? 0 : 1;
+  const [selectedTray, setSelectedTray] = useState(defaultTray);
 
   return (
     <div
