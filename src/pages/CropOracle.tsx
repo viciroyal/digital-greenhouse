@@ -31,13 +31,13 @@ import { getCropLayer, getIdealSlotLayers, layerMatchScore, successionScore, che
 
 /* ─── Zone Data ─── */
 const ZONES = [
-  { hz: 396, name: 'Foundation', vibe: 'Grounding', color: '#FF0000', note: 'C', description: 'Root anchoring, phosphorus, deep stability' },
-  { hz: 417, name: 'Flow', vibe: 'Flow', color: '#FF7F00', note: 'D', description: 'Water, hydration, fungal transit' },
-  { hz: 528, name: 'Alchemy', vibe: 'Energy', color: '#FFFF00', note: 'E', description: 'Solar power, nitrogen, growth core' },
-  { hz: 639, name: 'Heart', vibe: 'Heart', color: '#00FF00', note: 'F', description: 'Connection, mycorrhizal sync, calcium' },
-  { hz: 741, name: 'Signal', vibe: 'Expression', color: '#0000FF', note: 'G', description: 'Potassium, Brix validation, alchemy' },
-  { hz: 852, name: 'Vision', vibe: 'Vision', color: '#9B59B6', note: 'A', description: 'Medicinal density, silica, insight' },
-  { hz: 963, name: 'Source', vibe: 'Protection', color: '#8B00FF', note: 'B', description: 'Garlic shield, sulfur, seed sanctuary' },
+  { hz: 396, name: 'Foundation', vibe: 'Grounding', plainVibe: 'Root Crops', color: '#FF0000', note: 'C', description: 'Root anchoring, phosphorus, deep stability', plainDesc: 'Potatoes, beets, carrots — deep-rooting crops' },
+  { hz: 417, name: 'Flow', vibe: 'Flow', plainVibe: 'Vine Crops', color: '#FF7F00', note: 'D', description: 'Water, hydration, fungal transit', plainDesc: 'Squash, melons, cucumbers — spreading crops' },
+  { hz: 528, name: 'Alchemy', vibe: 'Energy', plainVibe: 'Summer Crops', color: '#FFFF00', note: 'E', description: 'Solar power, nitrogen, growth core', plainDesc: 'Tomatoes, corn, beans — heat-loving crops' },
+  { hz: 639, name: 'Heart', vibe: 'Heart', plainVibe: 'Salad Crops', color: '#00FF00', note: 'F', description: 'Connection, mycorrhizal sync, calcium', plainDesc: 'Lettuce, greens, herbs — quick-harvest crops' },
+  { hz: 741, name: 'Signal', vibe: 'Expression', plainVibe: 'Spice Crops', color: '#0000FF', note: 'G', description: 'Potassium, Brix validation, alchemy', plainDesc: 'Peppers, herbs, aromatics — flavor crops' },
+  { hz: 852, name: 'Vision', vibe: 'Vision', plainVibe: 'Medicine Crops', color: '#9B59B6', note: 'A', description: 'Medicinal density, silica, insight', plainDesc: 'Medicinal herbs, teas, tincture plants' },
+  { hz: 963, name: 'Source', vibe: 'Protection', plainVibe: 'Shield Crops', color: '#8B00FF', note: 'B', description: 'Garlic shield, sulfur, seed sanctuary', plainDesc: 'Garlic, onions, pest barriers' },
 ];
 
 /* ─── Environment Options ─── */
@@ -51,13 +51,13 @@ const ENVIRONMENTS = [
 
 /* ─── Chord interval display order ─── */
 const INTERVAL_ORDER = [
-  { key: 'Root (Lead)', label: 'The Star', role: 'Root (1st)', emoji: '🌟', hint: 'Your main crop — the headliner of the bed.' },
-  { key: '3rd (Triad)', label: 'The Companion', role: '3rd (Triad)', emoji: '🌿', hint: 'A helpful neighbor that keeps pests away or adds nutrients.' },
-  { key: '5th (Stabilizer)', label: 'The Stabilizer', role: '5th', emoji: '⚓', hint: 'A ground-cover or nitrogen-fixer that feeds the soil.' },
-  { key: '7th (Signal)', label: 'The Signal', role: '7th', emoji: '🦋', hint: 'Flowers & herbs that attract pollinators and beneficial insects.' },
-  { key: '9th (Sub-bass)', label: 'The Underground', role: '9th', emoji: '🥔', hint: 'Root vegetables growing beneath the surface.' },
-  { key: '11th (Tension)', label: 'The Sentinel', role: '11th', emoji: '🍄', hint: 'Fungi that build an underground nutrient network.' },
-  { key: '13th (Top Note)', label: 'The Aerial', role: '13th', emoji: '🌻', hint: 'Tall plants that create shade and wind protection above.' },
+  { key: 'Root (Lead)', label: 'The Star', plainLabel: 'Main Crop', role: 'Root (1st)', emoji: '🌟', hint: 'Your main crop — the headliner of the bed.' },
+  { key: '3rd (Triad)', label: 'The Companion', plainLabel: 'Pest Helper', role: '3rd (Triad)', emoji: '🌿', hint: 'A helpful neighbor that keeps pests away or adds nutrients.' },
+  { key: '5th (Stabilizer)', label: 'The Stabilizer', plainLabel: 'Soil Builder', role: '5th', emoji: '⚓', hint: 'A ground-cover or nitrogen-fixer that feeds the soil.' },
+  { key: '7th (Signal)', label: 'The Signal', plainLabel: 'Pollinator', role: '7th', emoji: '🦋', hint: 'Flowers & herbs that attract pollinators and beneficial insects.' },
+  { key: '9th (Sub-bass)', label: 'The Underground', plainLabel: 'Root Veggie', role: '9th', emoji: '🥔', hint: 'Root vegetables growing beneath the surface.' },
+  { key: '11th (Tension)', label: 'The Sentinel', plainLabel: 'Fungi Layer', role: '11th', emoji: '🍄', hint: 'Fungi that build an underground nutrient network.' },
+  { key: '13th (Top Note)', label: 'The Aerial', plainLabel: 'Tall Cover', role: '13th', emoji: '🌻', hint: 'Tall plants that create shade and wind protection above.' },
 ];
 
 /* ─── Antagonist & Synergy Rules ─── */
@@ -264,6 +264,7 @@ const CropOracle = () => {
   const [deletingRecipeId, setDeletingRecipeId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [proMode, setProMode] = useState(false);
+  const [plainMode, setPlainMode] = useState(false);
   const [hardinessZone, setHardinessZone] = useState<number | null>(null);
   const [hardinessSubZone, setHardinessSubZone] = useState<string | null>(null);
   const [selectedState, setSelectedState] = useState<string | null>(null);
@@ -1125,6 +1126,21 @@ const CropOracle = () => {
           </button>
 
           <button
+            onClick={() => setPlainMode(!plainMode)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[10px] tracking-wider transition-all"
+            style={{
+              background: plainMode
+                ? 'linear-gradient(135deg, hsl(45 40% 18%), hsl(45 30% 12%))'
+                : 'hsl(0 0% 10%)',
+              border: `1px solid ${plainMode ? 'hsl(45 50% 40%)' : 'hsl(0 0% 20%)'}`,
+              color: plainMode ? 'hsl(45 60% 75%)' : 'hsl(0 0% 50%)',
+              boxShadow: plainMode ? '0 0 12px hsl(45 50% 30% / 0.3)' : 'none',
+            }}
+          >
+            <span className="text-sm">{plainMode ? '📖' : '🎵'}</span>
+            {plainMode ? 'PLAIN' : 'MAJIC'}
+          </button>
+          <button
             onClick={() => navigate(userId ? '/profile' : '/auth')}
             className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
             style={{
@@ -1648,18 +1664,20 @@ const CropOracle = () => {
                         }}
                       >
                         <span className="text-xs font-mono font-bold" style={{ color: zone.color }}>
-                          {zone.note}
+                          {plainMode ? '●' : zone.note}
                         </span>
                       </div>
 
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <h3 className="font-bubble text-lg" style={{ color: zone.color }}>
-                            {zone.vibe}
+                            {plainMode ? zone.plainVibe : zone.vibe}
                           </h3>
-                          <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
-                            {zone.hz}Hz
-                          </span>
+                          {!plainMode && (
+                            <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
+                              {zone.hz}Hz
+                            </span>
+                          )}
                           {!inSeason && (
                             <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{
                               background: 'hsl(40 80% 45% / 0.15)',
@@ -1670,7 +1688,7 @@ const CropOracle = () => {
                           )}
                         </div>
                         <p className="text-xs font-body" style={{ color: 'hsl(0 0% 50%)' }}>
-                          {zone.description}
+                          {plainMode ? zone.plainDesc : zone.description}
                         </p>
                       </div>
 
@@ -1700,10 +1718,10 @@ const CropOracle = () => {
               transition={{ duration: 0.3 }}
             >
               <h2 className="text-center text-2xl md:text-3xl font-bubble mb-1" style={{ color: selectedZone.color }}>
-                Your {selectedZone.vibe} Recipe
+                Your {plainMode ? (selectedZone.plainVibe || selectedZone.vibe) : selectedZone.vibe} Recipe
               </h2>
               <p className="text-center text-sm font-mono mb-2" style={{ color: 'hsl(0 0% 45%)' }}>
-                STEP 3 — {proMode ? 'THE 13TH CHORD' : 'THE TRIAD'}
+                STEP 3 — {plainMode ? (proMode ? 'FULL GARDEN PLAN' : 'SIMPLE PLAN') : (proMode ? 'THE 13TH CHORD' : 'THE TRIAD')}
               </p>
               {/* ═══ Shuffle / Reroll Button ═══ */}
               <div className="flex justify-center mb-2">
@@ -2297,7 +2315,7 @@ const CropOracle = () => {
                     >
                       <Sparkles className="w-4 h-4" style={{ color: selectedZone.color }} />
                       <span className="font-mono text-xs font-bold tracking-wider" style={{ color: selectedZone.color }}>
-                        {proMode ? '7-VOICE PLANTING CHORD' : '3-VOICE TRIAD'}
+                        {plainMode ? (proMode ? '7-PLANT GARDEN PLAN' : '3-PLANT GARDEN PLAN') : (proMode ? '7-VOICE PLANTING CHORD' : '3-VOICE TRIAD')}
                       </span>
                       <div className="ml-auto flex items-center gap-2">
                         {hasData && (
@@ -2603,15 +2621,17 @@ const CropOracle = () => {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-bubble text-sm" style={{ color: 'hsl(40 50% 90%)' }}>
-                              {environment === 'food-forest' && FOOD_FOREST_LAYERS[slot.key] ? FOOD_FOREST_LAYERS[slot.key].label : slot.label}
+                              {environment === 'food-forest' && FOOD_FOREST_LAYERS[slot.key] ? FOOD_FOREST_LAYERS[slot.key].label : (plainMode && slot.plainLabel ? slot.plainLabel : slot.label)}
                             </span>
-                            <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{
-                              background: `${selectedZone.color}15`,
-                              color: selectedZone.color,
-                              border: `1px solid ${selectedZone.color}30`,
-                            }}>
-                              {slot.role}
-                            </span>
+                            {!plainMode && (
+                              <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{
+                                background: `${selectedZone.color}15`,
+                                color: selectedZone.color,
+                                border: `1px solid ${selectedZone.color}30`,
+                              }}>
+                                {slot.role}
+                              </span>
+                            )}
                             {slot.crop && isReady && (
                               <span className="text-[8px] font-mono px-1.5 py-0.5 rounded" style={{
                                 background: 'hsl(120 50% 25% / 0.3)',
