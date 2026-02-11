@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Sprout, Droplets, Thermometer, Sun, Clock, Leaf } from 'lucide-react';
+import { ChevronDown, Sprout, Droplets, Thermometer, Sun, Clock, Leaf, Snowflake, CalendarDays } from 'lucide-react';
 import EcoParadigmCard from '@/components/community/EcoParadigmCard';
 import GACommunityResources from '@/components/community/GACommunityResources';
 
@@ -8,7 +8,35 @@ interface PropagationPanelProps {
   zoneColor: string;
   zoneName: string;
   environment?: string;
+  hardinessZone?: number | null;
 }
+
+/* ─── Last frost date approximations by USDA zone (month, day) ─── */
+const LAST_FROST_BY_ZONE: Record<number, { month: number; day: number; label: string }> = {
+  3:  { month: 5, day: 15, label: 'May 15' },
+  4:  { month: 5, day: 1,  label: 'May 1' },
+  5:  { month: 4, day: 15, label: 'Apr 15' },
+  6:  { month: 4, day: 1,  label: 'Apr 1' },
+  7:  { month: 3, day: 15, label: 'Mar 15' },
+  8:  { month: 3, day: 1,  label: 'Mar 1' },
+  9:  { month: 2, day: 15, label: 'Feb 15' },
+  10: { month: 1, day: 31, label: 'Jan 31' },
+  11: { month: 1, day: 1,  label: 'Year-round' },
+  12: { month: 1, day: 1,  label: 'Year-round' },
+  13: { month: 1, day: 1,  label: 'Year-round' },
+};
+
+/* ─── Seed starting timeline entries (weeks before last frost) ─── */
+const SEED_TIMING = [
+  { crop: 'Peppers & Eggplant', weeksBefore: 10, icon: '🫑', tray: '50-cell', category: 'warm' },
+  { crop: 'Tomatoes', weeksBefore: 8, icon: '🍅', tray: '50-cell', category: 'warm' },
+  { crop: 'Broccoli & Cabbage', weeksBefore: 8, icon: '🥦', tray: '72-cell', category: 'cool' },
+  { crop: 'Lettuce & Greens', weeksBefore: 6, icon: '🥬', tray: '72-cell', category: 'cool' },
+  { crop: 'Squash & Cucumbers', weeksBefore: 4, icon: '🥒', tray: '50-cell', category: 'warm' },
+  { crop: 'Herbs (Basil, Cilantro)', weeksBefore: 6, icon: '🌿', tray: '72-cell', category: 'warm' },
+  { crop: 'Onions & Leeks', weeksBefore: 12, icon: '🧅', tray: '128-cell', category: 'cool' },
+  { crop: 'Flowers & Pollinators', weeksBefore: 8, icon: '🌸', tray: '128-cell', category: 'warm' },
+];
 
 const TRAY_SIZES = [
   {
@@ -94,11 +122,38 @@ const SEED_SOURCES = [
   { name: 'Local Seed Library', type: 'Community', note: 'Locally-adapted, free exchange' },
 ];
 
-const PropagationPanel = ({ zoneColor, zoneName, environment }: PropagationPanelProps) => {
+const PropagationPanel = ({ zoneColor, zoneName, environment, hardinessZone }: PropagationPanelProps) => {
   const [open, setOpen] = useState(true);
-  // Smart default: pot/container → 128-cell, farm/high-tunnel → 50-cell, else → 72-cell
   const defaultTray = environment === 'pot' ? 2 : (environment === 'farm' || environment === 'high-tunnel') ? 0 : 1;
   const [selectedTray, setSelectedTray] = useState(defaultTray);
+
+  /* ─── Compute seed starting dates from frost date ─── */
+  const frostData = useMemo(() => {
+    if (!hardinessZone) return null;
+    const baseZone = Math.floor(hardinessZone);
+    const frost = LAST_FROST_BY_ZONE[baseZone];
+    if (!frost) return null;
+
+    const currentYear = new Date().getFullYear();
+    const lastFrostDate = new Date(currentYear, frost.month - 1, frost.day);
+    
+    const timings = SEED_TIMING.map(entry => {
+      const startDate = new Date(lastFrostDate);
+      startDate.setDate(startDate.getDate() - entry.weeksBefore * 7);
+      const now = new Date();
+      const daysUntil = Math.ceil((startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      
+      return {
+        ...entry,
+        startDate,
+        startLabel: startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        daysUntil,
+        status: daysUntil < -14 ? 'passed' as const : daysUntil < 0 ? 'now' as const : daysUntil <= 14 ? 'soon' as const : 'upcoming' as const,
+      };
+    }).sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+
+    return { frostLabel: frost.label, lastFrostDate, timings };
+  }, [hardinessZone]);
 
   return (
     <div
@@ -201,6 +256,95 @@ const PropagationPanel = ({ zoneColor, zoneName, environment }: PropagationPanel
                   </div>
                 </div>
               </div>
+
+              {/* ─── SEED STARTING TIMELINE (frost-date based) ─── */}
+              {frostData && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Snowflake className="w-3.5 h-3.5" style={{ color: 'hsl(200 70% 65%)' }} />
+                    <span className="text-[9px] font-mono tracking-widest" style={{ color: 'hsl(200 60% 60%)' }}>
+                      SEED STARTING TIMELINE
+                    </span>
+                  </div>
+                  <div
+                    className="p-2.5 rounded-lg mb-2"
+                    style={{ background: 'hsl(200 30% 8%)', border: '1px solid hsl(200 30% 18%)' }}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <CalendarDays className="w-3 h-3" style={{ color: 'hsl(200 60% 60%)' }} />
+                      <span className="text-[9px] font-mono font-bold" style={{ color: 'hsl(200 60% 65%)' }}>
+                        Last Frost: ~{frostData.frostLabel}
+                      </span>
+                      <span className="text-[8px] font-mono ml-auto" style={{ color: 'hsl(0 0% 40%)' }}>
+                        Zone {Math.floor(hardinessZone!)}
+                      </span>
+                    </div>
+                    <p className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>
+                      Dates are approximate — check local extension office for precise frost dates.
+                    </p>
+                  </div>
+
+                  <div className="space-y-1">
+                    {frostData.timings.map(t => {
+                      const statusColor =
+                        t.status === 'now' ? 'hsl(45 80% 55%)' :
+                        t.status === 'soon' ? 'hsl(30 70% 55%)' :
+                        t.status === 'passed' ? 'hsl(0 0% 35%)' :
+                        'hsl(0 0% 50%)';
+                      const statusBg =
+                        t.status === 'now' ? 'hsl(45 60% 55% / 0.12)' :
+                        t.status === 'soon' ? 'hsl(30 50% 50% / 0.08)' :
+                        'transparent';
+                      const statusLabel =
+                        t.status === 'now' ? '🔥 START NOW' :
+                        t.status === 'soon' ? '⏳ COMING UP' :
+                        t.status === 'passed' ? '⏪ WINDOW PASSED' :
+                        `${t.daysUntil}d away`;
+
+                      return (
+                        <div
+                          key={t.crop}
+                          className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg"
+                          style={{
+                            background: statusBg || 'hsl(0 0% 7%)',
+                            border: `1px solid ${t.status === 'now' ? 'hsl(45 60% 40%)' : 'hsl(0 0% 12%)'}`,
+                            opacity: t.status === 'passed' ? 0.5 : 1,
+                          }}
+                        >
+                          <span className="text-sm shrink-0">{t.icon}</span>
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[9px] font-mono font-bold block" style={{ color: statusColor }}>
+                              {t.crop}
+                            </span>
+                            <span className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                              {t.weeksBefore}wk before frost · {t.tray}
+                            </span>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <span className="text-[9px] font-mono font-bold block" style={{ color: statusColor }}>
+                              {t.startLabel}
+                            </span>
+                            <span className="text-[7px] font-mono" style={{ color: statusColor }}>
+                              {statusLabel}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {!frostData && (
+                <div className="p-2.5 rounded-lg" style={{ background: 'hsl(200 20% 8%)', border: '1px solid hsl(200 20% 15%)' }}>
+                  <div className="flex items-center gap-2">
+                    <Snowflake className="w-3.5 h-3.5" style={{ color: 'hsl(0 0% 30%)' }} />
+                    <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                      Set your USDA Hardiness Zone above to see personalized seed starting dates
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* ─── PROPAGATION STEPS ─── */}
               <div>
