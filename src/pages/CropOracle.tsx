@@ -238,6 +238,12 @@ const CropOracle = () => {
     return candidates.sort((a, b) => (a.common_name || a.name).localeCompare(b.common_name || b.name));
   }, [allCrops, environment, hardinessZone]);
 
+  /* ─── Total crops matching hardiness zone (across all frequency zones) ─── */
+  const zoneMatchCount = useMemo(() => {
+    if (!allCrops || !hardinessZone) return null;
+    return allCrops.filter(fitsHardinessZone).length;
+  }, [allCrops, hardinessZone, hardinessSubZone]);
+
   /* ─── Filtered star search ─── */
   const filteredStarCandidates = useMemo(() => {
     if (!starSearchQuery || starSearchQuery.length < 1) return starCandidates.slice(0, 20);
@@ -695,6 +701,18 @@ const CropOracle = () => {
                   ? `USDA ${hardinessSubZone || hardinessZone}${selectedState ? ` · ${STATE_HARDINESS_ZONES[selectedState]?.abbr || selectedState}` : ''}`
                   : 'GROW ZONE'}
               </span>
+              {zoneMatchCount !== null && (
+                <span
+                  className="text-[8px] font-mono px-1.5 py-0.5 rounded-full"
+                  style={{
+                    background: 'hsl(140 30% 15% / 0.6)',
+                    color: 'hsl(140 50% 60%)',
+                    border: '1px solid hsl(140 40% 25% / 0.4)',
+                  }}
+                >
+                  {zoneMatchCount}
+                </span>
+              )}
               <ChevronDown className="w-2.5 h-2.5" style={{ color: 'hsl(0 0% 35%)', transform: showZonePicker ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
             </button>
 
@@ -1900,7 +1918,6 @@ const CropOracle = () => {
           </motion.div>
         )}
       </div>
-
 
       {/* Griot Oracle — Floating Help */}
       <GriotOracle />
