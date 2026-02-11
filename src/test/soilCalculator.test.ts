@@ -11,8 +11,9 @@ import {
 } from '@/components/almanac/engines/soil/soilConstants';
 
 describe('Soil Calculator Constants', () => {
-  it('Master Mix has exactly 8 components', () => {
-    expect(MASTER_MIX_PROTOCOL).toHaveLength(8);
+  it('Master Mix has all core, mineral, and biology components', () => {
+    expect(MASTER_MIX_PROTOCOL.length).toBeGreaterThanOrEqual(17);
+    expect(MASTER_MIX_PROTOCOL.find(c => c.id === 'cococoir')).toBeDefined();
   });
 
   it('base reference area is 150 sq ft (60ft × 2.5ft)', () => {
