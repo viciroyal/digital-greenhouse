@@ -287,21 +287,26 @@ const CropOracle = () => {
   const isInCurrentSeason = (c: MasterCrop): boolean => {
     const seasons = (c.planting_season || []).map(s => s.toLowerCase());
     if (seasons.length === 0) return true; // no data = don't exclude
-    return seasons.includes(currentSeason);
+    return seasons.includes(currentSeason) || seasons.includes('year-round');
   };
 
-  /* ─── Filter crops by zone + environment + season ─── */
+  /* ─── Filter crops by zone + environment (season used as preference, not hard gate) ─── */
   const recipeCrops = useMemo(() => {
     if (!allCrops || !selectedZone) return [];
 
     let filtered = allCrops.filter(c => c.frequency_hz === selectedZone.hz);
 
+    // Zone filter: strictly enforce — 100% zone compatibility
     if (hardinessZone) {
       filtered = filtered.filter(fitsHardinessZone);
     }
 
-    // Season filter: strictly enforce — only crops plantable NOW
-    filtered = filtered.filter(isInCurrentSeason);
+    // Season preference: sort in-season crops first, but don't exclude others
+    filtered.sort((a, b) => {
+      const aInSeason = isInCurrentSeason(a) ? 1 : 0;
+      const bInSeason = isInCurrentSeason(b) ? 1 : 0;
+      return bInSeason - aInSeason;
+    });
 
     if (environment === 'pot') {
       filtered = filtered.filter(c => {
@@ -343,8 +348,12 @@ const CropOracle = () => {
     if (hardinessZone) {
       candidates = candidates.filter(fitsHardinessZone);
     }
-    // Strict season filter
-    candidates = candidates.filter(isInCurrentSeason);
+    // Season preference: sort in-season first but don't exclude
+    candidates.sort((a, b) => {
+      const aS = isInCurrentSeason(a) ? 1 : 0;
+      const bS = isInCurrentSeason(b) ? 1 : 0;
+      return bS - aS;
+    });
     if (environment === 'pot') {
       candidates = candidates.filter(c => {
         const spacing = c.spacing_inches ? parseInt(c.spacing_inches) : 6;
@@ -471,8 +480,11 @@ const CropOracle = () => {
       return seasons.includes(currentSeason);
     };
 
-    // Strict gate — only zone-compatible AND in-season crops (no fallback)
-    pool = pool.filter(c => isZoneCompatible(c) && isInSeason(c) && isSeasonCompatible(c));
+    // Zone: strictly enforced (100%). Season: prefer in-season, fallback to zone-only
+    const seasonGated = pool.filter(c => isZoneCompatible(c) && isSeasonCompatible(c) && isInSeason(c));
+    const zoneGated = pool.filter(c => isZoneCompatible(c) && isSeasonCompatible(c));
+    const zoneOnly = pool.filter(c => isZoneCompatible(c));
+    pool = seasonGated.length >= 7 ? seasonGated : zoneGated.length >= 3 ? zoneGated : zoneOnly;
 
     const usedIds = new Set<string>();
 
@@ -512,6 +524,8 @@ const CropOracle = () => {
       score += sharedSeasons.length * 3;
       // Bonus if ANY season data exists (+1)
       if (cSeasons.length > 0) score += 1;
+      // Current-season boost (+4 if plantable now)
+      if (isInCurrentSeason(c)) score += 4;
       // Zone compatibility (+5 if crop fits user's zone, heavy penalty if not)
       if (hardinessZone && c.hardiness_zone_min != null && c.hardiness_zone_max != null) {
         if (hardinessZone >= c.hardiness_zone_min && hardinessZone <= c.hardiness_zone_max) score += 5;
