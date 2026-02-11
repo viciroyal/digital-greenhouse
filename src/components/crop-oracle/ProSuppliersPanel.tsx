@@ -7,9 +7,11 @@ interface ProSuppliersPanelProps {
   zoneName: string;
 }
 
-type Category = 'irrigation' | 'soilLabs' | 'inputs' | 'biocontrol';
+type Category = 'gaLocal' | 'seeds' | 'irrigation' | 'soilLabs' | 'inputs' | 'biocontrol';
 
 const CATEGORIES: { id: Category; label: string; icon: React.ReactNode; color: string }[] = [
+  { id: 'gaLocal', label: 'GA LOCAL', icon: <Globe className="w-3.5 h-3.5" />, color: 'hsl(340 55% 55%)' },
+  { id: 'seeds', label: 'SEEDS & STARTS', icon: <Shovel className="w-3.5 h-3.5" />, color: 'hsl(80 50% 50%)' },
   { id: 'irrigation', label: 'IRRIGATION & DRIP', icon: <Droplets className="w-3.5 h-3.5" />, color: 'hsl(200 55% 50%)' },
   { id: 'soilLabs', label: 'SOIL TESTING LABS', icon: <FlaskConical className="w-3.5 h-3.5" />, color: 'hsl(45 60% 55%)' },
   { id: 'inputs', label: 'ORGANIC INPUTS', icon: <Shovel className="w-3.5 h-3.5" />, color: 'hsl(120 40% 50%)' },
@@ -17,6 +19,21 @@ const CATEGORIES: { id: Category; label: string; icon: React.ReactNode; color: s
 ];
 
 const SUPPLIERS: Record<Category, { name: string; url: string; note: string; specialty: string }[]> = {
+  gaLocal: [
+    { name: 'Georgia Organics', url: 'https://georgiaorganics.org', note: 'Farmer services, grants, accelerator program & local food network', specialty: 'GA farmer hub' },
+    { name: 'Rodale Institute SE', url: 'https://rodaleinstitute.org/about/facilities-and-campuses/regional-resource-centers/southeast-organic-center/', note: 'Southeast Organic Center in Chattahoochee Hills — research & education', specialty: 'Organic research' },
+    { name: 'EcoGEM Atlanta', url: 'https://www.eco-gem.com/gypsum-atlanta-ga/', note: 'OMRI-certified gypsum, soil conditioner for regenerative & organic ag', specialty: 'Gypsum & calcium' },
+    { name: 'Food Well Alliance', url: 'https://www.foodwellalliance.org', note: 'Community garden grants, compost deliveries, workshops in metro ATL', specialty: 'ATL gardens' },
+    { name: 'UGA Extension', url: 'https://extension.uga.edu', note: 'Free soil testing, pest ID, and county-specific growing guides for GA', specialty: 'Free soil tests' },
+    { name: 'Levity Farms', url: 'https://www.levityfarms.com', note: 'Local GA farm offering CSA shares — support regenerative land stewards', specialty: 'GA CSA' },
+  ],
+  seeds: [
+    { name: 'Georgia Seed & Garden', url: 'https://georgiaseeds.com', note: 'GA-specific growing instructions with heirloom & open-pollinated seed', specialty: 'GA heirloom' },
+    { name: 'Southern Exposure Seed Exchange', url: 'https://www.southernexposure.com', note: 'Heritage & heirloom varieties bred for the South — seed saving focus', specialty: 'Southern heritage' },
+    { name: 'Sow True Seed', url: 'https://sowtrueseed.com', note: 'Appalachian-based, open-pollinated & organic seed for SE climate', specialty: 'SE organic seed' },
+    { name: 'Seed Savers Exchange', url: 'https://www.seedsavers.org', note: 'Heirloom seed library — preserving 20,000+ rare & heritage varieties', specialty: 'Seed sovereignty' },
+    { name: 'Fruition Seeds', url: 'https://www.fruitionseeds.com', note: 'Organic seeds with detailed growing guides & variety trial data', specialty: 'Growing guides' },
+  ],
   irrigation: [
     { name: 'DripWorks', url: 'https://www.dripworks.com', note: 'Full drip irrigation kits, timers & fittings', specialty: 'Drip systems' },
     { name: 'Drip Depot', url: 'https://www.dripdepot.com', note: 'Affordable drip tape, emitters & micro-sprinklers', specialty: 'Budget drip' },
