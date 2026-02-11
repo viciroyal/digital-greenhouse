@@ -17,6 +17,7 @@ import SoilLinkPanel from '@/components/crop-oracle/SoilLinkPanel';
 import PlantingCalendar from '@/components/crop-oracle/PlantingCalendar';
 import ScentCorridorPanel from '@/components/crop-oracle/ScentCorridorPanel';
 import PropagationPanel from '@/components/crop-oracle/PropagationPanel';
+import EcoParadigmCard from '@/components/community/EcoParadigmCard';
 
 /* ─── Zone Data ─── */
 const ZONES = [
@@ -1180,6 +1181,11 @@ const CropOracle = () => {
                       </div>
                     </div>
                     <p className="text-xs font-body" style={{ color: 'hsl(0 0% 55%)' }}>{env.description}</p>
+                    {env.id === 'high-tunnel' && (
+                      <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+                        <EcoParadigmCard variant="compact" />
+                      </div>
+                    )}
                   </motion.button>
                 ))}
               </div>

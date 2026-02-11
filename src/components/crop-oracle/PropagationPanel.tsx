@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Sprout, Droplets, Thermometer, Sun, Clock, Leaf } from 'lucide-react';
+import EcoParadigmCard from '@/components/community/EcoParadigmCard';
+import GACommunityResources from '@/components/community/GACommunityResources';
 
 interface PropagationPanelProps {
   zoneColor: string;
@@ -281,6 +283,10 @@ const PropagationPanel = ({ zoneColor, zoneName, environment }: PropagationPanel
                   ))}
                 </ul>
               </div>
+
+              {/* ─── ECO-PARADIGM & GA COMMUNITY ─── */}
+              <EcoParadigmCard variant="inline" />
+              <GACommunityResources variant="compact" />
 
             </div>
           </motion.div>
