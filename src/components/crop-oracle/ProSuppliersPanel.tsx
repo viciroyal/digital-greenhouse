@@ -59,6 +59,7 @@ const SUPPLIERS: Record<Category, { name: string; url?: string; note: string; sp
     { name: 'Fedco OGS', url: 'https://www.fedcoseeds.com/ogs', note: 'OMRI-listed organic fertilizers & amendments, bulk pricing', specialty: 'Northeast supply' },
     { name: 'KIS Organics', url: 'https://www.kisorganics.com', note: 'Biochar, nutrient packs, water-only soil mixes', specialty: 'No-till soil' },
     { name: 'Redmond Minerals', url: 'https://www.redmond.life', note: 'Real Salt, volcanic conditioner, trace mineral clay', specialty: 'Trace minerals' },
+    { name: 'Neversink Tools', url: 'https://neversinktools.com', note: 'No-till market garden tools — tilthers, broadforks, bed prep & harvest gear', specialty: 'No-till tools' },
   ],
   biocontrol: [
     { name: 'Arbico Organics', url: 'https://www.arbico-organics.com', note: 'Beneficial insects, nematodes, organic pest control', specialty: 'Full IPM catalog' },
