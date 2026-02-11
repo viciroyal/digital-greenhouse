@@ -557,47 +557,102 @@ const ChordComposer = ({
                   )}
                 </div>
                 <div className="space-y-1.5">
-                  {seasonalSuggestions.map((suggestion, i) => {
+                {seasonalSuggestions.map((suggestion, i) => {
                     const meta = INTERVAL_META[suggestion.interval];
+                    // Season/harvest alignment with Root crop
+                    const rootPlanting = chordStatus['Root (Lead)'];
+                    const rootCropPartial = rootPlanting?.crop;
+                    const rootCrop = rootCropPartial && allCrops ? allCrops.find(c => c.id === rootCropPartial.id) : null;
+                    const rootSeasons = rootCrop?.planting_season || [];
+                    const rootHarvest = rootCrop?.harvest_days ?? null;
+                    const sugSeasons = suggestion.crop.planting_season || [];
+                    const sugHarvest = suggestion.crop.harvest_days ?? null;
+                    const sharedSeasons = rootSeasons.filter(s => sugSeasons.includes(s));
+                    const harvestDiff = rootHarvest !== null && sugHarvest !== null
+                      ? sugHarvest - rootHarvest : null;
+                    const hasSeasonData = sugSeasons.length > 0;
+                    const hasOverlap = sharedSeasons.length > 0;
+
                     return (
                       <motion.div
                         key={suggestion.interval}
                         initial={{ opacity: 0, x: -6 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.08 }}
-                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg"
+                        className="flex flex-col gap-1 px-2.5 py-1.5 rounded-lg"
                         style={{
                           background: `${meta.color}10`,
                           border: `1px solid ${meta.color}25`,
                         }}
                       >
-                        <span style={{ color: meta.color }}>{meta.icon}</span>
-                        <div className="flex-1 min-w-0">
-                          <span className="text-[10px] font-mono font-bold block truncate" style={{ color: 'hsl(0 0% 75%)' }}>
-                            {suggestion.crop.common_name || suggestion.crop.name}
-                          </span>
-                          <span className="text-[8px] font-mono flex items-center gap-1" style={{ color: 'hsl(0 0% 40%)' }}>
-                            {suggestion.source === 'companion' ? <Users className="w-2.5 h-2.5 inline" /> : '🎵'}
-                            {' '}{suggestion.label}
-                          </span>
+                        <div className="flex items-center gap-2">
+                          <span style={{ color: meta.color }}>{meta.icon}</span>
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[10px] font-mono font-bold block truncate" style={{ color: 'hsl(0 0% 75%)' }}>
+                              {suggestion.crop.common_name || suggestion.crop.name}
+                            </span>
+                            <span className="text-[8px] font-mono flex items-center gap-1" style={{ color: 'hsl(0 0% 40%)' }}>
+                              {suggestion.source === 'companion' ? <Users className="w-2.5 h-2.5 inline" /> : '🎵'}
+                              {' '}{suggestion.label}
+                            </span>
+                          </div>
+                          {isAdmin ? (
+                            <button
+                              onClick={() => handleSuggestionAssign(suggestion)}
+                              disabled={addPlanting.isPending}
+                              className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
+                              style={{
+                                background: `${meta.color}20`,
+                                border: `1px solid ${meta.color}40`,
+                              }}
+                              title={`Add ${suggestion.crop.common_name || suggestion.crop.name} to ${suggestion.interval}`}
+                            >
+                              <Plus className="w-3 h-3" style={{ color: meta.color }} />
+                            </button>
+                          ) : (
+                            <span className="text-[8px] font-mono" style={{ color: meta.color }}>
+                              {meta.shortLabel}
+                            </span>
+                          )}
                         </div>
-                        {isAdmin ? (
-                          <button
-                            onClick={() => handleSuggestionAssign(suggestion)}
-                            disabled={addPlanting.isPending}
-                            className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
-                            style={{
-                              background: `${meta.color}20`,
-                              border: `1px solid ${meta.color}40`,
-                            }}
-                            title={`Add ${suggestion.crop.common_name || suggestion.crop.name} to ${suggestion.interval}`}
-                          >
-                            <Plus className="w-3 h-3" style={{ color: meta.color }} />
-                          </button>
-                        ) : (
-                          <span className="text-[8px] font-mono" style={{ color: meta.color }}>
-                            {meta.shortLabel}
-                          </span>
+                        {/* Season & Harvest Alignment Badges */}
+                        {rootCrop && (
+                          <div className="flex items-center gap-1 flex-wrap ml-5">
+                            {hasSeasonData && hasOverlap && (
+                              <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5"
+                                style={{ background: 'hsl(140 30% 12%)', color: 'hsl(140 50% 55%)', border: '1px solid hsl(140 30% 22%)' }}>
+                                ✓ {sharedSeasons.join(', ')}
+                              </span>
+                            )}
+                            {hasSeasonData && !hasOverlap && (
+                              <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5"
+                                style={{ background: 'hsl(0 40% 12%)', color: 'hsl(0 55% 60%)', border: '1px solid hsl(0 35% 25%)' }}>
+                                ⚠ No shared season
+                              </span>
+                            )}
+                            {!hasSeasonData && (
+                              <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5"
+                                style={{ background: 'hsl(30 40% 12%)', color: 'hsl(30 50% 55%)', border: '1px solid hsl(30 30% 22%)' }}>
+                                ⚠ No season data
+                              </span>
+                            )}
+                            {harvestDiff !== null && (
+                              <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5"
+                                style={{
+                                  background: Math.abs(harvestDiff) <= 15 ? 'hsl(140 30% 12%)' : Math.abs(harvestDiff) <= 30 ? 'hsl(45 30% 12%)' : 'hsl(0 0% 8%)',
+                                  color: Math.abs(harvestDiff) <= 15 ? 'hsl(140 50% 55%)' : Math.abs(harvestDiff) <= 30 ? 'hsl(45 50% 55%)' : 'hsl(0 0% 45%)',
+                                  border: `1px solid ${Math.abs(harvestDiff) <= 15 ? 'hsl(140 30% 22%)' : Math.abs(harvestDiff) <= 30 ? 'hsl(45 30% 22%)' : 'hsl(0 0% 15%)'}`,
+                                }}>
+                                🌾 {harvestDiff > 0 ? '+' : ''}{harvestDiff}d vs root
+                              </span>
+                            )}
+                            {sugHarvest === null && rootHarvest !== null && (
+                              <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5"
+                                style={{ background: 'hsl(0 0% 8%)', color: 'hsl(0 0% 40%)', border: '1px solid hsl(0 0% 15%)' }}>
+                                🌾 No harvest data
+                              </span>
+                            )}
+                          </div>
                         )}
                       </motion.div>
                     );
