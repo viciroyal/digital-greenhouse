@@ -191,7 +191,7 @@ export const useAutoGeneration = (
 
     /** Score a candidate crop for seasonal/harvest compatibility with the root.
      *  Weighted heavily (~80% of total ranking) to ensure in-season sync dominates pairing. */
-    const compatibilityScore = (crop: MasterCrop): number => {
+    const compatibilityScore = (crop: MasterCrop, slotKey?: string): number => {
       let score = 0;
       // +10 per shared planting season (high weight for seasonal alignment)
       const cropSeasons = crop.planting_season || [];
@@ -204,6 +204,11 @@ export const useAutoGeneration = (
         if (diff <= 15) score += 8;
         else if (diff <= 30) score += 4;
       }
+      // BRIX VALIDATION: +4 bonus for crops with Brix targets in the 12-24 optimal range
+      if (crop.brix_target_min != null && crop.brix_target_min >= 12) score += 4;
+      if (crop.brix_target_max != null && crop.brix_target_max >= 18) score += 2;
+      // SPRINTER BONUS: reward fast-harvest crops (< 45 days) in 7th/Signal slot
+      if (slotKey === '7th (Signal)' && crop.harvest_days != null && crop.harvest_days <= 45) score += 6;
       return score;
     };
 
@@ -322,7 +327,7 @@ export const useAutoGeneration = (
         })
         .map(c => ({
           crop: c,
-          compat: compatibilityScore(c),
+          compat: compatibilityScore(c, slotKey),
           newInstrument: c.instrument_type && !usedInstruments.has(c.instrument_type) ? 1 : 0,
           layerBonus: layerMatchScore(c, slotKey, idealLayers),
           succession: successionScore(c, placedCrops),
