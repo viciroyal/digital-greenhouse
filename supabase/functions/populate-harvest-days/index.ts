@@ -34,7 +34,6 @@ serve(async (req) => {
       .from("master_crops")
       .select("id, name, common_name, scientific_name, category, growth_habit")
       .is("harvest_days", null)
-      .in("category", ["Sustenance", "Aromatic"])
       .order("name", { ascending: true })
       .limit(40);
 
@@ -153,8 +152,7 @@ Rules:
     const { count } = await supabase
       .from("master_crops")
       .select("id", { count: "exact", head: true })
-      .is("harvest_days", null)
-      .in("category", ["Sustenance", "Aromatic"]);
+      .is("harvest_days", null);
 
     return new Response(JSON.stringify({ updated, remaining: count ?? 0, batch_size: crops.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
