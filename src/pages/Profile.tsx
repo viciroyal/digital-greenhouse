@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Calendar, Loader2, LogOut, Check, FlaskConical, Sprout, Users, MapPin, Clock } from 'lucide-react';
+import { ArrowLeft, User, Mail, Calendar, Loader2, LogOut, Check, FlaskConical, Sprout, Users, MapPin, Clock, Ruler } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -248,6 +248,45 @@ const Profile = () => {
       }
       setPopulateStatus(`Done! ${totalUpdated} harvest days updated.`);
       toast({ title: 'Harvest days populated', description: `${totalUpdated} crops updated.` });
+    } catch (error: any) {
+      setPopulateStatus(null);
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsPopulating(false);
+    }
+  };
+
+  const handlePopulateSpacing = async () => {
+    setIsPopulating(true);
+    setPopulateStatus('Starting Spacing...');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      let remaining = 1;
+      let totalUpdated = 0;
+      while (remaining > 0) {
+        const resp = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/populate-spacing`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+              'Content-Type': 'application/json',
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+          }
+        );
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Failed');
+        totalUpdated += data.updated || 0;
+        remaining = data.remaining || 0;
+        setPopulateStatus(`Spacing: ${totalUpdated} updated, ${remaining} remaining...`);
+        if (remaining === 0) break;
+        await new Promise(r => setTimeout(r, 1500));
+      }
+      setPopulateStatus(`Done! ${totalUpdated} spacing values updated.`);
+      toast({ title: 'Spacing populated', description: `${totalUpdated} crops updated.` });
     } catch (error: any) {
       setPopulateStatus(null);
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
@@ -598,6 +637,29 @@ const Profile = () => {
                     <span className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
                       POPULATE HARVEST DAYS
+                    </span>
+                  )}
+                </Button>
+                <Button
+                  onClick={handlePopulateSpacing}
+                  variant="outline"
+                  className="w-full py-5 font-body tracking-wider"
+                  style={{
+                    background: 'hsl(200 20% 10%)',
+                    border: '1px solid hsl(200 40% 30%)',
+                    color: 'hsl(200 55% 60%)',
+                  }}
+                  disabled={isPopulating}
+                >
+                  {isPopulating && populateStatus?.includes('Spacing') ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {populateStatus}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Ruler className="w-4 h-4" />
+                      POPULATE SPACING
                     </span>
                   )}
                 </Button>

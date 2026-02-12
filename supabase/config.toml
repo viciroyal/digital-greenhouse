@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.populate-harvest-days]
 verify_jwt = false
+
+[functions.populate-spacing]
+verify_jwt = false
