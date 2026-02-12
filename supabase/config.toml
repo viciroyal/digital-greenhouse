@@ -5,3 +5,12 @@ verify_jwt = false
 
 [functions.populate-crop-data]
 verify_jwt = false
+
+[functions.populate-companions]
+verify_jwt = false
+
+[functions.populate-hardiness]
+verify_jwt = false
+
+[functions.populate-harvest-days]
+verify_jwt = false
