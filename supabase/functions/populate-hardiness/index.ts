@@ -48,11 +48,11 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const cropList = crops.map(c => {
+    const cropList = crops.map((c, i) => {
       const name = c.common_name || c.name;
       const sci = c.scientific_name ? ` (${c.scientific_name})` : '';
       const habit = c.growth_habit ? `, ${c.growth_habit}` : '';
-      return `- ${name}${sci} [${c.category}${habit}]`;
+      return `- [ID:${i}] ${name}${sci} [${c.category}${habit}]`;
     }).join("\n");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -95,11 +95,11 @@ Rules:
                     items: {
                       type: "object",
                       properties: {
-                        common_name: { type: "string", description: "The plant common name as given in the input" },
+                        id: { type: "integer", description: "The numeric ID from the input list (e.g., 0, 1, 2...)" },
                         zone_min: { type: "number", description: "Minimum USDA zone (e.g., 3.0 for 3a, 3.5 for 3b)" },
                         zone_max: { type: "number", description: "Maximum USDA zone (e.g., 10.0 for 10a, 10.5 for 10b)" },
                       },
-                      required: ["common_name", "zone_min", "zone_max"],
+                      required: ["id", "zone_min", "zone_max"],
                       additionalProperties: false,
                     },
                   },
@@ -138,16 +138,16 @@ Rules:
 
     let updated = 0;
     for (const entry of entries) {
-      const matchingCrop = crops.find(
-        c => (c.common_name || c.name).toLowerCase() === entry.common_name.toLowerCase()
-      );
-      if (matchingCrop && entry.zone_min != null && entry.zone_max != null) {
+      const idx = entry.id;
+      if (idx == null || idx < 0 || idx >= crops.length) continue;
+      const crop = crops[idx];
+      if (entry.zone_min != null && entry.zone_max != null) {
         const { error: updateErr } = await supabase
           .from("master_crops")
           .update({ hardiness_zone_min: entry.zone_min, hardiness_zone_max: entry.zone_max })
-          .eq("id", matchingCrop.id);
+          .eq("id", crop.id);
         if (!updateErr) updated++;
-        else console.error("Update error for", matchingCrop.id, updateErr);
+        else console.error("Update error for", crop.id, updateErr);
       }
     }
 
