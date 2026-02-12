@@ -1,18 +1,21 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Sprout, Scissors, Beaker, Calendar, Clock, ExternalLink } from 'lucide-react';
+import { ChevronDown, Sprout, Scissors, Beaker, Calendar, Clock, ExternalLink, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { getCurrentSeasonalTasks } from '@/data/almanacData';
 import { getLunarPhase } from '@/hooks/useLunarPhase';
+import { suggestSuccession, SuccessionCandidate } from '@/lib/successionEngine';
 
 interface HarvestItem {
   cropName: string;
   bedNumber: number;
   daysLeft: number;
   zoneColor: string;
+  cropData: MasterCrop | null;
+  bedmates: MasterCrop[];
 }
 
 interface PlantNowItem {
@@ -22,6 +25,7 @@ interface PlantNowItem {
 
 const TwoWeekDashboard = () => {
   const [open, setOpen] = useState(false);
+  const [expandedHarvest, setExpandedHarvest] = useState<number | null>(null);
   const { data: allCrops } = useMasterCrops();
   const lunar = useMemo(() => getLunarPhase(), []);
 
@@ -55,11 +59,18 @@ const TwoWeekDashboard = () => {
       const daysLeft = Math.ceil((harvestDate - now) / (24 * 60 * 60 * 1000));
 
       if (daysLeft >= -3 && daysLeft <= 14) {
+        // Gather bedmates (other crops in same bed)
+        const bedmates: MasterCrop[] = plantings
+          .filter(p2 => p2.bed_id === p.bed_id && p2.id !== p.id && p2.crop)
+          .map(p2 => p2.crop as unknown as MasterCrop);
+
         items.push({
           cropName: crop.common_name || crop.name,
           bedNumber: bed.bed_number,
           daysLeft,
           zoneColor: bed.zone_color || '#888',
+          cropData: crop as MasterCrop,
+          bedmates,
         });
       }
     }
@@ -102,6 +113,20 @@ const TwoWeekDashboard = () => {
     }
     return items;
   }, [allCrops, lunar]);
+
+  // Succession suggestions for harvest items
+  const successionMap = useMemo(() => {
+    if (!allCrops || harvestItems.length === 0) return new Map<number, SuccessionCandidate[]>();
+    const map = new Map<number, SuccessionCandidate[]>();
+    harvestItems.forEach((item, i) => {
+      if (item.cropData) {
+        const harvestDate = new Date();
+        harvestDate.setDate(harvestDate.getDate() + Math.max(item.daysLeft, 0));
+        map.set(i, suggestSuccession(item.cropData, allCrops, null, item.bedmates, harvestDate, 3));
+      }
+    });
+    return map;
+  }, [allCrops, harvestItems]);
 
   // Seasonal soil/spray tasks
   const seasonalTasks = useMemo(() => getCurrentSeasonalTasks(), []);
@@ -187,45 +212,102 @@ const TwoWeekDashboard = () => {
                       </span>
                     </div>
                     <div className="space-y-1">
-                      {harvestItems.map((item, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center gap-2 px-3 py-2 rounded-lg"
-                          style={{
-                            background: item.daysLeft <= 0
-                              ? 'hsl(0 40% 10% / 0.5)'
-                              : item.daysLeft <= 3
-                                ? 'hsl(45 40% 10% / 0.3)'
-                                : 'hsl(0 0% 6%)',
-                            border: `1px solid ${item.daysLeft <= 0 ? 'hsl(0 50% 30% / 0.5)' : 'hsl(0 0% 10%)'}`,
-                          }}
-                        >
-                          <div className="w-2 h-2 rounded-full" style={{ background: item.zoneColor, boxShadow: `0 0 4px ${item.zoneColor}60` }} />
-                          <span className="text-[10px] font-mono flex-1" style={{ color: 'hsl(0 0% 70%)' }}>
-                            {item.cropName}
-                          </span>
-                          <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
-                            Bed {item.bedNumber}
-                          </span>
-                          <span
-                            className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded"
-                            style={{
-                              color: item.daysLeft <= 0
-                                ? 'hsl(0 70% 65%)'
-                                : item.daysLeft <= 3
-                                  ? 'hsl(45 80% 60%)'
-                                  : 'hsl(140 50% 55%)',
-                              background: item.daysLeft <= 0
-                                ? 'hsl(0 50% 15%)'
-                                : item.daysLeft <= 3
-                                  ? 'hsl(45 40% 12%)'
-                                  : 'hsl(140 30% 10%)',
-                            }}
-                          >
-                            {item.daysLeft <= 0 ? 'READY' : `${item.daysLeft}d`}
-                          </span>
-                        </div>
-                      ))}
+                      {harvestItems.map((item, i) => {
+                        const suggestions = successionMap.get(i) || [];
+                        const isExpanded = expandedHarvest === i;
+                        return (
+                          <div key={i}>
+                            <button
+                              onClick={() => setExpandedHarvest(isExpanded ? null : i)}
+                              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors"
+                              style={{
+                                background: item.daysLeft <= 0
+                                  ? 'hsl(0 40% 10% / 0.5)'
+                                  : item.daysLeft <= 3
+                                    ? 'hsl(45 40% 10% / 0.3)'
+                                    : 'hsl(0 0% 6%)',
+                                border: `1px solid ${item.daysLeft <= 0 ? 'hsl(0 50% 30% / 0.5)' : isExpanded ? 'hsl(140 40% 25%)' : 'hsl(0 0% 10%)'}`,
+                              }}
+                            >
+                              <div className="w-2 h-2 rounded-full" style={{ background: item.zoneColor, boxShadow: `0 0 4px ${item.zoneColor}60` }} />
+                              <span className="text-[10px] font-mono flex-1" style={{ color: 'hsl(0 0% 70%)' }}>
+                                {item.cropName}
+                              </span>
+                              <span className="text-[8px] font-mono" style={{ color: 'hsl(0 0% 40%)' }}>
+                                Bed {item.bedNumber}
+                              </span>
+                              <span
+                                className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded"
+                                style={{
+                                  color: item.daysLeft <= 0
+                                    ? 'hsl(0 70% 65%)'
+                                    : item.daysLeft <= 3
+                                      ? 'hsl(45 80% 60%)'
+                                      : 'hsl(140 50% 55%)',
+                                  background: item.daysLeft <= 0
+                                    ? 'hsl(0 50% 15%)'
+                                    : item.daysLeft <= 3
+                                      ? 'hsl(45 40% 12%)'
+                                      : 'hsl(140 30% 10%)',
+                                }}
+                              >
+                                {item.daysLeft <= 0 ? 'READY' : `${item.daysLeft}d`}
+                              </span>
+                              {suggestions.length > 0 && (
+                                <RefreshCw
+                                  className="w-3 h-3 transition-transform"
+                                  style={{
+                                    color: isExpanded ? 'hsl(140 50% 55%)' : 'hsl(0 0% 30%)',
+                                    transform: isExpanded ? 'rotate(180deg)' : 'none',
+                                  }}
+                                />
+                              )}
+                            </button>
+
+                            {/* Succession Suggestions */}
+                            <AnimatePresence>
+                              {isExpanded && suggestions.length > 0 && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: 'auto', opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="ml-4 mt-1 mb-1 space-y-1">
+                                    <span className="text-[8px] font-mono tracking-widest block mb-1" style={{ color: 'hsl(140 40% 50%)' }}>
+                                      ↻ PLANT NEXT
+                                    </span>
+                                    {suggestions.map((s, si) => (
+                                      <div
+                                        key={si}
+                                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-md"
+                                        style={{
+                                          background: `${s.crop.zone_color}08`,
+                                          border: `1px solid ${s.crop.zone_color}20`,
+                                        }}
+                                      >
+                                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: s.crop.zone_color }} />
+                                        <span className="text-[9px] font-mono flex-1" style={{ color: `${s.crop.zone_color}cc` }}>
+                                          {s.crop.common_name || s.crop.name}
+                                        </span>
+                                        {s.crop.harvest_days && (
+                                          <span className="text-[7px] font-mono px-1 py-0.5 rounded" style={{ background: 'hsl(200 30% 12%)', color: 'hsl(200 50% 60%)' }}>
+                                            {s.crop.harvest_days}d
+                                          </span>
+                                        )}
+                                        <span className="text-[7px] font-mono px-1 py-0.5 rounded" style={{ background: 'hsl(0 0% 8%)', color: 'hsl(0 0% 50%)' }}>
+                                          {s.reasons[0]}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
