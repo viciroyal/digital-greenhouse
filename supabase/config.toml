@@ -17,3 +17,9 @@ verify_jwt = false
 
 [functions.populate-spacing]
 verify_jwt = false
+
+[functions.populate-seed-cost]
+verify_jwt = false
+
+[functions.populate-yield]
+verify_jwt = false
