@@ -7,6 +7,8 @@ import VirtualizedZoneTable from '@/components/crop-library/VirtualizedZoneTable
 import CropLibraryFilters from '@/components/crop-library/CropLibraryFilters';
 import { generateCsv } from '@/components/crop-library/csvExport';
 import { ZONE_ORDER } from '@/components/crop-library/constants';
+import { STATE_HARDINESS_ZONES, US_STATES } from '@/data/stateHardinessZones';
+import { cropFitsZone } from '@/lib/frostDates';
 
 const CropLibrary = () => {
   const { data: crops, isLoading, error } = useMasterCrops();
@@ -16,6 +18,7 @@ const CropLibrary = () => {
   const [selectedZone, setSelectedZone] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedHabit, setSelectedHabit] = useState<string | null>(null);
+  const [hardinessZone, setHardinessZone] = useState<number | null>(null);
 
   const categories = useMemo(() => {
     if (!crops) return [];
@@ -43,13 +46,14 @@ const CropLibrary = () => {
       if (selectedZone !== null && c.frequency_hz !== selectedZone) return false;
       if (selectedCategory && c.category !== selectedCategory) return false;
       if (selectedHabit && c.growth_habit?.toLowerCase() !== selectedHabit.toLowerCase()) return false;
+      if (hardinessZone !== null && !cropFitsZone(c.hardiness_zone_min, c.hardiness_zone_max, hardinessZone)) return false;
       if (q) {
         const haystack = `${c.common_name || ''} ${c.name} ${c.scientific_name || ''} ${c.zone_name} ${c.category} ${c.growth_habit || ''} ${c.dominant_mineral || ''}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
     });
-  }, [crops, searchQuery, selectedZone, selectedCategory, selectedHabit]);
+  }, [crops, searchQuery, selectedZone, selectedCategory, selectedHabit, hardinessZone]);
 
   const groupedByZone = useMemo(() =>
     ZONE_ORDER
@@ -138,6 +142,8 @@ const CropLibrary = () => {
             zoneNames={zoneNames}
             resultCount={filteredCrops.length}
             totalCount={totalCrops}
+            hardinessZone={hardinessZone}
+            onHardinessZoneChange={setHardinessZone}
           />
         )}
 

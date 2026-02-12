@@ -1,5 +1,6 @@
-import { Search, X } from 'lucide-react';
+import { Search, X, MapPin } from 'lucide-react';
 import { ZONE_ORDER } from './constants';
+import { STATE_HARDINESS_ZONES, US_STATES } from '@/data/stateHardinessZones';
 
 interface Props {
   searchQuery: string;
@@ -15,6 +16,8 @@ interface Props {
   zoneNames: Record<number, string>;
   resultCount: number;
   totalCount: number;
+  hardinessZone?: number | null;
+  onHardinessZoneChange?: (hz: number | null) => void;
 }
 
 const CropLibraryFilters = ({
@@ -24,14 +27,16 @@ const CropLibraryFilters = ({
   selectedHabit, onHabitChange,
   categories, habits, zoneNames,
   resultCount, totalCount,
+  hardinessZone, onHardinessZoneChange,
 }: Props) => {
-  const hasFilters = searchQuery || selectedZone !== null || selectedCategory !== null || selectedHabit !== null;
+  const hasFilters = searchQuery || selectedZone !== null || selectedCategory !== null || selectedHabit !== null || (hardinessZone !== null && hardinessZone !== undefined);
 
   const clearAll = () => {
     onSearchChange('');
     onZoneChange(null);
     onCategoryChange(null);
     onHabitChange(null);
+    onHardinessZoneChange?.(null);
   };
 
   return (
@@ -88,6 +93,31 @@ const CropLibraryFilters = ({
           <option key={h} value={h}>{h.charAt(0).toUpperCase() + h.slice(1)}</option>
         ))}
       </select>
+
+      {/* Hardiness Zone filter (by state) */}
+      {onHardinessZoneChange && (
+        <select
+          value={hardinessZone ?? ''}
+          onChange={(e) => {
+            if (e.target.value) {
+              const state = e.target.value;
+              const info = STATE_HARDINESS_ZONES[state];
+              if (info) onHardinessZoneChange(info.zone);
+            } else {
+              onHardinessZoneChange(null);
+            }
+          }}
+          className="text-xs font-apothecary bg-background border border-border rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary/50"
+        >
+          <option value="">All Zones (USDA)</option>
+          {US_STATES.map((state) => {
+            const info = STATE_HARDINESS_ZONES[state];
+            return (
+              <option key={state} value={state}>{info.abbr} — Zone {info.subZone}</option>
+            );
+          })}
+        </select>
+      )}
 
       {/* Result count + clear */}
       {hasFilters && (

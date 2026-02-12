@@ -1,9 +1,11 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Sprout, Sun, SunMedium, CloudSun, TreePine, Salad, CookingPot, Flower2, Leaf, Check, Printer, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Sprout, Sun, SunMedium, CloudSun, TreePine, Salad, CookingPot, Flower2, Leaf, Check, Printer, ChevronRight, MapPin, X } from 'lucide-react';
 import { useMasterCrops, type MasterCrop } from '@/hooks/useMasterCrops';
 import { companionScore, getSynergyNotes } from '@/lib/companionScoring';
+import { STATE_HARDINESS_ZONES, US_STATES } from '@/data/stateHardinessZones';
+import { getZoneAwarePlantingWindows, cropFitsZone } from '@/lib/frostDates';
 
 /* ─── WIZARD OPTIONS ─── */
 type SpaceOption = 'windowsill' | 'patio' | 'small-bed' | 'big-yard';
@@ -169,18 +171,28 @@ function getPlainInstructions(crop: MasterCrop, space: SpaceOption): string[] {
 const FirstGarden = () => {
   const navigate = useNavigate();
   const { data: allCrops, isLoading } = useMasterCrops();
-  const [step, setStep] = useState(0); // 0=space, 1=sun, 2=goal, 3=result
+  const [step, setStep] = useState(0); // 0=space, 1=sun, 2=goal, 3=zone, 4=result
   const [space, setSpace] = useState<SpaceOption | null>(null);
   const [sun, setSun] = useState<SunOption | null>(null);
   const [goal, setGoal] = useState<GoalOption | null>(null);
+  const [selectedState, setSelectedState] = useState<string | null>(null);
+  const [hardinessZone, setHardinessZone] = useState<number | null>(null);
+  const [hardinessSubZone, setHardinessSubZone] = useState<string | null>(null);
+
+  // Filter crops by hardiness zone before recipe generation
+  const zonedCrops = useMemo(() => {
+    if (!allCrops) return [];
+    if (!hardinessZone) return allCrops;
+    return allCrops.filter(c => cropFitsZone(c.hardiness_zone_min, c.hardiness_zone_max, hardinessZone));
+  }, [allCrops, hardinessZone]);
 
   const recipe = useMemo(() => {
-    if (!allCrops || !space || !sun || !goal) return [];
-    return pickRecipe(allCrops, space, sun, goal);
-  }, [allCrops, space, sun, goal]);
+    if (!zonedCrops || zonedCrops.length === 0 || !space || !sun || !goal) return [];
+    return pickRecipe(zonedCrops, space, sun, goal);
+  }, [zonedCrops, space, sun, goal]);
 
   const handleNext = () => {
-    if (step < 3) setStep(s => s + 1);
+    if (step < 4) setStep(s => s + 1);
   };
 
   const handleBack = () => {
@@ -192,12 +204,13 @@ const FirstGarden = () => {
     window.print();
   };
 
-  const canAdvance = (step === 0 && space) || (step === 1 && sun) || (step === 2 && goal);
+  const canAdvance = (step === 0 && space) || (step === 1 && sun) || (step === 2 && goal) || step === 3;
 
   const stepTitles = [
     'How much space do you have?',
     'How much sun does your spot get?',
     'What do you want to grow?',
+    'Where are you located?',
   ];
 
   return (
@@ -222,7 +235,7 @@ const FirstGarden = () => {
 
       {/* Progress dots */}
       <div className="flex justify-center gap-2 mb-8">
-        {[0, 1, 2, 3].map(i => (
+        {[0, 1, 2, 3, 4].map(i => (
           <div
             key={i}
             className="w-2.5 h-2.5 rounded-full transition-all duration-300"
@@ -236,8 +249,8 @@ const FirstGarden = () => {
 
       <div className="max-w-lg mx-auto px-4 pb-20">
         <AnimatePresence mode="wait">
-          {/* ─── STEPS 0-2: Questions ─── */}
-          {step < 3 && (
+          {/* ─── STEPS 0-3: Questions ─── */}
+          {step < 4 && step < 3 && (
             <motion.div
               key={`step-${step}`}
               initial={{ opacity: 0, x: 40 }}
@@ -309,7 +322,7 @@ const FirstGarden = () => {
                     cursor: canAdvance ? 'pointer' : 'not-allowed',
                   }}
                 >
-                  {step === 2 ? 'Show My Garden Plan' : 'Next'}
+                  {step === 2 ? 'Next' : 'Next'}
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -327,8 +340,92 @@ const FirstGarden = () => {
             </motion.div>
           )}
 
-          {/* ─── STEP 3: Result ─── */}
+          {/* ─── STEP 3: Zone Selection ─── */}
           {step === 3 && (
+            <motion.div
+              key="step-zone"
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -40 }}
+              transition={{ duration: 0.25 }}
+            >
+              <h2 className="text-xl font-bold text-center mb-2" style={{ color: 'hsl(0 0% 85%)' }}>
+                {stepTitles[3]}
+              </h2>
+              <p className="text-xs text-center mb-6" style={{ color: 'hsl(0 0% 45%)' }}>
+                Select your state to filter crops for your climate zone
+              </p>
+
+              <div
+                className="grid grid-cols-4 gap-1.5 max-h-64 overflow-y-auto rounded-xl p-3"
+                style={{ background: 'hsl(0 0% 6%)', border: '1px solid hsl(0 0% 12%)' }}
+              >
+                {US_STATES.map(state => {
+                  const info = STATE_HARDINESS_ZONES[state];
+                  const isActive = selectedState === state;
+                  return (
+                    <button
+                      key={state}
+                      onClick={() => {
+                        setSelectedState(state);
+                        setHardinessZone(info.zone);
+                        setHardinessSubZone(info.subZone);
+                      }}
+                      className="text-left px-2 py-1.5 rounded-md font-mono text-[10px] transition-all truncate"
+                      style={{
+                        background: isActive ? 'hsl(130 30% 12%)' : 'hsl(0 0% 7%)',
+                        border: `1.5px solid ${isActive ? 'hsl(130 50% 45%)' : 'hsl(0 0% 15%)'}`,
+                        color: isActive ? 'hsl(130 50% 65%)' : 'hsl(0 0% 55%)',
+                      }}
+                    >
+                      <span className="font-bold">{info.abbr}</span>
+                      <span className="ml-1 opacity-60">{info.subZone}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {selectedState && (
+                <div
+                  className="mt-3 px-3 py-2 rounded-xl flex items-center gap-2"
+                  style={{ background: 'hsl(130 30% 10%)', border: '1px solid hsl(130 50% 30% / 0.4)' }}
+                >
+                  <MapPin className="w-3.5 h-3.5" style={{ color: 'hsl(130 50% 55%)' }} />
+                  <span className="text-xs font-mono" style={{ color: 'hsl(130 50% 65%)' }}>
+                    {selectedState} — USDA Zone {hardinessSubZone}
+                  </span>
+                  <button
+                    onClick={() => {
+                      setSelectedState(null);
+                      setHardinessZone(null);
+                      setHardinessSubZone(null);
+                    }}
+                    className="ml-auto"
+                  >
+                    <X className="w-3.5 h-3.5" style={{ color: 'hsl(0 0% 45%)' }} />
+                  </button>
+                </div>
+              )}
+
+              <div className="mt-6 flex flex-col items-center gap-3">
+                <button
+                  onClick={handleNext}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200"
+                  style={{
+                    background: 'hsl(130 50% 45%)',
+                    color: 'hsl(0 0% 5%)',
+                    boxShadow: '0 4px 20px hsl(130 50% 45% / 0.3)',
+                  }}
+                >
+                  {selectedState ? 'Show My Garden Plan' : 'Skip — Show All Crops'}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ─── STEP 4: Result ─── */}
+          {step === 4 && (
             <motion.div
               key="result"
               initial={{ opacity: 0, y: 30 }}
@@ -349,6 +446,9 @@ const FirstGarden = () => {
                 </h2>
                 <p className="text-xs mt-1" style={{ color: 'hsl(0 0% 45%)' }}>
                   {space === 'windowsill' ? 'Windowsill' : space === 'patio' ? 'Patio containers' : space === 'small-bed' ? 'Small raised bed' : 'Yard beds'} · {sun === 'full' ? 'Full sun' : sun === 'partial' ? 'Partial sun' : 'Shade'} · {recipe.length} plants
+                  {selectedState && hardinessSubZone && (
+                    <span> · Zone {hardinessSubZone} ({STATE_HARDINESS_ZONES[selectedState]?.abbr})</span>
+                  )}
                 </p>
               </div>
 
@@ -394,7 +494,7 @@ const FirstGarden = () => {
                               <p className="text-[10px] italic" style={{ color: 'hsl(0 0% 35%)' }}>{crop.scientific_name}</p>
                             )}
 
-                            {/* Yield & cost badges */}
+                            {/* Yield, harvest & planting window badges */}
                             <div className="flex gap-2 mt-1.5 flex-wrap">
                               {crop.harvest_days && (
                                 <span className="text-[9px] font-mono px-1.5 py-0.5 rounded" style={{ background: 'hsl(200 30% 12%)', color: 'hsl(200 50% 65%)' }}>
@@ -404,6 +504,16 @@ const FirstGarden = () => {
                               {crop.est_yield_lbs_per_plant != null && (
                                 <span className="text-[9px] font-mono px-1.5 py-0.5 rounded" style={{ background: 'hsl(130 30% 12%)', color: 'hsl(130 50% 65%)' }}>
                                   ~{crop.est_yield_lbs_per_plant} lbs/plant
+                                </span>
+                              )}
+                              {crop.hardiness_zone_min != null && crop.hardiness_zone_max != null && (
+                                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5" style={{ background: 'hsl(140 30% 12%)', color: 'hsl(140 50% 60%)', border: '1px solid hsl(140 40% 25% / 0.3)' }}>
+                                  🌍 Zone {Math.floor(crop.hardiness_zone_min)}{crop.hardiness_zone_min % 1 >= 0.5 ? 'b' : 'a'}–{Math.floor(crop.hardiness_zone_max)}{crop.hardiness_zone_max % 1 >= 0.5 ? 'b' : 'a'}
+                                </span>
+                              )}
+                              {hardinessZone && crop.planting_season && crop.planting_season.length > 0 && (
+                                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5" style={{ background: 'hsl(200 40% 12%)', color: 'hsl(200 60% 60%)', border: '1px solid hsl(200 40% 25% / 0.3)' }}>
+                                  📅 {getZoneAwarePlantingWindows(crop.planting_season, hardinessZone).map(w => w.window).join(' · ')}
                                 </span>
                               )}
                             </div>
