@@ -30,35 +30,32 @@ serve(async (req) => {
 
     if (!roleData) throw new Error("Admin access required");
 
-    // Fetch crops that have only 1 planting season — they need expansion
-    const { data: crops, error: fetchErr } = await supabase
+    // Fetch all crops with seasons, then filter in JS to those needing expansion
+    const { data: allCropsRaw, error: fetchErr } = await supabase
       .from("master_crops")
       .select("id, name, common_name, scientific_name, category, growth_habit, planting_season, hardiness_zone_min, hardiness_zone_max, harvest_days")
       .not("planting_season", "is", null)
-      .order("name", { ascending: true })
-      .limit(40);
+      .order("name", { ascending: true });
+
+    // Filter to crops with < 3 seasons, then take first 80
+    const crops = (allCropsRaw || [])
+      .filter(c => (c.planting_season || []).length < 3)
+      .slice(0, 80);
 
     if (fetchErr) throw fetchErr;
 
-    // Filter to crops with fewer than 3 seasons (need expansion)
-    const needsExpansion = crops?.filter(c => {
-      const seasons = c.planting_season || [];
-      return seasons.length < 3;
-    }) || [];
-
-    if (needsExpansion.length === 0) {
-      // Count total remaining
-      const { data: allCrops } = await supabase
+    if (crops.length === 0) {
+      const { data: allCheck } = await supabase
         .from("master_crops")
         .select("planting_season")
         .not("planting_season", "is", null);
-      
-      const remaining = allCrops?.filter(c => (c.planting_season || []).length < 3).length || 0;
-      
-      return new Response(JSON.stringify({ message: "No crops need season expansion in this batch", updated: 0, remaining }), {
+      const remaining = allCheck?.filter(c => (c.planting_season || []).length < 3).length || 0;
+      return new Response(JSON.stringify({ message: "All crops have 3+ seasons", updated: 0, remaining }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const needsExpansion = crops;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
