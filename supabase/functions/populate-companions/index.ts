@@ -50,12 +50,12 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     // Build prompt with crop details for context
-    const cropList = crops.map(c => {
+    const cropList = crops.map((c, i) => {
       const name = c.common_name || c.name;
       const sci = c.scientific_name ? ` (${c.scientific_name})` : '';
       const habit = c.growth_habit ? `, ${c.growth_habit}` : '';
       const seasons = c.planting_season?.length ? `, seasons: ${c.planting_season.join('/')}` : '';
-      return `- ${name}${sci} [${c.category}${habit}${seasons}]`;
+      return `- [ID:${i}] ${name}${sci} [${c.category}${habit}${seasons}]`;
     }).join("\n");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -98,14 +98,14 @@ Rules:
                     items: {
                       type: "object",
                       properties: {
-                        common_name: { type: "string", description: "The crop common name as given in the input" },
+                        id: { type: "integer", description: "The numeric ID from the input list (e.g., 0, 1, 2...)" },
                         companions: {
                           type: "array",
                           items: { type: "string" },
                           description: "Array of companion plant common names (lowercase, 3-8 items)",
                         },
                       },
-                      required: ["common_name", "companions"],
+                      required: ["id", "companions"],
                       additionalProperties: false,
                     },
                   },
@@ -147,16 +147,16 @@ Rules:
     // Match and update
     let updated = 0;
     for (const entry of entries) {
-      const matchingCrop = crops.find(
-        c => (c.common_name || c.name).toLowerCase() === entry.common_name.toLowerCase()
-      );
-      if (matchingCrop && entry.companions && entry.companions.length > 0) {
+      const idx = entry.id;
+      if (idx == null || idx < 0 || idx >= crops.length) continue;
+      const crop = crops[idx];
+      if (entry.companions && entry.companions.length > 0) {
         const { error: updateErr } = await supabase
           .from("master_crops")
           .update({ companion_crops: entry.companions })
-          .eq("id", matchingCrop.id);
+          .eq("id", crop.id);
         if (!updateErr) updated++;
-        else console.error("Update error for", matchingCrop.id, updateErr);
+        else console.error("Update error for", crop.id, updateErr);
       }
     }
 
