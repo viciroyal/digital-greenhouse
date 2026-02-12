@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Calendar, Loader2, LogOut, Check, FlaskConical, Sprout, Users, MapPin, Clock, Ruler, DollarSign, TrendingUp } from 'lucide-react';
+import { ArrowLeft, User, Mail, Calendar, Loader2, LogOut, Check, FlaskConical, Sprout, Users, MapPin, Clock, Ruler, DollarSign, TrendingUp, Sun } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -349,6 +349,37 @@ const Profile = () => {
       }
       setPopulateStatus(`Done! ${totalUpdated} yield values updated.`);
       toast({ title: 'Yield data populated', description: `${totalUpdated} crops updated.` });
+    } catch (error: any) {
+      setPopulateStatus(null);
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsPopulating(false);
+    }
+  };
+
+  const handlePopulateSeasons = async () => {
+    setIsPopulating(true);
+    setPopulateStatus('Starting Season Expansion...');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+      let remaining = 1;
+      let totalUpdated = 0;
+      while (remaining > 0) {
+        const resp = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/populate-seasons`,
+          { method: 'POST', headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
+        );
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Failed');
+        totalUpdated += data.updated || 0;
+        remaining = data.remaining || 0;
+        setPopulateStatus(`Seasons: ${totalUpdated} expanded, ${remaining} remaining...`);
+        if (remaining === 0) break;
+        await new Promise(r => setTimeout(r, 1500));
+      }
+      setPopulateStatus(`Done! ${totalUpdated} crop seasons expanded.`);
+      toast({ title: 'Seasons expanded', description: `${totalUpdated} crops updated with additional planting seasons.` });
     } catch (error: any) {
       setPopulateStatus(null);
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
@@ -768,6 +799,29 @@ const Profile = () => {
                     <span className="flex items-center gap-2">
                       <TrendingUp className="w-4 h-4" />
                       POPULATE YIELD
+                    </span>
+                  )}
+                </Button>
+                <Button
+                  onClick={handlePopulateSeasons}
+                  variant="outline"
+                  className="w-full py-5 font-body tracking-wider"
+                  style={{
+                    background: 'hsl(40 20% 10%)',
+                    border: '1px solid hsl(40 40% 30%)',
+                    color: 'hsl(40 55% 60%)',
+                  }}
+                  disabled={isPopulating}
+                >
+                  {isPopulating && populateStatus?.includes('Season') ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {populateStatus}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Sun className="w-4 h-4" />
+                      EXPAND SEASONS
                     </span>
                   )}
                 </Button>
