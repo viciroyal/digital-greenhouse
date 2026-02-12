@@ -35,7 +35,7 @@ serve(async (req) => {
       .select("id, name, common_name, scientific_name, category, growth_habit, root_depth_inches")
       .is("spacing_inches", null)
       .order("frequency_hz", { ascending: true })
-      .limit(40);
+      .limit(80);
 
     if (fetchErr) throw fetchErr;
     if (!crops || crops.length === 0) {
