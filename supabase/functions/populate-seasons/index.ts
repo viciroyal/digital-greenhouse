@@ -174,10 +174,28 @@ Rules:
     }
 
     const aiData = await response.json();
-    const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall) throw new Error("No tool call in AI response");
+    let entries: any[];
 
-    const { entries } = JSON.parse(toolCall.function.arguments);
+    const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
+    if (toolCall?.function?.arguments) {
+      entries = JSON.parse(toolCall.function.arguments).entries;
+    } else {
+      // Fallback: parse JSON from content when tool_calls missing
+      const content = aiData.choices?.[0]?.message?.content || "";
+      let cleaned = content.trim();
+      if (cleaned.startsWith("```")) {
+        cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+      }
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        entries = parsed.entries;
+      }
+      if (!entries!) {
+        console.error("AI response had no tool call or parseable content:", JSON.stringify(aiData).substring(0, 500));
+        throw new Error("Could not extract structured data from AI response");
+      }
+    }
 
     let updated = 0;
     const validSeasons = new Set(["Spring", "Summer", "Fall", "Winter"]);
