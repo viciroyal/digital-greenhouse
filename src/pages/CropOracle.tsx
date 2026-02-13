@@ -560,6 +560,22 @@ const CropOracle = () => {
     return candidates.sort((a, b) => (a.common_name || a.name).localeCompare(b.common_name || b.name));
   }, [allCrops, environment, hardinessZone, currentSeason]);
 
+  /* ─── Family counts for star candidates ─── */
+  const FAMILY_KEYWORDS = ['tomato', 'pepper', 'bean', 'squash', 'lettuce', 'kale', 'corn', 'cucumber', 'melon', 'onion', 'garlic', 'potato', 'carrot', 'beet', 'radish', 'pea', 'eggplant', 'cabbage', 'broccoli', 'spinach', 'chard', 'celery', 'turnip', 'okra', 'pumpkin', 'zucchini', 'basil', 'mint', 'thyme', 'sage', 'oregano', 'dill', 'parsley', 'cilantro', 'rosemary', 'lavender', 'sunflower', 'marigold', 'nasturtium', 'beetroot', 'fennel', 'leek', 'shallot', 'chive', 'strawberry', 'blueberry', 'raspberry', 'watermelon', 'cantaloupe', 'tomatillo', 'moringa', 'cassava', 'taro', 'yam', 'breadfruit', 'jackfruit', 'guava', 'mango', 'papaya', 'banana', 'cacao', 'vanilla', 'turmeric', 'ginger', 'lemongrass', 'cardamom', 'avocado', 'fig', 'pomegranate', 'passion fruit', 'dragon fruit', 'amaranth', 'quinoa', 'sorghum', 'millet', 'clover', 'comfrey', 'alfalfa'];
+  const getCropFamilyKey = (c: MasterCrop): string => {
+    const fullName = `${(c.common_name || '')} ${c.name}`.toLowerCase();
+    const matched = FAMILY_KEYWORDS.find(f => fullName.includes(f));
+    return matched || c.name.toLowerCase().split('_')[0];
+  };
+  const familyCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const c of starCandidates) {
+      const fam = getCropFamilyKey(c);
+      counts[fam] = (counts[fam] || 0) + 1;
+    }
+    return counts;
+  }, [starCandidates]);
+
   /* ─── Total crops matching hardiness zone (across all frequency zones) ─── */
   const zoneMatchCount = useMemo(() => {
     if (!allCrops || !hardinessZone) return null;
@@ -2109,19 +2125,30 @@ const CropOracle = () => {
               >
                 <button
                   onClick={() => { setShowStarPicker(!showStarPicker); setStarSearchQuery(''); }}
-                  className="w-full py-3 rounded-xl font-mono text-xs tracking-wider flex items-center justify-center gap-2 transition-all"
+                  className="w-full py-4 rounded-2xl font-mono text-sm tracking-wider flex items-center justify-center gap-3 transition-all"
                   style={{
                     background: starCrop
-                      ? `linear-gradient(135deg, ${selectedZone.color}12, hsl(0 0% 6%))`
-                      : 'hsl(0 0% 6%)',
-                    border: `1px solid ${starCrop ? selectedZone.color + '40' : 'hsl(0 0% 12%)'}`,
+                      ? `linear-gradient(135deg, ${selectedZone.color}18, hsl(45 80% 20% / 0.2), hsl(0 0% 6%))`
+                      : 'linear-gradient(135deg, hsl(45 80% 20% / 0.15), hsl(0 0% 6%))',
+                    border: `1.5px solid ${starCrop ? selectedZone.color + '50' : 'hsl(45 80% 40% / 0.3)'}`,
                     color: starCrop ? selectedZone.color : 'hsl(45 80% 55%)',
+                    boxShadow: starCrop
+                      ? `0 0 20px ${selectedZone.color}15, inset 0 1px 0 ${selectedZone.color}10`
+                      : '0 0 15px hsl(45 80% 40% / 0.08), inset 0 1px 0 hsl(45 80% 55% / 0.05)',
                   }}
                 >
-                  <span className="text-base">🌟</span>
-                  {starCrop
-                    ? `STAR: ${(starCrop.common_name || starCrop.name).toUpperCase()}`
-                    : 'CHOOSE YOUR STAR CROP'}
+                  <span className="text-xl">🌟</span>
+                  <span className="flex flex-col items-start">
+                    <span className="text-xs font-bold">
+                      {starCrop
+                        ? `STAR: ${(starCrop.common_name || starCrop.name).toUpperCase()}`
+                        : 'CHOOSE YOUR STAR CROP'}
+                    </span>
+                    <span className="text-[9px] font-body opacity-50 tracking-normal">
+                      {starCrop ? 'Tap to change · Recipe built around your star' : `${starCandidates.length.toLocaleString()} crops available · Search the full registry`}
+                    </span>
+                  </span>
+                  {!starCrop && <Search className="w-4 h-4 ml-auto opacity-40" />}
                 </button>
 
                 <AnimatePresence>
@@ -2245,6 +2272,18 @@ const CropOracle = () => {
                                       {crop.chord_interval ? ` • ${crop.chord_interval}` : ''}
                                       {crop.dominant_mineral ? ` • ${crop.dominant_mineral}` : ''}
                                     </span>
+                                    {(() => {
+                                      const fam = getCropFamilyKey(crop);
+                                      const count = familyCounts[fam] || 1;
+                                      return count > 1 ? (
+                                        <span className="text-[8px] font-mono px-1.5 py-0.5 rounded-full shrink-0" style={{
+                                          background: 'hsl(45 60% 30% / 0.2)',
+                                          color: 'hsl(45 60% 60%)',
+                                        }}>
+                                          {count} {fam}
+                                        </span>
+                                      ) : null;
+                                    })()}
                                     <GrowthHabitBadge habit={crop.growth_habit} size="sm" />
                                     <TrapCropBadge description={crop.description} guildRole={crop.guild_role} size="sm" />
                                   </div>
@@ -3117,7 +3156,7 @@ const CropOracle = () => {
                     onChange={e => setSearchQuery(e.target.value)}
                     placeholder={swapSlotIndex !== null
                       ? `Search to swap ${INTERVAL_ORDER[swapSlotIndex].label}...`
-                      : 'Search by name, category, mineral, guild role, element, season...'
+                      : `Search ${(allCrops?.length || 0).toLocaleString()} crops by name, family, mineral, season...`
                     }
                     className="bg-transparent flex-1 text-sm font-body outline-none"
                     style={{ color: 'hsl(0 0% 80%)' }}
@@ -3186,6 +3225,18 @@ const CropOracle = () => {
                                 {crop.frequency_hz}Hz • {zoneData?.name || crop.zone_name} • {crop.category}
                                 {crop.chord_interval && ` • ${crop.chord_interval}`}
                               </span>
+                              {(() => {
+                                const fam = getCropFamilyKey(crop);
+                                const count = familyCounts[fam] || 1;
+                                return count > 1 ? (
+                                  <span className="text-[8px] font-mono px-1.5 py-0.5 rounded-full shrink-0" style={{
+                                    background: 'hsl(45 60% 30% / 0.2)',
+                                    color: 'hsl(45 60% 60%)',
+                                  }}>
+                                    {count} {fam}
+                                  </span>
+                                ) : null;
+                              })()}
                               <GrowthHabitBadge habit={crop.growth_habit} size="sm" />
                               <TrapCropBadge description={crop.description} guildRole={crop.guild_role} size="sm" />
                             </div>
