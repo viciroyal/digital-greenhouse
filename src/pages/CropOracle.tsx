@@ -774,10 +774,14 @@ const CropOracle = () => {
 
     // Seeded rotation: pick from candidates using recipeSeed, preferring harmonically-scored crops
     // Family-diversity: penalize crops whose family appeared in the same slot last shuffle
+    const KNOWN_FAMILIES = ['tomato', 'pepper', 'bean', 'squash', 'lettuce', 'kale', 'corn', 'cucumber', 'melon', 'onion', 'garlic', 'potato', 'carrot', 'beet', 'radish', 'pea', 'eggplant', 'cabbage', 'broccoli', 'spinach', 'chard', 'celery', 'turnip', 'okra', 'pumpkin', 'zucchini', 'basil', 'mint', 'thyme', 'sage', 'oregano', 'dill', 'parsley', 'cilantro', 'rosemary', 'lavender', 'sunflower', 'marigold', 'nasturtium', 'beetroot', 'fennel', 'leek', 'shallot', 'chive', 'strawberry', 'blueberry', 'raspberry', 'watermelon', 'cantaloupe', 'tomatillo'];
     const getCropFamily = (c: MasterCrop): string => {
-      // Extract family from name: e.g. "pepper_jalapeno" → "pepper", "tomato_cherry" → "tomato"
-      const base = (c.common_name || c.name).toLowerCase().split(/[\s(]/)[0];
-      return base;
+      // Check common_name and internal name for known family keywords
+      const fullName = `${(c.common_name || '')} ${c.name}`.toLowerCase();
+      const matched = KNOWN_FAMILIES.find(f => fullName.includes(f));
+      if (matched) return matched;
+      // Fallback: use the internal name's base (before underscore)
+      return c.name.toLowerCase().split('_')[0];
     };
     let pickCounter = 0;
     let hasSentinelInRecipe = starCrop ? isSentinelOrTrap(starCrop) : false;
