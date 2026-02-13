@@ -77,7 +77,7 @@ const DevGuide = () => {
           DEVELOPER GUIDE
         </h1>
         <p className="text-center font-['Space_Mono'] text-xs mb-8" style={{ color: 'hsl(0 0% 45%)' }}>
-          Technical documentation • File structure • Best practices • v2.0
+          Technical documentation • File structure • Best practices • v3.0
         </p>
 
         <Section title="ARCHITECTURE OVERVIEW">
@@ -86,7 +86,9 @@ const DevGuide = () => {
           <p><strong>State:</strong> React Query for server state (Infinity staleTime for static crop data), useState for local UI state. No Redux or Zustand needed.</p>
           <p><strong>Environments:</strong> Pot, Raised Bed, Farm (Pro), High Tunnel (Pro), Food Forest (Pro). Each environment applies custom recipe filtering logic.</p>
           <p><strong>Performance:</strong> All secondary routes use <code>React.lazy()</code> for code splitting. Only the landing page (Index) loads eagerly for instant first paint. CropRow components use <code>React.memo()</code> to prevent unnecessary re-renders. The Crop Library uses <code>@tanstack/react-virtual</code> for row virtualization.</p>
-          <p><strong>Data completeness:</strong> All 1,684 crops have 100% population across all 6 AI-batch fields: growth_habit, scientific_name, planting_season, harvest_days, root_depth_inches, min_container_gal.</p>
+          <p><strong>Data completeness:</strong> All 2,188 crops have 100% population across all AI-batch fields: growth_habit, scientific_name, planting_season, harvest_days, root_depth_inches, min_container_gal, hardiness zones, spacing, seed cost, yield, companions, and descriptions (745 curated, remainder uses fallback metadata).</p>
+          <p><strong>Shuffle diversity:</strong> The recipe engine uses a scoring penalty system with a 2-shuffle cooldown window: −18 for families used in the most recent shuffle, −10 for the 2nd-to-last, and −10 cross-slot penalty within the same recipe. Word-boundary regex prevents false positives.</p>
+          <p><strong>Locking system:</strong> Individual crop slots can be locked/unlocked. LOCK ALL / UNLOCK ALL buttons manage all slots. Locked slots persist across shuffles via <code>lockedSlots</code> Set and <code>manualOverrides</code> object, which are kept in sync.</p>
         </Section>
 
         <Section title="FILE STRUCTURE">
@@ -160,14 +162,19 @@ const DevGuide = () => {
     ├── cropOracle.test.ts
     ├── zoneProtocol.test.ts
     ├── jazzVoicingFungi.test.ts
-    └── birthchart.test.ts`}</Code>
+    ├── birthchart.test.ts
+    ├── companionScoring.test.ts  # Antagonist & synergy math
+    ├── pickRecipe.test.ts        # Diversity enforcement & category limits
+    ├── successionEngine.test.ts  # Rotation & nitrogen-fixer bonuses
+    └── autoGeneration.test.ts    # Brix/Sprinter scoring & vibrational dissonance`}</Code>
         </Section>
 
         <Section title="DATABASE SCHEMA">
           <p>All data lives in Lovable Cloud (Supabase). Key tables:</p>
-          <Code>{`master_crops       — 1,684 crops with frequency_hz, zone, Brix targets, chord_interval,
+          <Code>{`master_crops       — 2,188 crops with frequency_hz, zone, Brix targets, chord_interval,
                      spacing, growth_habit, root_depth_inches, min_container_gal,
-                     scientific_name, hardiness zones, planting_season, harvest_days
+                     scientific_name, hardiness zones, planting_season, harvest_days,
+                     description (745 curated), seed_cost_cents, est_yield_lbs_per_plant
 garden_beds        — User garden beds with zone assignment, Brix readings, inoculants
 bed_plantings      — Crops planted in specific beds with guild roles
 saved_recipes      — User-saved chord recipes (environment + zone + chord data)
@@ -353,26 +360,42 @@ const MyPage = lazy(() => import("./pages/MyPage"));
         <Section title="EDGE FUNCTIONS">
           <p>Backend functions live in <code>supabase/functions/</code>:</p>
           <Code>{`supabase/functions/
-├── griot-oracle/index.ts       — AI advisor (Lovable AI gateway)
-├── populate-crop-data/index.ts — Batch AI data population
-├── populate-scientific-names/  — Scientific name population (legacy)`}</Code>
-          <p>Edge functions deploy automatically. The <code>populate-crop-data</code> function supports batch-filling fields: <code>growth_habit</code>, <code>scientific_name</code>, <code>planting_season</code>, <code>harvest_days</code>, <code>root_depth_inches</code>, <code>min_container_gal</code>. All 6 fields are now <strong>100% populated</strong> across all 1,684 crops.</p>
+├── griot-oracle/index.ts          — AI advisor (Lovable AI gateway)
+├── populate-crop-data/index.ts    — Batch AI data population (growth_habit, etc.)
+├── populate-descriptions/         — AI-generated crop descriptions (Gemini 2.5 Flash)
+├── populate-companions/           — Companion crop relationships
+├── populate-hardiness/            — USDA hardiness zone ranges
+├── populate-harvest-days/         — Days to harvest
+├── populate-seasons/              — Planting season arrays
+├── populate-seed-cost/            — Seed cost estimates
+├── populate-spacing/              — Plant spacing data
+├── populate-yield/                — Yield per plant estimates
+├── populate-tropical-crops/       — Tropical crop additions
+├── populate-scientific-names/     — Scientific name population (legacy)`}</Code>
+          <p>Edge functions deploy automatically. All data population fields are <strong>100% populated</strong> across 2,188 crops. The <code>populate-descriptions</code> function generates evocative 1-2 sentence descriptions using Gemini 2.5 Flash, currently covering 745 crops with fallback metadata for the remainder.</p>
           <Code>{`// Usage: POST /populate-crop-data
-{ "field": "growth_habit" }  // Fills 50 crops per batch`}</Code>
+{ "field": "growth_habit" }  // Fills 50 crops per batch
+
+// Usage: POST /populate-descriptions
+// Fills 50 crops per batch with AI-generated descriptions`}</Code>
         </Section>
 
         <Section title="TESTING">
-          <p>Tests live in <code>src/test/</code> and use Vitest + React Testing Library.</p>
+          <p>Tests live in <code>src/test/</code> and use Vitest + React Testing Library. 100+ automated tests across 11 files.</p>
           <Code>{`# Run all tests
 bun run test
 
 # Key test files:
-src/test/soilCalculator.test.ts   — Soil mix math (17 tests)
-src/test/lunarPhase.test.ts       — Moon phase accuracy (12 tests)
-src/test/cropOracle.test.ts       — Zone mapping & chords (11 tests)
-src/test/zoneProtocol.test.ts     — Instrument integrity (8 tests)
-src/test/jazzVoicingFungi.test.ts — Fungi mapping
-src/test/birthchart.test.ts       — Astro calculator`}</Code>
+src/test/soilCalculator.test.ts      — Soil mix math (17 tests)
+src/test/lunarPhase.test.ts          — Moon phase accuracy (12 tests)
+src/test/cropOracle.test.ts          — Zone mapping & chords (11 tests)
+src/test/zoneProtocol.test.ts        — Instrument integrity (8 tests)
+src/test/companionScoring.test.ts    — Antagonist & synergy scoring
+src/test/pickRecipe.test.ts          — Diversity enforcement & category limits
+src/test/successionEngine.test.ts    — Rotation & nitrogen-fixer bonuses
+src/test/autoGeneration.test.ts      — Brix/Sprinter scoring & vibrational dissonance
+src/test/jazzVoicingFungi.test.ts    — Fungi mapping
+src/test/birthchart.test.ts          — Astro calculator`}</Code>
           <p><strong>Test naming:</strong> <code>[feature].test.ts</code> for pure logic, <code>[Component].test.tsx</code> for UI.</p>
         </Section>
 
@@ -387,7 +410,7 @@ src/test/birthchart.test.ts       — Astro calculator`}</Code>
         </Section>
 
         <p className="text-center font-['Space_Mono'] text-[10px] mt-8" style={{ color: 'hsl(0 0% 30%)' }}>
-          PharmBoi Developer Guide • v2.0 • {new Date().toISOString().split('T')[0]}
+          PharmBoi Developer Guide • v3.0 • {new Date().toISOString().split('T')[0]}
         </p>
       </main>
     </div>

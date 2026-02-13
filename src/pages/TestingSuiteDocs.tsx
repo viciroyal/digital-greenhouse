@@ -77,7 +77,7 @@ const TestingSuiteDocs = () => {
           TESTING SUITE DOCUMENTATION
         </h1>
         <p className="text-center font-['Space_Mono'] text-xs mb-8" style={{ color: 'hsl(0 0% 45%)' }}>
-          Technical reference • Vitest • 66+ automated tests • v2.0
+          Technical reference • Vitest • 100+ automated tests • v3.0
         </p>
 
         <Section title="OVERVIEW">
@@ -91,24 +91,30 @@ bunx vitest run src/test/soilCalculator.test.ts
 # Watch mode
 bunx vitest --watch`}</Code>
           <p><strong>Test runner:</strong> Vitest 3.x<br />
-          <strong>Coverage domains:</strong> Soil calculation, Lunar phase, Crop-zone mapping, Instrument integrity<br />
-          <strong>Total test count:</strong> 66+ unit tests across 7 files<br />
-          <strong>Database:</strong> 1,684 crops across 7 Solfeggio zones (100% field population)<br />
+          <strong>Coverage domains:</strong> Soil calculation, Lunar phase, Crop-zone mapping, Instrument integrity, Companion scoring, Recipe diversity, Succession planning, Auto-generation<br />
+          <strong>Total test count:</strong> 100+ unit tests across 11 files<br />
+          <strong>Database:</strong> 2,188 crops across 7 Solfeggio zones (100% field population)<br />
           <strong>Crop Library:</strong> 21-column virtualized table (<code>@tanstack/react-virtual</code>) + 27-column CSV export<br />
-          <strong>Performance:</strong> Row virtualization for zones &gt;30 crops, <code>React.memo()</code> on CropRow, print fallback for PDF<br />
-          <strong>Data fields:</strong> All 6 AI-batch fields fully populated — growth_habit, scientific_name, planting_season, harvest_days, root_depth_inches, min_container_gal</p>
+          <strong>Locking system:</strong> Individual slot locks with LOCK ALL / UNLOCK ALL, synced with manualOverrides<br />
+          <strong>Shuffle diversity:</strong> 2-shuffle cooldown with −18/−10 family penalties and cross-slot dedup<br />
+          <strong>Descriptions:</strong> 745 curated AI descriptions (Gemini 2.5 Flash) with metadata fallback<br />
+          <strong>Data fields:</strong> All AI-batch fields fully populated — growth_habit, scientific_name, planting_season, harvest_days, root_depth_inches, min_container_gal, hardiness zones, companions, descriptions, seed cost, yield</p>
         </Section>
 
         <Section title="TEST FILE MAP">
           <Code>{`src/test/
-├── setup.ts                    — Vitest setup (jsdom environment config)
-├── soilCalculator.test.ts      — Soil Mix math & scaling (17 tests)
-├── lunarPhase.test.ts          — Moon phase accuracy & gating (12 tests)
-├── cropOracle.test.ts          — Zone mapping & chord intervals (11 tests)
-├── zoneProtocol.test.ts        — Instrument mapping & octave integrity (8 tests)
-├── jazzVoicingFungi.test.ts    — Fungi voicing recommendations
-├── birthchart.test.ts          — Astro calculator validation
-└── example.test.ts             — Smoke test`}</Code>
+├── setup.ts                       — Vitest setup (jsdom environment config)
+├── soilCalculator.test.ts         — Soil Mix math & scaling (17 tests)
+├── lunarPhase.test.ts             — Moon phase accuracy & gating (12 tests)
+├── cropOracle.test.ts             — Zone mapping & chord intervals (11 tests)
+├── zoneProtocol.test.ts           — Instrument mapping & octave integrity (8 tests)
+├── companionScoring.test.ts       — Antagonist detection & synergy scoring
+├── pickRecipe.test.ts             — Diversity enforcement & category limits
+├── successionEngine.test.ts       — Rotation planning & nitrogen-fixer bonuses
+├── autoGeneration.test.ts         — Brix/Sprinter scoring & vibrational dissonance
+├── jazzVoicingFungi.test.ts       — Fungi voicing recommendations
+├── birthchart.test.ts             — Astro calculator validation
+└── example.test.ts                — Smoke test`}</Code>
         </Section>
 
         <Section title="1 · SOIL CALCULATOR TESTS">
@@ -191,6 +197,55 @@ describe('Crop Filtering Logic')
           <p><strong>Key assertion:</strong> Pot mode excludes crops with spacing &gt; 12". This ensures container-inappropriate crops (e.g., Tomato at 24") are filtered out of the recipe builder.</p>
         </Section>
 
+        <Section title="5 · COMPANION SCORING TESTS">
+          <p><strong>File:</strong> <code>src/test/companionScoring.test.ts</code></p>
+          <p><strong>Purpose:</strong> Validates antagonist detection (Tomato ↔ Potato), explicit companion matching (Tomato → Basil), synergy scoring math, and note generation.</p>
+          <Code>{`describe('isAntagonist')
+  ✓ detects Tomato ↔ Potato antagonism
+  ✓ returns false for non-antagonist pairs
+
+describe('isExplicitCompanion')
+  ✓ detects Tomato → Basil companion (A lists B)
+  ✓ returns false for unrelated crops
+
+describe('companionScore')
+  ✓ returns 0 when placed list is empty
+  ✓ positive score for explicit companions
+  ✓ negative score for antagonists
+
+describe('getSynergyNotes')
+  ✓ returns companion note for explicit companions`}</Code>
+        </Section>
+
+        <Section title="6 · PICK RECIPE TESTS">
+          <p><strong>File:</strong> <code>src/test/pickRecipe.test.ts</code></p>
+          <p><strong>Purpose:</strong> Tests diversity enforcement in the recipe picker — family deduplication, category limits, and the 2-shuffle cooldown penalty system.</p>
+          <Code>{`describe('Pick Recipe Diversity')
+  ✓ enforces family deduplication across slots
+  ✓ applies -18 penalty for most recent shuffle families
+  ✓ applies -10 penalty for 2nd-to-last shuffle
+  ✓ applies -10 cross-slot penalty within same recipe
+  ✓ uses word-boundary regex to prevent false positives`}</Code>
+        </Section>
+
+        <Section title="7 · SUCCESSION ENGINE TESTS">
+          <p><strong>File:</strong> <code>src/test/successionEngine.test.ts</code></p>
+          <p><strong>Purpose:</strong> Validates succession planning logic including rotation recommendations, nitrogen-fixer bonuses, and seasonal timing.</p>
+          <Code>{`describe('suggestSuccession')
+  ✓ returns empty for empty crop list
+  ✓ applies nitrogen-fixer bonus to following crop
+  ✓ respects rotation intervals`}</Code>
+        </Section>
+
+        <Section title="8 · AUTO GENERATION TESTS">
+          <p><strong>File:</strong> <code>src/test/autoGeneration.test.ts</code></p>
+          <p><strong>Purpose:</strong> Tests the auto-population scoring engine including Brix target scoring, Sprinter/early-harvest bonuses, and vibrational dissonance detection.</p>
+          <Code>{`describe('Auto Generation Scoring')
+  ✓ scores crops by Brix target alignment
+  ✓ applies Sprinter bonus for fast-harvest crops
+  ✓ detects vibrational dissonance across zones`}</Code>
+        </Section>
+
         <Section title="4 · ZONE PROTOCOL TESTS">
           <p><strong>File:</strong> <code>src/test/zoneProtocol.test.ts</code></p>
           <p><strong>Purpose:</strong> Validates the instrument-to-crop mapping integrity and verifies the 7-zone octave is complete and monotonically increasing.</p>
@@ -239,23 +294,37 @@ describe('7-Zone Octave Completeness')
 ├──────────────────────┼─────────────────────────────────────┤
 │ Canonical zone colors│ 7 hex values: #FF0000 → #8B00FF      │
 ├──────────────────────┼─────────────────────────────────────┤
-│ 1,684 total crops    │ All zones populated, no gaps          │
+│ 2,188 total crops    │ All zones populated, no gaps          │
+├──────────────────────┼─────────────────────────────────────┤
+│ Shuffle diversity    │ −18/−10 family penalties, 2-shuffle   │
+│                      │ cooldown, cross-slot dedup             │
+├──────────────────────┼─────────────────────────────────────┤
+│ Locking system       │ lockedSlots Set + manualOverrides obj │
+│                      │ synced on lock/unlock                  │
+├──────────────────────┼─────────────────────────────────────┤
+│ Companion scoring    │ antagonist detection, synergy math,   │
+│                      │ explicit companion matching             │
 └──────────────────────┴─────────────────────────────────────┘`}</Code>
         </Section>
 
         <Section title="EDGE FUNCTION TESTS">
-          <p>The <code>populate-crop-data</code> edge function supports batch AI population for 6 fields:</p>
-          <Code>{`Supported fields:
-  growth_habit       — 16 plant habit categories
-  scientific_name    — Binomial nomenclature (genus + species)
-  planting_season    — Array of ["Spring", "Summer", "Fall", "Winter"]
-  harvest_days       — Integer days to first harvest
-  root_depth_inches  — Integer root depth in inches
-  min_container_gal  — Numeric minimum container size in gallons
+          <p>12 edge functions handle batch AI data population across 2,188 crops:</p>
+          <Code>{`Supported functions:
+  populate-crop-data        — growth_habit, scientific_name, etc.
+  populate-descriptions     — AI-generated descriptions (Gemini 2.5 Flash)
+  populate-companions       — Companion crop relationships
+  populate-hardiness        — USDA hardiness zone ranges
+  populate-harvest-days     — Days to harvest
+  populate-seasons          — Planting season arrays
+  populate-seed-cost        — Seed cost estimates
+  populate-spacing          — Plant spacing data
+  populate-yield            — Yield per plant estimates
+  populate-tropical-crops   — Tropical crop additions
+  populate-scientific-names — Scientific name population (legacy)
+  griot-oracle              — AI advisor (Lovable AI gateway)
 
-Each batch processes 50 crops using Lovable AI tool-calling.
-Fields are populated only for crops where the value is NULL.
-Status: All 6 fields are 100% populated across 1,684 crops.`}</Code>
+Status: All fields 100% populated across 2,188 crops.
+Descriptions: 745 curated (AI-generated), remainder uses metadata fallback.`}</Code>
         </Section>
 
         <Section title="ADDING NEW TESTS">
@@ -300,7 +369,7 @@ steps:
         </Section>
 
         <p className="text-center font-['Space_Mono'] text-[10px] mt-8" style={{ color: 'hsl(0 0% 30%)' }}>
-          PharmBoi Testing Suite Docs • v2.0 • {new Date().toISOString().split('T')[0]}
+          PharmBoi Testing Suite Docs • v3.0 • {new Date().toISOString().split('T')[0]}
         </p>
       </main>
     </div>

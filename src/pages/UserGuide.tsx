@@ -84,7 +84,7 @@ const UserGuide = () => {
         <Section title="What Is This App?" emoji="🤔">
           <p>PharmBoi is a <strong>garden planning tool</strong> that helps you figure out what to plant, where to plant it, and how to take care of your soil. Think of it like a recipe book — but for growing food!</p>
           <p>The app uses <strong>music ideas</strong> (like keys on a piano) to organize plants into groups called <strong>"Zones."</strong> Each zone has a color and a purpose, just like notes in a song work together.</p>
-          <p>The registry contains <strong>1,684 crops</strong> across 7 Solfeggio frequency zones — from tomatoes and herbs to fruit trees and medicinal mushrooms. Every crop includes scientific names, growth habits, container sizing, root depth, and hardiness zone data.</p>
+          <p>The registry contains <strong>2,188 crops</strong> across 7 Solfeggio frequency zones — from tomatoes and herbs to fruit trees and medicinal mushrooms. Every crop includes scientific names, growth habits, container sizing, root depth, hardiness zone data, and many have <strong>curated descriptions</strong> that appear when you hover over crop names.</p>
         </Section>
 
         <Section title="The Home Page (The Stage)" emoji="🎤">
@@ -121,6 +121,7 @@ const UserGuide = () => {
             <li>⚓ <strong>The Stabilizer</strong> — Feeds the soil</li>
             <li>🦋 <strong>The Signal</strong> — Attracts bees and butterflies</li>
           </ul>
+          <p>You can <strong>lock</strong> any crop slot by clicking the 🔒 icon next to it. Locked crops stay put when you shuffle! Use <strong>LOCK ALL</strong> / <strong>UNLOCK ALL</strong> to manage all slots at once.</p>
         </Section>
 
         <Section title="Pro Mode (13th Chord)" emoji="🎹">
@@ -164,7 +165,7 @@ const UserGuide = () => {
         </Section>
 
         <Section title="Container Sizing" emoji="🪴">
-          <p>All <strong>1,684 crops</strong> include <strong>root depth</strong> and <strong>minimum container size</strong> data:</p>
+          <p>All <strong>2,188 crops</strong> include <strong>root depth</strong> and <strong>minimum container size</strong> data:</p>
           <ul className="list-disc pl-5 space-y-1">
             <li><strong>Root Depth (inches)</strong> — How deep the roots go. Shallow herbs are 6-12", deep trees 36-72"+</li>
             <li><strong>Min Container (gallons)</strong> — The smallest pot that will work. Small herbs need 1-2 gal, trees need 15-25+ gal</li>
@@ -174,6 +175,21 @@ const UserGuide = () => {
 
         <Section title="Setting a Star Crop" emoji="⭐">
           <p>Don't like the auto-picked main crop? Click <strong>"Pick Star"</strong> to search and choose your own favorite. The rest of the recipe will rebuild around your Star.</p>
+        </Section>
+
+        <Section title="Locking & Shuffling Crops" emoji="🔒">
+          <p>Click the <strong>lock icon</strong> (🔒) next to any crop to <strong>pin it in place</strong>. When you hit <strong>SHUFFLE VOICING</strong>, only unlocked slots change — your locked favorites stay put!</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>LOCK ALL</strong> — Locks every slot (shuffle won't change anything)</li>
+            <li><strong>UNLOCK ALL</strong> — Frees every slot for a full shuffle</li>
+            <li>Lock 2 of 3 slots to experiment with just one position</li>
+            <li>The shuffle counter shows how many slots are locked (e.g., "2 LOCKED")</li>
+          </ul>
+          <p>The shuffle algorithm maximizes diversity — it penalizes recently used plant families so you get fresh suggestions every time!</p>
+        </Section>
+
+        <Section title="Crop Descriptions & Tooltips" emoji="💬">
+          <p><strong>Hover over any crop name</strong> in the recipe to see a tooltip with a description. Crops with curated descriptions show evocative 1-2 sentence profiles. Others display a metadata summary (scientific name, category, growth habit, dominant mineral).</p>
         </Section>
 
         <Section title="Swapping Crops" emoji="🔄">
@@ -205,25 +221,20 @@ const UserGuide = () => {
         </Section>
 
         <Section title="Crop Library & CSV Export" emoji="📊">
-          <p>Visit the <strong>Crop Library</strong> (/crop-library) to see all <strong>1,684 crops</strong> organized by frequency zone in a high-density, printable table.</p>
-          <p><strong>Table Columns (21):</strong></p>
+          <p>Visit the <strong>Crop Library</strong> (/crop-library) to see all <strong>2,188 crops</strong> organized by frequency zone in a high-density, printable table.</p>
+          <p><strong>Filters:</strong></p>
           <ul className="list-disc pl-5 space-y-1">
-            <li>Common Name, Scientific Name, Hz, Zone, Element, Category</li>
-            <li>Growth Habit (with emoji badge), Chord Interval, Instrument Type</li>
-            <li>Dominant Mineral, Brix Range, Hardiness Zone (sub-zone a/b format)</li>
-            <li>Harvest Days, Spacing, Root Depth (inches), Min Container (gallons)</li>
-            <li>Planting Season, Guild Role, Focus Tag</li>
-            <li>Companion Crops, Crop Guild</li>
+            <li>Search by name, family, mineral, or season</li>
+            <li>Filter by frequency zone, category, or growth habit</li>
+            <li>Filter by <strong>USDA Hardiness Zone</strong> — select your zone or state to see only crops that grow in your climate</li>
           </ul>
-          <p><strong>CSV Export (27 columns):</strong> Adds root_depth_inches, min_container_gal, soil_protocol_focus, cultural_role, description, and library_note beyond what the table shows. Array fields (companions, guilds, seasons) use semicolon separators.</p>
+          <p><strong>CSV Export (27 columns):</strong> Download the full registry as a spreadsheet with all crop data including companions, descriptions, and hardiness zones.</p>
           <p><strong>Actions:</strong></p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Click <strong>"Export CSV"</strong> to download the full registry as a spreadsheet</li>
             <li>Click <strong>"Print / Export PDF"</strong> to save a printable reference</li>
             <li>Each crop displays its <strong>growth habit badge</strong> (🌳 Tree, 🌱 Herb, 🍄 Fungus, etc.)</li>
-            <li>Crops are grouped by zone with color-coded headers and count badges</li>
           </ul>
-          <p><strong>Performance:</strong> Table uses <code>React.memo()</code> on every row to stay smooth with 1,684 entries. Routes are lazy-loaded so the library only downloads when you visit it.</p>
         </Section>
 
         <Section title="Quick Tips" emoji="💡">
@@ -240,7 +251,7 @@ const UserGuide = () => {
         </Section>
 
         <p className="text-center font-['Space_Mono'] text-xs mt-8" style={{ color: 'hsl(0 0% 30%)' }}>
-          PharmBoi © {new Date().getFullYear()} — The Charles Legend
+          PharmBoi User Guide • v3.0 • Artwork by Alyssa Best • © {new Date().getFullYear()} — The Charles Legend
         </p>
       </main>
     </div>
