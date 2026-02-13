@@ -55,7 +55,7 @@ serve(async (req) => {
     // Filter to crops with < 3 seasons, then take first 80
     const crops = (allCropsRaw || [])
       .filter(c => (c.planting_season || []).length < 3)
-      .slice(0, 80);
+      .slice(0, 200);
 
     if (fetchErr) throw fetchErr;
 
