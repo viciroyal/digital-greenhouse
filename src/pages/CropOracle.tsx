@@ -1920,6 +1920,13 @@ const CropOracle = () => {
                           setManualOverrides({});
                         } else {
                           setLockedSlots(new Set(filledIndices));
+                          // Save all current crops as manual overrides so they persist through shuffles
+                          const newOverrides: Record<number, MasterCrop> = {};
+                          filledIndices.forEach(idx => {
+                            const crop = chordCard[idx]?.crop;
+                            if (crop) newOverrides[idx] = crop;
+                          });
+                          setManualOverrides(prev => ({ ...prev, ...newOverrides }));
                         }
                       }}
                       className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wider transition-all hover:scale-105"
@@ -3233,6 +3240,11 @@ const CropOracle = () => {
                                   });
                                 } else {
                                   next.add(i);
+                                  // Save current crop as manual override so it persists through shuffles
+                                  const currentCrop = chordCard[i]?.crop;
+                                  if (currentCrop) {
+                                    setManualOverrides(prev => ({ ...prev, [i]: currentCrop }));
+                                  }
                                 }
                                 return next;
                               });
