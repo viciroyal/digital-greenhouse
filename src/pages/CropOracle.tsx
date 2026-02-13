@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield, Shuffle, Shovel } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield, Shuffle, Shovel, Lock, Unlock } from 'lucide-react';
 import GrowthHabitBadge from '@/components/crop-oracle/GrowthHabitBadge';
 import TrapCropBadge from '@/components/crop-oracle/TrapCropBadge';
 import { useNavigate } from 'react-router-dom';
@@ -260,6 +260,7 @@ const CropOracle = () => {
   const [swapSlotIndex, setSwapSlotIndex] = useState<number | null>(null);
   const [manualOverrides, setManualOverrides] = useState<Record<number, MasterCrop>>({});
   const [preSwapCrops, setPreSwapCrops] = useState<Record<number, MasterCrop>>({});
+  const [lockedSlots, setLockedSlots] = useState<Set<number>>(new Set());
   const [starCrop, setStarCrop] = useState<MasterCrop | null>(null);
   const [showStarPicker, setShowStarPicker] = useState(false);
   const [starSearchQuery, setStarSearchQuery] = useState('');
@@ -330,6 +331,7 @@ const CropOracle = () => {
     setIsSaved(false);
     setManualOverrides({});
     setPreSwapCrops({});
+    setLockedSlots(new Set());
     setSwapSlotIndex(null);
     setStarCrop(null);
     setShowStarPicker(false);
@@ -1415,6 +1417,7 @@ const CropOracle = () => {
                   setSeasonalOverride(false);
                   setManualOverrides({});
                   setPreSwapCrops({});
+                  setLockedSlots(new Set());
                   setStarCrop(null);
                   setIsSaved(false);
                   setStep(3);
@@ -1861,7 +1864,18 @@ const CropOracle = () => {
               {/* ═══ Shuffle / Reroll Button ═══ */}
               <div className="flex justify-center mb-2">
                 <button
-                  onClick={() => setRecipeSeed(s => s + 1)}
+                  onClick={() => {
+                    // Preserve locked slots as manual overrides before shuffling
+                    if (lockedSlots.size > 0) {
+                      const newOverrides = { ...manualOverrides };
+                      for (const idx of lockedSlots) {
+                        const currentCrop = chordCard[idx]?.crop;
+                        if (currentCrop) newOverrides[idx] = currentCrop;
+                      }
+                      setManualOverrides(newOverrides);
+                    }
+                    setRecipeSeed(s => s + 1);
+                  }}
                   className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono tracking-wider transition-all hover:scale-105"
                   style={{
                     background: `${selectedZone.color}18`,
@@ -1872,6 +1886,9 @@ const CropOracle = () => {
                 >
                   <Shuffle className="w-3 h-3" />
                   SHUFFLE VOICING
+                  {lockedSlots.size > 0 && (
+                    <span className="ml-1 text-[8px] opacity-70">({lockedSlots.size} locked)</span>
+                  )}
                 </button>
               </div>
 
@@ -1955,6 +1972,7 @@ const CropOracle = () => {
                           setSelectedZone(zone);
                           setManualOverrides({});
                           setPreSwapCrops({});
+                          setLockedSlots(new Set());
                           setStarCrop(null);
                           setIsSaved(false);
                           setShowStarPicker(false);
@@ -2237,6 +2255,7 @@ const CropOracle = () => {
                                 setStarCrop(null);
                                 setManualOverrides({});
                                 setPreSwapCrops({});
+                                setLockedSlots(new Set());
                                 setShowStarPicker(false);
                                 setIsSaved(false);
                               }}
@@ -2265,7 +2284,8 @@ const CropOracle = () => {
                                 onClick={() => {
                                   setStarCrop(crop);
                                   setManualOverrides({});
-                                  setPreSwapCrops({});
+                                   setPreSwapCrops({});
+                                   setLockedSlots(new Set());
                                   setShowStarPicker(false);
                                   setIsSaved(false);
                                   toast({
@@ -3104,7 +3124,36 @@ const CropOracle = () => {
                             <Undo2 className="w-3.5 h-3.5" style={{ color: 'hsl(0 0% 55%)' }} />
                           </button>
                         )}
-                        {slot.crop && !manualOverrides[i] && (
+                        {/* Lock/Unlock button */}
+                        {slot.crop && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLockedSlots(prev => {
+                                const next = new Set(prev);
+                                if (next.has(i)) {
+                                  next.delete(i);
+                                } else {
+                                  next.add(i);
+                                }
+                                return next;
+                              });
+                            }}
+                            className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all hover:scale-110"
+                            style={{
+                              background: lockedSlots.has(i) ? `${selectedZone.color}20` : 'hsl(0 0% 12%)',
+                              border: `1px solid ${lockedSlots.has(i) ? `${selectedZone.color}50` : 'hsl(0 0% 20%)'}`,
+                            }}
+                            title={lockedSlots.has(i) ? 'Unlock — this slot will shuffle' : 'Lock — keep this crop during shuffle'}
+                          >
+                            {lockedSlots.has(i) ? (
+                              <Lock className="w-3 h-3" style={{ color: selectedZone.color }} />
+                            ) : (
+                              <Unlock className="w-3 h-3" style={{ color: 'hsl(0 0% 40%)' }} />
+                            )}
+                          </button>
+                        )}
+                        {slot.crop && !manualOverrides[i] && !lockedSlots.has(i) && (
                           <span className="text-[9px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>
                             {slot.crop.frequency_hz}Hz
                           </span>
