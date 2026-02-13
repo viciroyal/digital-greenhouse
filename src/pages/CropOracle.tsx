@@ -811,10 +811,10 @@ const CropOracle = () => {
         let score = harmonicScore(c, hasSentinelInRecipe, currentSlotKey);
         const family = getCropFamily(c);
         // Penalize if this family was used in the same slot in previous shuffles
-        if (prevFamilies.includes(family)) score -= 6;
+        if (prevFamilies.includes(family)) score -= 12;
         // Also penalize if already used in this round's other slots
         const usedThisRound = Object.values(newSlotFamilies).flat();
-        if (usedThisRound.includes(family)) score -= 3;
+        if (usedThisRound.includes(family)) score -= 6;
         return { crop: c, score, family };
       });
       scored.sort((a, b) => b.score - a.score);
