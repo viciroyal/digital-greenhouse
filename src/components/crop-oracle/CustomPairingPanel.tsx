@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
-import { Plus, X, GripVertical, Trash2, Sprout } from 'lucide-react';
+import { Plus, X, GripVertical, Trash2, Sprout, AlertTriangle } from 'lucide-react';
 import { MasterCrop } from '@/hooks/useMasterCrops';
+import { isAntagonist, isExplicitCompanion } from '@/lib/companionScoring';
 
 interface PairingSlot {
   id: string;
@@ -44,17 +45,31 @@ const CustomPairingPanel = ({ zoneColor, zoneName, availableCrops }: CustomPairi
   };
 
   const usedCropIds = new Set(slots.filter(s => s.crop).map(s => s.crop!.id));
+  const placedCrops = useMemo(() => slots.filter(s => s.crop).map(s => s.crop!), [slots]);
 
-  const filteredCrops = availableCrops.filter(c => {
-    if (usedCropIds.has(c.id)) return false;
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      c.name.toLowerCase().includes(q) ||
-      (c.common_name || '').toLowerCase().includes(q) ||
-      (c.category || '').toLowerCase().includes(q)
-    );
-  }).slice(0, 30);
+  // Categorize crops: filter out antagonists, boost companions
+  const filteredCrops = useMemo(() => {
+    return availableCrops.filter(c => {
+      if (usedCropIds.has(c.id)) return false;
+      if (!searchQuery) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        c.name.toLowerCase().includes(q) ||
+        (c.common_name || '').toLowerCase().includes(q) ||
+        (c.category || '').toLowerCase().includes(q)
+      );
+    }).map(c => {
+      const clashWith = placedCrops.find(p => isAntagonist(c, p));
+      const companionOf = placedCrops.find(p => isExplicitCompanion(c, p));
+      return { crop: c, clashWith, companionOf };
+    }).filter(entry => !entry.clashWith) // hide antagonists
+    .sort((a, b) => {
+      // companions first
+      if (a.companionOf && !b.companionOf) return -1;
+      if (!a.companionOf && b.companionOf) return 1;
+      return 0;
+    }).slice(0, 30);
+  }, [availableCrops, usedCropIds, searchQuery, placedCrops]);
 
   const filledCount = slots.filter(s => s.crop).length;
 
@@ -252,21 +267,26 @@ const CustomPairingPanel = ({ zoneColor, zoneName, availableCrops }: CustomPairi
                   No crops found
                 </div>
               ) : (
-                filteredCrops.map(crop => (
+                filteredCrops.map(entry => (
                   <button
-                    key={crop.id}
-                    onClick={() => assignCrop(searchSlotId, crop)}
+                    key={entry.crop.id}
+                    onClick={() => assignCrop(searchSlotId, entry.crop)}
                     className="w-full text-left px-3 py-1.5 flex items-center gap-2 transition-colors hover:bg-white/5"
                   >
                     <span className="text-xs truncate" style={{ color: 'hsl(0 0% 70%)' }}>
-                      {crop.common_name || crop.name}
+                      {entry.crop.common_name || entry.crop.name}
                     </span>
+                    {entry.companionOf && (
+                      <span className="text-[8px] font-mono px-1 rounded flex-shrink-0" style={{ background: 'hsl(130 40% 15%)', color: 'hsl(130 50% 60%)' }}>
+                        ✦ {entry.companionOf.common_name || entry.companionOf.name}
+                      </span>
+                    )}
                     <span className="text-[8px] font-mono ml-auto flex-shrink-0" style={{ color: 'hsl(0 0% 40%)' }}>
-                      {crop.category}
+                      {entry.crop.category}
                     </span>
-                    {crop.chord_interval && (
+                    {entry.crop.chord_interval && (
                       <span className="text-[8px] font-mono px-1 rounded flex-shrink-0" style={{ background: `${zoneColor}15`, color: `${zoneColor}90` }}>
-                        {crop.chord_interval}
+                        {entry.crop.chord_interval}
                       </span>
                     )}
                   </button>
