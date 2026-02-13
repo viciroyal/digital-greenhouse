@@ -2884,6 +2884,7 @@ const CropOracle = () => {
                   </div>
                 )}
 
+                <TooltipProvider delayDuration={300}>
                 <div className="divide-y" style={{ borderColor: 'hsl(0 0% 10%)' }}>
                   {chordCard.map((slot, i) => {
                     // Beginner mode: only show Triad (Root, 3rd, 5th)
@@ -2977,7 +2978,38 @@ const CropOracle = () => {
                           {slot.crop ? (
                             <>
                               <p className="text-xs font-body mt-0.5 flex items-center gap-1 flex-wrap" style={{ color: 'hsl(0 0% 65%)' }}>
-                                {slot.crop.common_name || slot.crop.name}
+                                {(() => {
+                                  const cropDesc = slot.crop.description
+                                    || [
+                                      slot.crop.scientific_name ? `${slot.crop.scientific_name}.` : '',
+                                      slot.crop.category ? `${slot.crop.category.charAt(0).toUpperCase() + slot.crop.category.slice(1)}` : '',
+                                      slot.crop.growth_habit ? `(${slot.crop.growth_habit})` : '',
+                                      slot.crop.dominant_mineral ? `• Rich in ${slot.crop.dominant_mineral}` : '',
+                                      slot.crop.cultural_role ? `• ${slot.crop.cultural_role}` : '',
+                                    ].filter(Boolean).join(' ') || null;
+                                  return cropDesc ? (
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <span className="cursor-help border-b border-dotted" style={{ borderColor: 'hsl(0 0% 30%)' }}>
+                                          {slot.crop.common_name || slot.crop.name}
+                                        </span>
+                                      </TooltipTrigger>
+                                      <TooltipContent
+                                        side="top"
+                                        className="max-w-[280px] text-[10px] font-mono leading-relaxed"
+                                        style={{
+                                          background: 'hsl(0 0% 8%)',
+                                          color: 'hsl(0 0% 70%)',
+                                          border: `1px solid ${selectedZone.color}30`,
+                                        }}
+                                      >
+                                        {cropDesc}
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  ) : (
+                                    <span>{slot.crop.common_name || slot.crop.name}</span>
+                                  );
+                                })()}
                                 {slot.crop.spacing_inches && (
                                   <span style={{ color: 'hsl(0 0% 35%)' }}> • {slot.crop.spacing_inches}" spacing</span>
                                 )}
@@ -3222,6 +3254,7 @@ const CropOracle = () => {
                     );
                   })}
                 </div>
+                </TooltipProvider>
 
                 {/* Footer */}
                 <div
