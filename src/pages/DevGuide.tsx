@@ -225,13 +225,13 @@ description        — Detailed description`}</Code>
 
         <Section title="THE 7-ZONE OCTAVE SYSTEM">
           <p>All crops are organized by Solfeggio frequency. This is the core domain model:</p>
-          <Code>{`396Hz (C) — Foundation — Red (#FF0000)    — Earth  — Phosphorus  — 250 crops
-417Hz (D) — Flow       — Orange (#FF7F00) — Water  — H/Carbon    — 175 crops
-528Hz (E) — Alchemy    — Yellow (#FFFF00) — Fire   — Nitrogen    — 243 crops
-639Hz (F) — Heart      — Green (#00FF00)  — Air    — Calcium     — 271 crops
-741Hz (G) — Signal     — Blue (#0000FF)   — Ether  — Potassium   — 312 crops
-852Hz (A) — Vision     — Indigo (#4B0082) — Light  — Silica      — 249 crops
-963Hz (B) — Source     — Violet (#8B00FF) — Spirit — Sulfur      — 184 crops`}</Code>
+          <Code>{`396Hz (C) — Foundation — Red (#FF0000)    — Earth  — Phosphorus  — 327 crops
+417Hz (D) — Flow       — Orange (#FF7F00) — Water  — H/Carbon    — 267 crops
+528Hz (E) — Alchemy    — Yellow (#FFFF00) — Fire   — Nitrogen    — 316 crops
+639Hz (F) — Heart      — Green (#00FF00)  — Air    — Calcium     — 326 crops
+741Hz (G) — Signal     — Blue (#0000FF)   — Ether  — Potassium   — 375 crops
+852Hz (A) — Vision     — Indigo (#4B0082) — Light  — Silica      — 308 crops
+963Hz (B) — Source     — Violet (#8B00FF) — Spirit — Sulfur      — 269 crops`}</Code>
         </Section>
 
         <Section title="CHORD INTERVAL SYSTEM">
