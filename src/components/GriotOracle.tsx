@@ -57,6 +57,8 @@ const GriotOracle = () => {
     }
   }, [isOpen]);
 
+  const MAX_INPUT_LENGTH = 1000;
+
   const sendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -89,12 +91,13 @@ const GriotOracle = () => {
 
       const conversationHistory = messages
         .filter((m) => m.id !== 'welcome')
+        .slice(-20) // Limit context window to last 20 messages
         .map((m) => ({
           role: m.role === 'griot' ? 'assistant' : 'user',
           content: m.content,
         }));
 
-      conversationHistory.push({ role: 'user', content: userMessage.content });
+      conversationHistory.push({ role: 'user', content: userMessage.content.slice(0, MAX_INPUT_LENGTH) });
 
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/griot-oracle`,
@@ -405,7 +408,7 @@ const GriotOracle = () => {
                   ref={inputRef}
                   type="text"
                   value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
+                  onChange={(e) => setInputValue(e.target.value.slice(0, MAX_INPUT_LENGTH))}
                   onKeyPress={handleKeyPress}
                   placeholder="Ask a growing question..."
                   disabled={isLoading}
