@@ -1880,7 +1880,7 @@ const CropOracle = () => {
                 STEP 3 — {plainMode ? (proMode ? 'FULL GARDEN PLAN' : 'SIMPLE PLAN') : (proMode ? 'THE 13TH CHORD' : 'THE TRIAD')}
               </p>
               {/* ═══ Shuffle / Reroll Button ═══ */}
-              <div className="flex justify-center mb-2">
+              <div className="flex justify-center gap-2 mb-2">
                 <button
                   onClick={() => {
                     // Preserve locked slots as manual overrides before shuffling
@@ -1908,6 +1908,32 @@ const CropOracle = () => {
                     <span className="ml-1 text-[8px] opacity-70">({lockedSlots.size} locked)</span>
                   )}
                 </button>
+                {/* Lock All / Unlock All toggle */}
+                {(() => {
+                  const filledIndices = chordCard.map((s, i) => s.crop ? i : -1).filter(i => i >= 0);
+                  const allLocked = filledIndices.length > 0 && filledIndices.every(i => lockedSlots.has(i));
+                  return (
+                    <button
+                      onClick={() => {
+                        if (allLocked) {
+                          setLockedSlots(new Set());
+                        } else {
+                          setLockedSlots(new Set(filledIndices));
+                        }
+                      }}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wider transition-all hover:scale-105"
+                      style={{
+                        background: allLocked ? `${selectedZone.color}20` : 'hsl(0 0% 8%)',
+                        color: allLocked ? selectedZone.color : 'hsl(0 0% 45%)',
+                        border: `1px solid ${allLocked ? `${selectedZone.color}40` : 'hsl(0 0% 20%)'}`,
+                      }}
+                      title={allLocked ? 'Unlock all slots' : 'Lock all slots'}
+                    >
+                      {allLocked ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+                      {allLocked ? 'UNLOCK ALL' : 'LOCK ALL'}
+                    </button>
+                  );
+                })()}
               </div>
 
               {/* ═══ Season Filter Chips ═══ */}
