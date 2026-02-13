@@ -793,8 +793,13 @@ const CropOracle = () => {
     const KNOWN_FAMILIES = ['tomato', 'pepper', 'bean', 'squash', 'lettuce', 'kale', 'corn', 'cucumber', 'melon', 'onion', 'garlic', 'potato', 'carrot', 'beet', 'radish', 'pea', 'eggplant', 'cabbage', 'broccoli', 'spinach', 'chard', 'celery', 'turnip', 'okra', 'pumpkin', 'zucchini', 'basil', 'mint', 'thyme', 'sage', 'oregano', 'dill', 'parsley', 'cilantro', 'rosemary', 'lavender', 'sunflower', 'marigold', 'nasturtium', 'beetroot', 'fennel', 'leek', 'shallot', 'chive', 'strawberry', 'blueberry', 'raspberry', 'watermelon', 'cantaloupe', 'tomatillo'];
     const getCropFamily = (c: MasterCrop): string => {
       // Check common_name and internal name for known family keywords
+      // Use word-boundary matching to avoid false positives like "peppermint" → "pepper"
       const fullName = `${(c.common_name || '')} ${c.name}`.toLowerCase();
-      const matched = KNOWN_FAMILIES.find(f => fullName.includes(f));
+      const matched = KNOWN_FAMILIES.find(f => {
+        // Use regex word boundary to avoid substring false positives
+        const regex = new RegExp(`\\b${f}\\b`);
+        return regex.test(fullName);
+      });
       if (matched) return matched;
       // Fallback: use the internal name's base (before underscore)
       return c.name.toLowerCase().split('_')[0];
@@ -818,11 +823,21 @@ const CropOracle = () => {
         return { crop: c, score, family };
       });
       scored.sort((a, b) => b.score - a.score);
-      // Widen top-tier to 3 points for more diversity
+      // Widen top-tier to 5 points for more diversity
       const bestScore = scored[0].score;
-      const topTier = scored.filter(s => s.score >= bestScore - 3);
-      const idx = (recipeSeed + pickCounter++) % topTier.length;
-      const picked = topTier[idx];
+      const topTier = scored.filter(s => s.score >= bestScore - 5);
+      // Deduplicate by family: pick the best representative from each family
+      // so that pepper, tomato, chard, etc. each get equal rotation chance
+      const familyBest = new Map<string, typeof scored[0]>();
+      for (const entry of topTier) {
+        if (!familyBest.has(entry.family) || entry.score > familyBest.get(entry.family)!.score) {
+          familyBest.set(entry.family, entry);
+        }
+      }
+      const familyPool = Array.from(familyBest.values()).sort((a, b) => b.score - a.score);
+      const pickPool = familyPool.length > 1 ? familyPool : topTier;
+      const idx = (recipeSeed + pickCounter++) % pickPool.length;
+      const picked = pickPool[idx];
       if (picked.crop && isSentinelOrTrap(picked.crop)) hasSentinelInRecipe = true;
       // Record family for this slot
       if (!newSlotFamilies[currentSlotKey]) newSlotFamilies[currentSlotKey] = [];
