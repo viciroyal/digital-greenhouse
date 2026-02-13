@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Calendar, Loader2, LogOut, Check, FlaskConical, Sprout, Users, MapPin, Clock, Ruler, DollarSign, TrendingUp, Sun } from 'lucide-react';
+import { ArrowLeft, User, Mail, Calendar, Loader2, LogOut, Check, FlaskConical, Sprout, Users, MapPin, Clock, Ruler, DollarSign, TrendingUp, Sun, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -380,6 +380,45 @@ const Profile = () => {
       }
       setPopulateStatus(`Done! ${totalUpdated} crop seasons expanded.`);
       toast({ title: 'Seasons expanded', description: `${totalUpdated} crops updated with additional planting seasons.` });
+    } catch (error: any) {
+      setPopulateStatus(null);
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsPopulating(false);
+    }
+  };
+
+  const handlePopulateTropicalCrops = async () => {
+    setIsPopulating(true);
+    setPopulateStatus('Starting Tropical Crops Generation...');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+      let totalInserted = 0;
+      // Run 8 batches to get ~200+ crops
+      for (let batch = 1; batch <= 8; batch++) {
+        setPopulateStatus(`Tropical Crops: Batch ${batch}/8 — ${totalInserted} inserted so far...`);
+        const resp = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/populate-tropical-crops`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+              'Content-Type': 'application/json',
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify({ batch }),
+          }
+        );
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Failed');
+        totalInserted += data.inserted || 0;
+        setPopulateStatus(`Tropical Crops: Batch ${batch}/8 done — ${totalInserted} inserted, total registry: ${data.total_crops}`);
+        // Delay between batches
+        if (batch < 8) await new Promise(r => setTimeout(r, 2000));
+      }
+      setPopulateStatus(`Done! ${totalInserted} tropical/indigenous crops added.`);
+      toast({ title: 'Tropical crops generated', description: `${totalInserted} new crops added to the registry.` });
     } catch (error: any) {
       setPopulateStatus(null);
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
@@ -822,6 +861,29 @@ const Profile = () => {
                     <span className="flex items-center gap-2">
                       <Sun className="w-4 h-4" />
                       EXPAND SEASONS
+                    </span>
+                  )}
+                </Button>
+                <Button
+                  onClick={handlePopulateTropicalCrops}
+                  variant="outline"
+                  className="w-full py-5 font-body tracking-wider"
+                  style={{
+                    background: 'hsl(160 20% 10%)',
+                    border: '1px solid hsl(160 40% 30%)',
+                    color: 'hsl(160 55% 60%)',
+                  }}
+                  disabled={isPopulating}
+                >
+                  {isPopulating && populateStatus?.includes('Tropical') ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {populateStatus}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Globe className="w-4 h-4" />
+                      ADD 200+ TROPICAL CROPS
                     </span>
                   )}
                 </Button>
