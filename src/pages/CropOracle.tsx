@@ -3015,6 +3015,42 @@ const CropOracle = () => {
                                   );
                                 })()}
                               </div>
+                              {/* Inline companion swap suggestions */}
+                              {slot.crop && slot.crop.companion_crops && slot.crop.companion_crops.length > 0 && (
+                                <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                                  <span className="text-[7px] font-mono" style={{ color: 'hsl(0 0% 35%)' }}>SWAP →</span>
+                                  {slot.crop.companion_crops.slice(0, 4).map((compName) => {
+                                    const matchedCrop = (allCrops || []).find(mc => {
+                                      const cn = (mc.common_name || mc.name).toLowerCase();
+                                      const target = compName.toLowerCase().trim();
+                                      return cn === target || cn.includes(target) || target.includes(cn.split('(')[0].trim());
+                                    });
+                                    if (!matchedCrop || chordCard.some(s => s.crop?.id === matchedCrop.id)) return null;
+                                    return (
+                                      <button
+                                        key={compName}
+                                        className="text-[7px] font-mono px-1.5 py-0.5 rounded transition-all hover:scale-105"
+                                        style={{
+                                          background: `${selectedZone.color}12`,
+                                          color: selectedZone.color,
+                                          border: `1px solid ${selectedZone.color}30`,
+                                        }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setManualOverrides(prev => ({ ...prev, [i]: matchedCrop }));
+                                          setIsSaved(false);
+                                          toast({
+                                            title: `${slot.label} swapped`,
+                                            description: `Now: ${matchedCrop.common_name || matchedCrop.name}`,
+                                          });
+                                        }}
+                                      >
+                                        🔄 {matchedCrop.common_name || matchedCrop.name}
+                                      </button>
+                                    );
+                                  }).filter(Boolean).slice(0, 3)}
+                                </div>
+                              )}
                             </>
                           ) : (
                             <p className="text-xs font-mono italic mt-0.5" style={{ color: 'hsl(0 0% 25%)' }}>
