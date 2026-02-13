@@ -138,64 +138,64 @@ const Index = () => {
               by Vici Royàl
             </motion.p>
 
-            {/* INITIATE Button */}
-            <motion.button
-              onClick={handleInitiate}
-              disabled={isTransitioning}
-              className="relative px-12 py-5 rounded-full font-bubble text-lg md:text-xl tracking-[0.3em] uppercase overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, hsl(350 75% 45%) 0%, hsl(280 60% 35%) 50%, hsl(220 60% 35%) 100%)',
-                border: '2px solid hsl(40 50% 75% / 0.3)',
-                color: 'hsl(40 50% 95%)',
-                boxShadow: '0 0 40px hsl(350 75% 50% / 0.3), 0 0 80px hsl(280 60% 40% / 0.15), inset 0 1px 0 hsl(40 50% 90% / 0.15)',
-              }}
+            {/* CTA Buttons — side by side */}
+            <motion.div
+              className="flex flex-row items-center gap-3"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.0, duration: 0.8 }}
-              whileHover={{ scale: 1.05, boxShadow: '0 0 60px hsl(350 75% 50% / 0.5), 0 0 120px hsl(280 60% 40% / 0.25)' }}
-              whileTap={{ scale: 0.97 }}
             >
-              {/* Shimmer */}
-              <motion.div
-                className="absolute inset-0 opacity-20"
-                style={{ background: 'linear-gradient(90deg, transparent, hsl(40 50% 90%), transparent)' }}
-                animate={{ x: ['-100%', '200%'] }}
-                transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-              />
-              <span className="relative z-10">Enter The Garden</span>
-            </motion.button>
+              {/* Plant Seeds — scroll to Sound System */}
+              <motion.button
+                onClick={() => {
+                  const el = document.querySelector('[data-section="sound-system"]');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="relative px-6 py-3 rounded-full font-bubble text-sm md:text-base tracking-[0.2em] uppercase overflow-hidden"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(140 55% 30%) 0%, hsl(160 50% 25%) 50%, hsl(120 40% 20%) 100%)',
+                  border: '2px solid hsl(140 50% 50% / 0.3)',
+                  color: 'hsl(40 50% 95%)',
+                  boxShadow: '0 0 30px hsl(140 55% 40% / 0.3), inset 0 1px 0 hsl(140 50% 90% / 0.15)',
+                }}
+                whileHover={{ scale: 1.05, boxShadow: '0 0 50px hsl(140 55% 40% / 0.5)' }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <motion.div
+                  className="absolute inset-0 opacity-20"
+                  style={{ background: 'linear-gradient(90deg, transparent, hsl(140 50% 85%), transparent)' }}
+                  animate={{ x: ['-100%', '200%'] }}
+                  transition={{ duration: 3, repeat: Infinity, repeatDelay: 2.5 }}
+                />
+                <span className="relative z-10 flex items-center gap-2">
+                  <Sprout className="w-4 h-4" />
+                  Plant Seeds
+                </span>
+              </motion.button>
 
-            {/* Plant Seeds — scroll to Sound System */}
-            <motion.button
-              onClick={() => {
-                const el = document.querySelector('[data-section="sound-system"]');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="relative px-10 py-5 rounded-full font-bubble text-lg md:text-xl tracking-[0.3em] uppercase overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, hsl(140 55% 30%) 0%, hsl(160 50% 25%) 50%, hsl(120 40% 20%) 100%)',
-                border: '2px solid hsl(140 50% 50% / 0.3)',
-                color: 'hsl(40 50% 95%)',
-                boxShadow: '0 0 40px hsl(140 55% 40% / 0.3), 0 0 80px hsl(140 50% 30% / 0.15), inset 0 1px 0 hsl(140 50% 90% / 0.15)',
-              }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2, duration: 0.8 }}
-              whileHover={{ scale: 1.05, boxShadow: '0 0 60px hsl(140 55% 40% / 0.5), 0 0 120px hsl(140 50% 30% / 0.25)' }}
-              whileTap={{ scale: 0.97 }}
-            >
-              {/* Shimmer */}
-              <motion.div
-                className="absolute inset-0 opacity-20"
-                style={{ background: 'linear-gradient(90deg, transparent, hsl(140 50% 85%), transparent)' }}
-                animate={{ x: ['-100%', '200%'] }}
-                transition={{ duration: 3, repeat: Infinity, repeatDelay: 2.5 }}
-              />
-              <span className="relative z-10 flex items-center gap-2">
-                <Sprout className="w-5 h-5" />
-                Plant Seeds
-              </span>
-            </motion.button>
+              {/* Enter The Garden */}
+              <motion.button
+                onClick={handleInitiate}
+                disabled={isTransitioning}
+                className="relative px-6 py-3 rounded-full font-bubble text-sm md:text-base tracking-[0.2em] uppercase overflow-hidden"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(350 75% 45%) 0%, hsl(280 60% 35%) 50%, hsl(220 60% 35%) 100%)',
+                  border: '2px solid hsl(40 50% 75% / 0.3)',
+                  color: 'hsl(40 50% 95%)',
+                  boxShadow: '0 0 30px hsl(350 75% 50% / 0.3), inset 0 1px 0 hsl(40 50% 90% / 0.15)',
+                }}
+                whileHover={{ scale: 1.05, boxShadow: '0 0 50px hsl(350 75% 50% / 0.5)' }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <motion.div
+                  className="absolute inset-0 opacity-20"
+                  style={{ background: 'linear-gradient(90deg, transparent, hsl(40 50% 90%), transparent)' }}
+                  animate={{ x: ['-100%', '200%'] }}
+                  transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+                />
+                <span className="relative z-10">Enter The Garden</span>
+              </motion.button>
+            </motion.div>
           </div>
 
           {/* Header icons */}
