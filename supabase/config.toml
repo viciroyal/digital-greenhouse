@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.populate-seasons]
 verify_jwt = false
+
+[functions.populate-tropical-crops]
+verify_jwt = false
