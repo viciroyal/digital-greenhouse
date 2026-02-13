@@ -99,7 +99,19 @@ const FileDropZone = ({ color, onFileUpload, disabled = false }: FileDropZonePro
     }
   }, [disabled]);
 
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+
   const processFile = (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      alert('File too large. Maximum size is 10MB.');
+      return;
+    }
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      alert('Invalid file type. Please upload an image (JPEG, PNG, GIF, WebP) or PDF.');
+      return;
+    }
+
     setIsUploading(true);
     playPlantingSound();
     
@@ -128,7 +140,7 @@ const FileDropZone = ({ color, onFileUpload, disabled = false }: FileDropZonePro
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
         className="hidden"
         onChange={handleFileSelect}
       />

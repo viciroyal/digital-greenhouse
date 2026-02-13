@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 const SYSTEM_PROMPT = `You are the Lead Ecologist and Technical Conductor for AgroMajic LLC, serving as the Field Advisor on the PHARMBOI regenerative farming platform created by Vici Royàl. Your mission is to generate and validate 7-crop "Bio-Harmonic Chords" for 60-foot research beds and provide practical, science-based guidance.
@@ -120,7 +120,39 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { messages } = await req.json();
+    const body = await req.json();
+    const { messages } = body;
+
+    // Validate messages array
+    if (!Array.isArray(messages)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid request", message: "Messages must be an array." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Limit conversation history to prevent abuse
+    const MAX_MESSAGES = 30;
+    const MAX_MESSAGE_LENGTH = 2000;
+
+    if (messages.length > MAX_MESSAGES) {
+      return new Response(
+        JSON.stringify({ error: "Too many messages", message: "Conversation too long. Please start a new session." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate and sanitize each message
+    const sanitizedMessages = messages.map((m: any) => {
+      if (!m || typeof m.content !== "string" || !["user", "assistant", "system"].includes(m.role)) {
+        throw new Error("Invalid message format");
+      }
+      return {
+        role: m.role as string,
+        content: m.content.slice(0, MAX_MESSAGE_LENGTH),
+      };
+    });
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
@@ -137,7 +169,7 @@ Deno.serve(async (req) => {
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          ...messages,
+          ...sanitizedMessages,
         ],
         max_tokens: 500,
         temperature: 0.4,
