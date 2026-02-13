@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ShopSection from '@/components/ShopSection';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, User } from 'lucide-react';
+import { BookOpen, User, Sprout } from 'lucide-react';
 import GrandCosmogram from '@/components/cosmogram/GrandCosmogram';
 import RespiratorySystem from '@/components/bio-digital/RespiratorySystem';
 import BioluminescentVeins from '@/components/bio-digital/BioluminescentVeins';
@@ -163,6 +163,38 @@ const Index = () => {
                 transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
               />
               <span className="relative z-10">Enter The Garden</span>
+            </motion.button>
+
+            {/* Plant Seeds — scroll to Sound System */}
+            <motion.button
+              onClick={() => {
+                const el = document.querySelector('[data-section="sound-system"]');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="relative px-10 py-5 rounded-full font-bubble text-lg md:text-xl tracking-[0.3em] uppercase overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, hsl(140 55% 30%) 0%, hsl(160 50% 25%) 50%, hsl(120 40% 20%) 100%)',
+                border: '2px solid hsl(140 50% 50% / 0.3)',
+                color: 'hsl(40 50% 95%)',
+                boxShadow: '0 0 40px hsl(140 55% 40% / 0.3), 0 0 80px hsl(140 50% 30% / 0.15), inset 0 1px 0 hsl(140 50% 90% / 0.15)',
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2, duration: 0.8 }}
+              whileHover={{ scale: 1.05, boxShadow: '0 0 60px hsl(140 55% 40% / 0.5), 0 0 120px hsl(140 50% 30% / 0.25)' }}
+              whileTap={{ scale: 0.97 }}
+            >
+              {/* Shimmer */}
+              <motion.div
+                className="absolute inset-0 opacity-20"
+                style={{ background: 'linear-gradient(90deg, transparent, hsl(140 50% 85%), transparent)' }}
+                animate={{ x: ['-100%', '200%'] }}
+                transition={{ duration: 3, repeat: Infinity, repeatDelay: 2.5 }}
+              />
+              <span className="relative z-10 flex items-center gap-2">
+                <Sprout className="w-5 h-5" />
+                Plant Seeds
+              </span>
             </motion.button>
           </div>
 
