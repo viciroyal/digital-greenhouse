@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ShopSection from '@/components/ShopSection';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, User, Sprout } from 'lucide-react';
+import { BookOpen, User, Music } from 'lucide-react';
 import GrandCosmogram from '@/components/cosmogram/GrandCosmogram';
 import RespiratorySystem from '@/components/bio-digital/RespiratorySystem';
 import BioluminescentVeins from '@/components/bio-digital/BioluminescentVeins';
@@ -153,22 +153,22 @@ const Index = () => {
                 }}
                 className="relative px-6 py-3 rounded-full font-bubble text-sm md:text-base tracking-[0.2em] uppercase overflow-hidden"
                 style={{
-                  background: 'linear-gradient(135deg, hsl(140 55% 30%) 0%, hsl(160 50% 25%) 50%, hsl(120 40% 20%) 100%)',
-                  border: '2px solid hsl(140 50% 50% / 0.3)',
+                  background: 'linear-gradient(135deg, hsl(350 75% 45%) 0%, hsl(280 60% 35%) 50%, hsl(220 60% 35%) 100%)',
+                  border: '2px solid hsl(40 50% 75% / 0.3)',
                   color: 'hsl(40 50% 95%)',
-                  boxShadow: '0 0 30px hsl(140 55% 40% / 0.3), inset 0 1px 0 hsl(140 50% 90% / 0.15)',
+                  boxShadow: '0 0 30px hsl(350 75% 50% / 0.3), inset 0 1px 0 hsl(40 50% 90% / 0.15)',
                 }}
-                whileHover={{ scale: 1.05, boxShadow: '0 0 50px hsl(140 55% 40% / 0.5)' }}
+                whileHover={{ scale: 1.05, boxShadow: '0 0 50px hsl(350 75% 50% / 0.5)' }}
                 whileTap={{ scale: 0.97 }}
               >
                 <motion.div
                   className="absolute inset-0 opacity-20"
-                  style={{ background: 'linear-gradient(90deg, transparent, hsl(140 50% 85%), transparent)' }}
+                  style={{ background: 'linear-gradient(90deg, transparent, hsl(40 50% 90%), transparent)' }}
                   animate={{ x: ['-100%', '200%'] }}
                   transition={{ duration: 3, repeat: Infinity, repeatDelay: 2.5 }}
                 />
                 <span className="relative z-10 flex items-center gap-2">
-                  <Sprout className="w-4 h-4" />
+                  <Music className="w-4 h-4" />
                   Plant Seeds
                 </span>
               </motion.button>
