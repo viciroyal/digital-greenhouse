@@ -275,8 +275,8 @@ const CropOracle = () => {
   const [modalInfoOpen, setModalInfoOpen] = useState(false);
   const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | 'scent' | 'propagation' | 'suppliers' | 'hole' | 'pairing' | null>(null);
   const [recipeSeed, setRecipeSeed] = useState(0);
-  // Track previously-used crop families per slot to ensure shuffle diversity
-  const prevSlotFamilies = useRef<Record<string, string[]>>({});
+  // Track previously-used crop families per slot (last 2 shuffles) to ensure diversity
+  const prevSlotFamilies = useRef<Record<string, string[][]>>({});
   const [showSeasonalCompanions, setShowSeasonalCompanions] = useState(false);
   const [seasonFilter, setSeasonFilter] = useState<string | null>(null);
 
@@ -810,16 +810,20 @@ const CropOracle = () => {
     const newSlotFamilies: Record<string, string[]> = {}; // Track families chosen this round
     const rotatedPick = (candidates: MasterCrop[]): MasterCrop | undefined => {
       if (candidates.length === 0) return undefined;
-      const prevFamilies = prevSlotFamilies.current[currentSlotKey] || [];
+      const prevRounds = prevSlotFamilies.current[currentSlotKey] || [];
       // Sort by harmonic score descending, then apply family-diversity penalty
       const scored = candidates.map(c => {
         let score = harmonicScore(c, hasSentinelInRecipe, currentSlotKey);
         const family = getCropFamily(c);
-        // Penalize if this family was used in the same slot in previous shuffles
-        if (prevFamilies.includes(family)) score -= 12;
-        // Also penalize if already used in this round's other slots
+        // Penalize if this family was used in the same slot in the last shuffle (-18)
+        // or the shuffle before that (-10) — creates a 2-shuffle cooldown
+        const lastRound = prevRounds[0] || [];
+        const prevRound = prevRounds[1] || [];
+        if (lastRound.includes(family)) score -= 18;
+        else if (prevRound.includes(family)) score -= 10;
+        // Also penalize if already used in this round's other slots (-10)
         const usedThisRound = Object.values(newSlotFamilies).flat();
-        if (usedThisRound.includes(family)) score -= 6;
+        if (usedThisRound.includes(family)) score -= 10;
         return { crop: c, score, family };
       });
       scored.sort((a, b) => b.score - a.score);
@@ -1039,8 +1043,13 @@ const CropOracle = () => {
       return { ...interval, crop, isCompanionFill, layer };
     }).map((slot, i) => manualOverrides[i] ? { ...slot, crop: manualOverrides[i], isCompanionFill: false, layer: getCropLayer(manualOverrides[i]) } : slot);
 
-    // Store this round's families for next shuffle's diversity check
-    prevSlotFamilies.current = newSlotFamilies;
+    // Store this round's families (keep last 2 rounds for cooldown window)
+    const updated: Record<string, string[][]> = {};
+    for (const key of Object.keys(newSlotFamilies)) {
+      const prev = prevSlotFamilies.current[key] || [];
+      updated[key] = [newSlotFamilies[key], ...(prev.length > 0 ? [prev[0]] : [])];
+    }
+    prevSlotFamilies.current = updated;
 
     return result;
   }, [recipeCrops, manualOverrides, starCrop, allCrops, selectedZone, environment, recipeSeed, hardinessZone]);
