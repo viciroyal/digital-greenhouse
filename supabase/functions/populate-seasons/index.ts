@@ -45,20 +45,30 @@ serve(async (req) => {
       });
     }
 
-    // Fetch crops needing expansion — override default 1000 row limit
-    const { data: allCropsRaw, error: fetchErr } = await supabase
-      .from("master_crops")
-      .select("id, name, common_name, scientific_name, category, growth_habit, planting_season, hardiness_zone_min, hardiness_zone_max, harvest_days")
-      .not("planting_season", "is", null)
-      .order("name", { ascending: true })
-      .limit(2000);
+    // Fetch crops needing expansion — paginate to bypass 1000-row limit
+    const allCropsRaw: any[] = [];
+    let page = 0;
+    const PAGE_SIZE = 1000;
+    while (true) {
+      const { data: batch, error: batchErr } = await supabase
+        .from("master_crops")
+        .select("id, name, common_name, scientific_name, category, growth_habit, planting_season, hardiness_zone_min, hardiness_zone_max, harvest_days")
+        .not("planting_season", "is", null)
+        .order("name", { ascending: true })
+        .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+      if (batchErr) throw batchErr;
+      if (!batch || batch.length === 0) break;
+      allCropsRaw.push(...batch);
+      if (batch.length < PAGE_SIZE) break;
+      page++;
+    }
 
-    // Filter to crops with < 3 seasons, then take first 200
-    const crops = (allCropsRaw || [])
+    // Filter to crops with < 3 seasons, then take first 80
+    const crops = allCropsRaw
       .filter(c => (c.planting_season || []).length < 3)
-      .slice(0, 200);
+      .slice(0, 80);
 
-    if (fetchErr) throw fetchErr;
+    const fetchErr = null;
 
     if (crops.length === 0) {
       const { data: allCheck } = await supabase
