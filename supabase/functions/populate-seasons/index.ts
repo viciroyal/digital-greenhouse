@@ -174,6 +174,16 @@ Rules:
     }
 
     const aiData = await response.json();
+    
+    // Check if gateway returned an error in the body (HTTP 200 but error payload)
+    if (aiData.error) {
+      console.error("AI gateway returned error in body:", JSON.stringify(aiData.error));
+      const msg = aiData.error.message || "AI gateway error";
+      return new Response(JSON.stringify({ error: `AI service error: ${msg}. Please retry.` }), {
+        status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     let entries: any[];
 
     const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
