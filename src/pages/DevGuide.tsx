@@ -86,7 +86,7 @@ const DevGuide = () => {
           <p><strong>State:</strong> React Query for server state (Infinity staleTime for static crop data), useState for local UI state. No Redux or Zustand needed.</p>
           <p><strong>Environments:</strong> Pot, Raised Bed, Farm (Pro), High Tunnel (Pro), Food Forest (Pro). Each environment applies custom recipe filtering logic.</p>
           <p><strong>Performance:</strong> All secondary routes use <code>React.lazy()</code> for code splitting. Only the landing page (Index) loads eagerly for instant first paint. CropRow components use <code>React.memo()</code> to prevent unnecessary re-renders. The Crop Library uses <code>@tanstack/react-virtual</code> for row virtualization.</p>
-          <p><strong>Data completeness:</strong> All 2,188 crops have 100% population across all AI-batch fields: growth_habit, scientific_name, planting_season, harvest_days, root_depth_inches, min_container_gal, hardiness zones, spacing, seed cost, yield, companions, and descriptions (745 curated, remainder uses fallback metadata).</p>
+          <p><strong>Data completeness:</strong> All 2,188 crops have 100% population across all AI-batch fields: growth_habit, scientific_name, planting_season, harvest_days, root_depth_inches, min_container_gal, hardiness zones, spacing, seed cost, yield, companions, and descriptions (2,188/2,188 curated — 100% coverage).</p>
           <p><strong>Shuffle diversity:</strong> The recipe engine uses a scoring penalty system with a 2-shuffle cooldown window: −18 for families used in the most recent shuffle, −10 for the 2nd-to-last, and −10 cross-slot penalty within the same recipe. Word-boundary regex prevents false positives.</p>
           <p><strong>Locking system:</strong> Individual crop slots can be locked/unlocked. LOCK ALL / UNLOCK ALL buttons manage all slots. Locked slots persist across shuffles via <code>lockedSlots</code> Set and <code>manualOverrides</code> object, which are kept in sync.</p>
         </Section>
@@ -174,7 +174,7 @@ const DevGuide = () => {
           <Code>{`master_crops       — 2,188 crops with frequency_hz, zone, Brix targets, chord_interval,
                      spacing, growth_habit, root_depth_inches, min_container_gal,
                      scientific_name, hardiness zones, planting_season, harvest_days,
-                     description (745 curated), seed_cost_cents, est_yield_lbs_per_plant
+                     description (2,188 curated — 100%), seed_cost_cents, est_yield_lbs_per_plant
 garden_beds        — User garden beds with zone assignment, Brix readings, inoculants
 bed_plantings      — Crops planted in specific beds with guild roles
 saved_recipes      — User-saved chord recipes (environment + zone + chord data)
