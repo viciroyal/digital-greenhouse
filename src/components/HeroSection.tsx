@@ -395,7 +395,7 @@ const HeroSection = ({ onLogoClick }: HeroSectionProps) => {
 
         {/* Artist credit - Organic style */}
         <motion.div
-          className="text-center"
+          className="text-center flex flex-col items-center gap-1"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
@@ -409,15 +409,12 @@ const HeroSection = ({ onLogoClick }: HeroSectionProps) => {
           >
             <span className="text-sm font-body" style={{ color: 'hsl(40 50% 75% / 0.6)' }}>by</span>
             <strong className="font-bold font-body" style={{ color: 'hsl(40 50% 85%)' }}>Vici Royàl</strong>
-            <span style={{ color: 'hsl(350 75% 50%)' }}>◆</span>
-            <span className="text-xs font-body" style={{ color: 'hsl(40 50% 75% / 0.5)' }}>
-              Produced by <strong style={{ color: 'hsl(40 50% 85%)' }}>Vici Royàl</strong> & <span style={{ color: 'hsl(350 75% 50%)' }}>Èks</span>
-            </span>
-            <span style={{ color: 'hsl(140 60% 45%)' }}>◆</span>
-            <span className="text-xs font-body" style={{ color: 'hsl(40 50% 75% / 0.5)' }}>
-              Artwork by <strong style={{ color: 'hsl(40 50% 85%)' }}>Alyssa Best</strong>
-            </span>
           </div>
+          <p className="text-[11px] font-body mt-1" style={{ color: 'hsl(40 50% 80% / 0.6)' }}>
+            Produced by Vici Royàl & Èks
+            <span style={{ color: 'hsl(140 60% 50%)', margin: '0 4px' }}>◆</span>
+            Artwork by{' '}<strong style={{ color: 'hsl(140 60% 60%)' }}>Alyssa Best</strong>
+          </p>
         </motion.div>
 
         {/* CTA Buttons - Gemstone style */}
