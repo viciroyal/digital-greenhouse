@@ -45,14 +45,15 @@ serve(async (req) => {
       });
     }
 
-    // Fetch all crops with seasons, then filter in JS to those needing expansion
+    // Fetch crops needing expansion — override default 1000 row limit
     const { data: allCropsRaw, error: fetchErr } = await supabase
       .from("master_crops")
       .select("id, name, common_name, scientific_name, category, growth_habit, planting_season, hardiness_zone_min, hardiness_zone_max, harvest_days")
       .not("planting_season", "is", null)
-      .order("name", { ascending: true });
+      .order("name", { ascending: true })
+      .limit(2000);
 
-    // Filter to crops with < 3 seasons, then take first 80
+    // Filter to crops with < 3 seasons, then take first 200
     const crops = (allCropsRaw || [])
       .filter(c => (c.planting_season || []).length < 3)
       .slice(0, 200);
@@ -100,20 +101,23 @@ serve(async (req) => {
             role: "system",
             content: `You are an expert horticulturist specializing in season-extension and multi-season planting strategies.
 
-Given a list of crops with their current planting season assignments, expand each crop's planting seasons to include ALL biologically valid seasons.
+Given a list of crops with their current planting season assignments, you MUST expand each crop's planting seasons to include ALL biologically valid seasons. Every crop MUST end up with at least 2 seasons, and most should have 3+.
 
 Rules:
 - Seasons are: Spring, Summer, Fall, Winter
 - A crop can have 1-4 seasons
 - Consider the crop's hardiness zones when assigning Winter/Summer
-- Cool-season crops (lettuce, spinach, kale, peas, radish, beet, carrot, turnip, brassicas) typically grow in: Spring, Fall, and often Winter in zones 7+
-- Warm-season crops (tomato, pepper, squash, corn, beans, melon, cucumber, eggplant) typically grow in: Spring, Summer
+- CRITICAL: Warm-season crops (tomato, pepper, squash, corn, beans, melon, cucumber, eggplant, okra, sweet potato) MUST have BOTH Spring AND Summer
+- CRITICAL: Cool-season crops (lettuce, spinach, kale, peas, radish, beet, carrot, turnip, brassicas, chard) MUST have Spring, Fall, AND Winter (in zones 7+)
 - Tropical/perennial crops in zones 9+ may grow year-round: Spring, Summer, Fall, Winter
 - Herbs often span: Spring, Summer, Fall (some like parsley/cilantro also Winter in mild zones)
 - Trees/shrubs with long establishment: Spring, Fall
 - Cover crops and nitrogen fixers: often Spring, Fall, sometimes Winter
 - Fast-maturing crops (under 45 days) can often squeeze into more seasons
+- Sunflowers, amaranth, and other warm-loving annuals: Spring AND Summer
+- Medicinal herbs and woodland plants: Spring AND Fall at minimum
 - DO NOT remove any existing seasons — only ADD new valid ones
+- If a crop currently has only 1 season, you MUST add at least 1 more
 - Be practical and regionally accurate based on USDA zones provided`,
           },
           {
@@ -207,7 +211,12 @@ Rules:
       }
     }
 
+    console.log("Parsed entries count:", entries.length);
+    // Log first 3 entries for debugging
+    console.log("Sample entries:", JSON.stringify(entries.slice(0, 3)));
+
     let updated = 0;
+    let skipped = 0;
     const validSeasons = new Set(["Spring", "Summer", "Fall", "Winter"]);
 
     for (const entry of entries) {
@@ -234,8 +243,11 @@ Rules:
           .eq("id", crop.id);
         if (!updateErr) updated++;
         else console.error("Update error for", crop.id, updateErr);
+      } else {
+        skipped++;
       }
     }
+    console.log(`Results: updated=${updated}, skipped=${skipped}, entries=${entries.length}`);
 
     // Count remaining crops with < 3 seasons
     const { data: allCrops2 } = await supabase
