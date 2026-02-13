@@ -1917,6 +1917,7 @@ const CropOracle = () => {
                       onClick={() => {
                         if (allLocked) {
                           setLockedSlots(new Set());
+                          setManualOverrides({});
                         } else {
                           setLockedSlots(new Set(filledIndices));
                         }
@@ -3225,6 +3226,11 @@ const CropOracle = () => {
                                 const next = new Set(prev);
                                 if (next.has(i)) {
                                   next.delete(i);
+                                  setManualOverrides(prev => {
+                                    const updated = { ...prev };
+                                    delete updated[i];
+                                    return updated;
+                                  });
                                 } else {
                                   next.add(i);
                                 }
