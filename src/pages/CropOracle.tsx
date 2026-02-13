@@ -1285,6 +1285,12 @@ const CropOracle = () => {
           <span className="text-xl">{lunar.phaseEmoji}</span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded" style={{
+                background: 'hsl(40 30% 18% / 0.4)',
+                color: 'hsl(40 50% 65%)',
+              }}>
+                {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+              </span>
               <span className="text-xs font-mono font-bold" style={{ color: 'hsl(270 60% 75%)' }}>
                 {lunar.phaseLabel}
               </span>
