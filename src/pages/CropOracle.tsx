@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield, Shuffle, Shovel, Lock, Unlock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield, Shuffle, Shovel, Lock, Unlock, Sun, CloudSun, Cloud } from 'lucide-react';
 import GrowthHabitBadge from '@/components/crop-oracle/GrowthHabitBadge';
 import TrapCropBadge from '@/components/crop-oracle/TrapCropBadge';
 import { useNavigate } from 'react-router-dom';
@@ -242,6 +242,18 @@ const FOOD_FOREST_LAYERS: Record<string, { label: string; emoji: string; hint: s
 
 /* ─── Spacing limits for containers ─── */
 const POT_MAX_SPACING = 12;
+
+// Derive sun requirement from category and growth_habit
+const getSunRequirement = (crop: { category?: string; growth_habit?: string | null; description?: string | null }): { label: string; level: 'full' | 'partial' | 'shade' } => {
+  const habit = (crop.growth_habit || '').toLowerCase();
+  const cat = (crop.category || '').toLowerCase();
+  const desc = (crop.description || '').toLowerCase();
+  if (['fern', 'moss', 'mushroom', 'fungi'].some(k => habit.includes(k) || cat.includes(k))) return { label: 'Shade', level: 'shade' };
+  if (desc.includes('shade-loving') || desc.includes('deep shade')) return { label: 'Shade', level: 'shade' };
+  if (['herb', 'leafy green', 'lettuce'].some(k => cat.includes(k)) || ['understory', 'ground cover', 'herbaceous shrub'].some(k => habit.includes(k))) return { label: 'Part Sun', level: 'partial' };
+  if (habit === 'tuber' || habit === 'root') return { label: 'Part Sun', level: 'partial' };
+  return { label: 'Full Sun', level: 'full' };
+};
 
 const CropOracle = () => {
   const navigate = useNavigate();
@@ -2953,7 +2965,23 @@ const CropOracle = () => {
                               {/* Growth Habit & Harvest Indicators */}
                               <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                                 <GrowthHabitBadge habit={slot.crop!.growth_habit} size="sm" />
-                                <TrapCropBadge description={slot.crop!.description} guildRole={slot.crop!.guild_role} size="sm" />
+                                {/* Sun requirement indicator */}
+                                {(() => {
+                                  const sun = getSunRequirement(slot.crop!);
+                                  const styles = {
+                                    full:    { bg: 'hsl(45 70% 20% / 0.3)', color: 'hsl(45 80% 60%)', border: 'hsl(45 60% 35% / 0.4)' },
+                                    partial: { bg: 'hsl(35 50% 18% / 0.3)', color: 'hsl(35 60% 55%)', border: 'hsl(35 40% 30% / 0.3)' },
+                                    shade:   { bg: 'hsl(210 30% 18% / 0.3)', color: 'hsl(210 40% 55%)', border: 'hsl(210 30% 30% / 0.3)' },
+                                  }[sun.level];
+                                  const SunIcon = sun.level === 'full' ? Sun : sun.level === 'partial' ? CloudSun : Cloud;
+                                  return (
+                                    <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                      style={{ background: styles.bg, color: styles.color, border: `1px solid ${styles.border}` }}>
+                                      <SunIcon className="w-2.5 h-2.5" />
+                                      {sun.label}
+                                    </span>
+                                  );
+                                })()}
                                 {slot.layer && (
                                   <span className="text-[7px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5"
                                     style={{ background: 'hsl(200 30% 18% / 0.3)', color: 'hsl(200 50% 60%)', border: '1px solid hsl(200 30% 30% / 0.3)' }}>
