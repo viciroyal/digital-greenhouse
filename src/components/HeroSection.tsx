@@ -413,6 +413,10 @@ const HeroSection = ({ onLogoClick }: HeroSectionProps) => {
             <span className="text-xs font-body" style={{ color: 'hsl(40 50% 75% / 0.5)' }}>
               Produced by <strong style={{ color: 'hsl(40 50% 85%)' }}>Vici Royàl</strong> & <span style={{ color: 'hsl(350 75% 50%)' }}>Èks</span>
             </span>
+            <span style={{ color: 'hsl(140 60% 45%)' }}>◆</span>
+            <span className="text-xs font-body" style={{ color: 'hsl(40 50% 75% / 0.5)' }}>
+              Artwork by <strong style={{ color: 'hsl(40 50% 85%)' }}>Alyssa Best</strong>
+            </span>
           </div>
         </motion.div>
 
