@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield, Shuffle, Shovel } from 'lucide-react';
@@ -275,6 +275,8 @@ const CropOracle = () => {
   const [modalInfoOpen, setModalInfoOpen] = useState(false);
   const [activeToolPanel, setActiveToolPanel] = useState<'soil' | 'calendar' | 'modal' | 'scent' | 'propagation' | 'suppliers' | 'hole' | 'pairing' | null>(null);
   const [recipeSeed, setRecipeSeed] = useState(0);
+  // Track previously-used crop families per slot to ensure shuffle diversity
+  const prevSlotFamilies = useRef<Record<string, string[]>>({});
   const [showSeasonalCompanions, setShowSeasonalCompanions] = useState(false);
   const [seasonFilter, setSeasonFilter] = useState<string | null>(null);
 
@@ -771,21 +773,41 @@ const CropOracle = () => {
     };
 
     // Seeded rotation: pick from candidates using recipeSeed, preferring harmonically-scored crops
+    // Family-diversity: penalize crops whose family appeared in the same slot last shuffle
+    const getCropFamily = (c: MasterCrop): string => {
+      // Extract family from name: e.g. "pepper_jalapeno" → "pepper", "tomato_cherry" → "tomato"
+      const base = (c.common_name || c.name).toLowerCase().split(/[\s(]/)[0];
+      return base;
+    };
     let pickCounter = 0;
     let hasSentinelInRecipe = starCrop ? isSentinelOrTrap(starCrop) : false;
     let currentSlotKey = ''; // Track which slot we're filling for layer scoring
+    const newSlotFamilies: Record<string, string[]> = {}; // Track families chosen this round
     const rotatedPick = (candidates: MasterCrop[]): MasterCrop | undefined => {
       if (candidates.length === 0) return undefined;
-      // Sort by harmonic score descending, then use seed to rotate within top-tier
-      const scored = candidates.map(c => ({ crop: c, score: harmonicScore(c, hasSentinelInRecipe, currentSlotKey) }));
+      const prevFamilies = prevSlotFamilies.current[currentSlotKey] || [];
+      // Sort by harmonic score descending, then apply family-diversity penalty
+      const scored = candidates.map(c => {
+        let score = harmonicScore(c, hasSentinelInRecipe, currentSlotKey);
+        const family = getCropFamily(c);
+        // Penalize if this family was used in the same slot in previous shuffles
+        if (prevFamilies.includes(family)) score -= 6;
+        // Also penalize if already used in this round's other slots
+        const usedThisRound = Object.values(newSlotFamilies).flat();
+        if (usedThisRound.includes(family)) score -= 3;
+        return { crop: c, score, family };
+      });
       scored.sort((a, b) => b.score - a.score);
-      // Pick from the top-scoring tier (all candidates within 1 point of best)
+      // Widen top-tier to 3 points for more diversity
       const bestScore = scored[0].score;
-      const topTier = scored.filter(s => s.score >= bestScore - 1);
+      const topTier = scored.filter(s => s.score >= bestScore - 3);
       const idx = (recipeSeed + pickCounter++) % topTier.length;
-      const picked = topTier[idx].crop;
-      if (picked && isSentinelOrTrap(picked)) hasSentinelInRecipe = true;
-      return picked;
+      const picked = topTier[idx];
+      if (picked.crop && isSentinelOrTrap(picked.crop)) hasSentinelInRecipe = true;
+      // Record family for this slot
+      if (!newSlotFamilies[currentSlotKey]) newSlotFamilies[currentSlotKey] = [];
+      newSlotFamilies[currentSlotKey].push(picked.family);
+      return picked.crop;
     };
 
     const pickCrop = (
@@ -816,7 +838,7 @@ const CropOracle = () => {
       return null;
     };
 
-    return INTERVAL_ORDER.map(interval => {
+    const result = INTERVAL_ORDER.map(interval => {
       let crop: MasterCrop | null = null;
       let isCompanionFill = false;
       currentSlotKey = interval.key; // Set slot context for layer scoring
@@ -981,6 +1003,11 @@ const CropOracle = () => {
       const layer = crop ? getCropLayer(crop) : null;
       return { ...interval, crop, isCompanionFill, layer };
     }).map((slot, i) => manualOverrides[i] ? { ...slot, crop: manualOverrides[i], isCompanionFill: false, layer: getCropLayer(manualOverrides[i]) } : slot);
+
+    // Store this round's families for next shuffle's diversity check
+    prevSlotFamilies.current = newSlotFamilies;
+
+    return result;
   }, [recipeCrops, manualOverrides, starCrop, allCrops, selectedZone, environment, recipeSeed, hardinessZone]);
 
   /* ─── Shading Warnings ─── */
