@@ -251,6 +251,7 @@ const CropOracle = () => {
   const [step, setStep] = useState(1);
   const [environment, setEnvironment] = useState<string | null>(null);
   const [selectedZone, setSelectedZone] = useState<typeof ZONES[0] | null>(null);
+  const [selectedZones, setSelectedZones] = useState<typeof ZONES>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -469,7 +470,8 @@ const CropOracle = () => {
   const recipeCrops = useMemo(() => {
     if (!allCrops || !selectedZone) return [];
 
-    let filtered = allCrops.filter(c => c.frequency_hz === selectedZone.hz);
+    const activeHzSet = new Set(selectedZones.length > 0 ? selectedZones.map(z => z.hz) : [selectedZone.hz]);
+    let filtered = allCrops.filter(c => activeHzSet.has(c.frequency_hz));
 
     // Trees only visible in food-forest mode
     if (environment !== 'food-forest') {
@@ -528,7 +530,7 @@ const CropOracle = () => {
     }
 
     return filtered;
-  }, [allCrops, selectedZone, environment, hardinessZone, currentSeason, seasonFilter]);
+  }, [allCrops, selectedZone, selectedZones, environment, hardinessZone, currentSeason, seasonFilter]);
 
   /* ─── Star crop candidates (ANY crop from ANY zone can be the Star) ─── */
   const starCandidates = useMemo(() => {
@@ -1327,6 +1329,7 @@ const CropOracle = () => {
                 onClick={() => {
                   if (!environment) setEnvironment('raised-bed');
                   setSelectedZone(zone);
+                  setSelectedZones([zone]);
                   setSeasonalOverride(false);
                   setManualOverrides({});
                   setStarCrop(null);
@@ -1649,14 +1652,24 @@ const CropOracle = () => {
                     <motion.button
                       key={zone.hz}
                       onClick={() => {
-                        setSelectedZone(zone);
+                        setSelectedZones(prev => {
+                          const exists = prev.some(z => z.hz === zone.hz);
+                          const next = exists ? prev.filter(z => z.hz !== zone.hz) : [...prev, zone];
+                          if (next.length > 0) {
+                            setSelectedZone(exists && selectedZone?.hz === zone.hz ? next[0] : (selectedZone || next[0]));
+                          } else {
+                            setSelectedZone(null);
+                          }
+                          return next;
+                        });
                         setSeasonalOverride(false);
-                        setStep(3);
                       }}
                       className="p-4 rounded-xl text-left transition-all flex items-center gap-4"
                       style={{
-                        background: `linear-gradient(90deg, ${zone.color}08, hsl(0 0% 6%))`,
-                        border: `2px solid ${zone.color}30`,
+                        background: selectedZones.some(z => z.hz === zone.hz)
+                          ? `linear-gradient(90deg, ${zone.color}20, hsl(0 0% 6%))`
+                          : `linear-gradient(90deg, ${zone.color}08, hsl(0 0% 6%))`,
+                        border: `2px solid ${selectedZones.some(z => z.hz === zone.hz) ? zone.color + '80' : zone.color + '30'}`,
                         opacity: inSeason ? 1 : 0.55,
                       }}
                       whileHover={{
@@ -1703,19 +1716,45 @@ const CropOracle = () => {
                         </p>
                       </div>
 
-                      <ArrowRight className="w-4 h-4 shrink-0" style={{ color: zone.color + '60' }} />
+                      {selectedZones.some(z => z.hz === zone.hz) ? (
+                        <Check className="w-4 h-4 shrink-0" style={{ color: zone.color }} />
+                      ) : (
+                        <ArrowRight className="w-4 h-4 shrink-0" style={{ color: zone.color + '60' }} />
+                      )}
                     </motion.button>
                   );
                 })}
               </div>
 
-              <button
-                onClick={() => setStep(1)}
-                className="mt-6 flex items-center gap-2 mx-auto text-xs font-mono"
-                style={{ color: 'hsl(0 0% 40%)' }}
-              >
-                <ArrowLeft className="w-3 h-3" /> BACK
-              </button>
+              {/* Next button for multi-select */}
+              <div className="mt-6 flex items-center justify-center gap-4">
+                <button
+                  onClick={() => setStep(1)}
+                  className="flex items-center gap-2 text-xs font-mono"
+                  style={{ color: 'hsl(0 0% 40%)' }}
+                >
+                  <ArrowLeft className="w-3 h-3" /> BACK
+                </button>
+                <button
+                  onClick={() => {
+                    if (selectedZones.length > 0) {
+                      setSelectedZone(selectedZones[0]);
+                      setStep(3);
+                    }
+                  }}
+                  disabled={selectedZones.length === 0}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-mono text-sm tracking-wider transition-all"
+                  style={{
+                    background: selectedZones.length > 0 ? 'hsl(45 80% 55%)' : 'hsl(0 0% 12%)',
+                    color: selectedZones.length > 0 ? 'hsl(0 0% 5%)' : 'hsl(0 0% 30%)',
+                    boxShadow: selectedZones.length > 0 ? '0 4px 20px hsl(45 80% 55% / 0.3)' : 'none',
+                    cursor: selectedZones.length > 0 ? 'pointer' : 'not-allowed',
+                  }}
+                >
+                  {selectedZones.length > 1 ? `NEXT (${selectedZones.length} ZONES)` : 'NEXT'}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             </motion.div>
           )}
 
@@ -1729,7 +1768,9 @@ const CropOracle = () => {
               transition={{ duration: 0.3 }}
             >
               <h2 className="text-center text-2xl md:text-3xl font-bubble mb-1" style={{ color: selectedZone.color }}>
-                Your {plainMode ? (selectedZone.plainVibe || selectedZone.vibe) : selectedZone.vibe} Recipe
+                Your {selectedZones.length > 1
+                  ? (plainMode ? selectedZones.map(z => z.plainVibe || z.vibe).join(' + ') : selectedZones.map(z => z.vibe).join(' + '))
+                  : (plainMode ? (selectedZone.plainVibe || selectedZone.vibe) : selectedZone.vibe)} Recipe
               </h2>
               <p className="text-center text-sm font-mono mb-2" style={{ color: 'hsl(0 0% 45%)' }}>
                 STEP 3 — {plainMode ? (proMode ? 'FULL GARDEN PLAN' : 'SIMPLE PLAN') : (proMode ? 'THE 13TH CHORD' : 'THE TRIAD')}
@@ -1754,7 +1795,8 @@ const CropOracle = () => {
               {/* ═══ Season Filter Chips ═══ */}
               {(() => {
                 // Compute base pool (zone + environment + hardiness, but NO season filter)
-                let basePool = (allCrops || []).filter(c => c.frequency_hz === selectedZone.hz);
+                const activeHzSet = new Set(selectedZones.length > 0 ? selectedZones.map(z => z.hz) : [selectedZone.hz]);
+                let basePool = (allCrops || []).filter(c => activeHzSet.has(c.frequency_hz));
                 if (environment !== 'food-forest') {
                   basePool = basePool.filter(c => !c.growth_habit || c.growth_habit.toLowerCase() !== 'tree');
                 }

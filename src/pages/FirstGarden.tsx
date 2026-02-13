@@ -48,9 +48,9 @@ function pickRecipe(
   allCrops: MasterCrop[],
   space: SpaceOption,
   sun: SunOption,
-  goal: GoalOption,
+  goals: GoalOption[],
 ): MasterCrop[] {
-  const preferredNames = GOAL_CROPS[goal];
+  const preferredNames = goals.flatMap(g => GOAL_CROPS[g]);
   const maxPlants = space === 'windowsill' ? 3 : space === 'patio' ? 4 : space === 'small-bed' ? 5 : 6;
 
   // Score and filter crops
@@ -77,8 +77,8 @@ function pickRecipe(
         if (regex.test(name)) { score += 20; break; }
       }
       // Boost growth habit matching the goal
-      if (goal === 'herbs' && c.growth_habit === 'herb') score += 10;
-      if (goal === 'flowers' && (c.category === 'Dye/Fiber/Aromatic' || c.growth_habit === 'herb')) score += 8;
+      if (goals.includes('herbs') && c.growth_habit === 'herb') score += 10;
+      if (goals.includes('flowers') && (c.category === 'Dye/Fiber/Aromatic' || c.growth_habit === 'herb')) score += 8;
       // Boost easy-to-grow categories
       if (c.category === 'Sustenance') score += 2;
       // Boost shorter harvest days (beginner-friendly)
@@ -174,7 +174,7 @@ const FirstGarden = () => {
   const [step, setStep] = useState(0); // 0=space, 1=sun, 2=goal, 3=zone, 4=result
   const [space, setSpace] = useState<SpaceOption | null>(null);
   const [sun, setSun] = useState<SunOption | null>(null);
-  const [goal, setGoal] = useState<GoalOption | null>(null);
+  const [goals, setGoals] = useState<GoalOption[]>([]);
   const [selectedState, setSelectedState] = useState<string | null>(null);
   const [hardinessZone, setHardinessZone] = useState<number | null>(null);
   const [hardinessSubZone, setHardinessSubZone] = useState<string | null>(null);
@@ -187,9 +187,9 @@ const FirstGarden = () => {
   }, [allCrops, hardinessZone]);
 
   const recipe = useMemo(() => {
-    if (!zonedCrops || zonedCrops.length === 0 || !space || !sun || !goal) return [];
-    return pickRecipe(zonedCrops, space, sun, goal);
-  }, [zonedCrops, space, sun, goal]);
+    if (!zonedCrops || zonedCrops.length === 0 || !space || !sun || goals.length === 0) return [];
+    return pickRecipe(zonedCrops, space, sun, goals);
+  }, [zonedCrops, space, sun, goals]);
 
   const handleNext = () => {
     if (step < 4) setStep(s => s + 1);
@@ -204,7 +204,7 @@ const FirstGarden = () => {
     window.print();
   };
 
-  const canAdvance = (step === 0 && space) || (step === 1 && sun) || (step === 2 && goal) || step === 3;
+  const canAdvance = (step === 0 && space) || (step === 1 && sun) || (step === 2 && goals.length > 0) || step === 3;
 
   const stepTitles = [
     'How much space do you have?',
@@ -267,7 +267,7 @@ const FirstGarden = () => {
                   const isSelected =
                     (step === 0 && space === opt.id) ||
                     (step === 1 && sun === opt.id) ||
-                    (step === 2 && goal === opt.id);
+                    (step === 2 && goals.includes(opt.id as GoalOption));
 
                   return (
                     <button
@@ -275,7 +275,10 @@ const FirstGarden = () => {
                       onClick={() => {
                         if (step === 0) setSpace(opt.id as SpaceOption);
                         else if (step === 1) setSun(opt.id as SunOption);
-                        else setGoal(opt.id as GoalOption);
+                        else {
+                          const g = opt.id as GoalOption;
+                          setGoals(prev => prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g]);
+                        }
                       }}
                       className="flex items-center gap-4 p-4 rounded-xl text-left transition-all duration-200"
                       style={{
@@ -439,10 +442,11 @@ const FirstGarden = () => {
                   <span className="text-xs font-mono" style={{ color: 'hsl(130 50% 65%)' }}>YOUR GARDEN PLAN</span>
                 </div>
                 <h2 className="text-lg font-bold" style={{ color: 'hsl(0 0% 85%)' }}>
-                  {goal === 'salads' ? '🥗 Fresh Salad Garden' :
-                   goal === 'cooking' ? '🍳 Kitchen Garden' :
-                   goal === 'herbs' ? '🌿 Herb & Tea Garden' :
-                   '🌸 Flower Garden'}
+                  {goals.includes('salads') && goals.length === 1 ? '🥗 Fresh Salad Garden' :
+                   goals.includes('cooking') && goals.length === 1 ? '🍳 Kitchen Garden' :
+                   goals.includes('herbs') && goals.length === 1 ? '🌿 Herb & Tea Garden' :
+                   goals.includes('flowers') && goals.length === 1 ? '🌸 Flower Garden' :
+                   '🌱 Mixed Garden'}
                 </h2>
                 <p className="text-xs mt-1" style={{ color: 'hsl(0 0% 45%)' }}>
                   {space === 'windowsill' ? 'Windowsill' : space === 'patio' ? 'Patio containers' : space === 'small-bed' ? 'Small raised bed' : 'Yard beds'} · {sun === 'full' ? 'Full sun' : sun === 'partial' ? 'Partial sun' : 'Shade'} · {recipe.length} plants
