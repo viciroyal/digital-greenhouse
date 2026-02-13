@@ -259,6 +259,7 @@ const CropOracle = () => {
   const [seasonalOverride, setSeasonalOverride] = useState(false);
   const [swapSlotIndex, setSwapSlotIndex] = useState<number | null>(null);
   const [manualOverrides, setManualOverrides] = useState<Record<number, MasterCrop>>({});
+  const [preSwapCrops, setPreSwapCrops] = useState<Record<number, MasterCrop>>({});
   const [starCrop, setStarCrop] = useState<MasterCrop | null>(null);
   const [showStarPicker, setShowStarPicker] = useState(false);
   const [starSearchQuery, setStarSearchQuery] = useState('');
@@ -328,6 +329,7 @@ const CropOracle = () => {
   useEffect(() => {
     setIsSaved(false);
     setManualOverrides({});
+    setPreSwapCrops({});
     setSwapSlotIndex(null);
     setStarCrop(null);
     setShowStarPicker(false);
@@ -1132,6 +1134,8 @@ const CropOracle = () => {
 
   const handleSwapCrop = (crop: MasterCrop) => {
     if (swapSlotIndex === null) return;
+    const currentCrop = chordCard[swapSlotIndex]?.crop;
+    if (currentCrop) setPreSwapCrops(prev => ({ ...prev, [swapSlotIndex]: prev[swapSlotIndex] || currentCrop }));
     setManualOverrides(prev => ({ ...prev, [swapSlotIndex]: crop }));
     setSwapSlotIndex(null);
     setSearchQuery('');
@@ -1410,6 +1414,7 @@ const CropOracle = () => {
                   setSelectedZones([zone]);
                   setSeasonalOverride(false);
                   setManualOverrides({});
+                  setPreSwapCrops({});
                   setStarCrop(null);
                   setIsSaved(false);
                   setStep(3);
@@ -1949,6 +1954,7 @@ const CropOracle = () => {
                         if (zone.hz !== selectedZone.hz) {
                           setSelectedZone(zone);
                           setManualOverrides({});
+                          setPreSwapCrops({});
                           setStarCrop(null);
                           setIsSaved(false);
                           setShowStarPicker(false);
@@ -2230,6 +2236,7 @@ const CropOracle = () => {
                               onClick={() => {
                                 setStarCrop(null);
                                 setManualOverrides({});
+                                setPreSwapCrops({});
                                 setShowStarPicker(false);
                                 setIsSaved(false);
                               }}
@@ -2258,6 +2265,7 @@ const CropOracle = () => {
                                 onClick={() => {
                                   setStarCrop(crop);
                                   setManualOverrides({});
+                                  setPreSwapCrops({});
                                   setShowStarPicker(false);
                                   setIsSaved(false);
                                   toast({
@@ -3037,8 +3045,9 @@ const CropOracle = () => {
                                         }}
                                         onClick={(e) => {
                                           e.stopPropagation();
+                                          const currentCrop = chordCard[i]?.crop;
+                                          if (currentCrop) setPreSwapCrops(prev => ({ ...prev, [i]: prev[i] || currentCrop }));
                                           setManualOverrides(prev => ({ ...prev, [i]: matchedCrop }));
-                                          setIsSaved(false);
                                           toast({
                                             title: `${slot.label} swapped`,
                                             description: `Now: ${matchedCrop.common_name || matchedCrop.name}`,
@@ -3067,13 +3076,23 @@ const CropOracle = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setManualOverrides(prev => {
+                              const previousCrop = preSwapCrops[i];
+                              if (previousCrop) {
+                                setManualOverrides(prev => ({ ...prev, [i]: previousCrop }));
+                              } else {
+                                setManualOverrides(prev => {
+                                  const next = { ...prev };
+                                  delete next[i];
+                                  return next;
+                                });
+                              }
+                              setPreSwapCrops(prev => {
                                 const next = { ...prev };
                                 delete next[i];
                                 return next;
                               });
                               setIsSaved(false);
-                              toast({ title: `${slot.label} restored`, description: 'Reverted to auto-selected crop.' });
+                              toast({ title: `${slot.label} restored`, description: previousCrop ? `Reverted to ${previousCrop.common_name || previousCrop.name}` : 'Reverted to auto-selected crop.' });
                             }}
                             className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all hover:scale-110"
                             style={{
@@ -3173,8 +3192,9 @@ const CropOracle = () => {
                               // Auto-pick the best non-root slot to swap
                               const bestSlot = chordCard.findIndex((s, idx) => idx > 0 && s.crop?.id !== matchedCrop.id);
                               if (bestSlot > 0) {
+                                const currentCrop = chordCard[bestSlot]?.crop;
+                                if (currentCrop) setPreSwapCrops(prev => ({ ...prev, [bestSlot]: prev[bestSlot] || currentCrop }));
                                 setManualOverrides(prev => ({ ...prev, [bestSlot]: matchedCrop }));
-                                setIsSaved(false);
                                 toast({
                                   title: `${INTERVAL_ORDER[bestSlot].label} swapped`,
                                   description: `Now: ${matchedCrop.common_name || matchedCrop.name}`,
