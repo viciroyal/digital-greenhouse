@@ -75,7 +75,7 @@ const ANTAGONIST_PAIRS: { groupA: string[]; groupB: string[]; reason: string }[]
   { groupA: ['mint'], groupB: ['parsley'], reason: 'Mint overwhelms parsley through aggressive root competition' },
   { groupA: ['sunflower'], groupB: ['potato'], reason: 'Sunflowers release allelopathic compounds that inhibit potato growth' },
   { groupA: ['potato'], groupB: ['squash', 'cucumber', 'zucchini', 'pumpkin'], reason: 'Shared susceptibility to blight and competition for soil nutrients' },
-  { groupA: ['bean'], groupB: ['pepper'], reason: 'Beans can shade peppers and compete for similar nutrients' },
+  // Removed: bean vs pepper — actually compatible per USDA companion planting guides
   { groupA: ['corn'], groupB: ['celery'], reason: 'Corn shading stunts celery growth' },
   { groupA: ['lettuce'], groupB: ['parsley'], reason: 'Parsley can bolt lettuce prematurely when planted nearby' },
   { groupA: ['onion'], groupB: ['asparagus'], reason: 'Onions inhibit asparagus growth through root secretions' },
@@ -920,7 +920,14 @@ const CropOracle = () => {
             }));
             if (!crop) assign(pickCrop(directMatch, c => c.chord_interval === '3rd (Triad)'));
           } else {
-            assign(pickCrop(directMatch, c => c.chord_interval === '3rd (Triad)'));
+          assign(pickCrop(directMatch, c => c.chord_interval === '3rd (Triad)'));
+          }
+          // Fallback: peppers are great understory companions — allow them in this slot
+          if (!crop) {
+            assign(pickCrop(undefined, c => {
+              const n = (c.common_name || c.name).toLowerCase();
+              return n.includes('pepper') && c.category === 'Sustenance';
+            }));
           }
           break;
         case '5th (Stabilizer)':
