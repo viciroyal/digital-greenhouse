@@ -1,0 +1,146 @@
+/* =========================================
+   AUTH CARD FOUNDATION
+========================================= */
+
+.auth-card {
+    position: relative;
+    overflow: visible !important;
+  }
+  
+  /* Fix Clerk internal card layout */
+  .cl-card {
+    width: 100% !important;
+    max-width: 480px;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  
+  /* =========================================
+     REMOVE CLERK DECORATORS
+  ========================================= */
+  
+  .cl-socialButtonsBlockButton__activeIndicator,
+  .cl-socialButtonsProviderIcon__activeIndicator,
+  .cl-socialButtonsBlockButton::after,
+  .cl-socialButtonsBlockButton::before,
+  .cl-lastAuthenticationStrategyBadge {
+    display: none !important;
+  }
+  
+  /* =========================================
+   SOCIAL BUTTONS — UNIFIED + CLEAN
+========================================= */
+
+.cl-socialButtons {
+    width: 100% !important;
+    margin: 0 auto !important;
+    overflow: visible !important;
+  }
+  
+  .cl-socialButtonsBlockButton {
+    position: relative !important;
+    overflow: visible !important;
+    border-radius: 16px !important;
+    transition: all 0.35s ease !important;
+  
+    /* Unified surface */
+    background: hsl(230 30% 18%) !important;
+    color: #E6D38A !important;
+  
+    /* Remove border */
+    border: none !important;
+  
+    /* Soft depth instead of border */
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  
+  
+  /* Focus glow only */
+  .cl-socialButtonsBlockButton:focus {
+    box-shadow:
+      0 0 25px rgba(155, 85, 255, 0.75),
+      0 0 45px rgba(155, 85, 255, 0.45);
+    outline: none;
+  }
+  
+  /* Subtle icon normalization */
+  .cl-socialButtonsProviderIcon svg {
+    filter: brightness(1.3) contrast(1.1);
+  }
+  
+  
+  /* =========================================
+     PRIMARY SUBMIT BUTTON
+  ========================================= */
+  
+  .cl-formButtonPrimary {
+    position: relative;
+    z-index: 1;
+    transition: all 0.35s ease;
+  }
+  
+  /* Dark readable purple text glow */
+  .cl-formButtonPrimary:hover::before {
+    color: hsl(270 75% 32%) !important;
+    text-shadow: 0 0 8px rgba(155, 85, 255, 0.8);
+  }
+  
+  .cl-formButtonPrimary:focus::before {
+    color: hsl(270 80% 30%) !important;
+    text-shadow: 0 0 10px rgba(155, 85, 255, 0.95);
+  }
+  
+  /* =========================================
+     SMALL CTA LINKS (SIGN IN / SIGN UP)
+  ========================================= */
+  
+  .auth-card span {
+    transition: all 0.3s ease;
+  }
+  
+  .auth-card span:hover {
+    color: #CFA9FF !important;
+    text-shadow: 0 0 10px rgba(155, 85, 255, 0.9);
+  }
+  .cl-rootBox {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+  
+  .cl-card {
+    max-width: 480px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+/* Force override Apple SVG fill */
+.auth-card .cl-socialButtonsBlockButton svg path[fill] {
+    fill: #E6D38A !important;
+  }
+  
+  .auth-card .cl-socialButtonsBlockButton:hover svg path[fill] {
+    fill: #CFA9FF !important;
+  }
+/* FORCE Apple icon color */
+.cl-socialButtonsBlockButton[data-provider="apple"] svg path {
+    fill: #E6D8FF !important; /* soft purple-tinted light */
+  }
+  
+  /* On hover */
+  .cl-socialButtonsBlockButton[data-provider="apple"]:hover svg path {
+    fill: #CFA9FF !important;
+  }
+  
+  /* On focus */
+  .cl-socialButtonsBlockButton[data-provider="apple"]:focus svg path {
+    fill: #CFA9FF !important;
+  }
+/* Fallback target */
+.cl-socialButtonsProviderIcon__apple svg path {
+    fill: #E6D8FF !important;
+  }
+      

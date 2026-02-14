@@ -152,10 +152,11 @@ const App = () => (
   publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string}
   appearance={{
     variables: {
-      colorPrimary: "hsl(48 100% 60%)",
+      colorPrimary: "#D4AF37",
     },
+
     elements: {
-      /* Remove Clerk default layout */
+      /* Root Layout */
       rootBox: "shadow-none p-0 w-full",
       card: "bg-transparent shadow-none border-none p-0 w-full",
 
@@ -168,35 +169,78 @@ const App = () => (
       formResendCodeLink: "hidden",
       formFieldLabel: "hidden",
 
-      /* Prevent side clipping */
       formFieldRow: "w-full px-1",
       formField: "w-full",
 
-      /* Inputs */
+      /* =========================
+         INPUTS
+      ========================== */
       formFieldInput:
-        "!bg-[hsl(230,30%,12%)] !border !border-[hsl(48,90%,55%)] !text-[hsl(48,100%,88%)] font-mono rounded-xl px-4 py-4 w-full placeholder:!text-[hsl(220,25%,78%)]",
+        "!bg-[hsl(230,30%,12%)] !border !border-[#B8932E] !text-[#F3E7B3] font-mono rounded-xl px-4 py-4 w-full placeholder:!text-[hsl(220,25%,70%)] transition-all duration-300 focus:shadow-[0_0_25px_rgba(155,85,255,0.65)]",
 
       formFieldInput__focus:
-        "!border-[hsl(48,100%,60%)]",
+        "!border-[#D4AF37] !outline-none !ring-0",
 
-      /* Submit Button */
-      formButtonPrimary:
-  "relative text-transparent bg-gradient-to-r from-[hsl(48,100%,60%)] to-[hsl(42,95%,52%)] border border-[hsl(48,100%,60%)] rounded-xl px-6 py-4 shadow-[0_0_35px_hsl(48,100%,60%/0.5)] hover:shadow-[0_0_55px_hsl(48,100%,60%/0.75)] transition-all duration-300 before:absolute before:inset-0 before:flex before:items-center before:justify-center before:font-mono before:tracking-widest before:uppercase before:text-[hsl(230,25%,18%)] before:content-[var(--clerk-button-text)]",
+      /* =========================
+         PRIMARY BUTTON (Metallic Gold + Purple Interaction)
+      ========================== */
+      formButtonPrimary: `
+      relative text-transparent
+      bg-gradient-to-r from-[#F7E08A] via-[#D4AF37] to-[#8C6B1F]
+      border border-[#C9A227]
+      rounded-xl px-6 py-4
+      transition-all duration-300
+      shadow-[0_0_18px_rgba(212,175,55,0.35)]
+    
+      hover:shadow-[0_0_30px_rgba(155,85,255,0.75),0_0_60px_rgba(155,85,255,0.45)]
+      focus:shadow-[0_0_35px_rgba(155,85,255,0.9),0_0_70px_rgba(155,85,255,0.55)]
+    
+      before:absolute
+      before:inset-0
+      before:flex
+      before:items-center
+      before:justify-center
+      before:font-mono
+      before:tracking-widest
+      before:uppercase
+      before:text-[hsl(270,85%,30%)]   /* darker base purple */
+      before:content-[var(--clerk-button-text)]
+      before:transition-all
+      before:duration-300
+    
+      hover:before:text-[hsl(270,90%,38%)]  /* darker readable purple */
+      focus:before:text-[hsl(270,95%,40%)]
+    `,
+    
+      formButtonPrimary__focus: "outline-none ring-0",
 
-
-      /* Social Buttons */
+      /* =========================
+         SOCIAL BUTTONS
+      ========================== */
       socialButtonsBlockButton:
-        "w-full bg-[hsl(230,30%,14%)] border border-[hsl(48,80%,45%)] text-[hsl(48,90%,85%)] font-mono rounded-xl py-4 flex items-center justify-center gap-4 shadow-[0_0_15px_hsl(48,100%,60%/0.15)] transition-all duration-300 hover:bg-[hsl(48,95%,58%)] hover:text-[hsl(230,30%,15%)] hover:shadow-[0_0_35px_hsl(48,100%,60%/0.45)]",
+        `
+        w-full
+        bg-[hsl(230,30%,14%)]
+        border border-[#B8932E]
+        text-[#E6D38A]
+        font-mono
+        rounded-xl py-4
+        flex items-center justify-center gap-4
+        transition-all duration-300
+        relative
+        focus:shadow-[0_0_30px_rgba(155,85,255,0.75),0_0_60px_rgba(155,85,255,0.45)]
+        `,
+
+      socialButtonsBlockButton__focus:
+        "outline-none ring-0",
 
       socialButtonsIcon:
-        "w-6 h-6",
+        "w-6 h-6 brightness-110 contrast-110 transition-all duration-300",
 
-      dividerLine:
-        "bg-[hsl(220,20%,30%)]",
-
-      dividerText:
-        "text-[hsl(220,25%,75%)] font-mono text-xs",
+      dividerLine: "bg-[hsl(220,20%,28%)]",
+      dividerText: "text-[hsl(220,25%,70%)] font-mono text-xs",
     },
+
     layout: {
       socialButtonsVariant: "blockButton",
     },
@@ -205,27 +249,26 @@ const App = () => (
   localization={{
     signIn: {
       start: {
-        actionText: "Enter the Path",
+        actionText: "ENTER THE PATH",
       },
     },
+
     signUp: {
       start: {
         actionText: "BEGIN INITIATION",
       },
+      continue: {
+        actionText: "BEGIN INITIATION",
+      },
     },
-  
-    formFieldInputPlaceholder__username:
-    "Enter username",
-  
-  formFieldInputPlaceholder__emailAddress:
-    "Enter your email address",
-  
+
+    formFieldInputPlaceholder__username: "Enter username",
+    formFieldInputPlaceholder__emailAddress:
+      "Enter your email address",
     formFieldInputPlaceholder__password:
       "Enter your password",
   }}
-  
 >
-
     <QueryClientProvider client={queryClient}>
       <CircadianProvider>
         <AudioBiomeProvider>
