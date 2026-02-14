@@ -28,7 +28,8 @@ const Auth = () => {
   }, []);
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4 relative">
+    <main className="relative min-h-screen flex items-center justify-center p-10">
+
 
       {/* Deep Space Background */}
       <div
@@ -41,7 +42,7 @@ const Auth = () => {
 
       {/* Back Button */}
       <motion.button
-        className="fixed top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 rounded-full"
+        className="absolute top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 rounded-full"
         style={{
           background: "hsl(230 30% 12% / 0.9)",
           border: "1px solid hsl(48 80% 40%)",

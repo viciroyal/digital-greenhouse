@@ -150,6 +150,7 @@ const AppRoutes = () => (
 const App = () => (
 <ClerkProvider
   publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string}
+  afterSignOutUrl="/auth?mode=signin"
   appearance={{
     variables: {
       colorPrimary: "#D4AF37",
