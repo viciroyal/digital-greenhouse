@@ -1,16 +1,10 @@
 import { SignIn, SignUp, useAuth } from "@clerk/clerk-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-<<<<<<< HEAD
-import { useEffect } from "react";
-import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
-=======
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import "@/styles/auth.css";
 
->>>>>>> 6f59c2b (Auth UI polish improvements)
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -26,15 +20,12 @@ const Auth = () => {
   useEffect(() => {
     if (isLoaded && isSignedIn) navigate("/crop-oracle");
   }, [isSignedIn, isLoaded, navigate]);
-<<<<<<< HEAD
-=======
   const [lastStrategy, setLastStrategy] = useState<string | null>(null);
 
   useEffect(() => {
   const strategy = localStorage.getItem("__clerk_last_active_strategy");
   setLastStrategy(strategy);
   }, []);
->>>>>>> 6f59c2b (Auth UI polish improvements)
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4 relative">
@@ -70,15 +61,6 @@ const Auth = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
       >
-<<<<<<< HEAD
-        <div className="rounded-2xl border border-[hsl(48,80%,40%)] bg-[hsl(230,30%,10%/0.98)] backdrop-blur-xl p-8 shadow-[0_0_60px_hsl(48,100%,60%/0.2)]">
-
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-[Staatliches] tracking-widest text-[hsl(48,100%,65%)]">
-              THE THRESHOLD
-            </h1>
-=======
         <div className=" auth-card rounded-2xl border border-[hsl(48,80%,40%)] bg-[hsl(230,30%,10%/0.98)] backdrop-blur-xl p-8">
 
           {/* Header */}
@@ -87,7 +69,6 @@ const Auth = () => {
   THE THRESHOLD
 </h1>
 
->>>>>>> 6f59c2b (Auth UI polish improvements)
             <p className="font-mono text-[hsl(48,70%,75%)] mt-2">
               {mode === "signin"
                 ? "Enter your credentials to continue."
@@ -97,79 +78,6 @@ const Auth = () => {
 
           {/* Toggle */}
           <div className="relative flex justify-center mb-10">
-<<<<<<< HEAD
-
-            <motion.div
-              layout
-              transition={{ type: "spring", stiffness: 500, damping: 35 }}
-              className="absolute top-0 bottom-0 w-36 rounded-full bg-gradient-to-r from-[hsl(48,100%,60%)] to-[hsl(42,95%,52%)] shadow-[0_0_35px_hsl(48,100%,60%/0.6)]"
-              style={{
-                left: mode === "signin" ? "0%" : "50%",
-              }}
-            />
-
-            <div className="relative flex w-72 border border-[hsl(48,70%,40%)] rounded-full bg-[hsl(230,30%,12%)] overflow-hidden">
-
-              <button
-                onClick={() => setMode("signin")}
-                className={`relative z-10 w-1/2 py-3 text-lg font-[Staatliches] tracking-widest transition-all ${
-                  mode === "signin"
-                  ? "text-[hsl(40,45%,65%)] hover:text-[hsl(51,80%,70%)]"
-                  : "text-[hsl(225,20%,35%)]"
-                }`}
-              >
-                SIGN IN
-              </button>
-
-              <button
-                onClick={() => setMode("signup")}
-                className={`relative z-10 w-1/2 py-3 text-lg font-[Staatliches] tracking-widest transition-all ${
-                  mode === "signup"
-                    ? "text-[hsl(40,45%,65%)] hover:text-[hsl(51,80%,70%)]"
-                    : "text-[hsl(225,20%,35%)]"
-                }`}
-              >
-                SIGN UP
-              </button>
-
-            </div>
-          </div>
-
-          {mode === "signin" ? (
-            <>
-              <div style={{ ["--clerk-button-text" as any]: "'ENTER THE PATH'" }}>
-  <SignIn redirectUrl="/crop-oracle" />
-</div>
-
-              <p className="text-center text-xs font-mono mt-6 text-[hsl(48,60%,70%)]">
-                New to the Path?{" "}
-                <span
-                  className="text-[hsl(48,100%,65%)] cursor-pointer"
-                  onClick={() => setMode("signup")}
-                >
-                  SIGN UP
-                </span>
-              </p>
-            </>
-          ) : (
-            <>
-              <div style={{ ["--clerk-button-text" as any]: "'BEGIN INITIATION'" }}>
-  <SignUp redirectUrl="/crop-oracle" />
-</div>
-
-              <p className="text-center text-xs font-mono mt-6 text-[hsl(48,60%,70%)]">
-                Already initiated?{" "}
-                <span
-                  className="text-[hsl(48,100%,65%)] cursor-pointer"
-                  onClick={() => setMode("signin")}
-                >
-                  SIGN IN
-                </span>
-              </p>
-            </>
-          )}
-
-=======
 
             <motion.div
               layout
@@ -246,7 +154,6 @@ const Auth = () => {
             </>
           )}
 
->>>>>>> 6f59c2b (Auth UI polish improvements)
         </div>
       </motion.div>
     </main>
