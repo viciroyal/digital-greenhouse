@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { ArrowLeft, User, Mail, Calendar, Loader2, LogOut, Check, FlaskConical, Sprout, Users, MapPin, Clock, Ruler, DollarSign, TrendingUp, Sun, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -9,9 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+
 const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user: clerkUser } = useUser();
+  const { signOut } = useAuth();
   const { isAdmin } = useAdminRole();
   const [isLoading, setIsLoading] = useState(true);
   const [isPopulating, setIsPopulating] = useState(false);
@@ -27,48 +31,50 @@ const Profile = () => {
 
   useEffect(() => {
     const loadProfile = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      if (!clerkUser) {
         navigate('/auth');
         return;
       }
 
-      setEmail(session.user.email || '');
-      setCreatedAt(session.user.created_at || '');
+      // Get email from Clerk
+      setEmail(clerkUser.primaryEmailAddress?.emailAddress || '');
+      setCreatedAt(clerkUser.createdAt?.toISOString() || '');
+      setAvatarUrl(clerkUser.imageUrl || null);
 
+      // Get profile data from Supabase
       const { data: profile } = await supabase
         .from('profiles')
         .select('display_name, avatar_url')
-        .eq('user_id', session.user.id)
+        .eq('user_id', clerkUser.id)
         .maybeSingle();
 
       if (profile) {
         setDisplayName(profile.display_name || '');
         setOriginalName(profile.display_name || '');
-        setAvatarUrl(profile.avatar_url);
+        if (profile.avatar_url) {
+          setAvatarUrl(profile.avatar_url);
+        }
+      } else {
+        // If no profile exists, use Clerk's full name
+        setDisplayName(clerkUser.fullName || clerkUser.firstName || '');
+        setOriginalName(clerkUser.fullName || clerkUser.firstName || '');
       }
 
       setIsLoading(false);
     };
 
     loadProfile();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) navigate('/auth');
-    });
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [clerkUser, navigate]);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      if (!clerkUser) throw new Error('Not authenticated');
 
       const { error } = await supabase
         .from('profiles')
         .update({ display_name: displayName })
-        .eq('user_id', session.user.id);
+        .eq('user_id', clerkUser.id);
 
       if (error) throw error;
 
@@ -85,9 +91,9 @@ const Profile = () => {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await supabase.auth.signOut();
+      await signOut();
       toast({ title: 'Signed out', description: 'Until next time, Pharmer.' });
-      navigate('/auth');
+      navigate('/');
     } catch (error: any) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
       setIsLoggingOut(false);
@@ -103,8 +109,9 @@ const Profile = () => {
     setIsPopulating(true);
     setPopulateStatus(`Starting ${label}...`);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { getToken } = useAuth();
+      const token = await getToken?.();
+      if (!token) throw new Error('Not authenticated');
 
       let remaining = 1;
       let totalUpdated = 0;
@@ -114,7 +121,7 @@ const Profile = () => {
           {
             method: 'POST',
             headers: {
-              Authorization: `Bearer ${session.access_token}`,
+              Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
               apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             },
@@ -142,8 +149,9 @@ const Profile = () => {
     setIsPopulating(true);
     setPopulateStatus('Starting Companion Crops...');
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { getToken } = useAuth();
+      const token = await getToken?.();
+      if (!token) throw new Error('Not authenticated');
 
       let remaining = 1;
       let totalUpdated = 0;
@@ -153,7 +161,7 @@ const Profile = () => {
           {
             method: 'POST',
             headers: {
-              Authorization: `Bearer ${session.access_token}`,
+              Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
               apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             },
@@ -165,7 +173,6 @@ const Profile = () => {
         remaining = data.remaining || 0;
         setPopulateStatus(`Companions: ${totalUpdated} updated, ${remaining} remaining...`);
         if (remaining === 0) break;
-        // Small delay to avoid rate limits
         await new Promise(r => setTimeout(r, 1500));
       }
       setPopulateStatus(`Done! ${totalUpdated} companion entries updated.`);
@@ -182,8 +189,9 @@ const Profile = () => {
     setIsPopulating(true);
     setPopulateStatus('Starting Hardiness Zones...');
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { getToken } = useAuth();
+      const token = await getToken?.();
+      if (!token) throw new Error('Not authenticated');
 
       let remaining = 1;
       let totalUpdated = 0;
@@ -193,7 +201,7 @@ const Profile = () => {
           {
             method: 'POST',
             headers: {
-              Authorization: `Bearer ${session.access_token}`,
+              Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
               apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             },
@@ -221,8 +229,9 @@ const Profile = () => {
     setIsPopulating(true);
     setPopulateStatus('Starting Harvest Days...');
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { getToken } = useAuth();
+      const token = await getToken?.();
+      if (!token) throw new Error('Not authenticated');
 
       let remaining = 1;
       let totalUpdated = 0;
@@ -232,7 +241,7 @@ const Profile = () => {
           {
             method: 'POST',
             headers: {
-              Authorization: `Bearer ${session.access_token}`,
+              Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
               apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             },
@@ -260,8 +269,9 @@ const Profile = () => {
     setIsPopulating(true);
     setPopulateStatus('Starting Spacing...');
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { getToken } = useAuth();
+      const token = await getToken?.();
+      if (!token) throw new Error('Not authenticated');
 
       let remaining = 1;
       let totalUpdated = 0;
@@ -271,7 +281,7 @@ const Profile = () => {
           {
             method: 'POST',
             headers: {
-              Authorization: `Bearer ${session.access_token}`,
+              Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
               apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             },
@@ -299,14 +309,15 @@ const Profile = () => {
     setIsPopulating(true);
     setPopulateStatus('Starting Seed Cost...');
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { getToken } = useAuth();
+      const token = await getToken?.();
+      if (!token) throw new Error('Not authenticated');
       let remaining = 1;
       let totalUpdated = 0;
       while (remaining > 0) {
         const resp = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/populate-seed-cost`,
-          { method: 'POST', headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
+          { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
         );
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'Failed');
@@ -330,14 +341,15 @@ const Profile = () => {
     setIsPopulating(true);
     setPopulateStatus('Starting Yield...');
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { getToken } = useAuth();
+      const token = await getToken?.();
+      if (!token) throw new Error('Not authenticated');
       let remaining = 1;
       let totalUpdated = 0;
       while (remaining > 0) {
         const resp = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/populate-yield`,
-          { method: 'POST', headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
+          { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
         );
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'Failed');
@@ -361,14 +373,15 @@ const Profile = () => {
     setIsPopulating(true);
     setPopulateStatus('Starting Season Expansion...');
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { getToken } = useAuth();
+      const token = await getToken?.();
+      if (!token) throw new Error('Not authenticated');
       let remaining = 1;
       let totalUpdated = 0;
       while (remaining > 0) {
         const resp = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/populate-seasons`,
-          { method: 'POST', headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
+          { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY } }
         );
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'Failed');
@@ -392,8 +405,9 @@ const Profile = () => {
     setIsPopulating(true);
     setPopulateStatus('Starting Tropical Crops Generation...');
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      const { getToken } = useAuth();
+      const token = await getToken?.();
+      if (!token) throw new Error('Not authenticated');
       let totalInserted = 0;
       // Run 8 batches to get ~200+ crops
       for (let batch = 1; batch <= 8; batch++) {
@@ -403,7 +417,7 @@ const Profile = () => {
           {
             method: 'POST',
             headers: {
-              Authorization: `Bearer ${session.access_token}`,
+              Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
               apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
             },
