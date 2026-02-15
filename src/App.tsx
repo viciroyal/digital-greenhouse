@@ -73,11 +73,11 @@ const AppRoutes = () => (
     <Route
       path="/crop-oracle"
       element={
-        <ProtectedRoute>
+        
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <CropOracle />
           </Suspense>
-        </ProtectedRoute>
+        
       }
     />
 
@@ -106,33 +106,33 @@ const AppRoutes = () => (
     <Route
       path="/crop-library"
       element={
-        <ProtectedRoute>
+       
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <CropLibrary />
           </Suspense>
-        </ProtectedRoute>
+       
       }
     />
 
     <Route
       path="/weekly-tasks"
       element={
-        <ProtectedRoute>
+       
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <WeeklyTasks />
           </Suspense>
-        </ProtectedRoute>
+       
       }
     />
 
     <Route
       path="/first-garden"
       element={
-        <ProtectedRoute>
+        
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <FirstGarden />
           </Suspense>
-        </ProtectedRoute>
+       
       }
     />
 
