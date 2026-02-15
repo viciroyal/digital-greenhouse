@@ -9,13 +9,11 @@ import { CircadianProvider } from "@/contexts/CircadianContext";
 import { AudioBiomeProvider } from "@/contexts/AudioBiomeContext";
 import { FieldModeProvider } from "@/contexts/FieldModeContext";
 import sovereignEmblem from "@/assets/sovereign-emblem.png";
-import AuthLayout from "./pages/AuthLayout";
-
-
 
 import Index from "./pages/Index";
 
 const CropOracle = lazy(() => import("./pages/CropOracle"));
+const Auth = lazy(() => import("./pages/Auth"));
 const Profile = lazy(() => import("./pages/Profile"));
 const UserGuide = lazy(() => import("./pages/UserGuide"));
 const DevGuide = lazy(() => import("./pages/DevGuide"));
@@ -31,7 +29,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isLoaded, isSignedIn } = useAuth();
 
   if (!isLoaded) {
-    return null;
+    return <div className="min-h-screen bg-background" />;
   }
 
   if (!isSignedIn) {
@@ -46,15 +44,13 @@ const AppRoutes = () => (
     <Route path="/" element={<Index />} />
 
     <Route
-  path="/auth/*"
-  element={
-    <Suspense fallback={<div className="min-h-screen bg-background" />}>
-      <AuthLayout />
-    </Suspense>
-  }
-/>
-
-
+      path="/auth"
+      element={
+        <Suspense fallback={<div className="min-h-screen bg-background" />}>
+          <Auth />
+        </Suspense>
+      }
+    />
 
     <Route
       path="/user-guide"
@@ -77,7 +73,7 @@ const AppRoutes = () => (
     <Route
       path="/crop-oracle"
       element={
-       
+        
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <CropOracle />
           </Suspense>
@@ -110,22 +106,22 @@ const AppRoutes = () => (
     <Route
       path="/crop-library"
       element={
-        <ProtectedRoute>
+       
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <CropLibrary />
           </Suspense>
-        </ProtectedRoute>
+       
       }
     />
 
     <Route
       path="/weekly-tasks"
       element={
-        <ProtectedRoute>
+       
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <WeeklyTasks />
           </Suspense>
-        </ProtectedRoute>
+       
       }
     />
 
@@ -136,7 +132,7 @@ const AppRoutes = () => (
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <FirstGarden />
           </Suspense>
-        
+       
       }
     />
 
@@ -154,12 +150,7 @@ const AppRoutes = () => (
 const App = () => (
 <ClerkProvider
   publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string}
-  signInUrl="/auth"
-  signUpUrl="/auth/sign-up"
-  afterSignOutUrl="/auth"
-  afterSignInUrl="/crop-oracle"
-  afterSignUpUrl="/crop-oracle"
-
+  afterSignOutUrl="/auth?mode=signin"
   appearance={{
     variables: {
       colorPrimary: "#D4AF37",
@@ -170,10 +161,10 @@ const App = () => (
       rootBox: "shadow-none p-0 w-full",
       card: "bg-transparent shadow-none border-none p-0 w-full",
 
-      header: "",
+      header: "hidden",
       headerTitle: "hidden",
       headerSubtitle: "hidden",
-      identityPreview: "",
+      identityPreview: "hidden",
       footer: "hidden",
       footerAction: "hidden",
       formResendCodeLink: "hidden",
