@@ -129,22 +129,13 @@ const Index = () => {
             </motion.h1>
 
             <motion.p
-              className="text-xs tracking-[0.4em] uppercase font-body"
+              className="text-xs tracking-[0.4em] uppercase font-body mb-10"
               style={{ color: 'hsl(40 50% 75% / 0.5)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
             >
               by Vici Royàl
-            </motion.p>
-            <motion.p
-              className="text-[10px] tracking-[0.25em] uppercase font-body mb-10"
-              style={{ color: 'hsl(40 50% 75% / 0.35)' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.95 }}
-            >
-              Artwork by <span style={{ color: 'hsl(140 60% 60%)' }}>Alyssa Best</span>
             </motion.p>
 
             {/* CTA Buttons — side by side */}
