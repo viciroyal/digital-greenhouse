@@ -8,6 +8,7 @@ import RespiratorySystem from '@/components/bio-digital/RespiratorySystem';
 import BioluminescentVeins from '@/components/bio-digital/BioluminescentVeins';
 import CircadianOverlay from '@/components/bio-digital/CircadianOverlay';
 import AutomajicSoundSystem from '@/components/audio/AutomajicSoundSystem';
+import MiniMusicPlayer from '@/components/audio/MiniMusicPlayer';
 import GriotOracle from '@/components/GriotOracle';
 import EshuLoader from '@/components/EshuLoader';
 import albumArt from '@/assets/pharmboi-artwork.png';
@@ -315,6 +316,9 @@ const Index = () => {
           </motion.div>
         </section>
       </div>
+
+      {/* Mini Music Player — auto-open + auto-play on first click */}
+      <MiniMusicPlayer autoPlay />
 
       {/* Griot Oracle — Floating Help */}
       <GriotOracle />
