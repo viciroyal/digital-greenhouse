@@ -1188,7 +1188,7 @@ const CropOracle = () => {
         }}
       >
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/stage')}
           className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110 shrink-0"
           style={{
             background: 'hsl(0 0% 10%)',

@@ -11,7 +11,7 @@ import { FieldModeProvider } from "@/contexts/FieldModeContext";
 import sovereignEmblem from "@/assets/sovereign-emblem.png";
 
 import AuthLayout from "./pages/AuthLayout";
-import Index from "./pages/Index";
+const Index = lazy(() => import("./pages/Index"));
 
 const CropOracle = lazy(() => import("./pages/CropOracle"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -39,7 +39,17 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppRoutes = () => (
   <Routes>
-    <Route path="/" element={<Index />} />
+    <Route path="/" element={
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <CropOracle />
+      </Suspense>
+    } />
+
+    <Route path="/stage" element={
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <Index />
+      </Suspense>
+    } />
 
     {/* AUTH */}
     <Route
@@ -71,17 +81,7 @@ const AppRoutes = () => (
     />
 
     {/* PROTECTED */}
-    <Route
-      path="/crop-oracle"
-      element={
-        
-          <Suspense fallback={<div className="min-h-screen bg-background" />}>
-            <CropOracle 
-            />
-          </Suspense>
-        
-      }
-    />
+    <Route path="/crop-oracle" element={<Navigate to="/" replace />} />
 
     <Route
       path="/profile"
