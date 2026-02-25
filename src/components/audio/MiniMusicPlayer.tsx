@@ -32,15 +32,42 @@ const formatTime = (time: number) => {
 };
 
 const MiniMusicPlayer = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState<TrackData | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState<TrackData | null>(trackData[0] || null);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
+  const [hasAutoStarted, setHasAutoStarted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Auto-start on first user interaction (browser autoplay policy)
+  useEffect(() => {
+    if (hasAutoStarted) return;
+    const startPlayback = () => {
+      setHasAutoStarted(true);
+      const audio = audioRef.current;
+      if (audio && currentTrack?.audioUrl) {
+        audio.src = currentTrack.audioUrl;
+        audio.load();
+        audio.play().catch(console.error);
+      }
+    };
+    document.addEventListener('click', startPlayback, { once: true });
+    document.addEventListener('keydown', startPlayback, { once: true });
+    // Also try immediately (works if user already interacted)
+    if (currentTrack?.audioUrl && audioRef.current) {
+      audioRef.current.src = currentTrack.audioUrl;
+      audioRef.current.load();
+      audioRef.current.play().then(() => setHasAutoStarted(true)).catch(() => {});
+    }
+    return () => {
+      document.removeEventListener('click', startPlayback);
+      document.removeEventListener('keydown', startPlayback);
+    };
+  }, [hasAutoStarted, currentTrack]);
 
   // Audio event handlers
   useEffect(() => {
