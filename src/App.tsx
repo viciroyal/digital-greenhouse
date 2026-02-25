@@ -306,11 +306,13 @@ identityPreview:
                 <AppRoutes />
               </BrowserRouter>
 
-              <img
-                src={sovereignEmblem}
-                alt="Sovereign Emblem"
-                className="fixed bottom-4 left-4 w-16 opacity-75 hover:opacity-100 transition-all duration-500 pointer-events-none z-50"
-              />
+              <a href="/stage">
+                <img
+                  src={sovereignEmblem}
+                  alt="Sovereign Emblem"
+                  className="fixed bottom-4 left-4 w-16 opacity-75 hover:opacity-100 transition-all duration-500 cursor-pointer z-50"
+                />
+              </a>
             </TooltipProvider>
           </FieldModeProvider>
         </AudioBiomeProvider>
