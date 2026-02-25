@@ -41,13 +41,19 @@ const AppRoutes = () => (
   <Routes>
     <Route path="/" element={
       <Suspense fallback={<div className="min-h-screen bg-background" />}>
-        <CropOracle />
+        <FirstGarden />
       </Suspense>
     } />
 
     <Route path="/stage" element={
       <Suspense fallback={<div className="min-h-screen bg-background" />}>
         <Index />
+      </Suspense>
+    } />
+
+    <Route path="/crop-oracle" element={
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <CropOracle />
       </Suspense>
     } />
 
@@ -81,7 +87,11 @@ const AppRoutes = () => (
     />
 
     {/* PROTECTED */}
-    <Route path="/crop-oracle" element={<Navigate to="/" replace />} />
+    <Route path="/crop-oracle" element={
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <CropOracle />
+      </Suspense>
+    } />
 
     <Route
       path="/profile"
@@ -127,14 +137,7 @@ const AppRoutes = () => (
       }
     />
 
-    <Route
-      path="/first-garden"
-      element={
-        <Suspense fallback={<div className="min-h-screen bg-background" />}>
-          <FirstGarden />
-        </Suspense>
-      }
-    />
+    <Route path="/first-garden" element={<Navigate to="/" replace />} />
 
     <Route
       path="*"
