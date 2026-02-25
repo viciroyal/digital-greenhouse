@@ -1,12 +1,20 @@
 import { useEffect } from "react";
-import type { UserResource } from "@clerk/types";
 import { supabase } from "@/integrations/supabase/client";
+
+interface ClerkUserLike {
+  id: string;
+  primaryEmailAddress?: { emailAddress: string } | null;
+  fullName?: string | null;
+  firstName?: string | null;
+  imageUrl?: string | null;
+  updatedAt?: string | Date | null;
+}
 
 /**
  * Syncs a Clerk user to the Supabase profiles table
  * This ensures your existing database structure is maintained while using Clerk for auth
  */
-export async function syncClerkUserToSupabase(clerkUser: UserResource): Promise<void> {
+export async function syncClerkUserToSupabase(clerkUser: ClerkUserLike): Promise<void> {
   try {
     if (!clerkUser.id) {
       console.warn("Clerk user has no ID, skipping sync");
@@ -44,7 +52,7 @@ export async function syncClerkUserToSupabase(clerkUser: UserResource): Promise<
 /**
  * Hook to automatically sync Clerk user on login/update
  */
-export function useClerkSupabaseSync(clerkUser: UserResource | null | undefined) {
+export function useClerkSupabaseSync(clerkUser: ClerkUserLike | null | undefined) {
   useEffect(() => {
     if (clerkUser?.id) {
       syncClerkUserToSupabase(clerkUser);
