@@ -232,6 +232,7 @@ description        — Detailed description`}</Code>
 741Hz (G) — Signal     — Blue (#0000FF)   — Ether  — Potassium   — 375 crops
 852Hz (A) — Vision     — Indigo (#4B0082) — Light  — Silica      — 308 crops
 963Hz (B) — Source     — Violet (#8B00FF) — Spirit — Sulfur      — 269 crops`}</Code>
+          <p style={{ color: 'hsl(45 90% 60%)', marginTop: '0.5rem' }}><strong>Total: 2,188 crops across all 7 zones</strong></p>
         </Section>
 
         <Section title="CHORD INTERVAL SYSTEM">
