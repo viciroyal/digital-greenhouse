@@ -9,6 +9,7 @@ import { CircadianProvider } from "@/contexts/CircadianContext";
 import { AudioBiomeProvider } from "@/contexts/AudioBiomeContext";
 import { FieldModeProvider } from "@/contexts/FieldModeContext";
 import sovereignEmblem from "@/assets/sovereign-emblem.png";
+import MiniMusicPlayer from "@/components/audio/MiniMusicPlayer";
 
 import AuthLayout from "./pages/AuthLayout";
 const Index = lazy(() => import("./pages/Index"));
@@ -305,6 +306,8 @@ identityPreview:
               <BrowserRouter>
                 <AppRoutes />
               </BrowserRouter>
+
+              <MiniMusicPlayer />
 
               <a href="/stage">
                 <img

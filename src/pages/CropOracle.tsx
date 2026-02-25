@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import GriotOracle from '@/components/GriotOracle';
 import EshuLoader from '@/components/EshuLoader';
 import { useWeatherAlert } from '@/hooks/useWeatherAlert';
-import MiniMusicPlayer from '@/components/audio/MiniMusicPlayer';
+
 import { STATE_HARDINESS_ZONES, US_STATES } from '@/data/stateHardinessZones';
 import ModalReference from '@/components/crop-oracle/ModalReference';
 import SoilLinkPanel from '@/components/crop-oracle/SoilLinkPanel';
@@ -3785,8 +3785,6 @@ const CropOracle = () => {
       {/* Griot Oracle — Floating Help */}
       <GriotOracle />
 
-      {/* Mini Music Player */}
-      <MiniMusicPlayer />
     </div>
   );
 };
