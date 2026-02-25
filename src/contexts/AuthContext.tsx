@@ -1,4 +1,4 @@
-import { useAuth, useUser } from '@clerk/react'
+import { useAuth, useUser } from '@clerk/clerk-react'
 import { createContext, ReactNode, useContext } from 'react'
 
 interface AuthContextType {
