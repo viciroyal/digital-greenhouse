@@ -1746,7 +1746,7 @@ const CropOracle = () => {
                 What energy do you need?
               </h2>
               <p className="text-center text-sm font-mono mb-8" style={{ color: 'hsl(0 0% 45%)' }}>
-                STEP 2 — THE VIBE
+                STEP 2 — THE VIBE · Select up to 3
               </p>
 
               <div className="grid grid-cols-1 gap-3">
