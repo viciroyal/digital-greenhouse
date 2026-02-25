@@ -258,14 +258,9 @@ const FirstGarden = () => {
               exit={{ opacity: 0, x: -40 }}
               transition={{ duration: 0.25 }}
             >
-              <h2 className="text-xl font-bold text-center mb-2" style={{ color: 'hsl(0 0% 85%)' }}>
+              <h2 className="text-xl font-bold text-center mb-8" style={{ color: 'hsl(0 0% 85%)' }}>
                 {stepTitles[step]}
               </h2>
-              {step === 2 ? (
-                <p className="text-xs text-center mb-6 font-mono" style={{ color: 'hsl(40 40% 60%)' }}>
-                  Select all that apply{goals.length > 1 ? ` · ${goals.length} selected` : ''}
-                </p>
-              ) : <div className="mb-6" />}
 
               <div className="grid gap-3">
                 {(step === 0 ? SPACE_OPTIONS : step === 1 ? SUN_OPTIONS : GOAL_OPTIONS).map((opt) => {

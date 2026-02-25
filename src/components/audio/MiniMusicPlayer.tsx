@@ -31,38 +31,16 @@ const formatTime = (time: number) => {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 };
 
-interface MiniMusicPlayerProps {
-  autoPlay?: boolean;
-}
-
-const MiniMusicPlayer = ({ autoPlay = false }: MiniMusicPlayerProps) => {
-  const [isOpen, setIsOpen] = useState(autoPlay);
+const MiniMusicPlayer = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState<TrackData | null>(autoPlay ? trackData[0] || null : null);
+  const [currentTrack, setCurrentTrack] = useState<TrackData | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const hasAutoPlayed = useRef(false);
-
-  // Auto-play on first user interaction (browsers block unmuted autoplay)
-  useEffect(() => {
-    if (!autoPlay || hasAutoPlayed.current) return;
-    const tryPlay = () => {
-      hasAutoPlayed.current = true;
-      setIsPlaying(true);
-      window.removeEventListener('click', tryPlay);
-      window.removeEventListener('touchstart', tryPlay);
-    };
-    window.addEventListener('click', tryPlay, { once: true });
-    window.addEventListener('touchstart', tryPlay, { once: true });
-    return () => {
-      window.removeEventListener('click', tryPlay);
-      window.removeEventListener('touchstart', tryPlay);
-    };
-  }, [autoPlay]);
 
   // Audio event handlers
   useEffect(() => {
