@@ -94,7 +94,19 @@ const UserGuide = () => {
             <li><strong>Step 2:</strong> Set your location and grow zone</li>
             <li><strong>Step 3-5:</strong> Follow the guided setup to get your first planting recipe</li>
           </ul>
-          <p>Want to skip ahead? Tap <strong>"Skip to Advanced Studio →"</strong> at the bottom to jump straight to the Crop Oracle.</p>
+          <p>Want to skip ahead? Tap <strong>"Skip to Advanced Studio →"</strong> at the bottom to enter the <strong>Studio Intake</strong> wizard.</p>
+        </Section>
+
+        <Section title="Studio Intake (Advanced Wizard)" emoji="🎛️">
+          <p>The <strong>Studio Intake</strong> is a 4-step questionnaire that guides experienced growers into the Crop Oracle with pre-selected settings:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>Step 1:</strong> Choose your environment — Pots, Raised Bed, Farm (Pro), High Tunnel (Pro), or Food Forest (Pro)</li>
+            <li><strong>Step 2:</strong> Select your sunlight level — Full Sun, Partial Sun, or Mostly Shade</li>
+            <li><strong>Step 3:</strong> Pick what you want to grow — select multiple crop categories (Root, Vine, Summer, Salad, Spice, Medicine, Shield). Each maps to a frequency zone</li>
+            <li><strong>Step 4:</strong> Set your location (optional) — choose your state to auto-detect your hardiness zone</li>
+          </ul>
+          <p>When you tap <strong>"Launch Studio"</strong>, the Crop Oracle opens with your environment and frequency zones pre-selected, skipping straight to your recipe.</p>
+          <p>You can also tap <strong>"Skip straight to Studio →"</strong> to bypass the intake and enter the Crop Oracle with a blank slate.</p>
         </Section>
 
         <Section title="The Stage (Landing Page)" emoji="🎤">
@@ -114,7 +126,7 @@ const UserGuide = () => {
             <li>Tap the seed icon to open the <strong>Growth Journal</strong> panel — it shows which areas you've discovered</li>
             <li>New discoveries trigger a <strong>water droplet</strong> animation</li>
           </ul>
-          <p>There are <strong>6 discoverable areas</strong>: First Garden, The Stage, Crop Oracle, Profile, User Guide, and playing music.</p>
+          <p>There are <strong>8 discoverable areas</strong>: First Garden, The Stage, Studio Intake, Crop Oracle, Profile, User Guide, playing music, and opening the Growth Journal.</p>
         </Section>
 
         <Section title="Discovery Hints" emoji="🧭">
