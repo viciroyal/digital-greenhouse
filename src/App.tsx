@@ -317,11 +317,13 @@ identityPreview:
                 <MiniMusicPlayerGuard />
               </BrowserRouter>
 
-              <img
-                src={sovereignEmblem}
-                alt="Sovereign Emblem"
-                className="fixed bottom-4 left-4 w-16 opacity-75 hover:opacity-100 transition-all duration-500 z-50 pointer-events-none"
-              />
+              <a href="/stage">
+                <img
+                  src={sovereignEmblem}
+                  alt="Sovereign Emblem"
+                  className="fixed bottom-4 left-4 w-16 opacity-75 hover:opacity-100 transition-all duration-500 cursor-pointer z-50"
+                />
+              </a>
             </TooltipProvider>
             </PlaybackProvider>
           </FieldModeProvider>
