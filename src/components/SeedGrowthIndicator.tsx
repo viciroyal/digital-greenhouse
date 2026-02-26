@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import FlourishingCelebration from './seed-growth/FlourishingCelebration';
 
 /**
  * Seed Growth Indicator
@@ -76,6 +77,9 @@ const SeedGrowthIndicator = () => {
 
   return (
     <>
+      {/* Flourishing celebration */}
+      <FlourishingCelebration active={progress >= 100} />
+
       {/* Fixed indicator button */}
       <motion.button
         className="fixed top-[4.25rem] left-4 z-50 flex flex-col items-center gap-1 cursor-pointer group"
