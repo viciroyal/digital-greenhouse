@@ -319,9 +319,8 @@ identityPreview:
                 <MiniMusicPlayerGuard />
                 <SeedGrowthIndicator />
                 <DiscoveryHint />
+                <SovereignEmblemLink />
               </BrowserRouter>
-
-              <SovereignEmblemLink />
             </TooltipProvider>
             </PlaybackProvider>
           </FieldModeProvider>
