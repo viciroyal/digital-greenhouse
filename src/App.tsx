@@ -13,6 +13,7 @@ import MiniMusicPlayer from "@/components/audio/MiniMusicPlayer";
 import SeedGrowthIndicator from "@/components/SeedGrowthIndicator";
 import DiscoveryHint from "@/components/seed-growth/DiscoveryHint";
 import SovereignEmblemLink from "@/components/SovereignEmblemLink";
+import GlobalNav from "@/components/GlobalNav";
 import { useLocation } from "react-router-dom";
 
 const MiniMusicPlayerGuard = () => {
@@ -327,6 +328,7 @@ identityPreview:
                 <SeedGrowthIndicator />
                 <DiscoveryHint />
                 <SovereignEmblemLink />
+                <GlobalNav />
               </BrowserRouter>
             </TooltipProvider>
             </PlaybackProvider>
