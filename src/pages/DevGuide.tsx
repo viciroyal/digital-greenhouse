@@ -77,14 +77,16 @@ const DevGuide = () => {
           DEVELOPER GUIDE
         </h1>
         <p className="text-center font-['Space_Mono'] text-xs mb-8" style={{ color: 'hsl(0 0% 45%)' }}>
-          Technical documentation • File structure • Best practices • v3.0
+          Technical documentation • File structure • Best practices • v4.0
         </p>
 
         <Section title="ARCHITECTURE OVERVIEW">
-          <p>The app follows <strong>"The Mullet Strategy"</strong>: a creative landing page (World 1 / The Stage) and a functional 3-step crop planning wizard (World 2 / The Studio).</p>
+          <p>The app follows <strong>"The Mullet Strategy"</strong>: a creative landing page (World 1 / The Stage) and a functional 3-step crop planning wizard (World 2 / The Studio). A <strong>First Garden</strong> wizard at <code>/</code> provides a beginner-friendly entry point.</p>
           <p><strong>Stack:</strong> React 18 + Vite + TypeScript + Tailwind CSS + Framer Motion + Lovable Cloud (Supabase)</p>
           <p><strong>State:</strong> React Query for server state (Infinity staleTime for static crop data), useState for local UI state. No Redux or Zustand needed.</p>
           <p><strong>Environments:</strong> Pot, Raised Bed, Farm (Pro), High Tunnel (Pro), Food Forest (Pro). Each environment applies custom recipe filtering logic.</p>
+          <p><strong>Routing:</strong> <code>/</code> = First Garden wizard, <code>/stage</code> = The Stage (landing), <code>/crop-oracle</code> = The Studio (Crop Oracle). All secondary routes use <code>React.lazy()</code> for code splitting.</p>
+          <p><strong>Discovery System:</strong> A lightweight custom-event bus (<code>discoveryEvents.ts</code>) tracks user exploration. The <code>SeedGrowthIndicator</code> shows progress (seed→flourishing), <code>DiscoveryHint</code> provides directional navigation hints, and <code>SovereignEmblemLink</code> shows a progress ring around the emblem. All persist to <code>localStorage</code>.</p>
           <p><strong>Performance:</strong> All secondary routes use <code>React.lazy()</code> for code splitting. Only the landing page (Index) loads eagerly for instant first paint. CropRow components use <code>React.memo()</code> to prevent unnecessary re-renders. The Crop Library uses <code>@tanstack/react-virtual</code> for row virtualization.</p>
           <p><strong>Data completeness:</strong> All 2,188 crops have 100% population across all AI-batch fields: growth_habit, scientific_name, planting_season, harvest_days, root_depth_inches, min_container_gal, hardiness zones, spacing, seed cost, yield, companions, and descriptions (2,188/2,188 curated — 100% coverage).</p>
           <p><strong>Shuffle diversity:</strong> The recipe engine uses a scoring penalty system with a 2-shuffle cooldown window: −18 for families used in the most recent shuffle, −10 for the 2nd-to-last, and −10 cross-slot penalty within the same recipe. Word-boundary regex prevents false positives.</p>
@@ -95,6 +97,7 @@ const DevGuide = () => {
           <Code>{`src/
 ├── pages/                  # Route-level components (lazy-loaded except Index)
 │   ├── Index.tsx            # Landing page (The Stage) — eagerly loaded
+│   ├── FirstGarden.tsx      # First Garden wizard (home page at /)
 │   ├── CropOracle.tsx       # 3-step wizard (The Studio) — MAIN feature
 │   ├── CropLibrary.tsx      # Full crop registry + CSV export
 │   ├── Auth.tsx             # Login / signup
@@ -148,8 +151,15 @@ const DevGuide = () => {
 │   └── ScienceModeContext.tsx  # Science overlay toggle
 ├── lib/
 │   ├── astroCalculator.ts   # Birth chart calculations
+│   ├── discoveryEvents.ts   # Discovery event bus (emitDiscovery, getDiscoveries)
 │   ├── geocoding.ts         # Location → coordinates
 │   └── utils.ts             # Tailwind merge utility
+├── components/
+│   ├── SeedGrowthIndicator.tsx  # Exploration progress tracker (top-left)
+│   ├── SovereignEmblemLink.tsx  # Emblem with progress ring (bottom-left)
+│   ├── seed-growth/
+│   │   ├── DiscoveryHint.tsx    # Floating directional hints
+│   │   └── DiscoveryHint.tsx    # Discovery celebration animation
 ├── integrations/
 │   └── supabase/            # Auto-generated — DO NOT EDIT
 │       ├── client.ts
@@ -343,6 +353,42 @@ INSERT INTO master_crops (
   396, 'Foundation', '#FF0000', 'Earth', 'Sustenance',
   'Root (Lead)', 'ROOT_FOCUS', 'herb', 18, 5, '24', 90
 );`}</Code>
+        </Section>
+
+        <Section title="DISCOVERY & EXPLORATION SYSTEM">
+          <p>The app includes a gamified exploration tracker that encourages users to visit all features:</p>
+          <Code>{`Architecture:
+├── lib/discoveryEvents.ts       — Event bus + localStorage persistence
+│   ├── ALL_DISCOVERIES          — Registry of 6 trackable items (pages + features)
+│   ├── emitDiscovery(key)       — Fire discovery event from any component
+│   ├── onDiscovery(handler)     — Subscribe to discovery events
+│   ├── getDiscoveries()         — Read from localStorage
+│   └── saveDiscoveries(items)   — Write to localStorage
+│
+├── SeedGrowthIndicator.tsx      — Top-left progress tracker
+│   ├── Stages: Seed → Sprout → Sapling → Budding → Blooming → Flourishing
+│   ├── Water droplet animation on new discovery
+│   └── Expandable Growth Journal panel
+│
+├── seed-growth/DiscoveryHint.tsx — Floating directional hints (bottom-center)
+│   ├── Shows contextual hints based on current page + undiscovered items
+│   ├── Tap to navigate directly to suggested page
+│   ├── Auto-hides after 12 seconds
+│   └── Dismissals stored in sessionStorage
+│
+└── SovereignEmblemLink.tsx      — Golden emblem with SVG progress ring
+    ├── Ring fills 0-100% based on discovery progress
+    ├── Completion celebration: particle burst + label + emblem wobble
+    └── Enhanced glow and "✦ Fully Discovered" tooltip at 100%
+
+Discoverable items (6 total):
+  '/'             — First Garden (page)
+  '/stage'        — The Stage (page)
+  '/crop-oracle'  — Crop Oracle (page)
+  '/profile'      — Profile (page)
+  '/user-guide'   — User Guide (page)
+  'played-music'  — Played Music (feature)`}</Code>
+          <p><strong>Adding a new discovery:</strong> Add an entry to <code>ALL_DISCOVERIES</code> in <code>discoveryEvents.ts</code>. For page discoveries, the system auto-detects visits. For feature discoveries, call <code>emitDiscovery('key')</code> from the relevant component.</p>
         </Section>
 
         <Section title="ADDING A NEW PAGE / ROUTE">
