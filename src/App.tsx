@@ -12,6 +12,7 @@ import { PlaybackProvider } from "@/contexts/PlaybackContext";
 import sovereignEmblem from "@/assets/sovereign-emblem.png";
 import MiniMusicPlayer from "@/components/audio/MiniMusicPlayer";
 import SeedGrowthIndicator from "@/components/SeedGrowthIndicator";
+import DiscoveryHint from "@/components/seed-growth/DiscoveryHint";
 import { useLocation } from "react-router-dom";
 
 const MiniMusicPlayerGuard = () => {
@@ -317,6 +318,7 @@ identityPreview:
                 <AppRoutes />
                 <MiniMusicPlayerGuard />
                 <SeedGrowthIndicator />
+                <DiscoveryHint />
               </BrowserRouter>
 
               <a href="/stage" className="group fixed bottom-4 left-4 z-50">
