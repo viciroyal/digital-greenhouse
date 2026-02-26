@@ -67,7 +67,7 @@ const DiscoveryHint = () => {
       {activeHint && (
         <motion.div
           key={activeHint.key}
-          className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2 max-w-xs w-[calc(100%-2rem)]"
+          className="fixed bottom-6 left-1/2 z-[55] -translate-x-1/2 max-w-xs w-[calc(100%-2rem)]"
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.95 }}
