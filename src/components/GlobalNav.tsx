@@ -14,15 +14,14 @@ const GlobalNav = () => {
 
   return (
     <motion.nav
-      className="fixed top-4 right-4 z-50 flex items-center gap-2"
+      className="fixed top-4 right-4 z-40 flex items-center gap-2 pointer-events-none"
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
     >
-      {/* User Guide */}
       <button
         onClick={() => navigate('/user-guide')}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-300 hover:scale-105"
+        className="pointer-events-auto flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-300 hover:scale-105"
         style={{
           background: 'hsl(230 30% 12% / 0.85)',
           border: '1px solid hsl(140 50% 35% / 0.4)',
@@ -38,7 +37,7 @@ const GlobalNav = () => {
       {isSignedIn ? (
         <button
           onClick={() => navigate('/profile')}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-300 hover:scale-105"
+          className="pointer-events-auto flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-300 hover:scale-105"
           style={{
             background: 'hsl(230 30% 12% / 0.85)',
             border: '1px solid hsl(45 70% 45% / 0.5)',
@@ -54,7 +53,7 @@ const GlobalNav = () => {
       ) : (
         <button
           onClick={() => navigate('/auth')}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-300 hover:scale-105"
+          className="pointer-events-auto flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-300 hover:scale-105"
           style={{
             background: 'linear-gradient(135deg, hsl(45 80% 50% / 0.15), hsl(45 70% 40% / 0.1))',
             border: '1px solid hsl(45 70% 45% / 0.5)',
