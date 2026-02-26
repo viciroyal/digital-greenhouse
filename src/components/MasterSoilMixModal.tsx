@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Leaf, Droplets, Sun, Moon } from 'lucide-react';
 import GlassModal, { 
@@ -5,6 +6,7 @@ import GlassModal, {
   GoldCornerAccents, 
   FloatingParticles 
 } from '@/components/ui/GlassModal';
+import { emitDiscovery } from '@/lib/discoveryEvents';
 
 interface MasterSoilMixModalProps {
   isOpen: boolean;
@@ -20,6 +22,7 @@ interface MasterSoilMixModalProps {
  * Refactored to use unified GlassModal system.
  */
 const MasterSoilMixModal = ({ isOpen, onClose }: MasterSoilMixModalProps) => {
+  useEffect(() => { if (isOpen) emitDiscovery('opened-soil-mix'); }, [isOpen]);
   const ingredients = [
     { icon: Leaf, name: "Forest Leaf Mold", ratio: "40%", note: "The memory of the canopy" },
     { icon: Droplets, name: "Worm Castings", ratio: "25%", note: "The alchemy of decomposition" },

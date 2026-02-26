@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, X, Leaf, Music } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { emitDiscovery } from '@/lib/discoveryEvents';
 
 interface Message {
   id: string;
@@ -61,6 +62,7 @@ const GriotOracle = () => {
 
   const sendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
+    emitDiscovery('asked-griot');
 
     const userMessage: Message = {
       id: Date.now().toString(),

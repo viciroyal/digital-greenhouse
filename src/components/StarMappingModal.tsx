@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { emitDiscovery } from '@/lib/discoveryEvents';
 
 interface StarMappingModalProps {
   isOpen: boolean;
@@ -120,6 +121,7 @@ const getResonanceType = (elements: string[]) => {
 };
 
 const StarMappingModal = ({ isOpen, onClose }: StarMappingModalProps) => {
+  useEffect(() => { if (isOpen) emitDiscovery('opened-star-map'); }, [isOpen]);
   const [step, setStep] = useState<Step>('input');
   const [birthDate, setBirthDate] = useState('');
   const [birthTime, setBirthTime] = useState('');
