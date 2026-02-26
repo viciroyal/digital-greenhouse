@@ -9,40 +9,45 @@
 export interface DiscoveryItem {
   label: string;
   emoji: string;
-  /** 'page' = auto-tracked by route, 'feature' = tracked via event */
   type: 'page' | 'feature';
-  /** Directional hint shown on relevant pages to guide users */
   hint?: string;
-  /** Which route(s) this hint should appear on (if any) */
   hintPages?: string[];
+  /** Route to navigate to when the hint is tapped. For features, use a CSS selector action instead. */
+  linkTo?: string;
+  /** CSS selector to click when hint is tapped (for features that aren't pages) */
+  clickSelector?: string;
 }
 
 /** All trackable discoveries — pages AND features */
 export const ALL_DISCOVERIES: Record<string, DiscoveryItem> = {
-  // Pages (tracked automatically by route)
   '/': { label: 'First Garden', emoji: '🌱', type: 'page',
-    hint: 'Start your journey — tap "Enter The Garden" on The Stage',
-    hintPages: ['/stage'] },
+    hint: 'Start your journey — tap here to enter the First Garden',
+    hintPages: ['/stage'],
+    linkTo: '/' },
   '/stage': { label: 'The Stage', emoji: '🎭', type: 'page',
-    hint: 'Visit The Stage — tap the sovereign emblem in the bottom left',
-    hintPages: ['/', '/crop-oracle'] },
+    hint: 'Visit The Stage — tap here to go',
+    hintPages: ['/', '/crop-oracle'],
+    linkTo: '/stage' },
   '/crop-oracle': { label: 'Crop Oracle', emoji: '🔮', type: 'page',
-    hint: 'Enter the Crop Oracle — tap "Enter The Garden" then skip to Advanced Studio',
-    hintPages: ['/', '/stage'] },
+    hint: 'Enter the Crop Oracle — tap here to explore',
+    hintPages: ['/', '/stage'],
+    linkTo: '/crop-oracle' },
   '/profile': { label: 'Profile', emoji: '👤', type: 'page',
-    hint: 'Visit your Profile — tap the person icon in the top right',
-    hintPages: ['/stage', '/crop-oracle'] },
+    hint: 'Visit your Profile — tap here to view',
+    hintPages: ['/stage', '/crop-oracle'],
+    linkTo: '/profile' },
   '/user-guide': { label: 'User Guide', emoji: '📖', type: 'page',
-    hint: 'Read the User Guide — find it in the top navigation',
-    hintPages: ['/stage', '/crop-oracle'] },
+    hint: 'Read the User Guide — tap here to learn more',
+    hintPages: ['/stage', '/crop-oracle'],
+    linkTo: '/user-guide' },
 
-  // Features (tracked via emitDiscovery)
   'played-music': { label: 'Played Music', emoji: '🎵', type: 'feature',
     hint: 'Play some music — tap the glowing music icon in the bottom right',
     hintPages: ['/stage', '/crop-oracle', '/'] },
   'used-filter': { label: 'Used Filters', emoji: '🔍', type: 'feature',
-    hint: 'Try the filters — use zone or category selects in the Crop Library',
-    hintPages: ['/crop-library', '/crop-oracle'] },
+    hint: 'Try the filters — tap here to open the Crop Library',
+    hintPages: ['/crop-library', '/crop-oracle'],
+    linkTo: '/crop-library' },
   'opened-growth-journal': { label: 'Growth Journal', emoji: '📓', type: 'feature',
     hint: 'Open your Growth Journal — tap the seed icon in the top left',
     hintPages: ['/stage', '/', '/crop-oracle'] },

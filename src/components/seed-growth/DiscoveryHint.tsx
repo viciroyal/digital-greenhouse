@@ -1,18 +1,19 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ALL_DISCOVERIES, getDiscoveries } from '@/lib/discoveryEvents';
-import { Compass } from 'lucide-react';
+import { Compass, ArrowRight } from 'lucide-react';
 
 const DISMISS_KEY = 'pharmboi-hint-dismissed';
 
 /**
  * Floating directional hint that appears on pages,
  * nudging users toward their next undiscovered area or feature.
- * Shows one hint at a time, dismissible, and auto-hides after 12s.
+ * Tapping the hint navigates directly to the suggested page/feature.
  */
 const DiscoveryHint = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [dismissed, setDismissed] = useState<string[]>(() => {
     try {
       return JSON.parse(sessionStorage.getItem(DISMISS_KEY) || '[]');
@@ -26,10 +27,9 @@ const DiscoveryHint = () => {
     const discoveries = getDiscoveries();
     const currentPath = location.pathname;
 
-    // Find the first undiscovered item that has a hint for this page
     for (const [key, item] of Object.entries(ALL_DISCOVERIES)) {
-      if (discoveries.includes(key)) continue; // already discovered
-      if (dismissed.includes(key)) continue; // dismissed this session
+      if (discoveries.includes(key)) continue;
+      if (dismissed.includes(key)) continue;
       if (!item.hint || !item.hintPages) continue;
       if (item.hintPages.some((p) => p === currentPath || (p !== '/' && currentPath.startsWith(p)))) {
         return { key, ...item };
@@ -38,7 +38,6 @@ const DiscoveryHint = () => {
     return null;
   }, [location.pathname, dismissed]);
 
-  // Auto-hide after 12 seconds, re-show on route change
   useEffect(() => {
     setVisible(true);
     const t = setTimeout(() => setVisible(false), 12000);
@@ -52,7 +51,16 @@ const DiscoveryHint = () => {
     sessionStorage.setItem(DISMISS_KEY, JSON.stringify(next));
   };
 
+  const handleTap = () => {
+    if (!hint) return;
+    dismiss();
+    if (hint.linkTo) {
+      navigate(hint.linkTo);
+    }
+  };
+
   const activeHint = hint && visible ? hint : null;
+  const isNavigable = activeHint?.linkTo;
 
   return (
     <AnimatePresence>
@@ -67,7 +75,7 @@ const DiscoveryHint = () => {
         >
           <div
             className="flex items-start gap-3 px-4 py-3 rounded-2xl cursor-pointer"
-            onClick={dismiss}
+            onClick={handleTap}
             style={{
               background: 'hsl(0 0% 8% / 0.92)',
               border: '1px solid hsl(45 50% 40% / 0.25)',
@@ -89,6 +97,24 @@ const DiscoveryHint = () => {
               <p className="text-[11px] font-mono leading-relaxed" style={{ color: 'hsl(0 0% 60%)' }}>
                 {activeHint.hint}
               </p>
+              {isNavigable && (
+                <div className="flex items-center gap-1 mt-1.5">
+                  <motion.span
+                    className="text-[9px] font-mono tracking-wider"
+                    style={{ color: 'hsl(45 70% 55%)' }}
+                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    TAP TO GO
+                  </motion.span>
+                  <motion.div
+                    animate={{ x: [0, 4, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <ArrowRight className="w-3 h-3" style={{ color: 'hsl(45 70% 55%)' }} />
+                  </motion.div>
+                </div>
+              )}
             </div>
             <button
               className="text-[9px] font-mono flex-shrink-0 mt-1 px-2 py-0.5 rounded-md"
