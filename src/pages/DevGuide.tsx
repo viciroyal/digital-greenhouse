@@ -85,7 +85,7 @@ const DevGuide = () => {
           <p><strong>Stack:</strong> React 18 + Vite + TypeScript + Tailwind CSS + Framer Motion + Lovable Cloud (Supabase)</p>
           <p><strong>State:</strong> React Query for server state (Infinity staleTime for static crop data), useState for local UI state. No Redux or Zustand needed.</p>
           <p><strong>Environments:</strong> Pot, Raised Bed, Farm (Pro), High Tunnel (Pro), Food Forest (Pro). Each environment applies custom recipe filtering logic.</p>
-          <p><strong>Routing:</strong> <code>/</code> = First Garden wizard, <code>/stage</code> = The Stage (landing), <code>/crop-oracle</code> = The Studio (Crop Oracle). All secondary routes use <code>React.lazy()</code> for code splitting.</p>
+          <p><strong>Routing:</strong> <code>/</code> = First Garden wizard, <code>/studio-intake</code> = Advanced Studio intake wizard, <code>/stage</code> = The Stage (landing), <code>/crop-oracle</code> = The Studio (Crop Oracle). The intake wizard maps goal selections to frequency zones and passes them via <code>location.state</code> to pre-configure the Crop Oracle. All secondary routes use <code>React.lazy()</code> for code splitting.</p>
           <p><strong>Discovery System:</strong> A lightweight custom-event bus (<code>discoveryEvents.ts</code>) tracks user exploration. The <code>SeedGrowthIndicator</code> shows progress (seed→flourishing), <code>DiscoveryHint</code> provides directional navigation hints, and <code>SovereignEmblemLink</code> shows a progress ring around the emblem. All persist to <code>localStorage</code>.</p>
           <p><strong>Performance:</strong> All secondary routes use <code>React.lazy()</code> for code splitting. Only the landing page (Index) loads eagerly for instant first paint. CropRow components use <code>React.memo()</code> to prevent unnecessary re-renders. The Crop Library uses <code>@tanstack/react-virtual</code> for row virtualization.</p>
           <p><strong>Data completeness:</strong> All 2,188 crops have 100% population across all AI-batch fields: growth_habit, scientific_name, planting_season, harvest_days, root_depth_inches, min_container_gal, hardiness zones, spacing, seed cost, yield, companions, and descriptions (2,188/2,188 curated — 100% coverage).</p>
@@ -98,6 +98,7 @@ const DevGuide = () => {
 ├── pages/                  # Route-level components (lazy-loaded except Index)
 │   ├── Index.tsx            # Landing page (The Stage) — eagerly loaded
 │   ├── FirstGarden.tsx      # First Garden wizard (home page at /)
+│   ├── StudioIntake.tsx     # Advanced Studio intake wizard (/studio-intake)
 │   ├── CropOracle.tsx       # 3-step wizard (The Studio) — MAIN feature
 │   ├── CropLibrary.tsx      # Full crop registry + CSV export
 │   ├── Auth.tsx             # Login / signup
@@ -359,7 +360,7 @@ INSERT INTO master_crops (
           <p>The app includes a gamified exploration tracker that encourages users to visit all features:</p>
           <Code>{`Architecture:
 ├── lib/discoveryEvents.ts       — Event bus + localStorage persistence
-│   ├── ALL_DISCOVERIES          — Registry of 6 trackable items (pages + features)
+│   ├── ALL_DISCOVERIES          — Registry of 8 trackable items (pages + features)
 │   ├── emitDiscovery(key)       — Fire discovery event from any component
 │   ├── onDiscovery(handler)     — Subscribe to discovery events
 │   ├── getDiscoveries()         — Read from localStorage
@@ -381,13 +382,15 @@ INSERT INTO master_crops (
     ├── Completion celebration: particle burst + label + emblem wobble
     └── Enhanced glow and "✦ Fully Discovered" tooltip at 100%
 
-Discoverable items (6 total):
-  '/'             — First Garden (page)
-  '/stage'        — The Stage (page)
-  '/crop-oracle'  — Crop Oracle (page)
-  '/profile'      — Profile (page)
-  '/user-guide'   — User Guide (page)
-  'played-music'  — Played Music (feature)`}</Code>
+Discoverable items (8 total):
+  '/'                — First Garden (page)
+  '/stage'           — The Stage (page)
+  '/studio-intake'   — Studio Intake (page)
+  '/crop-oracle'     — Crop Oracle (page)
+  '/profile'         — Profile (page)
+  '/user-guide'      — User Guide (page)
+  'played-music'     — Played Music (feature)
+  'opened-growth-journal' — Growth Journal (feature)`}</Code>
           <p><strong>Adding a new discovery:</strong> Add an entry to <code>ALL_DISCOVERIES</code> in <code>discoveryEvents.ts</code>. For page discoveries, the system auto-detects visits. For feature discoveries, call <code>emitDiscovery('key')</code> from the relevant component.</p>
         </Section>
 
@@ -457,7 +460,7 @@ src/test/birthchart.test.ts          — Astro calculator`}</Code>
         </Section>
 
         <p className="text-center font-['Space_Mono'] text-[10px] mt-8" style={{ color: 'hsl(0 0% 30%)' }}>
-          PharmBoi Developer Guide • v3.0 • {new Date().toISOString().split('T')[0]}
+          PharmBoi Developer Guide • v4.1 • {new Date().toISOString().split('T')[0]}
         </p>
       </main>
     </div>
