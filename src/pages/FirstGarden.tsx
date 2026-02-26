@@ -390,7 +390,7 @@ const FirstGarden = () => {
 
                 {/* Skip to Advanced */}
                 <button
-                  onClick={() => navigate('/crop-oracle')}
+                  onClick={() => navigate('/studio-intake')}
                   className="text-[11px] font-mono tracking-wider transition-colors hover:underline mt-2"
                   style={{ color: 'hsl(0 0% 35%)' }}
                 >
