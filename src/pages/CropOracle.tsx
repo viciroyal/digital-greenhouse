@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Leaf, Sprout, Tractor, Home as HomeIcon, Sparkles, Save, Check, LogIn, Moon, Search, AlertTriangle, X, Undo2, Droplets, Trash2, ChevronDown, ChevronUp, Thermometer, CloudRain, User, MapPin, Navigation, Printer, Beaker, Calendar, Music, TreePine, Shield, Shuffle, Shovel, Lock, Unlock, Sun, CloudSun, Cloud } from 'lucide-react';
 import GrowthHabitBadge from '@/components/crop-oracle/GrowthHabitBadge';
 import TrapCropBadge from '@/components/crop-oracle/TrapCropBadge';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMasterCrops, MasterCrop } from '@/hooks/useMasterCrops';
 import { getLunarPhase, isCropLunarReady, isZoneInSeason, getSeasonalGateMessage } from '@/hooks/useLunarPhase';
@@ -257,6 +257,7 @@ const getSunRequirement = (crop: { category?: string; growth_habit?: string | nu
 
 const CropOracle = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { data: allCrops, isLoading } = useMasterCrops();
@@ -337,6 +338,40 @@ const CropOracle = () => {
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  // Read intake wizard state if navigated from /studio-intake
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.fromIntake) {
+      if (state.environment) setEnvironment(state.environment);
+      if (state.hardinessZone) {
+        setHardinessZone(state.hardinessZone);
+        setHardinessSubZone(state.hardinessSubZone || null);
+      }
+      // Map hz values to zone objects and pre-select
+      if (state.zoneHz?.length) {
+        const matchedZones = ZONES.filter(z => state.zoneHz.includes(z.hz));
+        if (matchedZones.length > 0) {
+          setSelectedZones(matchedZones);
+          setSelectedZone(matchedZones[0]);
+          // If environment is also set, skip straight to step 3
+          if (state.environment) {
+            setStep(3);
+          } else {
+            setStep(2);
+          }
+        }
+      } else if (state.environment) {
+        setStep(2);
+      }
+      // Enable pro mode if pro environment was selected
+      if (['farm', 'high-tunnel', 'food-forest'].includes(state.environment)) {
+        setProMode(true);
+      }
+      // Clear location state to prevent re-triggering
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // Reset saved state when recipe changes
   useEffect(() => {

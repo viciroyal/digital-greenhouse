@@ -32,6 +32,7 @@ const TestingSuiteDocs = lazy(() => import("./pages/TestingSuiteDocs"));
 const CropLibrary = lazy(() => import("./pages/CropLibrary"));
 const WeeklyTasks = lazy(() => import("./pages/WeeklyTasks"));
 const FirstGarden = lazy(() => import("./pages/FirstGarden"));
+const StudioIntake = lazy(() => import("./pages/StudioIntake"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -149,6 +150,12 @@ const AppRoutes = () => (
     />
 
     <Route path="/first-garden" element={<Navigate to="/" replace />} />
+
+    <Route path="/studio-intake" element={
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <StudioIntake />
+      </Suspense>
+    } />
 
     <Route
       path="*"
