@@ -101,20 +101,43 @@ const SeedGrowthIndicator = () => {
         <motion.div
           className="relative w-14 h-14 rounded-full flex items-center justify-center"
           style={{
-            background: 'hsl(0 0% 6% / 0.9)',
-            border: `2px solid ${stage.color}`,
+            background: progress >= 100
+              ? 'radial-gradient(circle, hsl(45 60% 12% / 0.95), hsl(0 0% 6% / 0.9))'
+              : 'hsl(0 0% 6% / 0.9)',
+            border: `2px solid ${progress >= 100 ? 'hsl(45 80% 55%)' : stage.color}`,
             backdropFilter: 'blur(8px)',
           }}
-          animate={{
-            boxShadow: [
-              `0 0 8px ${stage.color.replace(')', ' / 0.2)')}`,
-              `0 0 20px ${stage.color.replace(')', ' / 0.45)')}`,
-              `0 0 8px ${stage.color.replace(')', ' / 0.2)')}`,
-            ],
-          }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          animate={progress >= 100
+            ? {
+                boxShadow: [
+                  '0 0 12px hsl(45 80% 55% / 0.3), 0 0 30px hsl(45 70% 50% / 0.15), inset 0 0 12px hsl(45 80% 55% / 0.1)',
+                  '0 0 20px hsl(45 80% 55% / 0.5), 0 0 50px hsl(45 70% 50% / 0.25), inset 0 0 20px hsl(45 80% 55% / 0.15)',
+                  '0 0 12px hsl(45 80% 55% / 0.3), 0 0 30px hsl(45 70% 50% / 0.15), inset 0 0 12px hsl(45 80% 55% / 0.1)',
+                ],
+                borderColor: ['hsl(45 80% 55%)', 'hsl(45 90% 65%)', 'hsl(45 80% 55%)'],
+              }
+            : {
+                boxShadow: [
+                  `0 0 8px ${stage.color.replace(')', ' / 0.2)')}`,
+                  `0 0 20px ${stage.color.replace(')', ' / 0.45)')}`,
+                  `0 0 8px ${stage.color.replace(')', ' / 0.2)')}`,
+                ],
+              }
+          }
+          transition={{ duration: progress >= 100 ? 3 : 2.5, repeat: Infinity, ease: 'easeInOut' }}
           whileHover={{ scale: 1.1 }}
         >
+          {/* Golden shimmer ring overlay for 100% */}
+          {progress >= 100 && (
+            <motion.div
+              className="absolute inset-[-3px] rounded-full pointer-events-none"
+              style={{
+                background: 'conic-gradient(from 0deg, transparent 0%, hsl(45 90% 65% / 0.4) 10%, transparent 20%, transparent 50%, hsl(45 80% 55% / 0.3) 60%, transparent 70%)',
+              }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+            />
+          )}
           <svg viewBox="0 0 60 80" className="w-10 h-10" aria-hidden="true">
             <ellipse cx="30" cy="72" rx="22" ry="5" fill="hsl(20 40% 18%)" />
             {progress > 10 && (
