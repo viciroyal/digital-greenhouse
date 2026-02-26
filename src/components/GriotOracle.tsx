@@ -148,7 +148,7 @@ const GriotOracle = () => {
     <>
       {/* Cowrie Shell Trigger */}
       <motion.button
-        className="fixed bottom-24 right-6 z-50 w-16 h-16 rounded-full flex items-center justify-center cursor-pointer group"
+        className="fixed bottom-32 right-6 z-50 w-16 h-16 rounded-full flex items-center justify-center cursor-pointer group"
         onClick={() => {
           if (isCropOracle) {
             setIsOpen(true);
