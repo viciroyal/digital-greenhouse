@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { usePlayback } from '@/contexts/PlaybackContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trackData, type TrackData } from '@/data/trackData';
 import { Play, Pause, Radio, ChevronRight, Volume2, VolumeX, SkipBack, SkipForward } from 'lucide-react';
@@ -510,78 +511,15 @@ const NowPlaying = ({
 };
 
 const AutomajicSoundSystem = () => {
-  const [currentTrack, setCurrentTrack] = useState<TrackData | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const {
+    currentTrack, isPlaying, currentTime, duration, volume, isMuted,
+    playTrack, togglePlay, seek, setVolume, setIsMuted, toggleMute,
+    skipPrev, skipNext, audioRef,
+  } = usePlayback();
+
   const [selectedTrack, setSelectedTrack] = useState<TrackData | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.7);
-  const [isMuted, setIsMuted] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const isMobile = useIsMobile();
-
-  // Audio event handlers
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const handleLoadedMetadata = () => setDuration(audio.duration);
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const handleEnded = () => {
-      // Auto-play next track
-      if (currentTrack) {
-        const nextTrackNum = currentTrack.row < 12 ? currentTrack.row + 1 : 1;
-        const nextTrack = trackData.find(t => t.row === nextTrackNum);
-        if (nextTrack) {
-          setCurrentTrack(nextTrack);
-        } else {
-          setIsPlaying(false);
-        }
-      }
-    };
-
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('ended', handleEnded);
-
-    return () => {
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, [currentTrack]);
-
-  // Play/pause when isPlaying or track changes
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (isPlaying && currentTrack?.audioUrl) {
-      audio.play().catch(console.error);
-    } else {
-      audio.pause();
-    }
-  }, [isPlaying, currentTrack]);
-
-  // Update audio source when track changes
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !currentTrack?.audioUrl) return;
-    
-    audio.src = currentTrack.audioUrl;
-    audio.load();
-    if (isPlaying) {
-      audio.play().catch(console.error);
-    }
-  }, [currentTrack?.audioUrl]);
-
-  // Volume control
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
-    }
-  }, [volume, isMuted]);
 
   const handleOpenDetail = (track: TrackData) => {
     setSelectedTrack(track);
@@ -593,25 +531,15 @@ const AutomajicSoundSystem = () => {
   };
 
   const handlePlayTrack = (track: TrackData) => {
-    if (currentTrack?.row === track.row) {
-      setIsPlaying(!isPlaying);
-    } else {
-      setCurrentTrack(track);
-      setIsPlaying(true);
-    }
+    playTrack(track);
   };
 
   const handleTogglePlay = () => {
-    if (!currentTrack?.audioUrl) return;
-    setIsPlaying(!isPlaying);
+    togglePlay();
   };
 
   const handleSeek = (value: number[]) => {
-    if (audioRef.current && duration) {
-      const newTime = (value[0] / 100) * duration;
-      audioRef.current.currentTime = newTime;
-      setCurrentTime(newTime);
-    }
+    seek(value);
   };
 
   const handleVolumeChange = (value: number[]) => {
@@ -619,25 +547,8 @@ const AutomajicSoundSystem = () => {
     if (value[0] > 0) setIsMuted(false);
   };
 
-  const handlePrevTrack = () => {
-    if (!currentTrack) return;
-    const prevTrackNum = currentTrack.row > 1 ? currentTrack.row - 1 : 12;
-    const prevTrack = trackData.find(t => t.row === prevTrackNum);
-    if (prevTrack) {
-      setCurrentTrack(prevTrack);
-      setIsPlaying(true);
-    }
-  };
-
-  const handleNextTrack = () => {
-    if (!currentTrack) return;
-    const nextTrackNum = currentTrack.row < 12 ? currentTrack.row + 1 : 1;
-    const nextTrack = trackData.find(t => t.row === nextTrackNum);
-    if (nextTrack) {
-      setCurrentTrack(nextTrack);
-      setIsPlaying(true);
-    }
-  };
+  const handlePrevTrack = () => skipPrev();
+  const handleNextTrack = () => skipNext();
 
   // Get tracks for each crate
   const getTracksForCrate = (crate: CrateConfig): TrackData[] => {
@@ -696,8 +607,7 @@ const AutomajicSoundSystem = () => {
         ))}
       </div>
 
-      {/* Hidden Audio Element */}
-      <audio ref={audioRef} preload="metadata" />
+      {/* Audio element is managed by PlaybackContext */}
 
       {/* Now Playing Footer */}
       <NowPlaying

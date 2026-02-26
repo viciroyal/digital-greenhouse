@@ -1,14 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, SkipBack, SkipForward, Music, X, ChevronUp, ChevronDown, Volume2, VolumeX } from 'lucide-react';
 import { trackData, type TrackData } from '@/data/trackData';
 import { Slider } from '@/components/ui/slider';
 import pharmbotArtwork from '@/assets/pharmboi-artwork.png';
-
-/**
- * MINI MUSIC PLAYER
- * A compact, collapsible album player for the Crop Oracle page.
- */
+import { usePlayback } from '@/contexts/PlaybackContext';
 
 const CRATE_LABELS: Record<string, { name: string; colorHsl: string }> = {
   root: { name: 'THE ROOT', colorHsl: '0 60% 35%' },
@@ -34,122 +30,18 @@ const formatTime = (time: number) => {
 const MiniMusicPlayer = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState<TrackData | null>(trackData[0] || null);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.7);
-  const [isMuted, setIsMuted] = useState(false);
-  const [hasAutoStarted, setHasAutoStarted] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Auto-start on first user interaction (browser autoplay policy)
-  useEffect(() => {
-    if (hasAutoStarted) return;
-    const startPlayback = () => {
-      setHasAutoStarted(true);
-      const audio = audioRef.current;
-      if (audio && currentTrack?.audioUrl) {
-        audio.src = currentTrack.audioUrl;
-        audio.load();
-        audio.play().catch(console.error);
-      }
-    };
-    document.addEventListener('click', startPlayback, { once: true });
-    document.addEventListener('keydown', startPlayback, { once: true });
-    // Also try immediately (works if user already interacted)
-    if (currentTrack?.audioUrl && audioRef.current) {
-      audioRef.current.src = currentTrack.audioUrl;
-      audioRef.current.load();
-      audioRef.current.play().then(() => setHasAutoStarted(true)).catch(() => {});
-    }
-    return () => {
-      document.removeEventListener('click', startPlayback);
-      document.removeEventListener('keydown', startPlayback);
-    };
-  }, [hasAutoStarted, currentTrack]);
+  const {
+    currentTrack, isPlaying, currentTime, duration, isMuted,
+    playTrack, togglePlay, seek, toggleMute, skipPrev, skipNext,
+  } = usePlayback();
 
-  // Audio event handlers
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const onMeta = () => setDuration(audio.duration);
-    const onTime = () => setCurrentTime(audio.currentTime);
-    const onEnd = () => {
-      if (currentTrack) {
-        const next = currentTrack.row < 12 ? currentTrack.row + 1 : 1;
-        const nextTrack = trackData.find(t => t.row === next);
-        if (nextTrack) setCurrentTrack(nextTrack);
-        else setIsPlaying(false);
-      }
-    };
-
-    audio.addEventListener('loadedmetadata', onMeta);
-    audio.addEventListener('timeupdate', onTime);
-    audio.addEventListener('ended', onEnd);
-    return () => {
-      audio.removeEventListener('loadedmetadata', onMeta);
-      audio.removeEventListener('timeupdate', onTime);
-      audio.removeEventListener('ended', onEnd);
-    };
-  }, [currentTrack]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !currentTrack?.audioUrl) return;
-    audio.src = currentTrack.audioUrl;
-    audio.load();
-    if (isPlaying) audio.play().catch(console.error);
-  }, [currentTrack?.audioUrl]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (isPlaying && currentTrack?.audioUrl) audio.play().catch(console.error);
-    else audio.pause();
-  }, [isPlaying, currentTrack]);
-
-  useEffect(() => {
-    if (audioRef.current) audioRef.current.volume = isMuted ? 0 : volume;
-  }, [volume, isMuted]);
-
-  const playTrack = (track: TrackData) => {
-    if (currentTrack?.row === track.row) {
-      setIsPlaying(!isPlaying);
-    } else {
-      setCurrentTrack(track);
-      setIsPlaying(true);
-    }
-  };
-
-  const handleSeek = (value: number[]) => {
-    if (audioRef.current && duration) {
-      const newTime = (value[0] / 100) * duration;
-      audioRef.current.currentTime = newTime;
-      setCurrentTime(newTime);
-    }
-  };
-
-  const skipPrev = () => {
-    if (!currentTrack) return;
-    const prev = currentTrack.row > 1 ? currentTrack.row - 1 : 12;
-    const t = trackData.find(tr => tr.row === prev);
-    if (t) { setCurrentTrack(t); setIsPlaying(true); }
-  };
-
-  const skipNext = () => {
-    if (!currentTrack) return;
-    const next = currentTrack.row < 12 ? currentTrack.row + 1 : 1;
-    const t = trackData.find(tr => tr.row === next);
-    if (t) { setCurrentTrack(t); setIsPlaying(true); }
-  };
+  const handleSeek = (value: number[]) => seek(value);
 
   const trackColor = currentTrack?.colorHsl || '270 60% 55%';
 
   return (
     <>
-      {/* Floating Music Trigger */}
       {!isOpen && (
         <motion.button
           className="fixed bottom-32 right-6 z-50 w-10 h-10 rounded-full flex items-center justify-center"
@@ -173,7 +65,6 @@ const MiniMusicPlayer = () => {
         </motion.button>
       )}
 
-      {/* Player Panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -197,30 +88,15 @@ const MiniMusicPlayer = () => {
             >
               <div className="flex items-center gap-2">
                 <Music className="w-3 h-3" style={{ color: `hsl(${trackColor})` }} />
-                <span
-                  className="font-mono text-[10px] tracking-wider uppercase"
-                  style={{ color: 'hsl(40 50% 85%)' }}
-                >
+                <span className="font-mono text-[10px] tracking-wider uppercase" style={{ color: 'hsl(40 50% 85%)' }}>
                   PHARMBOI
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <motion.button
-                  onClick={() => setIsExpanded(!isExpanded)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="p-1.5 rounded-full"
-                  style={{ color: 'hsl(40 50% 60%)' }}
-                >
+                <motion.button onClick={() => setIsExpanded(!isExpanded)} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="p-1.5 rounded-full" style={{ color: 'hsl(40 50% 60%)' }}>
                   {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
                 </motion.button>
-                <motion.button
-                  onClick={() => setIsOpen(false)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="p-1.5 rounded-full"
-                  style={{ color: 'hsl(40 50% 60%)' }}
-                >
+                <motion.button onClick={() => setIsOpen(false)} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="p-1.5 rounded-full" style={{ color: 'hsl(40 50% 60%)' }}>
                   <X className="w-4 h-4" />
                 </motion.button>
               </div>
@@ -231,19 +107,14 @@ const MiniMusicPlayer = () => {
               <div className="px-3 py-2 flex items-center gap-2" style={{ borderBottom: `1px solid hsl(${trackColor} / 0.15)` }}>
                 <motion.div
                   className="w-8 h-8 rounded-md overflow-hidden flex-shrink-0"
-                  style={{
-                    border: `2px solid hsl(${trackColor} / 0.5)`,
-                    boxShadow: `0 0 12px hsl(${trackColor} / 0.3)`,
-                  }}
+                  style={{ border: `2px solid hsl(${trackColor} / 0.5)`, boxShadow: `0 0 12px hsl(${trackColor} / 0.3)` }}
                   animate={isPlaying ? { rotate: [0, 360] } : {}}
                   transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
                 >
                   <img src={pharmbotArtwork} alt="Album Art" className="w-full h-full object-cover" />
                 </motion.div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-display text-xs truncate" style={{ color: `hsl(${trackColor})` }}>
-                    {currentTrack.track}
-                  </p>
+                  <p className="font-display text-xs truncate" style={{ color: `hsl(${trackColor})` }}>{currentTrack.track}</p>
                   <p className="font-mono text-[10px] truncate" style={{ color: 'hsl(40 50% 60%)' }}>
                     {currentTrack.featuring ? `ft. ${currentTrack.featuring}` : 'Vici Royàl'}
                   </p>
@@ -253,52 +124,29 @@ const MiniMusicPlayer = () => {
 
             {/* Transport Controls */}
             <div className="px-3 py-2">
-              {/* Progress */}
               {currentTrack && (
                 <div className="mb-2">
-                  <Slider
-                    value={[duration ? (currentTime / duration) * 100 : 0]}
-                    onValueChange={handleSeek}
-                    max={100}
-                    step={0.1}
-                    className="cursor-pointer"
-                  />
+                  <Slider value={[duration ? (currentTime / duration) * 100 : 0]} onValueChange={handleSeek} max={100} step={0.1} className="cursor-pointer" />
                   <div className="flex justify-between mt-1">
                     <span className="font-mono text-[9px]" style={{ color: 'hsl(40 50% 50%)' }}>{formatTime(currentTime)}</span>
                     <span className="font-mono text-[9px]" style={{ color: 'hsl(40 50% 50%)' }}>{formatTime(duration)}</span>
                   </div>
                 </div>
               )}
-
-              {/* Buttons */}
               <div className="flex items-center justify-center gap-2">
-                <motion.button
-                  onClick={() => setIsMuted(!isMuted)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-1 rounded-full"
-                  style={{ color: isMuted ? 'hsl(40 30% 45%)' : `hsl(${trackColor})` }}
-                >
+                <motion.button onClick={toggleMute} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="p-1 rounded-full" style={{ color: isMuted ? 'hsl(40 30% 45%)' : `hsl(${trackColor})` }}>
                   {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
                 </motion.button>
-
-                <motion.button
-                  onClick={skipPrev}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded-full"
-                  style={{ background: 'hsl(20 30% 18%)', color: 'hsl(40 50% 70%)' }}
-                >
+                <motion.button onClick={skipPrev} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="p-2 rounded-full" style={{ background: 'hsl(20 30% 18%)', color: 'hsl(40 50% 70%)' }}>
                   <SkipBack className="w-3.5 h-3.5" />
                 </motion.button>
-
                 <motion.button
                   onClick={() => {
                     if (!currentTrack) {
                       const first = trackData[0];
-                      if (first) { setCurrentTrack(first); setIsPlaying(true); }
+                      if (first) playTrack(first);
                     } else {
-                      setIsPlaying(!isPlaying);
+                      togglePlay();
                     }
                   }}
                   whileHover={{ scale: 1.1 }}
@@ -311,20 +159,9 @@ const MiniMusicPlayer = () => {
                     boxShadow: `0 0 15px hsl(${trackColor} / 0.3)`,
                   }}
                 >
-                  {isPlaying ? (
-                    <Pause className="w-4 h-4" style={{ color: 'hsl(20 30% 8%)' }} />
-                  ) : (
-                    <Play className="w-4 h-4 ml-0.5" style={{ color: 'hsl(40 50% 85%)' }} />
-                  )}
+                  {isPlaying ? <Pause className="w-4 h-4" style={{ color: 'hsl(20 30% 8%)' }} /> : <Play className="w-4 h-4 ml-0.5" style={{ color: 'hsl(40 50% 85%)' }} />}
                 </motion.button>
-
-                <motion.button
-                  onClick={skipNext}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-1.5 rounded-full"
-                  style={{ background: 'hsl(20 30% 18%)', color: 'hsl(40 50% 70%)' }}
-                >
+                <motion.button onClick={skipNext} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="p-1.5 rounded-full" style={{ background: 'hsl(20 30% 18%)', color: 'hsl(40 50% 70%)' }}>
                   <SkipForward className="w-3.5 h-3.5" />
                 </motion.button>
               </div>
@@ -333,21 +170,10 @@ const MiniMusicPlayer = () => {
             {/* Expanded Track List */}
             <AnimatePresence>
               {isExpanded && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div
-                    className="px-3 py-2 max-h-64 overflow-y-auto"
-                    style={{ borderTop: `1px solid hsl(${trackColor} / 0.15)` }}
-                  >
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                  <div className="px-3 py-2 max-h-64 overflow-y-auto" style={{ borderTop: `1px solid hsl(${trackColor} / 0.15)` }}>
                     {trackData.map((track) => {
-                      const crate = getCrateForTrack(track.row);
-                      const crateInfo = CRATE_LABELS[crate];
                       const isActive = currentTrack?.row === track.row;
-
                       return (
                         <motion.button
                           key={track.row}
@@ -363,26 +189,14 @@ const MiniMusicPlayer = () => {
                             {String(track.row).padStart(2, '0')}
                           </span>
                           <div className="flex-1 min-w-0">
-                            <p
-                              className="text-xs truncate"
-                              style={{
-                                color: isActive ? `hsl(${track.colorHsl})` : 'hsl(40 50% 80%)',
-                                fontFamily: "'Staatliches', cursive",
-                              }}
-                            >
+                            <p className="text-xs truncate" style={{ color: isActive ? `hsl(${track.colorHsl})` : 'hsl(40 50% 80%)', fontFamily: "'Staatliches', cursive" }}>
                               {track.track}
                             </p>
                           </div>
                           {isActive && isPlaying && (
                             <div className="flex gap-0.5 items-center">
                               {[0, 1, 2].map(i => (
-                                <motion.div
-                                  key={i}
-                                  className="w-0.5 rounded-full"
-                                  style={{ background: `hsl(${track.colorHsl})` }}
-                                  animate={{ height: [3, 10, 3] }}
-                                  transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.15 }}
-                                />
+                                <motion.div key={i} className="w-0.5 rounded-full" style={{ background: `hsl(${track.colorHsl})` }} animate={{ height: [3, 10, 3] }} transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.15 }} />
                               ))}
                             </div>
                           )}
@@ -396,9 +210,6 @@ const MiniMusicPlayer = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Hidden Audio Element */}
-      <audio ref={audioRef} preload="metadata" />
     </>
   );
 };
