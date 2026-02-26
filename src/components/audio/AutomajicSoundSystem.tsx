@@ -609,23 +609,6 @@ const AutomajicSoundSystem = () => {
 
       {/* Audio element is managed by PlaybackContext */}
 
-      {/* Now Playing Footer */}
-      <NowPlaying
-        track={currentTrack}
-        isPlaying={isPlaying}
-        onTogglePlay={handleTogglePlay}
-        audioRef={audioRef}
-        currentTime={currentTime}
-        duration={duration}
-        onSeek={handleSeek}
-        volume={volume}
-        isMuted={isMuted}
-        onVolumeChange={handleVolumeChange}
-        onToggleMute={() => setIsMuted(!isMuted)}
-        onPrevTrack={handlePrevTrack}
-        onNextTrack={handleNextTrack}
-      />
-
       {/* Track Detail View Modal */}
       <TrackDetailView
         track={selectedTrack}
