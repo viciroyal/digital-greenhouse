@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { CircadianProvider } from "@/contexts/CircadianContext";
 import { AudioBiomeProvider } from "@/contexts/AudioBiomeContext";
 import { FieldModeProvider } from "@/contexts/FieldModeContext";
+import { PlaybackProvider } from "@/contexts/PlaybackContext";
 import sovereignEmblem from "@/assets/sovereign-emblem.png";
 import MiniMusicPlayer from "@/components/audio/MiniMusicPlayer";
 import { useLocation } from "react-router-dom";
@@ -303,9 +304,10 @@ identityPreview:
   >
   
   <QueryClientProvider client={queryClient}>
-      <CircadianProvider>
+    <CircadianProvider>
         <AudioBiomeProvider>
           <FieldModeProvider>
+            <PlaybackProvider>
             <TooltipProvider>
               <Toaster />
               <Sonner />
@@ -323,6 +325,7 @@ identityPreview:
                 />
               </a>
             </TooltipProvider>
+            </PlaybackProvider>
           </FieldModeProvider>
         </AudioBiomeProvider>
       </CircadianProvider>
