@@ -279,9 +279,22 @@ const FirstGarden = () => {
               exit={{ opacity: 0, x: -40 }}
               transition={{ duration: 0.25 }}
             >
-              <h2 className="text-xl font-bold text-center mb-8" style={{ color: 'hsl(0 0% 85%)' }}>
+              <h2 className="text-xl font-bold text-center mb-2" style={{ color: 'hsl(0 0% 85%)' }}>
                 {stepTitles[step]}
               </h2>
+
+              {/* Usage hint */}
+              <motion.p
+                className="text-center text-xs mb-6 font-mono tracking-wide"
+                style={{ color: 'hsl(130 50% 55% / 0.6)' }}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                {step === 0 && '↓ Tap your space to get started'}
+                {step === 1 && '☀ Select your sunlight level'}
+                {step === 2 && '🌱 Pick one or more goals'}
+              </motion.p>
 
               <div className="grid gap-3">
                 {(step === 0 ? SPACE_OPTIONS : step === 1 ? SUN_OPTIONS : GOAL_OPTIONS).map((opt) => {
@@ -301,11 +314,11 @@ const FirstGarden = () => {
                           setGoals(prev => prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g]);
                         }
                       }}
-                      className="flex items-center gap-4 p-4 rounded-xl text-left transition-all duration-200"
+                      className="flex items-center gap-4 p-4 rounded-xl text-left transition-all duration-300"
                       style={{
                         background: isSelected ? 'hsl(130 30% 12%)' : 'hsl(0 0% 7%)',
                         border: `2px solid ${isSelected ? 'hsl(130 50% 45%)' : 'hsl(0 0% 12%)'}`,
-                        boxShadow: isSelected ? '0 0 16px hsl(130 50% 45% / 0.15)' : 'none',
+                        boxShadow: isSelected ? '0 0 20px hsl(130 50% 45% / 0.25)' : 'none',
                       }}
                     >
                       <div
@@ -334,28 +347,51 @@ const FirstGarden = () => {
               </div>
 
               {/* Next button */}
-              <div className="mt-8 flex justify-center">
-                <button
+              <div className="mt-8 flex flex-col items-center gap-3">
+                <motion.button
                   onClick={handleNext}
                   disabled={!canAdvance}
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200"
+                  className="flex items-center gap-2 px-8 py-3.5 rounded-xl font-semibold text-sm transition-all duration-300"
                   style={{
                     background: canAdvance ? 'hsl(130 50% 45%)' : 'hsl(0 0% 12%)',
                     color: canAdvance ? 'hsl(0 0% 5%)' : 'hsl(0 0% 30%)',
-                    boxShadow: canAdvance ? '0 4px 20px hsl(130 50% 45% / 0.3)' : 'none',
+                    boxShadow: canAdvance ? '0 4px 25px hsl(130 50% 45% / 0.4)' : 'none',
                     cursor: canAdvance ? 'pointer' : 'not-allowed',
                   }}
+                  animate={canAdvance ? {
+                    boxShadow: [
+                      '0 4px 20px hsl(130 50% 45% / 0.3)',
+                      '0 4px 35px hsl(130 50% 45% / 0.55)',
+                      '0 4px 20px hsl(130 50% 45% / 0.3)',
+                    ],
+                  } : {}}
+                  transition={{ boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' } }}
                 >
-                  {step === 2 ? 'Next' : 'Next'}
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
+                  Next
+                  <motion.span
+                    animate={canAdvance ? { x: [0, 4, 0] } : {}}
+                    transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.span>
+                </motion.button>
 
-              {/* Skip to Advanced */}
-              <div className="mt-6 text-center">
+                {/* Hint text */}
+                {!canAdvance && (
+                  <motion.p
+                    className="text-[10px] font-mono tracking-wider"
+                    style={{ color: 'hsl(0 0% 35%)' }}
+                    animate={{ opacity: [0.4, 0.8, 0.4] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    ↑ Select an option above to continue
+                  </motion.p>
+                )}
+
+                {/* Skip to Advanced */}
                 <button
                   onClick={() => navigate('/crop-oracle')}
-                  className="text-[11px] font-mono tracking-wider transition-colors hover:underline"
+                  className="text-[11px] font-mono tracking-wider transition-colors hover:underline mt-2"
                   style={{ color: 'hsl(0 0% 35%)' }}
                 >
                   Skip to Advanced Studio →
@@ -432,18 +468,30 @@ const FirstGarden = () => {
               )}
 
               <div className="mt-6 flex flex-col items-center gap-3">
-                <button
+                <motion.button
                   onClick={handleNext}
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200"
+                  className="flex items-center gap-2 px-8 py-3.5 rounded-xl font-semibold text-sm transition-all duration-300"
                   style={{
                     background: 'hsl(130 50% 45%)',
                     color: 'hsl(0 0% 5%)',
-                    boxShadow: '0 4px 20px hsl(130 50% 45% / 0.3)',
                   }}
+                  animate={{
+                    boxShadow: [
+                      '0 4px 20px hsl(130 50% 45% / 0.3)',
+                      '0 4px 35px hsl(130 50% 45% / 0.55)',
+                      '0 4px 20px hsl(130 50% 45% / 0.3)',
+                    ],
+                  }}
+                  transition={{ boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' } }}
                 >
                   {selectedState ? 'Show My Garden Plan' : 'Skip — Show All Crops'}
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                  <motion.span
+                    animate={{ x: [0, 4, 0] }}
+                    transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.span>
+                </motion.button>
               </div>
             </motion.div>
           )}
