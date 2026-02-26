@@ -39,27 +39,28 @@ const MiniMusicPlayer = () => {
 
   return (
     <>
-      {/* Floating Music Trigger */}
+      {/* Floating Music Trigger — matches Stage aesthetic */}
       {!isOpen && (
         <motion.button
-          className="fixed bottom-32 right-6 z-50 w-12 h-12 rounded-full flex items-center justify-center"
+          className="fixed bottom-8 right-6 z-50 px-5 py-3 rounded-full font-bubble text-sm tracking-[0.15em] uppercase overflow-hidden flex items-center gap-2"
           onClick={() => setIsOpen(true)}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          animate={{
-            boxShadow: [
-              '0 0 15px hsl(270 50% 35% / 0.3)',
-              '0 0 30px hsl(270 50% 45% / 0.5)',
-              '0 0 15px hsl(270 50% 35% / 0.3)',
-            ],
-          }}
-          transition={{ boxShadow: { duration: 4, repeat: Infinity, ease: 'easeInOut' } }}
           style={{
-            background: 'linear-gradient(135deg, hsl(270 40% 18%), hsl(280 35% 12%))',
-            border: '2px solid hsl(270 40% 35%)',
+            background: 'linear-gradient(135deg, hsl(350 75% 45%) 0%, hsl(280 60% 35%) 50%, hsl(220 60% 35%) 100%)',
+            border: '2px solid hsl(40 50% 75% / 0.3)',
+            color: 'hsl(40 50% 95%)',
+            boxShadow: '0 0 30px hsl(350 75% 50% / 0.3), inset 0 1px 0 hsl(40 50% 90% / 0.15)',
           }}
+          whileHover={{ scale: 1.05, boxShadow: '0 0 50px hsl(350 75% 50% / 0.5)' }}
+          whileTap={{ scale: 0.97 }}
         >
-          <Music className="w-5 h-5" style={{ color: 'hsl(270 60% 70%)' }} />
+          <motion.div
+            className="absolute inset-0 opacity-20"
+            style={{ background: 'linear-gradient(90deg, transparent, hsl(40 50% 90%), transparent)' }}
+            animate={{ x: ['-100%', '200%'] }}
+            transition={{ duration: 3, repeat: Infinity, repeatDelay: 2.5 }}
+          />
+          <Music className="w-5 h-5 relative z-10" />
+          <span className="relative z-10">Sound System</span>
         </motion.button>
       )}
 
