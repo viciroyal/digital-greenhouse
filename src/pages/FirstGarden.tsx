@@ -284,17 +284,27 @@ const FirstGarden = () => {
               </h2>
 
               {/* Usage hint */}
-              <motion.p
-                className="text-center text-xs mb-6 font-mono tracking-wide"
-                style={{ color: 'hsl(130 50% 55% / 0.6)' }}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                {step === 0 && '↓ Tap your space to get started'}
-                {step === 1 && '☀ Select your sunlight level'}
-                {step === 2 && '🌱 Pick one or more goals'}
-              </motion.p>
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <motion.p
+                  className="text-xs font-mono tracking-wide"
+                  style={{ color: 'hsl(130 50% 55% / 0.6)' }}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  {step === 0 && '↓ Tap your space to get started'}
+                  {step === 1 && '☀ Select your sunlight level'}
+                  {step === 2 && '🌱 Select all that apply'}
+                </motion.p>
+                {step === 2 && goals.length > 0 && (
+                  <span
+                    className="text-[10px] font-mono px-2 py-0.5 rounded-full"
+                    style={{ background: 'hsl(130 50% 55% / 0.15)', color: 'hsl(130 50% 55%)' }}
+                  >
+                    {goals.length} selected
+                  </span>
+                )}
+              </div>
 
               <div className="grid gap-3">
                 {(step === 0 ? SPACE_OPTIONS : step === 1 ? SUN_OPTIONS : GOAL_OPTIONS).map((opt) => {
