@@ -1,6 +1,7 @@
 import { Search, X, MapPin } from 'lucide-react';
 import { ZONE_ORDER } from './constants';
 import { STATE_HARDINESS_ZONES, US_STATES } from '@/data/stateHardinessZones';
+import { emitDiscovery } from '@/lib/discoveryEvents';
 
 interface Props {
   searchQuery: string;
@@ -61,7 +62,7 @@ const CropLibraryFilters = ({
       {/* Zone filter */}
       <select
         value={selectedZone ?? ''}
-        onChange={(e) => onZoneChange(e.target.value ? Number(e.target.value) : null)}
+        onChange={(e) => { onZoneChange(e.target.value ? Number(e.target.value) : null); if (e.target.value) emitDiscovery('used-filter'); }}
         className="text-xs font-apothecary bg-background border border-border rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary/50"
       >
         <option value="">All Zones</option>
@@ -73,7 +74,7 @@ const CropLibraryFilters = ({
       {/* Category filter */}
       <select
         value={selectedCategory ?? ''}
-        onChange={(e) => onCategoryChange(e.target.value || null)}
+        onChange={(e) => { onCategoryChange(e.target.value || null); if (e.target.value) emitDiscovery('used-filter'); }}
         className="text-xs font-apothecary bg-background border border-border rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary/50"
       >
         <option value="">All Categories</option>

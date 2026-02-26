@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { trackData, type TrackData } from '@/data/trackData';
+import { emitDiscovery } from '@/lib/discoveryEvents';
 
 interface PlaybackContextType {
   currentTrack: TrackData | null;
@@ -104,6 +105,7 @@ export const PlaybackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [volume, isMuted]);
 
   const playTrack = useCallback((track: TrackData) => {
+    emitDiscovery('played-music');
     if (currentTrack?.row === track.row) {
       setIsPlaying(prev => !prev);
     } else {
