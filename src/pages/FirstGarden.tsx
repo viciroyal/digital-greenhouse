@@ -505,25 +505,47 @@ const FirstGarden = () => {
               transition={{ duration: 0.4 }}
               className="print:bg-white"
             >
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-3" style={{ background: 'hsl(130 30% 12%)', border: '1px solid hsl(130 50% 45% / 0.3)' }}>
+              {/* Celebration Header */}
+              <motion.div
+                className="text-center mb-8"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', damping: 15, delay: 0.1 }}
+              >
+                <motion.div
+                  className="text-4xl mb-3"
+                  animate={{ rotate: [0, -10, 10, -5, 0] }}
+                  transition={{ duration: 1, delay: 0.3 }}
+                >
+                  🎉
+                </motion.div>
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-3"
+                  style={{ background: 'hsl(130 30% 12%)', border: '1px solid hsl(130 50% 45% / 0.3)' }}>
                   <Sprout className="w-4 h-4" style={{ color: 'hsl(130 50% 55%)' }} />
                   <span className="text-xs font-mono" style={{ color: 'hsl(130 50% 65%)' }}>YOUR GARDEN PLAN</span>
                 </div>
-                <h2 className="text-lg font-bold" style={{ color: 'hsl(0 0% 85%)' }}>
+                <h2 className="text-xl font-bold" style={{ color: 'hsl(0 0% 90%)' }}>
                   {goals.includes('salads') && goals.length === 1 ? '🥗 Fresh Salad Garden' :
                    goals.includes('cooking') && goals.length === 1 ? '🍳 Kitchen Garden' :
                    goals.includes('herbs') && goals.length === 1 ? '🌿 Herb & Tea Garden' :
                    goals.includes('flowers') && goals.length === 1 ? '🌸 Flower Garden' :
                    '🌱 Mixed Garden'}
                 </h2>
-                <p className="text-xs mt-1" style={{ color: 'hsl(0 0% 45%)' }}>
+                <p className="text-xs mt-2" style={{ color: 'hsl(0 0% 50%)' }}>
                   {space === 'windowsill' ? 'Windowsill' : space === 'patio' ? 'Patio containers' : space === 'small-bed' ? 'Small raised bed' : 'Yard beds'} · {sun === 'full' ? 'Full sun' : sun === 'partial' ? 'Partial sun' : 'Shade'} · {recipe.length} plants
                   {selectedState && hardinessSubZone && (
                     <span> · Zone {hardinessSubZone} ({STATE_HARDINESS_ZONES[selectedState]?.abbr})</span>
                   )}
                 </p>
-              </div>
+                <motion.p
+                  className="text-[10px] font-mono tracking-wider mt-3"
+                  style={{ color: 'hsl(130 50% 55% / 0.5)' }}
+                  animate={{ opacity: [0.3, 0.7, 0.3] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  ↓ Here's what to plant — scroll to explore
+                </motion.p>
+              </motion.div>
 
               {isLoading ? (
                 <div className="text-center py-12">
@@ -535,72 +557,88 @@ const FirstGarden = () => {
                   <p className="text-sm" style={{ color: 'hsl(0 0% 50%)' }}>No crops matched your criteria. Try adjusting your selections.</p>
                 </div>
               ) : (
-                <div className="grid gap-3">
+                <div className="grid gap-4">
                   {recipe.map((crop, i) => {
                     const instructions = getPlainInstructions(crop, space!);
                     const synergies = getSynergyNotes(crop, recipe);
                     return (
-                      <div
+                      <motion.div
                         key={crop.id}
-                        className="rounded-xl p-4"
+                        className="rounded-2xl p-5 relative overflow-hidden"
                         style={{
                           background: 'hsl(0 0% 7%)',
-                          border: '1px solid hsl(0 0% 12%)',
+                          border: '1px solid hsl(130 50% 30% / 0.15)',
+                        }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.12, duration: 0.4 }}
+                        whileHover={{
+                          borderColor: 'hsl(130 50% 45% / 0.4)',
+                          boxShadow: '0 0 25px hsl(130 50% 45% / 0.1)',
                         }}
                       >
-                        <div className="flex items-start gap-3">
-                          <div
-                            className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold"
+                        {/* Plant number badge */}
+                        <div className="flex items-start gap-4">
+                          <motion.div
+                            className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold"
                             style={{
-                              background: 'hsl(130 30% 12%)',
-                              color: 'hsl(130 50% 55%)',
-                              border: '1px solid hsl(130 50% 45% / 0.2)',
+                              background: 'linear-gradient(135deg, hsl(130 40% 15%), hsl(130 30% 10%))',
+                              color: 'hsl(130 50% 60%)',
+                              border: '2px solid hsl(130 50% 45% / 0.3)',
+                              boxShadow: '0 0 12px hsl(130 50% 45% / 0.15)',
                             }}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: i * 0.12 + 0.2, type: 'spring', damping: 12 }}
                           >
                             {i + 1}
-                          </div>
+                          </motion.div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-sm" style={{ color: 'hsl(0 0% 85%)' }}>
+                            <h3 className="font-bold text-base" style={{ color: 'hsl(0 0% 90%)' }}>
                               {crop.common_name || crop.name}
                             </h3>
                             {crop.scientific_name && (
-                              <p className="text-[10px] italic" style={{ color: 'hsl(0 0% 35%)' }}>{crop.scientific_name}</p>
+                              <p className="text-[10px] italic mt-0.5" style={{ color: 'hsl(0 0% 35%)' }}>{crop.scientific_name}</p>
                             )}
 
-                            {/* Yield, harvest & planting window badges */}
-                            <div className="flex gap-2 mt-1.5 flex-wrap">
+                            {/* Quick stats row */}
+                            <div className="flex gap-2 mt-2 flex-wrap">
                               {crop.harvest_days && (
-                                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded" style={{ background: 'hsl(200 30% 12%)', color: 'hsl(200 50% 65%)' }}>
-                                  ~{crop.harvest_days} days to harvest
+                                <span className="text-[10px] font-mono px-2 py-1 rounded-lg inline-flex items-center gap-1"
+                                  style={{ background: 'hsl(200 30% 12%)', color: 'hsl(200 50% 65%)', border: '1px solid hsl(200 40% 25% / 0.3)' }}>
+                                  ⏱ {crop.harvest_days} days
                                 </span>
                               )}
                               {crop.est_yield_lbs_per_plant != null && (
-                                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded" style={{ background: 'hsl(130 30% 12%)', color: 'hsl(130 50% 65%)' }}>
-                                  ~{crop.est_yield_lbs_per_plant} lbs/plant
+                                <span className="text-[10px] font-mono px-2 py-1 rounded-lg inline-flex items-center gap-1"
+                                  style={{ background: 'hsl(130 30% 12%)', color: 'hsl(130 50% 65%)', border: '1px solid hsl(130 40% 25% / 0.3)' }}>
+                                  🌾 ~{crop.est_yield_lbs_per_plant} lbs
                                 </span>
                               )}
                               {crop.hardiness_zone_min != null && crop.hardiness_zone_max != null && (
-                                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5" style={{ background: 'hsl(140 30% 12%)', color: 'hsl(140 50% 60%)', border: '1px solid hsl(140 40% 25% / 0.3)' }}>
-                                  🌍 Zone {Math.floor(crop.hardiness_zone_min)}{crop.hardiness_zone_min % 1 >= 0.5 ? 'b' : 'a'}–{Math.floor(crop.hardiness_zone_max)}{crop.hardiness_zone_max % 1 >= 0.5 ? 'b' : 'a'}
+                                <span className="text-[10px] font-mono px-2 py-1 rounded-lg inline-flex items-center gap-1"
+                                  style={{ background: 'hsl(140 30% 12%)', color: 'hsl(140 50% 60%)', border: '1px solid hsl(140 40% 25% / 0.3)' }}>
+                                  🌍 Zone {Math.floor(crop.hardiness_zone_min)}–{Math.floor(crop.hardiness_zone_max)}
                                 </span>
                               )}
                               {hardinessZone && crop.planting_season && crop.planting_season.length > 0 && (
-                                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-0.5" style={{ background: 'hsl(200 40% 12%)', color: 'hsl(200 60% 60%)', border: '1px solid hsl(200 40% 25% / 0.3)' }}>
+                                <span className="text-[10px] font-mono px-2 py-1 rounded-lg inline-flex items-center gap-1"
+                                  style={{ background: 'hsl(200 40% 12%)', color: 'hsl(200 60% 60%)', border: '1px solid hsl(200 40% 25% / 0.3)' }}>
                                   📅 {getZoneAwarePlantingWindows(crop.planting_season, hardinessZone).map(w => w.window).join(' · ')}
                                 </span>
                               )}
                             </div>
 
-                            {/* Companion synergy badges */}
+                            {/* Companion synergy */}
                             {synergies.length > 0 && (
-                              <div className="flex gap-1.5 mt-1.5 flex-wrap">
+                              <div className="flex gap-1.5 mt-2 flex-wrap">
                                 {synergies.map((note, k) => (
-                                  <span
-                                    key={k}
-                                    className="text-[9px] font-mono px-1.5 py-0.5 rounded inline-flex items-center gap-1"
+                                  <span key={k}
+                                    className="text-[10px] font-mono px-2 py-1 rounded-lg inline-flex items-center gap-1"
                                     style={{
                                       background: note.type === 'companion' ? 'hsl(270 30% 12%)' : 'hsl(0 30% 12%)',
                                       color: note.type === 'companion' ? 'hsl(270 50% 70%)' : 'hsl(0 50% 65%)',
+                                      border: `1px solid ${note.type === 'companion' ? 'hsl(270 40% 25% / 0.3)' : 'hsl(0 40% 25% / 0.3)'}`,
                                     }}
                                   >
                                     {note.type === 'companion' ? '✦' : '⚠'} {note.message}
@@ -609,49 +647,99 @@ const FirstGarden = () => {
                               </div>
                             )}
 
-                            {/* Instructions */}
-                            <ul className="mt-2.5 space-y-1">
+                            {/* Step-by-step instructions */}
+                            <div className="mt-3 space-y-1.5">
+                              <p className="text-[10px] font-mono tracking-wider uppercase mb-1" style={{ color: 'hsl(130 50% 50% / 0.6)' }}>
+                                How to grow it:
+                              </p>
                               {instructions.map((inst, j) => (
-                                <li key={j} className="flex items-start gap-2 text-xs" style={{ color: 'hsl(0 0% 55%)' }}>
-                                  <ChevronRight className="w-3 h-3 flex-shrink-0 mt-0.5" style={{ color: 'hsl(130 50% 45%)' }} />
-                                  {inst}
-                                </li>
+                                <motion.div
+                                  key={j}
+                                  className="flex items-start gap-2.5 text-xs rounded-lg px-2.5 py-1.5"
+                                  style={{ color: 'hsl(0 0% 60%)', background: 'hsl(0 0% 5%)' }}
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: i * 0.12 + j * 0.08 + 0.3 }}
+                                >
+                                  <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold mt-0.5"
+                                    style={{ background: 'hsl(130 40% 15%)', color: 'hsl(130 50% 55%)', border: '1px solid hsl(130 50% 45% / 0.2)' }}>
+                                    {j + 1}
+                                  </span>
+                                  <span>{inst}</span>
+                                </motion.div>
                               ))}
-                            </ul>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     );
                   })}
                 </div>
               )}
 
-              {/* Action buttons */}
-              <div className="flex gap-3 mt-6 justify-center print:hidden">
-                <button
-                  onClick={handlePrint}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono transition-colors"
-                  style={{ background: 'hsl(0 0% 8%)', color: 'hsl(0 0% 50%)', border: '1px solid hsl(0 0% 15%)' }}
-                >
-                  <Printer className="w-3.5 h-3.5" />
-                  PRINT
-                </button>
-                <button
-                  onClick={() => navigate('/crop-oracle')}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-mono transition-colors"
-                  style={{ background: 'hsl(130 30% 15%)', color: 'hsl(130 50% 65%)', border: '1px solid hsl(130 50% 45% / 0.3)' }}
-                >
-                  <Sprout className="w-3.5 h-3.5" />
-                  ADVANCED PLANNER
-                </button>
-              </div>
-
-              {/* Tip */}
-              <div className="mt-6 p-3 rounded-xl text-center" style={{ background: 'hsl(45 30% 8%)', border: '1px solid hsl(45 40% 25% / 0.3)' }}>
-                <p className="text-[11px]" style={{ color: 'hsl(45 40% 60%)' }}>
-                  💡 <strong>Beginner tip:</strong> Start with just 2–3 plants. You can always add more once you see how they grow!
+              {/* What's Next section */}
+              <motion.div
+                className="mt-8 p-5 rounded-2xl text-center"
+                style={{ background: 'hsl(45 20% 7%)', border: '1px solid hsl(45 40% 25% / 0.3)' }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+              >
+                <p className="text-xs font-mono tracking-wider uppercase mb-1" style={{ color: 'hsl(45 60% 60%)' }}>🚀 What's Next?</p>
+                <p className="text-[11px] mb-4" style={{ color: 'hsl(45 40% 60%)' }}>
+                  Print your plan or explore the full garden studio with companion planting, soil protocols & more
                 </p>
-              </div>
+                <div className="flex gap-3 justify-center print:hidden">
+                  <motion.button
+                    onClick={handlePrint}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono transition-all"
+                    style={{ background: 'hsl(0 0% 10%)', color: 'hsl(0 0% 55%)', border: '1px solid hsl(0 0% 18%)' }}
+                    whileHover={{ scale: 1.03, borderColor: 'hsl(0 0% 30%)' }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    PRINT PLAN
+                  </motion.button>
+                  <motion.button
+                    onClick={() => navigate('/crop-oracle')}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono transition-all"
+                    style={{
+                      background: 'hsl(130 40% 15%)',
+                      color: 'hsl(130 50% 70%)',
+                      border: '1px solid hsl(130 50% 45% / 0.3)',
+                    }}
+                    animate={{
+                      boxShadow: [
+                        '0 0 10px hsl(130 50% 45% / 0.15)',
+                        '0 0 25px hsl(130 50% 45% / 0.35)',
+                        '0 0 10px hsl(130 50% 45% / 0.15)',
+                      ],
+                    }}
+                    transition={{ boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' } }}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <Sprout className="w-3.5 h-3.5" />
+                    OPEN STUDIO
+                    <motion.span animate={{ x: [0, 3, 0] }} transition={{ duration: 1, repeat: Infinity }}>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </motion.span>
+                  </motion.button>
+                </div>
+              </motion.div>
+
+              {/* Beginner tip */}
+              <motion.div
+                className="mt-4 p-3 rounded-xl text-center"
+                style={{ background: 'hsl(45 30% 8%)', border: '1px solid hsl(45 40% 25% / 0.2)' }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1 }}
+              >
+                <p className="text-[11px]" style={{ color: 'hsl(45 40% 60%)' }}>
+                  💡 <strong>Tip:</strong> Start with just 2–3 plants. You can always add more once you see how they grow!
+                </p>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
