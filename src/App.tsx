@@ -317,12 +317,31 @@ identityPreview:
                 <MiniMusicPlayerGuard />
               </BrowserRouter>
 
-              <a href="/stage">
+              <a href="/stage" className="group fixed bottom-4 left-4 z-50">
                 <img
                   src={sovereignEmblem}
-                  alt="Sovereign Emblem"
-                  className="fixed bottom-4 left-4 w-16 opacity-75 hover:opacity-100 transition-all duration-500 cursor-pointer z-50"
+                  alt="Sovereign Emblem — Go to The Stage"
+                  className="w-16 opacity-75 hover:opacity-100 transition-all duration-500 cursor-pointer"
+                  style={{
+                    filter: 'drop-shadow(0 0 12px hsl(45 80% 50% / 0.4))',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.filter = 'drop-shadow(0 0 25px hsl(45 80% 55% / 0.7)) drop-shadow(0 0 50px hsl(45 80% 50% / 0.3))')}
+                  onMouseLeave={(e) => (e.currentTarget.style.filter = 'drop-shadow(0 0 12px hsl(45 80% 50% / 0.4))')}
                 />
+                <div
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"
+                  style={{
+                    background: 'hsl(220 40% 10% / 0.9)',
+                    border: '1px solid hsl(45 70% 45%)',
+                    color: 'hsl(45 70% 75%)',
+                    fontSize: '10px',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    fontFamily: 'Space Mono, monospace',
+                  }}
+                >
+                  The Stage — Home Base
+                </div>
               </a>
             </TooltipProvider>
             </PlaybackProvider>

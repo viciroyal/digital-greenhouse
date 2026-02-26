@@ -42,15 +42,22 @@ const MiniMusicPlayer = () => {
       {/* Floating Music Trigger — matches Stage aesthetic */}
       {!isOpen && (
         <motion.button
-          className="fixed bottom-8 right-6 z-50 w-16 h-16 rounded-full overflow-hidden flex items-center justify-center"
+          className="fixed bottom-8 right-6 z-50 w-16 h-16 rounded-full overflow-hidden flex items-center justify-center group"
           onClick={() => setIsOpen(true)}
           style={{
             background: 'linear-gradient(135deg, hsl(350 75% 45%) 0%, hsl(280 60% 35%) 50%, hsl(220 60% 35%) 100%)',
             border: '2px solid hsl(40 50% 75% / 0.3)',
             color: 'hsl(40 50% 95%)',
-            boxShadow: '0 0 30px hsl(350 75% 50% / 0.3), inset 0 1px 0 hsl(40 50% 90% / 0.15)',
           }}
-          whileHover={{ scale: 1.05, boxShadow: '0 0 50px hsl(350 75% 50% / 0.5)' }}
+          animate={{
+            boxShadow: [
+              '0 0 20px hsl(350 75% 50% / 0.3), inset 0 1px 0 hsl(40 50% 90% / 0.15)',
+              '0 0 40px hsl(280 60% 50% / 0.5), inset 0 1px 0 hsl(40 50% 90% / 0.15)',
+              '0 0 20px hsl(350 75% 50% / 0.3), inset 0 1px 0 hsl(40 50% 90% / 0.15)',
+            ],
+          }}
+          transition={{ boxShadow: { duration: 3, repeat: Infinity, ease: 'easeInOut' } }}
+          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.97 }}
         >
           <motion.div
@@ -60,6 +67,21 @@ const MiniMusicPlayer = () => {
             transition={{ duration: 3, repeat: Infinity, repeatDelay: 2.5 }}
           />
           <Music className="w-7 h-7 relative z-10" />
+          {/* Tooltip */}
+          <div
+            className="absolute bottom-full right-0 mb-2 px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"
+            style={{
+              background: 'hsl(220 40% 10% / 0.9)',
+              border: '1px solid hsl(350 60% 45%)',
+              color: 'hsl(350 60% 75%)',
+              fontSize: '10px',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase' as const,
+              fontFamily: 'Space Mono, monospace',
+            }}
+          >
+            Sound System — Music Player
+          </div>
         </motion.button>
       )}
 
