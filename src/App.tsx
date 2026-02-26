@@ -10,6 +10,13 @@ import { AudioBiomeProvider } from "@/contexts/AudioBiomeContext";
 import { FieldModeProvider } from "@/contexts/FieldModeContext";
 import sovereignEmblem from "@/assets/sovereign-emblem.png";
 import MiniMusicPlayer from "@/components/audio/MiniMusicPlayer";
+import { useLocation } from "react-router-dom";
+
+const MiniMusicPlayerGuard = () => {
+  const { pathname } = useLocation();
+  if (pathname === "/stage") return null;
+  return <MiniMusicPlayer />;
+};
 
 import AuthLayout from "./pages/AuthLayout";
 const Index = lazy(() => import("./pages/Index"));
@@ -305,9 +312,8 @@ identityPreview:
 
               <BrowserRouter>
                 <AppRoutes />
+                <MiniMusicPlayerGuard />
               </BrowserRouter>
-
-              <MiniMusicPlayer />
 
               <a href="/stage">
                 <img
