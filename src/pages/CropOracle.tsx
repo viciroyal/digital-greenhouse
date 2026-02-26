@@ -1218,52 +1218,68 @@ const CropOracle = () => {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={() => setProMode(!proMode)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[10px] tracking-wider transition-all"
-            style={{
-              background: proMode
-                ? 'linear-gradient(135deg, hsl(270 40% 18%), hsl(270 30% 12%))'
-                : 'hsl(0 0% 10%)',
-              border: `1px solid ${proMode ? 'hsl(270 50% 40%)' : 'hsl(0 0% 20%)'}`,
-              color: proMode ? 'hsl(270 60% 75%)' : 'hsl(120 40% 60%)',
-              boxShadow: proMode ? '0 0 12px hsl(270 50% 30% / 0.3)' : 'none',
-            }}
-          >
-            <span className="text-sm">{proMode ? '🎛️' : '🌱'}</span>
-            {proMode ? 'PRO' : 'AMATEUR'}
-          </button>
+          <div className="relative group">
+            <button
+              onClick={() => setProMode(!proMode)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[10px] tracking-wider transition-all"
+              style={{
+                background: proMode
+                  ? 'linear-gradient(135deg, hsl(270 40% 18%), hsl(270 30% 12%))'
+                  : 'hsl(0 0% 10%)',
+                border: `1px solid ${proMode ? 'hsl(270 50% 40%)' : 'hsl(0 0% 20%)'}`,
+                color: proMode ? 'hsl(270 60% 75%)' : 'hsl(120 40% 60%)',
+                boxShadow: proMode ? '0 0 12px hsl(270 50% 30% / 0.3)' : 'none',
+              }}
+            >
+              <span className="text-sm">{proMode ? '🎛️' : '🌱'}</span>
+              {proMode ? 'PRO' : 'AMATEUR'}
+            </button>
+            <span className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 rounded-lg text-[8px] font-mono tracking-wider whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50" style={{ background: 'hsl(0 0% 8% / 0.95)', border: '1px solid hsl(270 40% 30%)', color: 'hsl(270 50% 70%)' }}>
+              {proMode ? 'Switch to beginner view' : 'Unlock all 7 voices + tools'}
+            </span>
+          </div>
 
-          <button
-            onClick={() => setPlainMode(!plainMode)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[10px] tracking-wider transition-all"
-            style={{
-              background: plainMode
-                ? 'linear-gradient(135deg, hsl(45 40% 18%), hsl(45 30% 12%))'
-                : 'hsl(0 0% 10%)',
-              border: `1px solid ${plainMode ? 'hsl(45 50% 40%)' : 'hsl(0 0% 20%)'}`,
-              color: plainMode ? 'hsl(45 60% 75%)' : 'hsl(0 0% 50%)',
-              boxShadow: plainMode ? '0 0 12px hsl(45 50% 30% / 0.3)' : 'none',
-            }}
-          >
-            <span className="text-sm">{plainMode ? '📖' : '🎵'}</span>
-            {plainMode ? 'PLAIN' : 'MAJIC'}
-          </button>
-          <button
-            onClick={() => navigate(userId ? '/profile' : '/auth')}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
-            style={{
-              background: 'hsl(0 0% 10%)',
-              border: userId ? '1px solid hsl(51 80% 50% / 0.4)' : '1px solid hsl(0 0% 20%)',
-            }}
-            title={userId ? 'Profile' : 'Sign In'}
-          >
-            {userId ? (
-              <User className="w-4 h-4" style={{ color: 'hsl(51 80% 60%)' }} />
-            ) : (
-              <LogIn className="w-4 h-4" style={{ color: 'hsl(0 0% 60%)' }} />
-            )}
-          </button>
+          <div className="relative group">
+            <button
+              onClick={() => setPlainMode(!plainMode)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[10px] tracking-wider transition-all"
+              style={{
+                background: plainMode
+                  ? 'linear-gradient(135deg, hsl(45 40% 18%), hsl(45 30% 12%))'
+                  : 'hsl(0 0% 10%)',
+                border: `1px solid ${plainMode ? 'hsl(45 50% 40%)' : 'hsl(0 0% 20%)'}`,
+                color: plainMode ? 'hsl(45 60% 75%)' : 'hsl(0 0% 50%)',
+                boxShadow: plainMode ? '0 0 12px hsl(45 50% 30% / 0.3)' : 'none',
+              }}
+            >
+              <span className="text-sm">{plainMode ? '📖' : '🎵'}</span>
+              {plainMode ? 'PLAIN' : 'MAJIC'}
+            </button>
+            <span className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 rounded-lg text-[8px] font-mono tracking-wider whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50" style={{ background: 'hsl(0 0% 8% / 0.95)', border: '1px solid hsl(45 40% 30%)', color: 'hsl(45 50% 70%)' }}>
+              {plainMode ? 'Switch to musical mode' : 'Use plain crop names'}
+            </span>
+          </div>
+
+          <div className="relative group">
+            <button
+              onClick={() => navigate(userId ? '/profile' : '/auth')}
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
+              style={{
+                background: 'hsl(0 0% 10%)',
+                border: userId ? '1px solid hsl(51 80% 50% / 0.4)' : '1px solid hsl(0 0% 20%)',
+                boxShadow: userId ? '0 0 8px hsl(51 80% 50% / 0.15)' : 'none',
+              }}
+            >
+              {userId ? (
+                <User className="w-4 h-4" style={{ color: 'hsl(51 80% 60%)' }} />
+              ) : (
+                <LogIn className="w-4 h-4" style={{ color: 'hsl(0 0% 60%)' }} />
+              )}
+            </button>
+            <span className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 rounded-lg text-[8px] font-mono tracking-wider whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50" style={{ background: 'hsl(0 0% 8% / 0.95)', border: '1px solid hsl(45 40% 30%)', color: 'hsl(45 50% 70%)' }}>
+              {userId ? 'View your profile' : 'Sign in to save recipes'}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -1695,12 +1711,20 @@ const CropOracle = () => {
               <h2 className="text-center text-2xl md:text-3xl font-bubble mb-2" style={{ color: 'hsl(45 80% 55%)' }}>
                 Where are you growing?
               </h2>
-              <p className="text-center text-sm font-mono mb-8" style={{ color: 'hsl(0 0% 45%)' }}>
+              <p className="text-center text-sm font-mono mb-2" style={{ color: 'hsl(0 0% 45%)' }}>
                 STEP 1 — THE ENVIRONMENT
               </p>
+              <motion.p
+                className="text-center text-[10px] font-mono tracking-wider mb-6"
+                style={{ color: 'hsl(45 60% 55% / 0.5)' }}
+                animate={{ opacity: [0.3, 0.7, 0.3] }}
+                transition={{ duration: 2.5, repeat: Infinity }}
+              >
+                ↓ Tap your growing space to begin
+              </motion.p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {ENVIRONMENTS.filter(env => proMode || (env.id !== 'farm' && env.id !== 'high-tunnel' && env.id !== 'food-forest')).map(env => (
+                {ENVIRONMENTS.filter(env => proMode || (env.id !== 'farm' && env.id !== 'high-tunnel' && env.id !== 'food-forest')).map((env, i) => (
                   <motion.button
                     key={env.id}
                     onClick={() => { setEnvironment(env.id); setStep(2); }}
@@ -1711,11 +1735,24 @@ const CropOracle = () => {
                         : 'hsl(0 0% 6%)',
                       border: `2px solid ${environment === env.id ? 'hsl(45 80% 55% / 0.5)' : 'hsl(0 0% 12%)'}`,
                     }}
-                    whileHover={{ scale: 1.02, borderColor: 'hsl(45 80% 55% / 0.3)' }}
+                    whileHover={{
+                      scale: 1.02,
+                      borderColor: 'hsl(45 80% 55% / 0.4)',
+                      boxShadow: '0 0 25px hsl(45 80% 55% / 0.15)',
+                    }}
                     whileTap={{ scale: 0.98 }}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08 }}
                   >
                     <div className="flex items-center gap-3 mb-2">
-                      <div style={{ color: 'hsl(45 80% 55%)' }}>{env.icon}</div>
+                      <motion.div
+                        style={{ color: 'hsl(45 80% 55%)' }}
+                        animate={{ filter: ['drop-shadow(0 0 4px hsl(45 80% 55% / 0.3))', 'drop-shadow(0 0 10px hsl(45 80% 55% / 0.5))', 'drop-shadow(0 0 4px hsl(45 80% 55% / 0.3))'] }}
+                        transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+                      >
+                        {env.icon}
+                      </motion.div>
                       <div>
                         <h3 className="font-bubble text-lg" style={{ color: 'hsl(40 50% 90%)' }}>{env.label}</h3>
                         <p className="text-[10px] font-mono" style={{ color: 'hsl(0 0% 45%)' }}>{env.subtitle}</p>
@@ -1830,6 +1867,18 @@ const CropOracle = () => {
                 })}
               </div>
 
+              {/* Usage hint */}
+              {selectedZones.length === 0 && (
+                <motion.p
+                  className="text-center text-[10px] font-mono tracking-wider mt-4"
+                  style={{ color: 'hsl(45 60% 55% / 0.5)' }}
+                  animate={{ opacity: [0.3, 0.7, 0.3] }}
+                  transition={{ duration: 2.5, repeat: Infinity }}
+                >
+                  ↑ Select one or more zones to continue
+                </motion.p>
+              )}
+
               {/* Next button for multi-select */}
               <div className="mt-6 flex items-center justify-center gap-4">
                 <button
@@ -1839,7 +1888,7 @@ const CropOracle = () => {
                 >
                   <ArrowLeft className="w-3 h-3" /> BACK
                 </button>
-                <button
+                <motion.button
                   onClick={() => {
                     if (selectedZones.length > 0) {
                       setSelectedZone(selectedZones[0]);
@@ -1851,13 +1900,27 @@ const CropOracle = () => {
                   style={{
                     background: selectedZones.length > 0 ? 'hsl(45 80% 55%)' : 'hsl(0 0% 12%)',
                     color: selectedZones.length > 0 ? 'hsl(0 0% 5%)' : 'hsl(0 0% 30%)',
-                    boxShadow: selectedZones.length > 0 ? '0 4px 20px hsl(45 80% 55% / 0.3)' : 'none',
                     cursor: selectedZones.length > 0 ? 'pointer' : 'not-allowed',
                   }}
+                  animate={selectedZones.length > 0 ? {
+                    boxShadow: [
+                      '0 4px 15px hsl(45 80% 55% / 0.2)',
+                      '0 4px 30px hsl(45 80% 55% / 0.45)',
+                      '0 4px 15px hsl(45 80% 55% / 0.2)',
+                    ],
+                  } : { boxShadow: 'none' }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  whileHover={selectedZones.length > 0 ? { scale: 1.03 } : {}}
+                  whileTap={selectedZones.length > 0 ? { scale: 0.97 } : {}}
                 >
                   {selectedZones.length > 1 ? `NEXT (${selectedZones.length} ZONES)` : 'NEXT'}
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                  <motion.span
+                    animate={selectedZones.length > 0 ? { x: [0, 4, 0] } : {}}
+                    transition={{ duration: 1.2, repeat: Infinity }}
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.span>
+                </motion.button>
               </div>
             </motion.div>
           )}
@@ -1881,33 +1944,47 @@ const CropOracle = () => {
               </p>
               {/* ═══ Shuffle / Reroll Button ═══ */}
               <div className="flex justify-center gap-2 mb-2">
-                <button
-                  onClick={() => {
-                    // Preserve locked slots as manual overrides before shuffling
-                    if (lockedSlots.size > 0) {
-                      const newOverrides = { ...manualOverrides };
-                      for (const idx of lockedSlots) {
-                        const currentCrop = chordCard[idx]?.crop;
-                        if (currentCrop) newOverrides[idx] = currentCrop;
+                <div className="relative group">
+                  <motion.button
+                    onClick={() => {
+                      // Preserve locked slots as manual overrides before shuffling
+                      if (lockedSlots.size > 0) {
+                        const newOverrides = { ...manualOverrides };
+                        for (const idx of lockedSlots) {
+                          const currentCrop = chordCard[idx]?.crop;
+                          if (currentCrop) newOverrides[idx] = currentCrop;
+                        }
+                        setManualOverrides(newOverrides);
                       }
-                      setManualOverrides(newOverrides);
-                    }
-                    setRecipeSeed(s => s + 1);
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono tracking-wider transition-all hover:scale-105"
-                  style={{
-                    background: `${selectedZone.color}18`,
-                    color: selectedZone.color,
-                    border: `1px solid ${selectedZone.color}30`,
-                  }}
-                  title="Rotate crops — shuffle different species into each slot"
-                >
-                  <Shuffle className="w-3 h-3" />
-                  SHUFFLE VOICING
-                  {lockedSlots.size > 0 && (
-                    <span className="ml-1 text-[8px] opacity-70">({lockedSlots.size} locked)</span>
-                  )}
-                </button>
+                      setRecipeSeed(s => s + 1);
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-mono tracking-wider transition-all"
+                    style={{
+                      background: `${selectedZone.color}18`,
+                      color: selectedZone.color,
+                      border: `1px solid ${selectedZone.color}30`,
+                    }}
+                    animate={{
+                      boxShadow: [
+                        `0 0 6px ${selectedZone.color}15`,
+                        `0 0 18px ${selectedZone.color}30`,
+                        `0 0 6px ${selectedZone.color}15`,
+                      ],
+                    }}
+                    transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Shuffle className="w-3 h-3" />
+                    SHUFFLE
+                    {lockedSlots.size > 0 && (
+                      <span className="ml-1 text-[8px] opacity-70">({lockedSlots.size} locked)</span>
+                    )}
+                  </motion.button>
+                  <span className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 rounded-lg text-[8px] font-mono tracking-wider whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50" style={{ background: 'hsl(0 0% 8% / 0.95)', border: `1px solid ${selectedZone.color}40`, color: selectedZone.color }}>
+                    Rotate new crops into slots
+                  </span>
+                </div>
                 {/* Lock All / Unlock All toggle */}
                 {(() => {
                   const filledIndices = chordCard.map((s, i) => s.crop ? i : -1).filter(i => i >= 0);
@@ -2058,37 +2135,44 @@ const CropOracle = () => {
                 {/* Tool icons */}
                 <div className="flex items-center gap-1 ml-2">
                   {[
-                    { id: 'soil' as const, icon: <Beaker className="w-3.5 h-3.5" />, tip: 'Soil Protocol' },
-                    { id: 'calendar' as const, icon: <Calendar className="w-3.5 h-3.5" />, tip: 'Planting Calendar' },
-                    { id: 'modal' as const, icon: <Music className="w-3.5 h-3.5" />, tip: 'Modal Guide' },
-                    ...((environment === 'food-forest' || proMode) ? [{ id: 'scent' as const, icon: <Shield className="w-3.5 h-3.5" />, tip: 'Scent Corridor' }] : []),
-                    ...(environment === 'food-forest' ? [{ id: 'hole' as const, icon: <TreePine className="w-3.5 h-3.5" />, tip: 'Hole Protocol' }] : []),
-                    { id: 'propagation' as const, icon: <Sprout className="w-3.5 h-3.5" />, tip: 'Seed Starting' },
-                    { id: 'pairing' as const, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/><circle cx="9" cy="9" r="2"/><circle cx="15" cy="15" r="2"/><path d="M9 15l6-6"/></svg>, tip: 'Custom Pairings' },
-                    ...(proMode ? [{ id: 'suppliers' as const, icon: <Shovel className="w-3.5 h-3.5" />, tip: 'Pro Suppliers' }] : []),
+                    { id: 'soil' as const, icon: <Beaker className="w-3.5 h-3.5" />, tip: 'Soil Protocol', hint: 'Build your soil mix' },
+                    { id: 'calendar' as const, icon: <Calendar className="w-3.5 h-3.5" />, tip: 'Planting Calendar', hint: 'View planting schedule' },
+                    { id: 'modal' as const, icon: <Music className="w-3.5 h-3.5" />, tip: 'Modal Guide', hint: 'Explore musical modes' },
+                    ...((environment === 'food-forest' || proMode) ? [{ id: 'scent' as const, icon: <Shield className="w-3.5 h-3.5" />, tip: 'Scent Corridor', hint: 'Design pest defense' }] : []),
+                    ...(environment === 'food-forest' ? [{ id: 'hole' as const, icon: <TreePine className="w-3.5 h-3.5" />, tip: 'Hole Protocol', hint: 'Tree planting guide' }] : []),
+                    { id: 'propagation' as const, icon: <Sprout className="w-3.5 h-3.5" />, tip: 'Seed Starting', hint: 'Start from seed' },
+                    { id: 'pairing' as const, icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/><circle cx="9" cy="9" r="2"/><circle cx="15" cy="15" r="2"/><path d="M9 15l6-6"/></svg>, tip: 'Custom Pairings', hint: 'Build custom combos' },
+                    ...(proMode ? [{ id: 'suppliers' as const, icon: <Shovel className="w-3.5 h-3.5" />, tip: 'Pro Suppliers', hint: 'Find seed sources' }] : []),
                   ].map(tool => {
                     const isActive = activeToolPanel === tool.id;
                     return (
                       <div key={tool.id} className="relative group">
-                        <button
+                        <motion.button
                           onClick={() => setActiveToolPanel(isActive ? null : tool.id)}
                           className="p-1.5 rounded-lg transition-all"
                           style={{
                             background: isActive ? `${selectedZone.color}20` : 'hsl(0 0% 8%)',
                             border: `1.5px solid ${isActive ? selectedZone.color : 'hsl(0 0% 15%)'}`,
                             color: isActive ? selectedZone.color : 'hsl(0 0% 40%)',
-                            boxShadow: isActive ? `0 0 10px ${selectedZone.color}25` : 'none',
                           }}
-                          title={tool.tip}
+                          animate={isActive ? {
+                            boxShadow: [
+                              `0 0 8px ${selectedZone.color}20`,
+                              `0 0 18px ${selectedZone.color}40`,
+                              `0 0 8px ${selectedZone.color}20`,
+                            ],
+                          } : { boxShadow: 'none' }}
+                          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                          whileHover={{ scale: 1.15, boxShadow: `0 0 12px ${selectedZone.color}30` }}
                         >
                           {tool.icon}
-                        </button>
-                        {/* Tooltip */}
+                        </motion.button>
+                        {/* Tooltip with hint */}
                         <span
-                          className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[7px] font-mono tracking-wider whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                          style={{ color: 'hsl(0 0% 40%)' }}
+                          className="absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded text-[7px] font-mono tracking-wider whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50"
+                          style={{ background: 'hsl(0 0% 6% / 0.95)', border: `1px solid ${selectedZone.color}30`, color: selectedZone.color }}
                         >
-                          {tool.tip}
+                          {tool.hint}
                         </span>
                       </div>
                     );
@@ -2230,7 +2314,7 @@ const CropOracle = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.15 }}
               >
-                <button
+                <motion.button
                   onClick={() => { setShowStarPicker(!showStarPicker); setStarSearchQuery(''); }}
                   className="w-full py-4 rounded-2xl font-mono text-sm tracking-wider flex items-center justify-center gap-3 transition-all"
                   style={{
@@ -2239,10 +2323,18 @@ const CropOracle = () => {
                       : 'linear-gradient(135deg, hsl(45 80% 20% / 0.15), hsl(0 0% 6%))',
                     border: `1.5px solid ${starCrop ? selectedZone.color + '50' : 'hsl(45 80% 40% / 0.3)'}`,
                     color: starCrop ? selectedZone.color : 'hsl(45 80% 55%)',
-                    boxShadow: starCrop
-                      ? `0 0 20px ${selectedZone.color}15, inset 0 1px 0 ${selectedZone.color}10`
-                      : '0 0 15px hsl(45 80% 40% / 0.08), inset 0 1px 0 hsl(45 80% 55% / 0.05)',
                   }}
+                  animate={!starCrop ? {
+                    boxShadow: [
+                      '0 0 10px hsl(45 80% 40% / 0.08), inset 0 1px 0 hsl(45 80% 55% / 0.05)',
+                      '0 0 25px hsl(45 80% 50% / 0.2), inset 0 1px 0 hsl(45 80% 55% / 0.08)',
+                      '0 0 10px hsl(45 80% 40% / 0.08), inset 0 1px 0 hsl(45 80% 55% / 0.05)',
+                    ],
+                  } : {
+                    boxShadow: `0 0 20px ${selectedZone.color}15, inset 0 1px 0 ${selectedZone.color}10`,
+                  }}
+                  transition={!starCrop ? { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } : {}}
+                  whileHover={{ scale: 1.01, boxShadow: `0 0 30px ${starCrop ? selectedZone.color : 'hsl(45 80% 55%)'}25` }}
                 >
                   <span className="text-xl">🌟</span>
                   <span className="flex flex-col items-start">
@@ -2256,7 +2348,7 @@ const CropOracle = () => {
                     </span>
                   </span>
                   {!starCrop && <Search className="w-4 h-4 ml-auto opacity-40" />}
-                </button>
+                </motion.button>
 
                 <AnimatePresence>
                   {showStarPicker && (
