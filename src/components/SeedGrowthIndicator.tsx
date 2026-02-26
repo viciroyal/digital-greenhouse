@@ -78,7 +78,7 @@ const SeedGrowthIndicator = () => {
     <>
       {/* Fixed indicator button */}
       <motion.button
-        className="fixed top-4 left-4 z-50 flex flex-col items-center gap-1 cursor-pointer group"
+        className="fixed top-[4.25rem] left-4 z-50 flex flex-col items-center gap-1 cursor-pointer group"
         onClick={() => setShowPanel(!showPanel)}
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -222,7 +222,7 @@ const SeedGrowthIndicator = () => {
       <AnimatePresence>
         {justDiscovered && DISCOVERY_PAGES[justDiscovered] && (
           <motion.div
-            className="fixed top-24 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-xl"
+            className="fixed top-32 left-4 z-50 flex items-center gap-2 px-4 py-2.5 rounded-xl"
             style={{
               background: 'hsl(0 0% 8% / 0.95)',
               border: `1px solid ${stage.color}`,
@@ -257,7 +257,7 @@ const SeedGrowthIndicator = () => {
       <AnimatePresence>
         {showPanel && (
           <motion.div
-            className="fixed top-24 left-4 z-50 w-64 rounded-2xl overflow-hidden"
+            className="fixed top-32 left-4 z-50 w-64 rounded-2xl overflow-hidden"
             style={{
               background: 'hsl(0 0% 6% / 0.95)',
               border: '1px solid hsl(130 40% 25% / 0.3)',
