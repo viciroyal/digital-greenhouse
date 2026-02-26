@@ -41,6 +41,11 @@ export const ALL_DISCOVERIES: Record<string, DiscoveryItem> = {
     hintPages: ['/stage', '/crop-oracle'],
     linkTo: '/user-guide' },
 
+  '/studio-intake': { label: 'Studio Intake', emoji: '🎛️', type: 'page',
+    hint: 'Try the Advanced Studio wizard — tap here to start',
+    hintPages: ['/', '/stage', '/crop-oracle'],
+    linkTo: '/studio-intake' },
+
   'played-music': { label: 'Played Music', emoji: '🎵', type: 'feature',
     hint: 'Play some music — tap the glowing music icon in the bottom right',
     hintPages: ['/stage', '/crop-oracle', '/'] },
