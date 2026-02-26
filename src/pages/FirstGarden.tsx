@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import EshuLoader from '@/components/EshuLoader';
 import { ArrowLeft, ArrowRight, Sprout, Sun, SunMedium, CloudSun, TreePine, Salad, CookingPot, Flower2, Leaf, Check, Printer, ChevronRight, MapPin, X } from 'lucide-react';
 import { useMasterCrops, type MasterCrop } from '@/hooks/useMasterCrops';
 import { companionScore, getSynergyNotes } from '@/lib/companionScoring';
@@ -171,6 +172,7 @@ function getPlainInstructions(crop: MasterCrop, space: SpaceOption): string[] {
 const FirstGarden = () => {
   const navigate = useNavigate();
   const { data: allCrops, isLoading } = useMasterCrops();
+  const [showGate, setShowGate] = useState(true);
   const [step, setStep] = useState(0); // 0=space, 1=sun, 2=goal, 3=zone, 4=result
   const [space, setSpace] = useState<SpaceOption | null>(null);
   const [sun, setSun] = useState<SunOption | null>(null);
@@ -213,8 +215,27 @@ const FirstGarden = () => {
     'Where are you located?',
   ];
 
+  // Auto-dismiss the gate after 3.5s
+  useEffect(() => {
+    const timer = setTimeout(() => setShowGate(false), 3500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="min-h-screen" style={{ background: 'hsl(140 15% 5%)' }}>
+      {/* Eshu Gate Opening */}
+      <AnimatePresence>
+        {showGate && (
+          <motion.div
+            className="fixed inset-0 z-[100] flex items-center justify-center"
+            style={{ background: 'hsl(20 30% 5%)' }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <EshuLoader size="lg" message="Eshu is opening the gate..." />
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-4 max-w-lg mx-auto">
         <button
