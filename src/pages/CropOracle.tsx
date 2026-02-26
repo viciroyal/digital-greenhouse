@@ -1817,9 +1817,19 @@ const CropOracle = () => {
               <h2 className="text-center text-2xl md:text-3xl font-bubble mb-2" style={{ color: 'hsl(45 80% 55%)' }}>
                 What energy do you need?
               </h2>
-              <p className="text-center text-sm font-mono mb-8" style={{ color: 'hsl(0 0% 45%)' }}>
-                STEP 2 — THE VIBE
-              </p>
+              <div className="flex items-center justify-center gap-2 mb-8">
+                <p className="text-sm font-mono" style={{ color: 'hsl(0 0% 45%)' }}>
+                  STEP 2 — Select all that apply
+                </p>
+                {selectedZones.length > 0 && (
+                  <span
+                    className="text-[10px] font-mono px-2 py-0.5 rounded-full"
+                    style={{ background: 'hsl(45 80% 55% / 0.15)', color: 'hsl(45 80% 55%)' }}
+                  >
+                    {selectedZones.length} selected
+                  </span>
+                )}
+              </div>
 
               <div className="grid grid-cols-1 gap-3">
                 {ZONES.map(zone => {
