@@ -597,6 +597,22 @@
     text-shadow: none !important;
   }
 }
+/* ═══ GLOBAL INTERACTIVE GLOW ═══ */
+@keyframes sovereignGlow {
+  0%, 100% { box-shadow: var(--base-shadow, none), 0 0 8px var(--glow-color, hsl(130 50% 45% / 0.2)); }
+  50% { box-shadow: var(--base-shadow, none), 0 0 22px var(--glow-color, hsl(130 50% 45% / 0.45)); }
+}
+
+button:not(:disabled):not([data-no-glow]):not(.cl-internal-b3fm6y) {
+  transition: box-shadow 0.3s ease, transform 0.15s ease, filter 0.3s ease;
+}
+button:not(:disabled):not([data-no-glow]):not(.cl-internal-b3fm6y):hover {
+  filter: brightness(1.12);
+}
+button:not(:disabled):not([data-no-glow]):not(.cl-internal-b3fm6y):active {
+  transform: scale(0.97);
+}
+
 /* 🔥 Kill Chrome Autofill White Background */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
