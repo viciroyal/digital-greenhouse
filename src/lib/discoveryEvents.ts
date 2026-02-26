@@ -19,17 +19,12 @@ export const ALL_DISCOVERIES: Record<string, DiscoveryItem> = {
   '/': { label: 'First Garden', emoji: '🌱', type: 'page' },
   '/stage': { label: 'The Stage', emoji: '🎭', type: 'page' },
   '/crop-oracle': { label: 'Crop Oracle', emoji: '🔮', type: 'page' },
-  '/crop-library': { label: 'Crop Library', emoji: '📚', type: 'page' },
-  '/weekly-tasks': { label: 'Weekly Tasks', emoji: '📋', type: 'page' },
   '/profile': { label: 'Profile', emoji: '👤', type: 'page' },
   '/user-guide': { label: 'User Guide', emoji: '📖', type: 'page' },
 
   // Features (tracked via emitDiscovery)
   'played-music': { label: 'Played Music', emoji: '🎵', type: 'feature' },
   'used-filter': { label: 'Used Filters', emoji: '🔍', type: 'feature' },
-  'opened-star-map': { label: 'Star Mapping', emoji: '⭐', type: 'feature' },
-  'opened-soil-mix': { label: 'Master Soil Mix', emoji: '🧪', type: 'feature' },
-  'asked-griot': { label: 'Asked the Griot', emoji: '🦉', type: 'feature' },
   'opened-growth-journal': { label: 'Growth Journal', emoji: '📓', type: 'feature' },
 };
 
