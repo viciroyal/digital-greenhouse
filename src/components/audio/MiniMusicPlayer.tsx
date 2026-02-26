@@ -156,7 +156,7 @@ const MiniMusicPlayer = () => {
               {/* Buttons */}
               <div className="flex items-center justify-center gap-3">
                 <motion.button onClick={toggleMute} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="p-1.5 rounded-full" style={{ color: isMuted ? 'hsl(40 30% 45%)' : `hsl(${trackColor})` }}>
-                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                 </motion.button>
 
                 {/* Volume Slider */}
@@ -171,7 +171,7 @@ const MiniMusicPlayer = () => {
                 </div>
 
                 <motion.button onClick={skipPrev} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="p-2.5 rounded-full" style={{ background: 'hsl(20 30% 18%)', color: 'hsl(40 50% 70%)' }}>
-                  <SkipBack className="w-4 h-4" />
+                  <SkipBack className="w-5 h-5" />
                 </motion.button>
 
                 <motion.button
@@ -197,7 +197,7 @@ const MiniMusicPlayer = () => {
                 </motion.button>
 
                 <motion.button onClick={skipNext} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="p-2.5 rounded-full" style={{ background: 'hsl(20 30% 18%)', color: 'hsl(40 50% 70%)' }}>
-                  <SkipForward className="w-4 h-4" />
+                  <SkipForward className="w-5 h-5" />
                 </motion.button>
               </div>
             </div>
