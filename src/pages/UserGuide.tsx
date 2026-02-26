@@ -87,9 +87,53 @@ const UserGuide = () => {
           <p>The registry contains <strong>2,188 crops</strong> across 7 Solfeggio frequency zones — from tomatoes and herbs to fruit trees and medicinal mushrooms. Every crop includes scientific names, growth habits, container sizing, root depth, hardiness zone data, and many have <strong>curated descriptions</strong> that appear when you hover over crop names.</p>
         </Section>
 
-        <Section title="The Home Page (The Stage)" emoji="🎤">
-          <p>When you first open the app, you'll see the <strong>Stage</strong> — a cool landing page with album artwork, music credits, and a button to enter the main tool.</p>
-          <p><strong>How to move forward:</strong> Click the big button that says <strong>"Enter the Studio"</strong> (or similar). This takes you to the Crop Oracle — the main planning tool.</p>
+        <Section title="First Garden (Home Page)" emoji="🌱">
+          <p>When you first open the app, you land on <strong>My First Garden</strong> — a friendly 5-step wizard that helps beginners pick their space, location, and first crops.</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>Step 1:</strong> Choose your space — Windowsill, Patio, Small Bed, or Big Yard</li>
+            <li><strong>Step 2:</strong> Set your location and grow zone</li>
+            <li><strong>Step 3-5:</strong> Follow the guided setup to get your first planting recipe</li>
+          </ul>
+          <p>Want to skip ahead? Tap <strong>"Skip to Advanced Studio →"</strong> at the bottom to jump straight to the Crop Oracle.</p>
+        </Section>
+
+        <Section title="The Stage (Landing Page)" emoji="🎤">
+          <p>The <strong>Stage</strong> is the album-style landing page with artwork, music credits, and two entry buttons:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>🎵 Plant Seeds</strong> — Play the album</li>
+            <li><strong>Enter the Garden</strong> — Go to the Crop Oracle</li>
+          </ul>
+          <p>You can always get back to The Stage by tapping the <strong>golden emblem</strong> in the bottom-left corner of any page.</p>
+        </Section>
+
+        <Section title="Growth Journal (Seed Tracker)" emoji="🌱">
+          <p>The <strong>Growth Journal</strong> is the small seed icon in the top-left corner. It tracks your exploration progress as you visit different parts of the app.</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>The seed evolves through stages: <strong>Seed → Sprout → Sapling → Budding → Blooming → Flourishing</strong></li>
+            <li>Your progress percentage is shown below the icon</li>
+            <li>Tap the seed icon to open the <strong>Growth Journal</strong> panel — it shows which areas you've discovered</li>
+            <li>New discoveries trigger a <strong>water droplet</strong> animation</li>
+          </ul>
+          <p>There are <strong>6 discoverable areas</strong>: First Garden, The Stage, Crop Oracle, Profile, User Guide, and playing music.</p>
+        </Section>
+
+        <Section title="Discovery Hints" emoji="🧭">
+          <p><strong>Floating directional hints</strong> appear at the bottom of the screen, nudging you toward areas you haven't explored yet.</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Each hint shows which feature or page to visit next</li>
+            <li>Tap the hint card to <strong>navigate directly</strong> to the suggested page</li>
+            <li>Tap the <strong>✕</strong> button to dismiss a hint without navigating</li>
+            <li>Hints auto-hide after 12 seconds and won't repeat once dismissed</li>
+          </ul>
+        </Section>
+
+        <Section title="Sovereign Emblem & Progress Ring" emoji="🛡️">
+          <p>The <strong>golden emblem</strong> in the bottom-left corner is your quick link back to The Stage. It also features a <strong>progress ring</strong> that fills as you discover more areas.</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>The ring fills from 0% to 100% as you explore</li>
+            <li>When you reach <strong>100%</strong>, a celebration animation plays with golden particles and the tooltip changes to <strong>"✦ Fully Discovered"</strong></li>
+            <li>Hover over the emblem to see a tooltip</li>
+          </ul>
         </Section>
 
         <Section title="The Crop Oracle — Step by Step" emoji="🔮">
@@ -251,7 +295,7 @@ const UserGuide = () => {
         </Section>
 
         <p className="text-center font-['Space_Mono'] text-xs mt-8" style={{ color: 'hsl(0 0% 30%)' }}>
-          PharmBoi User Guide • v3.0 • Artwork by Alyssa Best • © {new Date().getFullYear()} — The Charles Legend
+          PharmBoi User Guide • v4.0 • Artwork by Alyssa Best • © {new Date().getFullYear()} — The Charles Legend
         </p>
       </main>
     </div>

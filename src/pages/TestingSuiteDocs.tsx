@@ -77,7 +77,7 @@ const TestingSuiteDocs = () => {
           TESTING SUITE DOCUMENTATION
         </h1>
         <p className="text-center font-['Space_Mono'] text-xs mb-8" style={{ color: 'hsl(0 0% 45%)' }}>
-          Technical reference • Vitest • 100+ automated tests • v3.0
+          Technical reference • Vitest • 100+ automated tests • v4.0
         </p>
 
         <Section title="OVERVIEW">
@@ -304,6 +304,15 @@ describe('7-Zone Octave Completeness')
 ├──────────────────────┼─────────────────────────────────────┤
 │ Companion scoring    │ antagonist detection, synergy math,   │
 │                      │ explicit companion matching             │
+├──────────────────────┼─────────────────────────────────────┤
+│ Discovery system     │ 6 trackable items (5 pages + 1        │
+│                      │ feature), localStorage persistence     │
+├──────────────────────┼─────────────────────────────────────┤
+│ Discovery hints      │ Contextual navigation hints,           │
+│                      │ 12s auto-hide, sessionStorage dismiss   │
+├──────────────────────┼─────────────────────────────────────┤
+│ Progress ring        │ SVG ring on SovereignEmblemLink,       │
+│                      │ celebration at 100%                     │
 └──────────────────────┴─────────────────────────────────────┘`}</Code>
         </Section>
 
@@ -369,7 +378,7 @@ steps:
         </Section>
 
         <p className="text-center font-['Space_Mono'] text-[10px] mt-8" style={{ color: 'hsl(0 0% 30%)' }}>
-          PharmBoi Testing Suite Docs • v3.0 • {new Date().toISOString().split('T')[0]}
+          PharmBoi Testing Suite Docs • v4.0 • {new Date().toISOString().split('T')[0]}
         </p>
       </main>
     </div>
