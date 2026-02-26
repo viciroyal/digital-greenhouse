@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getDiscoveries, TOTAL_DISCOVERIES, onDiscovery } from '@/lib/discoveryEvents';
 import sovereignEmblem from '@/assets/sovereign-emblem.png';
@@ -21,6 +21,7 @@ const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
 
 const SovereignEmblemLink = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [progress, setProgress] = useState(() => getDiscoveries().length / TOTAL_DISCOVERIES);
   const [celebrating, setCelebrating] = useState(false);
   const prevProgress = useRef(progress);
@@ -53,7 +54,7 @@ const SovereignEmblemLink = () => {
   const dashOffset = CIRCUMFERENCE * (1 - progress);
 
   return (
-    <a href="/stage" className="group fixed bottom-4 left-4 z-50">
+    <div onClick={() => navigate('/stage')} role="link" className="group fixed bottom-4 left-4 z-50 cursor-pointer">
       {/* Celebration burst */}
       <AnimatePresence>
         {celebrating && (
@@ -201,7 +202,7 @@ const SovereignEmblemLink = () => {
       >
         {isComplete ? '✦ Fully Discovered' : 'The Stage — Home Base'}
       </div>
-    </a>
+    </div>
   );
 };
 
