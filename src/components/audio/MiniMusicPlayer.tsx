@@ -42,7 +42,7 @@ const MiniMusicPlayer = () => {
       {/* Floating Music Trigger — matches Stage aesthetic */}
       {!isOpen && (
         <motion.button
-          className="fixed bottom-8 right-6 z-50 px-5 py-3 rounded-full font-bubble text-sm tracking-[0.15em] uppercase overflow-hidden flex items-center gap-2"
+          className="fixed bottom-8 right-6 z-50 w-12 h-12 rounded-full overflow-hidden flex items-center justify-center"
           onClick={() => setIsOpen(true)}
           style={{
             background: 'linear-gradient(135deg, hsl(350 75% 45%) 0%, hsl(280 60% 35%) 50%, hsl(220 60% 35%) 100%)',
@@ -60,7 +60,6 @@ const MiniMusicPlayer = () => {
             transition={{ duration: 3, repeat: Infinity, repeatDelay: 2.5 }}
           />
           <Music className="w-5 h-5 relative z-10" />
-          <span className="relative z-10">Sound System</span>
         </motion.button>
       )}
 
