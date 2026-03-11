@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import flyerArt from '@/assets/thearlyshow-flyer.jpg';
 
 const EVENT_URL = 'https://partiful.com/e/2sCcLMfPWq8nRTYiNbs5?c=4q_yLdPt';
 
