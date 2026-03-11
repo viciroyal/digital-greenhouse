@@ -37,7 +37,22 @@ const ShopSection = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <div className="gem-card rounded-organic-lg overflow-hidden">
-            <div className="p-8 md:p-12 space-y-6">
+            <div className="grid md:grid-cols-2 gap-0">
+              {/* Flyer Artwork */}
+              <div className="relative aspect-square md:aspect-auto bg-gradient-to-br from-muted/50 to-muted/20 flex items-center justify-center overflow-hidden">
+                <motion.img
+                  src={flyerArt}
+                  alt="ThEarlyShow 11 Year Anniversary flyer featuring Gas Hound, Vici Royal, Sarafina Ethereal, and Sistah Moon"
+                  className="w-full h-full object-cover"
+                  initial={{ scale: 1.05, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1 }}
+                />
+              </div>
+
+              {/* Event Details */}
+              <div className="p-8 md:p-10 space-y-5">
               {/* Date & Location */}
               <div className="flex flex-wrap gap-4 text-sm font-body">
                 <span className="px-4 py-1.5 rounded-full bg-gem-ruby/20 text-gem-ruby">
