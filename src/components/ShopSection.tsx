@@ -39,11 +39,11 @@ const ShopSection = () => {
           <div className="gem-card rounded-organic-lg overflow-hidden">
             <div className="grid md:grid-cols-2 gap-0">
               {/* Flyer Artwork */}
-              <div className="relative h-full min-h-[300px] md:min-h-full bg-gradient-to-br from-muted/50 to-muted/20 flex items-center justify-center overflow-hidden">
+              <div className="relative overflow-hidden">
                 <motion.img
                   src={flyerArt}
                   alt="ThEarlyShow 11 Year Anniversary flyer featuring Gas Hound, Vici Royal, Sarafina Ethereal, and Sistah Moon"
-                  className="w-full h-full object-cover absolute inset-0"
+                  className="w-full h-full object-cover block"
                   initial={{ scale: 1.05, opacity: 0 }}
                   whileInView={{ scale: 1, opacity: 1 }}
                   viewport={{ once: true }}
