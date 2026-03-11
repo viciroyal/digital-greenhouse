@@ -103,6 +103,7 @@ const ShopSection = () => {
               </div>
             </div>
           </div>
+          </div>
         </motion.div>
       </div>
     </section>
