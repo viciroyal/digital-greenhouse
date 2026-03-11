@@ -87,7 +87,7 @@ const ShopSection = () => {
               </div>
             </div>
           </div>
-        </motion.a>
+        </motion.div>
       </div>
     </section>
   );
