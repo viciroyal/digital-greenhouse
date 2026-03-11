@@ -251,7 +251,7 @@ const Index = () => {
           <AutomajicSoundSystem />
         </section>
 
-        {/* ═══ SHOP — The Source Formula ═══ */}
+        {/* ═══ EVENT — ThEarlyShow 11 Year Anniversary ═══ */}
         <section data-section="shop">
           <ShopSection />
         </section>
