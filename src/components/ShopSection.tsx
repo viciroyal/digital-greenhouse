@@ -43,7 +43,7 @@ const ShopSection = () => {
                 <motion.img
                   src={flyerArt}
                   alt="ThEarlyShow 11 Year Anniversary flyer featuring Gas Hound, Vici Royal, Sarafina Ethereal, and Sistah Moon"
-                  className="w-full h-full object-cover block"
+                  className="w-full h-full object-contain block"
                   initial={{ scale: 1.05, opacity: 0 }}
                   whileInView={{ scale: 1, opacity: 1 }}
                   viewport={{ once: true }}
