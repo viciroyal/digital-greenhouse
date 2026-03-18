@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Sun, CloudSun, Sprout, ShoppingCart, Leaf, Loader2 } from 'lucide-react';
+import { ArrowLeft, Sun, CloudSun, Sprout, ShoppingCart, Leaf } from 'lucide-react';
 import collectivelySustainable from '@/assets/collectively-sustainable.png';
 import ZoneSelector from '@/components/ten-by-ten/ZoneSelector';
 import { STATE_HARDINESS_ZONES } from '@/data/stateHardinessZones';
-import { useZoneCrops, type ZoneCropSuggestion } from '@/hooks/useZoneCrops';
 
 /* ─── DATA ─── */
 
@@ -19,7 +18,7 @@ type PlantingPlan = { crop: string; spacing: string; plants: string; note?: stri
 type SeasonOption = { season: string; plans: PlantingPlan[] };
 type SunOption = { id: 'full' | 'partial'; label: string; icon: React.ReactNode; options: SeasonOption[] };
 
-const DEFAULT_SUN_OPTIONS: SunOption[] = [
+const SUN_OPTIONS: SunOption[] = [
   {
     id: 'full', label: 'Full Sun', icon: <Sun className="w-6 h-6" />,
     options: [
@@ -94,32 +93,8 @@ const TenByTen = () => {
   const [selectedSun, setSelectedSun] = useState<'full' | 'partial' | null>(null);
   const [selectedState, setSelectedState] = useState<string | null>(null);
 
-  const hardinessZone = selectedState ? STATE_HARDINESS_ZONES[selectedState]?.zone ?? null : null;
-  const { data: zoneCrops, isLoading: zoneCropsLoading } = useZoneCrops(hardinessZone);
-
   const totalCost = SOIL_MATERIALS.reduce((sum, m) => sum + m.price * m.qty, 0);
-
-  // Build sun options: use zone-aware crops if available, else defaults
-  const sunOptions: SunOption[] = zoneCrops && (zoneCrops.spring.length > 0 || zoneCrops.fall.length > 0)
-    ? [
-        {
-          id: 'full', label: 'Full Sun', icon: <Sun className="w-6 h-6" />,
-          options: [
-            ...(zoneCrops.spring.length > 0 ? [{ season: 'Spring Planting', plans: zoneCrops.spring.slice(0, 4).map(c => ({ crop: c.crop, spacing: c.spacing, plants: c.plants, note: c.note })) }] : []),
-            ...(zoneCrops.fall.length > 0 ? [{ season: 'Fall Planting', plans: zoneCrops.fall.slice(0, 4).map(c => ({ crop: c.crop, spacing: c.spacing, plants: c.plants, note: c.note })) }] : []),
-          ],
-        },
-        {
-          id: 'partial', label: 'Partial Sun', icon: <CloudSun className="w-6 h-6" />,
-          options: [
-            ...(zoneCrops.spring.length > 2 ? [{ season: 'Spring Planting', plans: zoneCrops.spring.slice(2, 6).map(c => ({ crop: c.crop, spacing: c.spacing, plants: c.plants, note: c.note })) }] : []),
-            ...(zoneCrops.fall.length > 2 ? [{ season: 'Fall Planting', plans: zoneCrops.fall.slice(2, 6).map(c => ({ crop: c.crop, spacing: c.spacing, plants: c.plants, note: c.note })) }] : []),
-          ],
-        },
-      ]
-    : DEFAULT_SUN_OPTIONS;
-
-  const activeSun = sunOptions.find(s => s.id === selectedSun);
+  const activeSun = SUN_OPTIONS.find(s => s.id === selectedSun);
 
   return (
     <div className="min-h-screen" style={{ background: 'hsl(140 15% 5%)' }}>
@@ -169,17 +144,11 @@ const TenByTen = () => {
           </div>
           {selectedState && (
             <p className="text-[11px] font-mono mb-4" style={{ color: 'hsl(200 50% 55%)' }}>
-              ✦ Crops tuned for {STATE_HARDINESS_ZONES[selectedState]?.label}
+              ✦ Your zone: {STATE_HARDINESS_ZONES[selectedState]?.label}
             </p>
           )}
-          {zoneCropsLoading && (
-            <div className="flex items-center gap-2 mb-4" style={{ color: 'hsl(0 0% 45%)' }}>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-xs font-mono">Loading zone-specific crops…</span>
-            </div>
-          )}
           <div className="grid grid-cols-2 gap-3">
-            {sunOptions.map(opt => {
+            {SUN_OPTIONS.map(opt => {
               const isActive = selectedSun === opt.id;
               return (
                 <button key={opt.id} onClick={() => setSelectedSun(opt.id)} className="flex flex-col items-center gap-2 p-5 rounded-xl transition-all duration-300" style={{ background: isActive ? 'hsl(130 30% 12%)' : 'hsl(0 0% 7%)', border: `2px solid ${isActive ? 'hsl(130 50% 45%)' : 'hsl(0 0% 12%)'}`, boxShadow: isActive ? '0 0 20px hsl(130 50% 45% / 0.25)' : 'none', color: isActive ? 'hsl(130 50% 55%)' : 'hsl(0 0% 45%)' }}>
@@ -193,8 +162,8 @@ const TenByTen = () => {
 
         {/* ═══ PLANTING OPTIONS ═══ */}
         <AnimatePresence mode="wait">
-          {activeSun && activeSun.options.length > 0 && (
-            <motion.section key={`${activeSun.id}-${selectedState}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+          {activeSun && (
+            <motion.section key={activeSun.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
               {activeSun.options.map((opt, idx) => (
                 <div key={idx} className="mb-8">
                   <h3 className="text-base font-bold mb-3 flex items-center gap-2" style={{ color: 'hsl(45 60% 70%)' }}>
