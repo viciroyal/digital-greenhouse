@@ -34,6 +34,7 @@ const CropLibrary = lazy(() => import("./pages/CropLibrary"));
 const WeeklyTasks = lazy(() => import("./pages/WeeklyTasks"));
 const FirstGarden = lazy(() => import("./pages/FirstGarden"));
 const StudioIntake = lazy(() => import("./pages/StudioIntake"));
+const TenByTen = lazy(() => import("./pages/TenByTen"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
