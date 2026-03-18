@@ -215,7 +215,7 @@ const SovereignEmblemLink = () => {
         <img
           src={collectivelySustainable}
           alt="Collectively Sustainable"
-          className="h-12 object-contain"
+          className="w-16 object-contain"
           style={{
             filter: 'drop-shadow(0 0 8px hsl(45 60% 50% / 0.3))',
           }}
