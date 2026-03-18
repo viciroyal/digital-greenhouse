@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getDiscoveries, TOTAL_DISCOVERIES, onDiscovery } from '@/lib/discoveryEvents';
 import sovereignEmblem from '@/assets/sovereign-emblem.png';
+import collectivelySustainable from '@/assets/collectively-sustainable.png';
 
 const RING_SIZE = 76;
 const STROKE_WIDTH = 2.5;
@@ -54,8 +55,8 @@ const SovereignEmblemLink = () => {
   const dashOffset = CIRCUMFERENCE * (1 - progress);
 
   return (
-    <div onClick={() => navigate('/stage')} role="link" className="group fixed bottom-4 left-4 z-50 cursor-pointer">
-      {/* Celebration burst */}
+    <div className="fixed bottom-4 left-4 z-50 flex items-end gap-3">
+      <div onClick={() => navigate('/stage')} role="link" className="group relative cursor-pointer">
       <AnimatePresence>
         {celebrating && (
           <>
@@ -202,6 +203,24 @@ const SovereignEmblemLink = () => {
       >
         {isComplete ? '✦ Fully Discovered' : 'The Stage — Home Base'}
       </div>
+      </div>
+
+      {/* Collectively Sustainable Logo */}
+      <a
+        href="https://collectivelysustainable.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block opacity-75 hover:opacity-100 transition-opacity duration-300"
+      >
+        <img
+          src={collectivelySustainable}
+          alt="Collectively Sustainable"
+          className="h-12 object-contain"
+          style={{
+            filter: 'drop-shadow(0 0 8px hsl(45 60% 50% / 0.3))',
+          }}
+        />
+      </a>
     </div>
   );
 };
