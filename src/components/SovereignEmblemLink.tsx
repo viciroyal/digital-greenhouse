@@ -217,6 +217,7 @@ const SovereignEmblemLink = () => {
           alt="Collectively Sustainable"
           className="w-16 object-contain"
           style={{
+            mixBlendMode: 'screen',
             filter: 'drop-shadow(0 0 8px hsl(45 60% 50% / 0.3))',
           }}
         />
