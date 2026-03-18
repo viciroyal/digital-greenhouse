@@ -55,7 +55,7 @@ const SovereignEmblemLink = () => {
   const dashOffset = CIRCUMFERENCE * (1 - progress);
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 flex items-end gap-3">
+    <div className="fixed bottom-4 left-4 z-50 flex items-center gap-4">
       <div onClick={() => navigate('/stage')} role="link" className="group relative cursor-pointer">
       <AnimatePresence>
         {celebrating && (
