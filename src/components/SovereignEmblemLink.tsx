@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getDiscoveries, TOTAL_DISCOVERIES, onDiscovery } from '@/lib/discoveryEvents';
 import sovereignEmblem from '@/assets/sovereign-emblem.png';
+import collectivelySustainable from '@/assets/collectively-sustainable.png';
 
 const RING_SIZE = 76;
 const STROKE_WIDTH = 2.5;

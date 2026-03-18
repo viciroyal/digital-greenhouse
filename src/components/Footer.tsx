@@ -236,17 +236,10 @@ const Footer = () => {
         </div>
 
         {/* The Covenant - Legal Disclaimer */}
-        <div className="pt-8 border-t border-border/20">
-          <div className="flex items-center justify-center gap-6 mb-4">
-            <img 
-              src={collectivelySustainable} 
-              alt="Collectively Sustainable" 
-              className="h-12 object-contain"
-            />
-            <p className="text-cream-muted/40 font-body text-xs">
-              © 2025 PHARMBOI. All rights reserved. Roots run deep. Gems shine bright.
-            </p>
-          </div>
+        <div className="text-center pt-8 border-t border-border/20">
+          <p className="text-cream-muted/40 font-body text-xs mb-4">
+            © 2025 PHARMBOI. All rights reserved. Roots run deep. Gems shine bright.
+          </p>
           <p 
             className="font-mono text-[10px] leading-relaxed max-w-2xl mx-auto text-center"
             style={{ 
