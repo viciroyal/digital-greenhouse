@@ -203,6 +203,24 @@ const SovereignEmblemLink = () => {
       >
         {isComplete ? '✦ Fully Discovered' : 'The Stage — Home Base'}
       </div>
+      </div>
+
+      {/* Collectively Sustainable Logo */}
+      <a
+        href="https://collectivelysustainable.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block opacity-75 hover:opacity-100 transition-opacity duration-300"
+      >
+        <img
+          src={collectivelySustainable}
+          alt="Collectively Sustainable"
+          className="h-12 object-contain"
+          style={{
+            filter: 'drop-shadow(0 0 8px hsl(45 60% 50% / 0.3))',
+          }}
+        />
+      </a>
     </div>
   );
 };
