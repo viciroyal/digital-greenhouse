@@ -206,11 +206,10 @@ const SovereignEmblemLink = () => {
       </div>
 
       {/* Collectively Sustainable Logo */}
-      <a
-        href="https://collectivelysustainable.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block opacity-75 hover:opacity-100 transition-opacity duration-300 w-16 h-16 flex items-center justify-center"
+      <div
+        onClick={() => navigate('/ten-by-ten')}
+        role="link"
+        className="block opacity-75 hover:opacity-100 transition-opacity duration-300 w-16 h-16 flex items-center justify-center cursor-pointer"
       >
         <img
           src={collectivelySustainable}
