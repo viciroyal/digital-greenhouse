@@ -3,6 +3,7 @@ import { Instagram, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import EcoParadigmCard from '@/components/community/EcoParadigmCard';
 import GACommunityResources from '@/components/community/GACommunityResources';
+import collectivelySustainable from '@/assets/collectively-sustainable.png';
 
 // Organic Vine Icon
 const VineIcon = ({ className = "" }: { className?: string }) => (
@@ -235,12 +236,19 @@ const Footer = () => {
         </div>
 
         {/* The Covenant - Legal Disclaimer */}
-        <div className="text-center pt-8 border-t border-border/20">
-          <p className="text-cream-muted/40 font-body text-xs mb-4">
-            © 2025 PHARMBOI. All rights reserved. Roots run deep. Gems shine bright.
-          </p>
+        <div className="pt-8 border-t border-border/20">
+          <div className="flex items-center justify-center gap-6 mb-4">
+            <img 
+              src={collectivelySustainable} 
+              alt="Collectively Sustainable" 
+              className="h-12 object-contain"
+            />
+            <p className="text-cream-muted/40 font-body text-xs">
+              © 2025 PHARMBOI. All rights reserved. Roots run deep. Gems shine bright.
+            </p>
+          </div>
           <p 
-            className="font-mono text-[10px] leading-relaxed max-w-2xl mx-auto"
+            className="font-mono text-[10px] leading-relaxed max-w-2xl mx-auto text-center"
             style={{ 
               color: 'hsl(45 20% 70% / 0.4)',
               letterSpacing: '0.02em',
