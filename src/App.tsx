@@ -34,6 +34,7 @@ const CropLibrary = lazy(() => import("./pages/CropLibrary"));
 const WeeklyTasks = lazy(() => import("./pages/WeeklyTasks"));
 const FirstGarden = lazy(() => import("./pages/FirstGarden"));
 const StudioIntake = lazy(() => import("./pages/StudioIntake"));
+const TenByTen = lazy(() => import("./pages/TenByTen"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -155,6 +156,12 @@ const AppRoutes = () => (
     <Route path="/studio-intake" element={
       <Suspense fallback={<div className="min-h-screen bg-background" />}>
         <StudioIntake />
+      </Suspense>
+    } />
+
+    <Route path="/ten-by-ten" element={
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <TenByTen />
       </Suspense>
     } />
 
