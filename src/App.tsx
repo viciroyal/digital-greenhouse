@@ -159,6 +159,12 @@ const AppRoutes = () => (
       </Suspense>
     } />
 
+    <Route path="/ten-by-ten" element={
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
+        <TenByTen />
+      </Suspense>
+    } />
+
     <Route
       path="*"
       element={

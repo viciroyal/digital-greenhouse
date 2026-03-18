@@ -220,7 +220,7 @@ const SovereignEmblemLink = () => {
             filter: 'drop-shadow(0 0 8px hsl(45 60% 50% / 0.3))',
           }}
         />
-      </a>
+      </div>
     </div>
   );
 };
